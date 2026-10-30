@@ -184,10 +184,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const badge = document.getElementById('currentScoreBadge');
     if (badge) badge.textContent = `${score} / 100 баллов`;
 
-    if (score >= 80) {
-      const saved = JSON.parse(localStorage.getItem('amk_student_data')) || AMK_DATA.student;
-      saved.skills[state.activeSpec] = Math.min(100, (saved.skills[state.activeSpec] || 80) + 5);
-      localStorage.setItem('amk_student_data', JSON.stringify(saved));
+    // 1. Local fallback storage
+    const saved = JSON.parse(localStorage.getItem('amk_student_data')) || AMK_DATA.student;
+    saved.skills[state.activeSpec] = Math.max(saved.skills[state.activeSpec] || 0, score);
+    localStorage.setItem('amk_student_data', JSON.stringify(saved));
+
+    // 2. Server database sync (Backend API)
+    if (score > 0) {
+      fetch('/api/grades/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          student_id: saved.id || 'KZ-AMK-2026-98421',
+          specialty_slug: state.activeSpec,
+          specialty_name: instructions[state.activeSpec] ? instructions[state.activeSpec].title : state.activeSpec,
+          score: score
+        })
+      }).catch(() => {
+        // Silent catch for offline or static GitHub Pages mode
+      });
     }
   }
 

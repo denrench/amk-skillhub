@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Кабинет преподавателя — АМК Практикум</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .teacher-page {
+      padding: 40px 0 80px;
+    }
+    .teacher-top-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .group-selector-pills {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .group-pill {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .group-pill:hover, .group-pill.active {
+      background: var(--accent-primary);
+      color: #fff;
+      border-color: var(--accent-primary);
+    }
+    .journal-table-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow-x: auto;
+      box-shadow: var(--shadow-card);
+    }
+    .journal-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    .journal-table th {
+      background: var(--bg-surface);
+      padding: 16px 20px;
+      color: var(--text-secondary);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .journal-table td {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .journal-table tr:last-child td {
+      border-bottom: none;
+    }
+    .journal-table tr:hover td {
+      background: var(--bg-card-hover);
+    }
+    .score-chip-sm {
+      font-family: var(--font-mono);
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      display: inline-block;
+    }
+    .score-chip-sm.excellent {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .score-chip-sm.good {
+      background: rgba(14, 165, 233, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(14, 165, 233, 0.3);
+    }
+    .score-chip-sm.pending {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-amber);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="index.html" class="brand">
+        <div class="brand-badge">АМК</div>
+        <div class="brand-info">
+          <span class="brand-name">Практикум</span>
+          <span class="brand-sub">Электронный журнал преподавателя</span>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Главная</a>
+        <a href="simulator.html" class="nav-link">Тренажеры</a>
+        <a href="teacher.html" class="nav-link active">Кабинет преподавателя</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="index.html" class="btn-toggle">
+          <span>&larr; На портал</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Teacher Main View -->
+  <main class="container teacher-page">
+    <div class="teacher-top-card">
+      <div>
+        <span class="badge-tag">Учебная часть АМК</span>
+        <h1 style="font-size: 2rem; margin-top: 4px; margin-bottom: 6px;">Ведомость успеваемости групп</h1>
+        <p style="margin: 0; font-size: 0.95rem;">Данные синхронизируются в реальном времени с базы данных SQLite3.</p>
+
+        <!-- Group Selector -->
+        <div class="group-selector-pills">
+          <button class="group-pill active" data-group="all">Все группы</button>
+          <button class="group-pill" data-group="ПО-22">Группа ПО-22 (IT)</button>
+          <button class="group-pill" data-group="АВ-21">Группа АВ-21 (Авто)</button>
+          <button class="group-pill" data-group="ХО-20">Группа ХО-20 (Холод)</button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px;">
+        <button class="btn btn-secondary" onclick="window.print()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Печать ведомости
+        </button>
+        <button class="btn btn-primary" id="btnRefreshGrades">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+          Обновить данные
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Journal Table -->
+    <div class="journal-table-wrap">
+      <table class="journal-table">
+        <thead>
+          <tr>
+            <th>ФИО Студента</th>
+            <th>Группа</th>
+            <th>ID Студента</th>
+            <th>Сдано тренажеров</th>
+            <th>Средний балл</th>
+            <th>Статус аттестации WorldSkills</th>
+          </tr>
+        </thead>
+        <tbody id="journalTableBody">
+          <!-- Populated from SQLite via /api/grades or fallback -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let currentGroup = 'all';
+
+      const groupPills = document.querySelectorAll('.group-pill');
+      groupPills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          groupPills.forEach(p => p.classList.remove('active'));
+          pill.classList.add('active');
+          currentGroup = pill.getAttribute('data-group');
+          loadGrades();
+        });
+      });
+
+      const refreshBtn = document.getElementById('btnRefreshGrades');
+      if (refreshBtn) refreshBtn.addEventListener('click', loadGrades);
+
+      function loadGrades() {
+        const tbody = document.getElementById('journalTableBody');
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Загрузка данных из базы данных АМК...</td></tr>`;
+
+        fetch(`/api/grades?group=${encodeURIComponent(currentGroup)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && data.students.length > 0) {
+              renderTable(data.students);
+            } else {
+              renderFallback();
+            }
+          })
+          .catch(() => {
+            // Graceful fallback for static GitHub Pages
+            renderFallback();
+          });
+      }
+
+      function renderTable(students) {
+        const tbody = document.getElementById('journalTableBody');
+        tbody.innerHTML = students.map(s => {
+          const isPassed = s.avg_score >= 85;
+          const statusClass = isPassed ? 'excellent' : (s.avg_score >= 70 ? 'good' : 'pending');
+          const statusText = isPassed ? 'Аттестован (Отлично)' : (s.avg_score >= 70 ? 'Аттестован (Хорошо)' : 'На доработке');
+
+          return `
+            <tr>
+              <td>
+                <strong style="color: var(--text-primary); font-size: 0.95rem;">${s.name}</strong>
+              </td>
+              <td><span style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-cyan);">${s.group}</span></td>
+              <td><span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">${s.student_id}</span></td>
+              <td><strong>${s.tests_passed}</strong> из 5 треков</td>
+              <td>
+                <span class="score-chip-sm ${statusClass}">${s.avg_score} / 100</span>
+              </td>
+              <td>
+                <span style="font-size: 0.82rem; font-weight: 700; color: ${isPassed ? 'var(--accent-emerald)' : 'var(--accent-amber)'};">
+                  ${statusText}
+                </span>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function renderFallback() {
+        const seed = [
+          { name: "Асылхан Бауыржанұлы", group: "ПО-22", student_id: "KZ-AMK-2026-98421", tests_passed: 5, avg_score: 100 },
+          { name: "Данил Панин", group: "ПО-22", student_id: "KZ-AMK-2026-98422", tests_passed: 4, avg_score: 90 },
+          { name: "Алина Сейдалиева", group: "ПО-22", student_id: "KZ-AMK-2026-98423", tests_passed: 3, avg_score: 87.5 },
+          { name: "Арман Исаев", group: "АВ-21", student_id: "KZ-AMK-2026-77101", tests_passed: 4, avg_score: 95 },
+          { name: "Жанибек Оразов", group: "ХО-20", student_id: "KZ-AMK-2026-55201", tests_passed: 3, avg_score: 92 }
+        ];
+        let list = seed;
+        if (currentGroup !== 'all') {
+          list = list.filter(s => s.group === currentGroup);
+        }
+        renderTable(list);
+      }
+
+      loadGrades();
+    });
+  </script>
+</body>
+</html>
