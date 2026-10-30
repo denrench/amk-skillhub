@@ -1,0 +1,820 @@
+/* ========================================================
+   AMK SKILLHUB: WORKSTATION / SIMULATOR STYLES
+   ======================================================== */
+
+.simulator-body {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #0b0f17;
+}
+
+/* Simulator Navbar */
+.sim-navbar {
+  height: 60px;
+  background: #111622;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  flex-shrink: 0;
+  gap: 16px;
+}
+
+.sim-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.btn-back:hover {
+  color: #fff;
+  border-color: var(--border-focus);
+}
+
+.sim-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sim-code-badge {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: rgba(99, 102, 241, 0.2);
+  color: var(--primary-light);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
+
+.sim-title-text {
+  font-size: 1.05rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sim-selector-wrap {
+  flex-grow: 1;
+  max-width: 420px;
+}
+
+.sim-select {
+  width: 100%;
+  background: var(--bg-elevated);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+}
+
+.sim-select:focus {
+  border-color: var(--primary);
+}
+
+.sim-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.timer-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-full);
+  color: var(--accent-amber);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.btn-icon-sm {
+  width: 34px;
+  height: 34px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.8rem;
+  transition: var(--transition);
+}
+
+.btn-icon-sm:hover {
+  border-color: var(--border-focus);
+}
+
+.btn-primary-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--gradient-brand);
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--primary-glow);
+  transition: var(--transition);
+}
+
+.btn-primary-sm:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+/* Split Workspace */
+.sim-workspace {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  height: calc(100vh - 60px);
+  overflow: hidden;
+}
+
+/* Left Sidebar */
+.sim-sidebar {
+  background: #10141f;
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-subtle);
+  background: #0d111a;
+}
+
+.s-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 12px 8px;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: var(--transition);
+}
+
+.s-tab.active {
+  color: var(--primary-light);
+  border-bottom-color: var(--primary);
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.sidebar-scroll {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 24px 20px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.sidebar-scroll h3 {
+  font-size: 1.15rem;
+  margin-bottom: 12px;
+}
+
+.sidebar-scroll h4 {
+  font-size: 0.95rem;
+  margin: 16px 0 8px;
+  color: var(--secondary);
+}
+
+.sidebar-scroll ul {
+  padding-left: 18px;
+  margin-bottom: 16px;
+  color: var(--text-muted);
+}
+
+.sidebar-scroll li {
+  margin-bottom: 6px;
+}
+
+.sidebar-status-footer {
+  padding: 14px 20px;
+  background: #0d111a;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-dot.green { background: var(--accent-green); }
+
+/* Right Main Stage */
+.sim-main-stage {
+  background: #080b11;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.sim-module {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sim-module.active {
+  display: flex;
+}
+
+/* ================= 1. IT Code Editor ================= */
+.code-editor-header {
+  height: 42px;
+  background: #111622;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+
+.editor-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.e-tab {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 8px 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.e-tab.active {
+  background: #080b11;
+  color: var(--primary-light);
+  font-weight: 600;
+  border-top: 2px solid var(--primary);
+}
+
+.btn-text-xs {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.btn-text-xs:hover { color: var(--text-main); }
+
+.code-editor-body {
+  flex-grow: 1;
+  display: flex;
+}
+
+.code-textarea {
+  width: 100%;
+  height: 100%;
+  background: #080b11;
+  color: #e2e8f0;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  padding: 20px;
+  border: none;
+  outline: none;
+  resize: none;
+}
+
+.console-drawer {
+  height: 200px;
+  background: #0e131d;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+}
+
+.console-head {
+  padding: 8px 16px;
+  background: #131926;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.console-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.console-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-dim);
+}
+
+.console-badge.pass {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--accent-green);
+  font-weight: 700;
+}
+
+.console-output {
+  padding: 14px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  overflow-y: auto;
+  line-height: 1.6;
+}
+
+/* ================= 2. Auto Diagnostic ================= */
+.auto-stage {
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.car-hood {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  height: 100%;
+}
+
+.engine-diagram {
+  background: #111622;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.engine-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.engine-state-badge {
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.engine-state-badge.warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--accent-amber);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.engine-state-badge.ok {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--accent-green);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.engine-block {
+  background: #090d14;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 24px;
+}
+
+.cylinder-row, .sensor-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sensor-node {
+  background: #161e31;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 14px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+}
+
+.sensor-node:hover, .sensor-node.selected {
+  border-color: var(--secondary);
+  background: rgba(6, 182, 212, 0.15);
+  box-shadow: 0 0 12px var(--secondary-glow);
+}
+
+.interactive-multimeter {
+  background: #1b2438;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meter-screen {
+  background: #06090e;
+  border: 1px solid rgba(0, 255, 170, 0.2);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.meter-val {
+  font-family: var(--font-mono);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.meter-unit {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: #10b981;
+}
+
+.meter-sub {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-left: 12px;
+}
+
+.meter-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.meter-btn {
+  background: #111622;
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.meter-btn.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.obd-scanner {
+  background: #111622;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.obd-screen {
+  background: #05080e;
+  border: 2px solid #1e293b;
+  border-radius: var(--radius-sm);
+  flex-grow: 1;
+  padding: 14px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  overflow-y: auto;
+}
+
+.obd-topbar {
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+}
+
+.obd-line { margin-bottom: 6px; color: #94a3b8; }
+.obd-line.red { color: #f43f5e; font-weight: 700; }
+.obd-line.yellow { color: #f59e0b; }
+
+.obd-keypad {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.obd-btn {
+  background: #1e293b;
+  border: 1px solid var(--border-subtle);
+  color: #fff;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.obd-btn:hover {
+  background: var(--primary);
+}
+
+/* ================= 3. Cryo / Refrigeration ================= */
+.cryo-stage {
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cryo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #111622;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+.cop-indicator strong {
+  color: var(--accent-green);
+  font-size: 1.4rem;
+  font-family: var(--font-mono);
+}
+
+.cryo-schematic {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  align-items: center;
+  margin: 30px 0;
+}
+
+.schematic-node {
+  background: #111622;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.node-icon { font-size: 2rem; margin-bottom: 8px; }
+.node-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+.node-data { font-family: var(--font-mono); font-size: 0.85rem; color: var(--secondary); }
+
+.cryo-control-panel {
+  display: grid;
+  grid-template-columns: 200px 200px 1fr;
+  gap: 20px;
+  background: #111622;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+.gauge-box {
+  background: #090d14;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  text-align: center;
+}
+
+.gauge-label { font-size: 0.75rem; color: var(--text-dim); }
+.gauge-num { font-size: 1.8rem; font-weight: 800; font-family: var(--font-mono); margin: 6px 0; }
+.gauge-num.red { color: #f43f5e; }
+.gauge-num.blue { color: #06b6d4; }
+.gauge-sub { font-size: 0.7rem; color: var(--text-dim); }
+
+.sliders-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+}
+
+.slider-row label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-bottom: 4px;
+}
+
+.slider-row input[type="range"] {
+  width: 100%;
+  accent-color: var(--primary);
+}
+
+/* ================= 4. Design Audit ================= */
+.design-stage {
+  padding: 24px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.design-tools-bar {
+  background: #111622;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.bugs-found-counter {
+  font-weight: 700;
+  color: var(--accent-green);
+  font-family: var(--font-mono);
+}
+
+.mockup-canvas-wrapper {
+  flex-grow: 1;
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+}
+
+.mockup-canvas {
+  width: 100%;
+  max-width: 680px;
+  background: #ffffff;
+  color: #1a1a1a;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.mock-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 14px;
+  margin-bottom: 24px;
+}
+
+.mock-flaw {
+  position: relative;
+  cursor: pointer;
+  border: 2px dashed transparent;
+  padding: 4px;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.mock-flaw:hover {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.mock-flaw.found {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.flaw-marker {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  background: #6366f1;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.mock-flaw:hover .flaw-marker,
+.mock-flaw.found .flaw-marker {
+  opacity: 1;
+}
+
+.mock-flaw.found .flaw-marker {
+  background: #10b981;
+}
+
+.mock-logo-bad {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: 12px;
+  color: #9333ea;
+  transform: skewX(-20deg);
+}
+
+.mock-unreadable-title {
+  color: #d1d5db; /* Unreadable low contrast on white */
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.mock-bad-typography {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-size: 13px;
+  line-height: 1.1;
+  color: #374151;
+  margin-bottom: 24px;
+}
+
+.mock-broken-btn {
+  background: #ef4444;
+  color: #fff;
+  border: 4px outset #b91c1c;
+  padding: 1px 3px; /* Awful padding */
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.design-notes-panel {
+  background: #111622;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 20px;
+}
+
+/* Responsive Workstation */
+@media (max-width: 900px) {
+  .sim-workspace { grid-template-columns: 1fr; }
+  .sim-sidebar { height: 260px; }
+  .car-hood { grid-template-columns: 1fr; }
+  .cryo-schematic { grid-template-columns: repeat(2, 1fr); }
+  .cryo-control-panel { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMK WorkStation — Интерактивный симулятор специальностей</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/simulator.css">
+</head>
+<body class="simulator-body">
+  <!-- Simulator Top Bar -->
+  <header class="sim-navbar">
+    <div class="sim-nav-left">
+      <a href="index.html" class="btn-back" title="Вернуться на дашборд">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        <span class="desktop-only" data-i18n="sim_back">Дашборд</span>
+      </a>
+
+      <div class="sim-title-group">
+        <span class="sim-code-badge" id="currentSpecCode">06130100</span>
+        <h1 class="sim-title-text" id="currentSpecTitle">Программное обеспечение</h1>
+      </div>
+    </div>
+
+    <!-- Specialty Switcher Dropdown in Navbar -->
+    <div class="sim-selector-wrap">
+      <label for="specialtySelect" class="sr-only">Специальность</label>
+      <select id="specialtySelect" class="sim-select">
+        <option value="it">💻 06130100 — Программное обеспечение (IT)</option>
+        <option value="auto">🚗 07161300 — ТО и ремонт авто (OBD-II диагностика)</option>
+        <option value="cryo">❄️ 07150900 — Холодильно-компрессорные машины</option>
+        <option value="design">🎨 02110300 — Графический дизайн и аудит</option>
+      </select>
+    </div>
+
+    <div class="sim-nav-right">
+      <!-- Exam Timer Pill -->
+      <div class="timer-pill" id="examTimerPill">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span id="timerDisplay">45:00</span>
+      </div>
+
+      <!-- Lang toggle -->
+      <button id="simLangToggle" class="btn-icon-sm" title="Тілді ауыстыру / Сменить язык">
+        <span id="simLangLabel">KZ</span>
+      </button>
+
+      <!-- Theme toggle -->
+      <button id="simThemeToggle" class="btn-icon-sm" title="Переключить тему">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        </svg>
+      </button>
+
+      <!-- Submit / Verify Button -->
+      <button id="runCheckBtn" class="btn btn-primary-sm">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span id="runBtnLabel" data-i18n="sim_btn_test">Проверить решение</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Split Screen Workstation Area -->
+  <main class="sim-workspace">
+    <!-- Left Pane: Case Brief, Objectives & Criteria -->
+    <aside class="sim-sidebar">
+      <div class="sidebar-tabs">
+        <button class="s-tab active" data-tab="brief" data-i18n="tab_brief">Задание кейса</button>
+        <button class="s-tab" data-tab="criteria" data-i18n="tab_criteria">Критерии WorldSkills</button>
+        <button class="s-tab" data-tab="hints" data-i18n="tab_hints">Подсказки</button>
+      </div>
+
+      <div class="sidebar-scroll" id="sidebarContent">
+        <!-- Rendered by simulator.js according to active track -->
+      </div>
+
+      <!-- Quick status footer -->
+      <div class="sidebar-status-footer">
+        <div class="status-indicator">
+          <span class="status-dot green"></span>
+          <span id="statusText">Готов к выполнению</span>
+        </div>
+        <div class="status-score">
+          Баллы: <strong id="currentScore">0 / 100</strong>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right Pane: Interactive Canvas / Sandbox -->
+    <section class="sim-main-stage">
+
+      <!-- ================= 1. IT SANDBOX (Code Editor) ================= -->
+      <div class="sim-module active" id="module-it">
+        <div class="code-editor-header">
+          <div class="editor-tabs">
+            <span class="e-tab active">solution.js</span>
+            <span class="e-tab">index.html</span>
+          </div>
+          <div class="editor-actions">
+            <button class="btn-text-xs" id="resetCodeBtn">Сбросить код</button>
+          </div>
+        </div>
+
+        <div class="code-editor-body">
+          <textarea id="codeEditor" spellcheck="false" class="code-textarea">// AMK SkillHub: 06130100 «Программное обеспечение»
+// Задание: Реализуйте функцию calculateScholarship(gradeAvg, attendanceRate)
+// Правила начисления стипендии в АМК:
+// - Если gradeAvg >= 4.5 и attendanceRate >= 90: вернуть "Повышенная (45 000 ₸)"
+// - Если gradeAvg >= 3.5 и attendanceRate >= 75: вернуть "Обычная (35 000 ₸)"
+// - Иначе: вернуть "Не назначена (0 ₸)"
+
+function calculateScholarship(gradeAvg, attendanceRate) {
+  // Напишите ваш код здесь:
+  if (gradeAvg >= 4.5 && attendanceRate >= 90) {
+    return "Повышенная (45 000 ₸)";
+  } else if (gradeAvg >= 3.5 && attendanceRate >= 75) {
+    return "Обычная (35 000 ₸)";
+  } else {
+    return "Не назначена (0 ₸)";
+  }
+}
+</textarea>
+        </div>
+
+        <div class="console-drawer">
+          <div class="console-head">
+            <span class="console-title">🖥 Тестовая консоль (Автопроверка тестами)</span>
+            <span class="console-badge" id="testResultBadge">Ожидание запуска</span>
+          </div>
+          <div class="console-output" id="consoleOutput">
+            Нажмите «Проверить решение» в правом верхнем углу, чтобы запустить серию из 4 автоматических юнит-тестов.
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 2. AUTO DIAGNOSTIC MODULE ================= -->
+      <div class="sim-module" id="module-auto">
+        <div class="auto-stage">
+          <div class="car-hood">
+            <div class="engine-diagram">
+              <div class="engine-header">
+                <h3>Диагностический стенд: ВАЗ-21179 / Toyota 2AR-FE</h3>
+                <span class="engine-state-badge warning" id="engineStatusBadge">⚠️ Check Engine Горит</span>
+              </div>
+
+              <!-- Engine Hotspots (clickable sensors) -->
+              <div class="engine-visual">
+                <div class="engine-block">
+                  <div class="cylinder-row">
+                    <button class="sensor-node" data-node="cyl1">Цилиндр 1 (Катушка A)</button>
+                    <button class="sensor-node" data-node="cyl2">Цилиндр 2 (Катушка B)</button>
+                    <button class="sensor-node" data-node="cyl3">Цилиндр 3 (Катушка C)</button>
+                    <button class="sensor-node" data-node="cyl4">Цилиндр 4 (Катушка D)</button>
+                  </div>
+                  <div class="sensor-row">
+                    <button class="sensor-node" data-node="maf">Датчик ДМРВ (MAF)</button>
+                    <button class="sensor-node" data-node="lambda">Лямбда-зонд O₂</button>
+                    <button class="sensor-node" data-node="tps">Дроссель (TPS)</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="interactive-multimeter">
+                <div class="meter-screen">
+                  <span class="meter-val" id="multimeterValue">0.00</span>
+                  <span class="meter-unit" id="multimeterUnit">V</span>
+                  <span class="meter-sub" id="multimeterStatus">Щупы не подключены</span>
+                </div>
+                <div class="meter-controls">
+                  <button class="meter-btn active" data-mode="v">Напряжение (V)</button>
+                  <button class="meter-btn" data-mode="ohm">Сопротивление (Ω)</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- OBD-II Scanner Instrument -->
+            <div class="obd-scanner">
+              <div class="obd-screen">
+                <div class="obd-topbar">OBD-II SCANNER v4.2 [CAN-BUS OK]</div>
+                <div class="obd-body" id="obdDisplay">
+                  <p class="obd-line red">ОШИБКА: P0301 — Пропуск зажигания в цилиндре 1</p>
+                  <p class="obd-line">Обороты: 820 об/мин (нестабильно)</p>
+                  <p class="obd-line">Напряжение бортсети: 14.1 В</p>
+                  <p class="obd-line yellow">Рекомендация: Проверить цепь первичной обмотки катушки цилиндра 1.</p>
+                </div>
+              </div>
+              <div class="obd-keypad">
+                <button class="obd-btn" id="obdReadBtn">Считать коды</button>
+                <button class="obd-btn" id="obdReplaceCoilBtn">🛠 Заменить катушку 1</button>
+                <button class="obd-btn" id="obdClearBtn">Сбросить ошибки</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 3. CRYO / REFRIGERATION MODULE ================= -->
+      <div class="sim-module" id="module-cryo">
+        <div class="cryo-stage">
+          <div class="cryo-header">
+            <div>
+              <h3>Холодильный контур: Компрессионная установка АМК</h3>
+              <p>Хладагент: <strong>R134a</strong> | Рабочий агент пищевого охлаждения</p>
+            </div>
+            <div class="cop-indicator">
+              <span>Холодильный коэфф. (COP): </span>
+              <strong id="copValue">3.42</strong>
+            </div>
+          </div>
+
+          <!-- Interactive Thermodynamic Schematic -->
+          <div class="cryo-schematic">
+            <!-- Compressor -->
+            <div class="schematic-node node-compressor">
+              <div class="node-icon">🌀</div>
+              <div class="node-name">Компрессор 2JS</div>
+              <div class="node-data">Ток: <span id="compAmp">4.8 A</span></div>
+            </div>
+            <div class="pipe pipe-hightemp"></div>
+
+            <!-- Condenser -->
+            <div class="schematic-node node-condenser">
+              <div class="node-icon">♨️</div>
+              <div class="node-name">Конденсатор</div>
+              <div class="node-data">Tконд: <span id="condTemp">+42 °C</span></div>
+            </div>
+            <div class="pipe pipe-liquid"></div>
+
+            <!-- TXV Valve -->
+            <div class="schematic-node node-txv">
+              <div class="node-icon">⏳</div>
+              <div class="node-name">ТРВ (Вентиль)</div>
+              <div class="node-data">Открытие: <span id="txvOpening">45%</span></div>
+            </div>
+            <div class="pipe pipe-lowtemp"></div>
+
+            <!-- Evaporator -->
+            <div class="schematic-node node-evaporator">
+              <div class="node-icon">❄️</div>
+              <div class="node-name">Испаритель</div>
+              <div class="node-data">Tкип: <span id="evapTemp">-10 °C</span></div>
+            </div>
+          </div>
+
+          <!-- Gauges and Sliders -->
+          <div class="cryo-control-panel">
+            <div class="gauge-box">
+              <span class="gauge-label">Высокое давление (HP)</span>
+              <div class="gauge-num red" id="hpGauge">14.2 bar</div>
+              <span class="gauge-sub">Норма: 12-16 bar</span>
+            </div>
+            <div class="gauge-box">
+              <span class="gauge-label">Низкое давление (LP)</span>
+              <div class="gauge-num blue" id="lpGauge">2.1 bar</div>
+              <span class="gauge-sub">Норма: 1.8-2.5 bar</span>
+            </div>
+
+            <!-- Interactive Sliders -->
+            <div class="sliders-box">
+              <div class="slider-row">
+                <label>Обороты компрессора: <span id="compRpmVal">1400</span> об/мин</label>
+                <input type="range" id="compRpmSlider" min="800" max="2200" step="100" value="1400">
+              </div>
+              <div class="slider-row">
+                <label>Степень открытия ТРВ: <span id="txvVal">45</span>%</label>
+                <input type="range" id="txvSlider" min="10" max="90" step="5" value="45">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 4. DESIGN AUDIT MODULE ================= -->
+      <div class="sim-module" id="module-design">
+        <div class="design-stage">
+          <div class="design-tools-bar">
+            <span>Режим: <strong>Дизайн-аудит (Найдите 4 ошибки в макете сайта колледжа)</strong></span>
+            <div class="bugs-found-counter">Найдено ошибок: <span id="bugsFoundCount">0</span> / 4</div>
+          </div>
+
+          <div class="mockup-canvas-wrapper">
+            <div class="mockup-canvas" id="designMockup">
+              <!-- Banner Mockup with intentional UX/UI flaws -->
+              <div class="mock-header">
+                <!-- Flaw 1: Bad logo alignment / distortion -->
+                <div class="mock-flaw" data-flaw="1" title="Нажмите, если видите ошибку">
+                  <div class="mock-logo-bad">A M K   C O L L E G E</div>
+                  <span class="flaw-marker">1</span>
+                </div>
+                <div class="mock-nav">О колледже | Специальности | Контакты</div>
+              </div>
+
+              <div class="mock-hero">
+                <!-- Flaw 2: Zero contrast text (light gray on white) -->
+                <div class="mock-flaw" data-flaw="2" title="Нажмите, если видите ошибку">
+                  <h2 class="mock-unreadable-title">Поступай в лучший колледж Алматы на бюджет</h2>
+                  <span class="flaw-marker">2</span>
+                </div>
+
+                <!-- Flaw 3: Inappropriate Comic Sans / unreadable font -->
+                <div class="mock-flaw" data-flaw="3" title="Нажмите, если видите ошибку">
+                  <p class="mock-bad-typography">
+                    Получи диплом государственного образца по специальности программное обеспечение и дизайн интерьера за 2 года 10 месяцев!
+                  </p>
+                  <span class="flaw-marker">3</span>
+                </div>
+
+                <!-- Flaw 4: Broken CTA Button with 1px padding -->
+                <div class="mock-flaw" data-flaw="4" title="Нажмите, если видите ошибку">
+                  <button class="mock-broken-btn">ПОДАТЬ ДОКУМЕНТЫ БЫСТРО БЕЗ СМС И РЕГИСТРАЦИИ</button>
+                  <span class="flaw-marker">4</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="design-notes-panel" id="designFeedback">
+            Кликайте по элементам макета, где нарушены правила типографики, контрастности, сетки или юзабилити.
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Success Toast -->
+  <div id="simToast" class="toast"></div>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/simulator.js"></script>
+</body>
+</html>

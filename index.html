@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMK SkillHub — Платформа профессионального обучения АМК</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <!-- Chart.js for Radar Chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Ambient background glow effects -->
+  <div class="glow-bg glow-primary"></div>
+  <div class="glow-bg glow-secondary"></div>
+
+  <!-- Header -->
+  <header class="navbar">
+    <div class="container nav-content">
+      <a href="index.html" class="brand">
+        <div class="logo-box">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">AMK <span class="gradient-text">SkillHub</span></span>
+          <span class="brand-sub" data-i18n="college_sub">Алматинский многопрофильный колледж</span>
+        </div>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#specialties" class="nav-link active" data-i18n="nav_specialties">Специальности</a>
+        <a href="#dashboard" class="nav-link" data-i18n="nav_passport">Паспорт навыков</a>
+        <a href="#demexam" class="nav-link" data-i18n="nav_demexam">Демоэкзамен</a>
+        <a href="simulator.html" class="nav-link btn-ghost-sm" data-i18n="nav_simulator">
+          <span class="pulse-dot"></span> Симуляторы
+        </a>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Lang Switcher -->
+        <button id="langToggle" class="btn-icon" title="Тілді ауыстыру / Сменить язык">
+          <span id="currentLangLabel">KZ</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggle" class="btn-icon" title="Переключить тему">
+          <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+
+        <!-- User Profile Pill -->
+        <div class="user-pill" id="userPill">
+          <div class="user-avatar">АБ</div>
+          <div class="user-info">
+            <span class="user-name">Асылхан Б.</span>
+            <span class="user-role" data-i18n="user_group">Гр. ПО-22 • 3 курс</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="badge-pill">
+          <span class="badge-tag">NEW</span>
+          <span data-i18n="hero_pill">Стандарты WorldSkills Kazakhstan 2026</span>
+        </div>
+        <h1 class="hero-title">
+          <span data-i18n="hero_title_1">Платформа практической подготовки</span> <br>
+          <span class="gradient-text" data-i18n="hero_title_2">для студентов колледжа АМК</span>
+        </h1>
+        <p class="hero-desc" data-i18n="hero_desc">
+          Переходи от скучной теории к реальным производственным кейсам. Встроенные симуляторы для программистов, автомехаников, дизайнеров и инженеров холодильных систем.
+        </p>
+
+        <div class="hero-buttons">
+          <a href="simulator.html" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            <span data-i18n="btn_start_sim">Запустить симулятор</span>
+          </a>
+          <button id="openPassportBtn" class="btn btn-secondary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span data-i18n="btn_view_passport">Мой паспорт навыков</span>
+          </button>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-num">7</span>
+            <span class="stat-label" data-i18n="stat_specs">Специальностей АМК</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-num">28+</span>
+            <span class="stat-label" data-i18n="stat_cases">Интерактивных кейсов</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-num">98%</span>
+            <span class="stat-label" data-i18n="stat_pass">Сдача Демоэкзамена</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Interactive Bento Widget: Live Skill Radar Preview -->
+      <div class="hero-preview">
+        <div class="bento-card bento-radar-hero">
+          <div class="card-header">
+            <div>
+              <span class="card-subtitle" data-i18n="radar_subtitle">Цифровой профиль студента</span>
+              <h3 class="card-title" data-i18n="radar_title">Паутинка компетенций</h3>
+            </div>
+            <span class="level-badge">Уровень: PRO</span>
+          </div>
+          <div class="chart-container">
+            <canvas id="heroRadarChart"></canvas>
+          </div>
+          <div class="radar-footer">
+            <div class="score-chip">
+              <span class="score-val">870</span>
+              <span class="score-name">SkillPoints</span>
+            </div>
+            <div class="score-chip">
+              <span class="score-val">12</span>
+              <span class="score-name" data-i18n="streak_days">Дней стрик 🔥</span>
+            </div>
+            <button class="btn-text-sm" id="syncProgressBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+              </svg>
+              <span data-i18n="btn_refresh">Обновить</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Specialties Grid Section -->
+  <section class="section" id="specialties">
+    <div class="container">
+      <div class="section-head text-center">
+        <div class="badge-pill mx-auto">
+          <span data-i18n="specs_badge">Направления АМК (amk.edu.kz)</span>
+        </div>
+        <h2 class="section-title">
+          <span data-i18n="specs_heading">Специальности колледжа и практические треки</span>
+        </h2>
+        <p class="section-desc" data-i18n="specs_desc">
+          Выбирай свое отделение и проходи интерактивные производственные модули, разработанные под реальные требования компаний Алматы.
+        </p>
+      </div>
+
+      <div class="specialties-grid" id="specialtiesContainer">
+        <!-- Rendered by JS from data.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Bento Grid: Dashboard & Features -->
+  <section class="section bento-section" id="dashboard">
+    <div class="container">
+      <div class="section-head">
+        <span class="card-subtitle" data-i18n="bento_sub">Экосистема обучения</span>
+        <h2 class="section-title" data-i18n="bento_title">Все инструменты в одном кабинете</h2>
+      </div>
+
+      <div class="bento-grid">
+        <!-- Card 1: Демоэкзамен -->
+        <div class="bento-card bento-demexam" id="demexam">
+          <div class="demexam-badge">
+            <span class="pulse-dot"></span>
+            <span data-i18n="dem_badge">Симулятор Демоэкзамена</span>
+          </div>
+          <h3 data-i18n="dem_title">Режим стресс-теста и таймера</h3>
+          <p data-i18n="dem_desc">
+            Имитация условий сдачи итоговой аттестации WorldSkills: обратный отсчет времени, критериальное оценивание (Модули A, B, C) и анти-плагиат.
+          </p>
+          <div class="dem-features">
+            <div class="dem-pill">⏱ Таймер 120 мин</div>
+            <div class="dem-pill">🎯 100 балльная шкала</div>
+            <div class="dem-pill">📑 Экспорт ведомости в PDF</div>
+          </div>
+          <a href="simulator.html?mode=exam" class="btn btn-dem">
+            <span data-i18n="btn_start_dem">Начать пробный экзамен</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+
+        <!-- Card 2: Партнеры и трудоустройство -->
+        <div class="bento-card bento-partners">
+          <span class="card-subtitle" data-i18n="partners_sub">Партнеры колледжа в Алматы</span>
+          <h3 data-i18n="partners_title">Прямой выход на стажировку</h3>
+          <p data-i18n="partners_desc">
+            Работодатели видят твою паутинку навыков в режиме реального времени. Лучшие студенты получают офферы уже на 3-м курсе.
+          </p>
+          <div class="partner-logos">
+            <div class="partner-tag">Almaty Auto Group</div>
+            <div class="partner-tag">Kolesa Group</div>
+            <div class="partner-tag">ТОО "АлматыХолод"</div>
+            <div class="partner-tag">Design Bureau KZ</div>
+            <div class="partner-tag">Astana Motors</div>
+          </div>
+        </div>
+
+        <!-- Card 3: Двуязычие -->
+        <div class="bento-card bento-lang">
+          <div class="lang-icon">🇰🇿 / 🇷🇺</div>
+          <h4 data-i18n="bento_lang_title">Қос тілді оқыту / Двуязычие</h4>
+          <p data-i18n="bento_lang_desc">
+            Барлық терминология мен симуляторлар қазақ және орыс тілдерінде толық қолжетімді.
+          </p>
+        </div>
+
+        <!-- Card 4: Геймификация -->
+        <div class="bento-card bento-achieve">
+          <span class="card-subtitle" data-i18n="achieve_sub">Геймификация</span>
+          <h4 data-i18n="achieve_title">Ачивки и звания</h4>
+          <div class="badges-row">
+            <div class="badge-item" title="Чистый код в IT">💻 CodeMaster</div>
+            <div class="badge-item" title="Мастер автодиагностики">🔧 OBD Expert</div>
+            <div class="badge-item" title="Повелитель давления">❄️ CryoPro</div>
+            <div class="badge-item" title="Глаз-алмаз в дизайне">🎨 PixelPerfect</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Digital Passport Modal -->
+  <div class="modal-overlay" id="passportModal">
+    <div class="modal-box">
+      <button class="modal-close" id="closePassportBtn">&times;</button>
+      <div class="modal-header">
+        <div class="badge-pill">
+          <span>ОФИЦИАЛЬНЫЙ СЕРТИФИКАТ АМК</span>
+        </div>
+        <h2>Цифровой паспорт компетенций</h2>
+        <p>Идентификатор: KZ-AMK-2026-98421</p>
+      </div>
+
+      <div class="modal-body passport-body">
+        <div class="passport-id-card">
+          <div class="id-header">
+            <div class="id-avatar">АБ</div>
+            <div>
+              <h3>Асылхан Бауыржанұлы</h3>
+              <p>Алматинский многопрофильный колледж • 06130100 «ПО»</p>
+            </div>
+          </div>
+          
+          <div class="id-chart-wrap">
+            <canvas id="modalRadarChart"></canvas>
+          </div>
+
+          <div class="id-stats-grid">
+            <div class="id-stat">
+              <span class="id-stat-num">94%</span>
+              <span class="id-stat-txt">Практика IT</span>
+            </div>
+            <div class="id-stat">
+              <span class="id-stat-num">88%</span>
+              <span class="id-stat-txt">Автодиагностика</span>
+            </div>
+            <div class="id-stat">
+              <span class="id-stat-num">91%</span>
+              <span class="id-stat-txt">Холодильные системы</span>
+            </div>
+            <div class="id-stat">
+              <span class="id-stat-num">85%</span>
+              <span class="id-stat-txt">Дизайн-аудит</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.print()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9"/>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+            <rect x="6" y="14" width="12" height="8"/>
+          </svg>
+          Скачать PDF-паспорт
+        </button>
+        <button class="btn btn-primary" id="copyShareLinkBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="18" cy="5" r="3"/>
+            <circle cx="6" cy="12" r="3"/>
+            <circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          Скопировать ссылку для резюме
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <div class="brand-title">AMK <span class="gradient-text">SkillHub</span></div>
+        <p>Образовательная платформа Алматинского многопрофильного колледжа (АМК). г. Алматы, ул. Жандосова, 63.</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://amk.edu.kz" target="_blank">Официальный сайт amk.edu.kz</a>
+        <a href="simulator.html">Интерактивные симуляторы</a>
+        <a href="#demexam">Стандарты Демоэкзамена</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>© 2026 АМК SkillHub. Проект профессионального обучения студентов колледжа.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
