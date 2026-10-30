@@ -272,6 +272,8 @@
 
   <div id="toast" class="toast"></div>
 
+  <!-- Scripts -->
+  <script src="js/audio.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       // 1. Tab Navigation
@@ -284,6 +286,7 @@
 
       tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
+          if (window.soundEngine) window.soundEngine.playClick();
           tabBtns.forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
           const target = btn.getAttribute('data-tab');
@@ -295,6 +298,10 @@
 
       // Toast Helper
       function showMsg(msg, isSuccess = true) {
+        if (window.soundEngine) {
+          if (isSuccess) window.soundEngine.playSuccess();
+          else window.soundEngine.playError();
+        }
         const toast = document.getElementById('toast');
         toast.textContent = msg;
         toast.style.borderColor = isSuccess ? 'var(--accent-emerald)' : 'var(--accent-rose)';

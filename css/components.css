@@ -1,44 +1,49 @@
 /* ========================================================
-   AMK SKILLHUB: CLEAN COMPONENTS & CALCULATOR
+   AMK SKILLHUB: PROFESSIONAL COMPONENTS (components.css)
+   Hero, Calculator, Specialties & Competency Passport
    ======================================================== */
 
-/* Hero Section */
+/* ========================================================
+   1. HERO SECTION
+   ======================================================== */
 .hero-clean {
-  padding: 60px 0 80px;
+  padding: 70px 0 90px;
+  position: relative;
 }
 
 .hero-grid-clean {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
-  gap: 48px;
+  gap: 56px;
   align-items: center;
 }
 
 .hero-title-clean {
-  font-size: 3rem;
-  letter-spacing: -0.03em;
-  margin-bottom: 20px;
+  font-size: 3.25rem;
+  letter-spacing: -0.035em;
+  margin-bottom: 22px;
+  line-height: 1.15;
 }
 
 .hero-desc-clean {
-  font-size: 1.1rem;
-  line-height: 1.7;
+  font-size: 1.12rem;
+  line-height: 1.75;
   color: var(--text-secondary);
-  margin-bottom: 36px;
-  max-width: 580px;
+  margin-bottom: 38px;
+  max-width: 600px;
 }
 
 .hero-btns-clean {
   display: flex;
   gap: 16px;
-  margin-bottom: 40px;
+  margin-bottom: 44px;
   flex-wrap: wrap;
 }
 
 .hero-stats-clean {
   display: flex;
-  gap: 32px;
-  padding-top: 24px;
+  gap: 36px;
+  padding-top: 28px;
   border-top: 1px solid var(--border-color);
 }
 
@@ -48,16 +53,18 @@
 }
 
 .stat-num {
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   font-weight: 900;
   color: var(--text-primary);
   font-family: var(--font-mono);
+  letter-spacing: -0.03em;
 }
 
 .stat-txt {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
   font-weight: 600;
+  margin-top: 2px;
 }
 
 /* Hero Chart Box */
@@ -65,8 +72,21 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 28px;
+  padding: 30px;
   box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.hero-chart-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-btn);
 }
 
 .chart-header {
@@ -77,142 +97,229 @@
 }
 
 .chart-badge {
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.14);
   color: var(--accent-emerald);
-  padding: 4px 10px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 5px 12px;
   border-radius: var(--radius-full);
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .radar-canvas-wrap {
-  height: 280px;
+  height: 290px;
   width: 100%;
+  position: relative;
 }
 
 /* ========================================================
-   SALARY & CAREER CALCULATOR (Fixed & Super Intuitive)
+   2. SALARY & CAREER NAVIGATOR (ALMATY MARKET)
    ======================================================== */
 .calc-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 36px;
+  padding: 42px;
   box-shadow: var(--shadow-card);
-  max-width: 900px;
-  margin: 0 auto;
+  position: relative;
 }
 
-.calc-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 16px;
+.calc-header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 36px;
 }
 
-.salary-output-box {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-active);
-  padding: 12px 24px;
-  border-radius: var(--radius-md);
-  text-align: right;
-}
-
-.salary-label {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  font-weight: 700;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.salary-number {
+.calc-header h2 {
   font-size: 2.2rem;
-  font-weight: 900;
-  color: var(--accent-emerald);
-  font-family: var(--font-mono);
-  line-height: 1;
-}
-
-.slider-container {
-  margin: 32px 0 28px;
-}
-
-.custom-range {
-  width: 100%;
-  height: 10px;
-  border-radius: var(--radius-full);
-  background: var(--bg-surface);
-  outline: none;
-  cursor: pointer;
-  accent-color: var(--accent-emerald);
-}
-
-.slider-scale {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  margin-top: 10px;
-  font-weight: 600;
-}
-
-.calc-results-head {
-  font-size: 1.05rem;
-  font-weight: 800;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.career-grid-results {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
-}
-
-.career-card-item {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 18px;
-  transition: var(--transition);
-}
-
-.career-card-item:hover {
-  border-color: var(--accent-primary);
-  transform: translateY(-2px);
-}
-
-.c-role {
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin-bottom: 6px;
-}
-
-.c-spec {
-  font-size: 0.78rem;
-  color: var(--accent-cyan);
-  font-weight: 600;
   margin-bottom: 12px;
 }
 
-.c-companies {
-  font-size: 0.78rem;
+.calc-slider-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 28px 32px;
+  margin-bottom: 36px;
+}
+
+.slider-top-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+
+.target-salary-display {
+  font-size: 2.4rem;
+  font-weight: 900;
+  font-family: var(--font-mono);
+  color: var(--accent-cyan);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.target-salary-display small {
+  font-size: 1rem;
   color: var(--text-muted);
-  line-height: 1.4;
+  font-family: var(--font-main);
+  font-weight: 600;
+}
+
+/* Range Input Styling */
+.custom-range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 6px;
+  background: #111827;
+  outline: none;
+  margin: 14px 0 8px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.custom-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--gradient-btn);
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(79, 70, 229, 0.6);
+  border: 3px solid #ffffff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.custom-range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 0 20px rgba(79, 70, 229, 0.85);
+}
+
+.custom-range-slider::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--gradient-btn);
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(79, 70, 229, 0.6);
+  border: 3px solid #ffffff;
+}
+
+.slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+/* Career Match Cards Grid */
+.careers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.career-match-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: var(--transition);
+}
+
+.career-match-card:hover {
+  border-color: var(--border-active);
+  background: var(--bg-surface-light);
+  transform: translateY(-2px);
+}
+
+.career-role-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+}
+
+.career-spec-code {
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  color: var(--accent-cyan);
+  font-weight: 700;
+  margin-bottom: 14px;
+  display: block;
+}
+
+.career-salary-box {
+  background: #090d16;
+  border: 1px solid var(--border-color);
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.career-salary-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.career-salary-num {
+  font-size: 1.25rem;
+  font-weight: 900;
+  font-family: var(--font-mono);
+  color: var(--accent-emerald);
+}
+
+.career-companies-tag {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.career-companies-tag strong {
+  color: var(--text-primary);
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+  color: var(--text-muted);
 }
 
 /* ========================================================
-   SPECIALTIES GRID & FILTER BAR
+   3. SPECIALTIES CATALOG
    ======================================================== */
-.filter-bar {
+.specialties-section {
+  padding: 80px 0;
+}
+
+.section-head-clean {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 40px;
+}
+
+.section-head-clean h2 {
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+}
+
+.category-tabs-clean {
   display: flex;
   justify-content: center;
   gap: 10px;
@@ -221,12 +328,12 @@
 }
 
 .tab-filter {
-  background: var(--bg-card);
+  background: var(--bg-surface);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  padding: 8px 18px;
+  padding: 9px 20px;
   border-radius: var(--radius-full);
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition);
@@ -234,16 +341,17 @@
 
 .tab-filter:hover {
   color: var(--text-primary);
+  border-color: var(--border-active);
 }
 
 .tab-filter.active {
   background: var(--accent-primary);
-  color: #fff;
+  color: #ffffff;
   border-color: var(--accent-primary);
   box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
 }
 
-.specialties-grid {
+.specs-grid-clean {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: 24px;
@@ -253,81 +361,105 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
-  padding: 24px;
+  padding: 30px;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-card);
   transition: var(--transition);
+  position: relative;
+  overflow: hidden;
 }
 
 .spec-clean-card:hover {
+  transform: translateY(-3px);
   border-color: var(--border-active);
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-card);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.65);
+}
+
+.spec-clean-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--border-color);
+  transition: var(--transition);
+}
+
+.spec-clean-card:hover::before {
+  background: var(--gradient-btn);
 }
 
 .spec-card-head {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   margin-bottom: 16px;
 }
 
 .spec-icon-clean {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm);
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
   background: var(--bg-surface);
+  border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
+  flex-shrink: 0;
 }
 
 .spec-code-clean {
+  font-size: 0.78rem;
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-muted);
+  color: var(--accent-cyan);
   font-weight: 700;
+  display: block;
+  margin-bottom: 2px;
 }
 
 .spec-clean-card h3 {
-  font-size: 1.2rem;
-  margin-bottom: 8px;
+  font-size: 1.15rem;
+  line-height: 1.35;
 }
 
 .spec-clean-card p {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   line-height: 1.6;
   margin-bottom: 20px;
-  flex-grow: 1;
+  color: var(--text-secondary);
 }
 
 .spec-tags-clean {
   display: flex;
-  gap: 6px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  gap: 6px;
+  margin-bottom: 24px;
 }
 
 .clean-tag {
   background: var(--bg-surface);
+  border: 1px solid var(--border-color);
   color: var(--text-secondary);
   font-size: 0.75rem;
-  padding: 3px 8px;
-  border-radius: var(--radius-xs);
   font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
 }
 
 .btn-open-track {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
   background: var(--bg-surface);
+  border: 1px solid var(--border-color);
   color: var(--text-primary);
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
   text-decoration: none;
+  padding: 12px 18px;
+  border-radius: var(--radius-sm);
   font-size: 0.88rem;
   font-weight: 700;
   transition: var(--transition);
@@ -336,59 +468,170 @@
 .btn-open-track:hover {
   background: var(--accent-primary);
   color: #fff;
+  border-color: var(--accent-primary);
 }
 
 /* ========================================================
-   MODAL DIALOG (Clean & Printable)
+   4. DIGITAL COMPETENCY PASSPORT (STUDENT ID & CERTIFICATE)
    ======================================================== */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+.diploma-card-inner {
+  background: #090d16;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.diploma-official-banner {
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-  padding: 20px;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
 }
 
-.modal-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.modal-box {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  max-width: 640px;
-  width: 100%;
-  padding: 32px;
-  position: relative;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-}
-
-.modal-close {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: none;
-  border: none;
+.diploma-rep-title {
+  font-size: 0.72rem;
   color: var(--text-muted);
-  font-size: 1.4rem;
-  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
 }
 
-.modal-close:hover {
+.diploma-college-name {
+  font-size: 1.05rem;
+  font-weight: 800;
   color: var(--text-primary);
 }
 
+.diploma-stamp {
+  border: 2px dashed rgba(16, 185, 129, 0.5);
+  color: var(--accent-emerald);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  transform: rotate(-3deg);
+}
+
+.diploma-user-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.diploma-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 12px;
+  background: var(--gradient-btn);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #fff;
+  font-weight: 900;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+}
+
+.diploma-meta h3 {
+  font-size: 1.35rem;
+  margin-bottom: 4px;
+}
+
+.diploma-meta p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.skills-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.skill-prog-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.skill-prog-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  width: 190px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skill-prog-bar-wrap {
+  flex-grow: 1;
+  height: 8px;
+  background: #1e293b;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.skill-prog-bar-fill {
+  height: 100%;
+  background: var(--gradient-btn);
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+.skill-prog-val {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  width: 60px;
+  text-align: right;
+}
+
+/* Print Stylesheet for Diploma */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #diplomaModal, #diplomaModal * {
+    visibility: visible;
+  }
+  #diplomaModal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .modal-header, .modal-close-btn, #btnDismissDiploma, #btnGoToSims {
+    display: none !important;
+  }
+  .diploma-card-inner {
+    border: 2px solid #000 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+}
+
+/* Responsive adjustments */
 @media (max-width: 900px) {
-  .hero-grid-clean { grid-template-columns: 1fr; }
-  .calc-card { padding: 24px; }
-  .salary-number { font-size: 1.8rem; }
+  .hero-grid-clean {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .hero-title-clean {
+    font-size: 2.4rem;
+  }
+  .calc-card {
+    padding: 24px;
+  }
 }

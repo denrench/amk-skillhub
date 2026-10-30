@@ -1,5 +1,6 @@
 /* ========================================================
-   AMK SKILLHUB: CLEAN & ROBUST CONTROLLER (app.js)
+   AMK SKILLHUB: PROFESSIONAL PRODUCTION CONTROLLER (app.js)
+   Clean, Resilient, Reactive & User-Centric
    ======================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -7,11 +8,11 @@ document.addEventListener('DOMContentLoaded', () => {
     theme: localStorage.getItem('amk_theme') || 'dark',
     lang: localStorage.getItem('amk_lang') || 'ru',
     activeCategory: 'all',
-    salary: 450000
+    salary: 450000,
+    currentUser: null
   };
 
   let radarChartInstance = null;
-  let modalChartInstance = null;
 
   // 1. Theme Management
   const themeToggle = document.getElementById('themeToggle');
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (themeToggle) {
     themeToggle.addEventListener('click', () => {
+      if (window.soundEngine) window.soundEngine.playClick();
       applyTheme(state.theme === 'dark' ? 'light' : 'dark');
     });
   }
@@ -37,10 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('amk_lang', lang);
     if (langLabel) langLabel.textContent = lang === 'ru' ? 'ҚАЗ' : 'РУС';
 
-    const dict = AMK_DATA.i18n[lang] || AMK_DATA.i18n.ru;
+    const dict = (AMK_DATA.i18n && AMK_DATA.i18n[lang]) ? AMK_DATA.i18n[lang] : (AMK_DATA.i18n ? AMK_DATA.i18n.ru : {});
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
-      if (dict[key]) el.textContent = dict[key];
+      if (dict && dict[key]) el.textContent = dict[key];
     });
 
     renderSpecialties();
@@ -50,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (langToggle) {
     langToggle.addEventListener('click', () => {
+      if (window.soundEngine) window.soundEngine.playClick();
       applyLanguage(state.lang === 'ru' ? 'kz' : 'ru');
       showToast(state.lang === 'kz' ? 'Тіл қазақшаға ауыстырылды' : 'Язык переключен на русский');
     });
@@ -59,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const filterButtons = document.querySelectorAll('.tab-filter');
   filterButtons.forEach(btn => {
     btn.addEventListener('click', () => {
+      if (window.soundEngine) window.soundEngine.playClick();
       filterButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.activeCategory = btn.getAttribute('data-cat');
@@ -71,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!grid) return;
 
     const isKz = state.lang === 'kz';
-    let list = AMK_DATA.specialties;
+    let list = AMK_DATA.specialties || [];
     if (state.activeCategory !== 'all') {
       list = list.filter(s => s.category === state.activeCategory);
     }
@@ -79,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     grid.innerHTML = list.map(s => {
       const title = isKz ? s.title_kz : s.title_ru;
       const desc = isKz ? s.desc_kz : s.desc_ru;
-      const tags = s.tags.map(t => `<span class="clean-tag">${t}</span>`).join('');
+      const tags = (s.tags || []).map(t => `<span class="clean-tag">${t}</span>`).join('');
 
       return `
         <div class="spec-clean-card">
@@ -101,47 +105,61 @@ document.addEventListener('DOMContentLoaded', () => {
     }).join('');
   }
 
-  // 4. FIXED SALARY & INCOME CALCULATOR (Гарантированно растет и реагирует)
+  // 4. Reactive Career Income Calculator
   const salarySlider = document.getElementById('salarySlider');
   const salaryDisplay = document.getElementById('salaryDisplay');
-  const careerGrid = document.getElementById('careerGrid');
 
-  function renderCareers(salaryValue) {
-    if (!careerGrid) return;
-
+  function renderCareers(targetSalary) {
     if (salaryDisplay) {
-      salaryDisplay.textContent = `${salaryValue.toLocaleString('ru-RU')} ₸ / мес`;
+      salaryDisplay.innerHTML = `${targetSalary.toLocaleString('ru-RU')} ₸ <small>/ ай (мес)</small>`;
     }
 
-    // Determine Career Tier
-    let tierBadge = 'Стажер / Начальный уровень';
-    let tierColor = '#94a3b8';
-    if (salaryValue >= 600000) {
-      tierBadge = 'Ведущий специалист / Старший мастер';
-      tierColor = '#10b981';
-    } else if (salaryValue >= 400000) {
-      tierBadge = 'Квалифицированный специалист';
-      tierColor = '#0ea5e9';
-    }
+    const grid = document.getElementById('careerGrid');
+    if (!grid) return;
 
-    careerGrid.innerHTML = AMK_DATA.careers.map(c => {
-      // Scale income to reflect the slider
-      const estimatedIncome = Math.round(Math.min(c.maxSalary, Math.max(c.baseSalary, salaryValue)));
+    const careers = AMK_DATA.careers || [];
+    grid.innerHTML = careers.map(c => {
+      // Calculate realistic scaled salary based on slider position
+      const minS = c.baseSalary || 250000;
+      const maxS = c.maxSalary || 950000;
+      const ratio = Math.max(0, Math.min(1, (targetSalary - 250000) / 700000));
+      const calculatedSalary = Math.round((minS + (maxS - minS) * ratio) / 5000) * 5000;
+
+      let levelBadge = 'Специалист';
+      let badgeColor = 'var(--accent-cyan)';
+      if (calculatedSalary >= 700000) {
+        levelBadge = 'Ведущий мастер / Тимлид';
+        badgeColor = 'var(--accent-emerald)';
+      } else if (calculatedSalary <= 320000) {
+        levelBadge = 'Начинающий техник';
+        badgeColor = 'var(--accent-amber)';
+      }
 
       return `
-        <div class="career-card-item">
-          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-            <div class="c-role">${c.role}</div>
-            <span style="font-family: var(--font-mono); font-weight: 900; color: #10b981; font-size: 1.1rem; white-space: nowrap;">
-              ~${estimatedIncome.toLocaleString('ru-RU')} ₸
-            </span>
+        <div class="career-match-card">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+              <span class="career-spec-code">${c.specialty}</span>
+              <span style="font-size: 0.72rem; font-weight: 800; color: ${badgeColor}; background: rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 4px;">
+                ${levelBadge}
+              </span>
+            </div>
+            <h4 class="career-role-title">${c.role}</h4>
           </div>
-          <div class="c-spec">${c.specialty}</div>
-          <div style="font-size: 0.75rem; color: ${tierColor}; font-weight: 700; margin-bottom: 8px;">
-            ${tierBadge}
+
+          <div style="margin: 16px 0;">
+            <div class="career-salary-box">
+              <span class="career-salary-label">Прогнозный доход:</span>
+              <span class="career-salary-num">${calculatedSalary.toLocaleString('ru-RU')} ₸</span>
+            </div>
+            <div class="career-companies-tag">
+              <strong>Работодатели в Алматы:</strong>
+              ${c.companies}
+            </div>
           </div>
-          <div class="c-companies">
-            <strong>Компании в Алматы:</strong> ${c.companies}
+
+          <div style="border-top: 1px solid var(--border-color); padding-top: 12px; font-size: 0.78rem; color: var(--text-muted);">
+            Ключевые навыки: <span style="color: var(--text-secondary);">${c.skills}</span>
           </div>
         </div>
       `;
@@ -149,36 +167,32 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (salarySlider) {
-    const handleSliderChange = (e) => {
+    salarySlider.addEventListener('input', (e) => {
       state.salary = parseInt(e.target.value, 10);
       renderCareers(state.salary);
-    };
-    salarySlider.addEventListener('input', handleSliderChange);
-    salarySlider.addEventListener('change', handleSliderChange);
+    });
   }
 
-  // 5. Radar Chart Rendering
+  // 5. Radar Chart of Competencies
   function renderCharts() {
     const isDark = state.theme === 'dark';
-    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)';
     const textColor = isDark ? '#94a3b8' : '#475569';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
 
-    const labels = [
-      'IT / Код',
-      'Автоэлектрика',
-      'Холодильные системы',
-      'Дизайн UI',
-      'Раскрой мебели',
-      'Документооборот'
-    ];
+    // Retrieve active student skills
+    const saved = JSON.parse(localStorage.getItem('amk_student_data')) || AMK_DATA.student;
+    const skills = saved.skills || { it: 90, auto: 85, cryo: 80, design: 85, furniture: 80 };
 
-    const dataVals = [
-      AMK_DATA.student.skills.it,
-      AMK_DATA.student.skills.auto,
-      AMK_DATA.student.skills.cryo,
-      AMK_DATA.student.skills.design,
-      AMK_DATA.student.skills.furniture,
-      AMK_DATA.student.skills.docs
+    const labels = state.lang === 'kz'
+      ? ['IT БҚ', 'Автодиагностика', 'Холод. жүйелер', 'UI Дизайн', 'ЧПУ Жиһаз']
+      : ['IT-разработка', 'Автодиагностика', 'Холод. машины', 'Граф. дизайн', 'ЧПУ Мебель'];
+
+    const dataValues = [
+      skills.it || 0,
+      skills.auto || 0,
+      skills.cryo || 0,
+      skills.design || 0,
+      skills.furniture || 0
     ];
 
     const config = {
@@ -186,14 +200,16 @@ document.addEventListener('DOMContentLoaded', () => {
       data: {
         labels: labels,
         datasets: [{
-          label: 'Освоение (%)',
-          data: dataVals,
+          label: 'Оценка WorldSkills',
+          data: dataValues,
           backgroundColor: 'rgba(79, 70, 229, 0.25)',
           borderColor: '#4f46e5',
           borderWidth: 2,
           pointBackgroundColor: '#0ea5e9',
-          pointBorderColor: '#fff',
-          pointRadius: 4
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6
         }]
       },
       options: {
@@ -227,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function checkAuthState() {
     const raw = localStorage.getItem('amk_current_user');
     const user = raw ? JSON.parse(raw) : null;
+    state.currentUser = user;
 
     const btnLogin = document.getElementById('btnNavLogin');
     const userBadge = document.getElementById('navUserBadge');
@@ -240,39 +257,36 @@ document.addEventListener('DOMContentLoaded', () => {
       if (userBadge) userBadge.style.display = 'flex';
 
       nameEl.textContent = user.full_name;
-      groupEl.textContent = user.role === 'teacher' ? 'Преподаватель' : user.group_name;
+      groupEl.textContent = user.role === 'teacher' ? 'Преподаватель' : (user.group_name || 'Студент');
 
       if (chip) {
         chip.onclick = () => {
+          if (window.soundEngine) window.soundEngine.playClick();
           if (user.role === 'teacher') {
             window.location.href = 'teacher.html';
           } else {
-            const modal = document.getElementById('diplomaModal');
-            if (modal) modal.classList.add('active');
+            openStudentDiplomaModal(user);
           }
         };
       }
 
       // Update certificate modal with logged in user data
-      const certName = document.querySelector('#diplomaModal strong');
-      const certSub = document.querySelector('#diplomaModal span');
-      const certId = document.querySelector('#diplomaModal p');
-      if (certName) certName.textContent = user.full_name;
-      if (certSub) certSub.textContent = `Алматинский многопрофильный колледж • ${user.group_name || 'Студент'}`;
-      if (certId && user.student_id) certId.textContent = `ID: ${user.student_id}`;
+      updateDiplomaModalData(user);
 
-      // Pull actual grades from backend database
+      // Pull actual grades from backend SQLite3 database if server is active
       if (user.id) {
         fetch(`/api/user/profile/${user.id}`)
           .then(r => r.json())
           .then(d => {
             if (d.success && d.grades && d.grades.length > 0) {
+              const saved = JSON.parse(localStorage.getItem('amk_student_data')) || AMK_DATA.student;
+              saved.skills = saved.skills || {};
               d.grades.forEach(g => {
-                if (AMK_DATA.student.skills[g.specialty_slug] !== undefined) {
-                  AMK_DATA.student.skills[g.specialty_slug] = g.score;
-                }
+                saved.skills[g.specialty_slug] = g.score;
               });
+              localStorage.setItem('amk_student_data', JSON.stringify(saved));
               renderCharts();
+              updateDiplomaModalData(user);
             }
           })
           .catch(() => {});
@@ -284,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (logoutBtn) {
       logoutBtn.onclick = () => {
+        if (window.soundEngine) window.soundEngine.playClick();
         localStorage.removeItem('amk_current_user');
         checkAuthState();
         showToast('Вы вышли из учетной записи');
@@ -291,18 +306,90 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  checkAuthState();
+  // 7. Student Diploma / Competency Passport Modal
+  const diplomaModal = document.getElementById('diplomaModal');
+  const openDiplomaBtn = document.getElementById('openDiplomaBtn');
+  const closeDiplomaBtn = document.getElementById('closeDiplomaBtn');
 
-  // Toast
+  function openStudentDiplomaModal(user) {
+    updateDiplomaModalData(user || state.currentUser);
+    if (diplomaModal) diplomaModal.classList.add('active');
+  }
+
+  function updateDiplomaModalData(user) {
+    const certName = document.getElementById('certStudentName');
+    const certSub = document.getElementById('certStudentGroup');
+    const certId = document.getElementById('certStudentId');
+    const certAvatar = document.getElementById('certStudentAvatar');
+
+    const u = user || state.currentUser || {
+      full_name: "Асылхан Бауыржанұлы",
+      group_name: "ПО-22",
+      student_id: "KZ-AMK-2026-98421"
+    };
+
+    if (certName) certName.textContent = u.full_name;
+    if (certSub) certSub.textContent = `Алматинский многопрофильный колледж • ${u.role === 'teacher' ? 'Преподаватель' : (u.group_name || 'Студент')}`;
+    if (certId) certId.textContent = u.student_id ? `Билет: ${u.student_id}` : 'ID: KZ-AMK-2026-98421';
+    if (certAvatar) {
+      const initials = u.full_name ? u.full_name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase() : 'АБ';
+      certAvatar.textContent = initials;
+    }
+
+    // Populate the 5 skills progress bars
+    const saved = JSON.parse(localStorage.getItem('amk_student_data')) || AMK_DATA.student;
+    const skills = saved.skills || { it: 94, auto: 88, cryo: 91, design: 85, furniture: 80 };
+
+    const bars = [
+      { id: 'progIt', valId: 'valIt', score: skills.it || 0 },
+      { id: 'progAuto', valId: 'valAuto', score: skills.auto || 0 },
+      { id: 'progCryo', valId: 'valCryo', score: skills.cryo || 0 },
+      { id: 'progDesign', valId: 'valDesign', score: skills.design || 0 },
+      { id: 'progFurn', valId: 'valFurn', score: skills.furniture || 0 }
+    ];
+
+    bars.forEach(b => {
+      const barEl = document.getElementById(b.id);
+      const valEl = document.getElementById(b.valId);
+      if (barEl) barEl.style.width = `${b.score}%`;
+      if (valEl) valEl.textContent = `${b.score} / 100`;
+    });
+  }
+
+  if (openDiplomaBtn) {
+    openDiplomaBtn.addEventListener('click', () => {
+      if (window.soundEngine) window.soundEngine.playClick();
+      openStudentDiplomaModal();
+    });
+  }
+
+  if (closeDiplomaBtn) {
+    closeDiplomaBtn.addEventListener('click', () => {
+      if (window.soundEngine) window.soundEngine.playClick();
+      if (diplomaModal) diplomaModal.classList.remove('active');
+    });
+  }
+
+  // Close modal when clicking outside backdrop
+  if (diplomaModal) {
+    diplomaModal.addEventListener('click', (e) => {
+      if (e.target === diplomaModal) {
+        diplomaModal.classList.remove('active');
+      }
+    });
+  }
+
+  // Toast Notification
   window.showToast = function(msg) {
     const toast = document.getElementById('toast');
     if (!toast) return;
     toast.textContent = msg;
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
+    setTimeout(() => toast.classList.remove('show'), 3500);
   };
 
-  // Initial execution
+  // Run initial state
+  checkAuthState();
   applyLanguage(state.lang);
   renderCareers(state.salary);
 });

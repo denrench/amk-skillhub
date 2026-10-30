@@ -1,6 +1,6 @@
 /* ========================================================
-   AMK SKILLHUB: INTUITIVE SIMULATOR WORKSTATION
-   Clear Step-by-Step Logic & Visual Clarity
+   AMK SKILLHUB: PROFESSIONAL SIMULATOR WORKSTATION (simulator.js)
+   Realistic Engineering Logic, Auto-Sync & Audiovisuals
    ======================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     activeSpec: 'it',
     score: 0,
     timerSeconds: 45 * 60,
-    // Auto module step-by-step
+    timerInterval: null,
+    // Auto module
     auto: {
       scanned: false,
       meterTested: false,
@@ -30,34 +31,65 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // User auth state in simulator
+  // 1. User Auth State & Display in Header
   const rawUser = localStorage.getItem('amk_current_user');
   const currentUser = rawUser ? JSON.parse(rawUser) : null;
   const simUserName = document.getElementById('simUserName');
   const simUserGroup = document.getElementById('simUserGroup');
   const simAuthLink = document.getElementById('simAuthLink');
+  const syncText = document.getElementById('syncText');
 
   if (currentUser) {
     if (simUserName) simUserName.textContent = currentUser.full_name;
-    if (simUserGroup) simUserGroup.textContent = currentUser.role === 'teacher' ? 'Преподаватель' : currentUser.group_name;
+    if (simUserGroup) simUserGroup.textContent = currentUser.role === 'teacher' ? 'Преподаватель' : (currentUser.group_name || 'Студент');
     if (simAuthLink) simAuthLink.style.display = 'none';
   } else {
     if (simUserName) simUserName.textContent = 'Гостевой режим';
-    if (simUserGroup) simUserGroup.textContent = '(без сохранения)';
-    if (simAuthLink) simAuthLink.style.display = 'inline-block';
+    if (simUserGroup) simUserGroup.textContent = '(демо-сдача)';
+    if (simAuthLink) simAuthLink.style.display = 'inline-flex';
   }
 
-  // Check URL params
+  // Sound Toggle Button
+  const btnSoundToggle = document.getElementById('btnSoundToggle');
+  if (btnSoundToggle) {
+    btnSoundToggle.addEventListener('click', () => {
+      if (window.soundEngine) {
+        const unmuted = window.soundEngine.toggleMute();
+        btnSoundToggle.textContent = unmuted ? '🔊' : '🔇';
+        btnSoundToggle.title = unmuted ? 'Звук включен' : 'Звук выключен';
+        if (unmuted) window.soundEngine.playClick();
+      }
+    });
+  }
+
+  // 2. Timer Countdown
+  const timerDisplay = document.getElementById('timerDisplay');
+  function startTimer() {
+    state.timerInterval = setInterval(() => {
+      if (state.timerSeconds > 0) {
+        state.timerSeconds--;
+        const m = Math.floor(state.timerSeconds / 60).toString().padStart(2, '0');
+        const s = (state.timerSeconds % 60).toString().padStart(2, '0');
+        if (timerDisplay) timerDisplay.textContent = `${m}:${s}`;
+      } else {
+        clearInterval(state.timerInterval);
+        alert('Время, отведенное на практический экзамен, завершилось!');
+      }
+    }, 1000);
+  }
+  startTimer();
+
+  // 3. Module Tabs Navigation
   const params = new URLSearchParams(window.location.search);
   const specParam = params.get('spec');
   if (specParam && ['it', 'auto', 'cryo', 'design', 'furniture'].includes(specParam)) {
     state.activeSpec = specParam;
   }
 
-  // Header Module Navigation
   const modButtons = document.querySelectorAll('.mod-btn');
   modButtons.forEach(btn => {
     btn.addEventListener('click', () => {
+      if (window.soundEngine) window.soundEngine.playClick();
       switchModule(btn.getAttribute('data-spec'));
     });
   });
@@ -75,107 +107,115 @@ document.addEventListener('DOMContentLoaded', () => {
     loadInstructions(specKey);
     state.score = 0;
     updateScore(0);
+
+    if (specKey === 'auto') drawOscilloscope();
+    if (specKey === 'furniture') drawFurnitureSheet();
   }
 
-  // Clear, Human Instructions for each module
+  // Detailed Step-by-Step Instructions
   const instructions = {
     it: {
-      title: "06130100 — Программное обеспечение",
+      code: "06130100 — ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ",
+      title: "Начисление академической стипендии",
       steps: [
         {
-          num: "Шаг 1: Задача",
-          title: "Логика начисления стипендии",
-          desc: "В деканате АМК нужно автоматически назначить выплаты. Изучите готовый шаблон функции calculateScholarship в редакторе справа."
+          num: "Шаг 1",
+          title: "Анализ алгоритмической задачи",
+          desc: "В деканате АМК автоматизируется начисление выплат. Изучите функцию calculateScholarship в онлайн-редакторе справа."
         },
         {
-          num: "Шаг 2: Условия",
-          title: "Критерии оценок",
-          desc: "Если балл >= 4.5 и посещаемость >= 90% — Повышенная. Если балл >= 3.5 и посещаемость >= 75% — Обычная. Иначе — Не назначена."
+          num: "Шаг 2",
+          title: "Проверка граничных условий",
+          desc: "Повышенная: балл >= 4.5 и посещаемость >= 90%. Обычная: балл >= 3.5 и посещаемость >= 75%. Иначе — Не назначена."
         },
         {
-          num: "Шаг 3: Проверка",
-          title: "Запуск автоматических тестов",
-          desc: "Нажмите синюю кнопку «Запустить тесты» справа. Система прогонит 4 контрольных случая и выставит баллы."
+          num: "Шаг 3",
+          title: "Запуск автоматических юнит-тестов",
+          desc: "Нажмите «Запустить автопроверку тестами». Движок протестирует функцию на 4 контрольных выборках и выставит итоговый балл."
         }
       ]
     },
     auto: {
-      title: "07161300 — ТО и ремонт автотранспорта",
+      code: "07161300 — ТО И РЕМОНТ АВТОТРАНСПОРТА",
+      title: "Компьютерная диагностика и автоэлектрика",
       steps: [
         {
-          num: "Шаг 1: Сканирование",
-          title: "Чтение кодов ошибок",
-          desc: "Горит лампа Check Engine. Нажмите кнопку «1. Считать ошибки сканером», чтобы определить код неисправности."
+          num: "Шаг 1",
+          title: "Считывание кодов DTC сканером",
+          desc: "Горит индикатор Check Engine. Нажмите «1. Считать коды ошибок сканером» для связи с блоком управления по CAN-шине."
         },
         {
-          num: "Шаг 2: Замер",
-          title: "Проверка мультиметром",
-          desc: "Нажмите «2. Замерить сопротивление катушки». Норма: 1.1 Ом. При обрыве мультиметр покажет O.L."
+          num: "Шаг 2",
+          title: "Инструментальный замер мультиметром",
+          desc: "Нажмите «2. Замерить сопротивление катушки 1». Норма: 1.1 Ом. При внутреннем обрыве прибор покажет O.L."
         },
         {
-          num: "Шаг 3: Ремонт и сброс",
-          title: "Замена и очистка памяти",
-          desc: "Нажмите «3. Заменить катушку 1», затем «4. Сбросить ошибки». Лампа Check Engine погаснет!"
+          num: "Шаг 3",
+          title: "Установка новой детали и сброс ЭБУ",
+          desc: "Замените катушку цилиндра 1, затем очистите память ошибок. Осциллограф зафиксирует нормальный импульс зажигания."
         }
       ]
     },
     cryo: {
-      title: "07150900 — Холодильно-компрессорные машины",
+      code: "07150900 — ХОЛОДИЛЬНЫЕ МАШИНЫ",
+      title: "Балансировка термодинамического контура R134a",
       steps: [
         {
-          num: "Шаг 1: Анализ",
-          title: "Термодинамический контур R134a",
-          desc: "Установка охлаждает пищевой склад в Алматы. Нужно настроить компрессор и вентиль ТРВ."
+          num: "Шаг 1",
+          title: "Контроль давления нагнетания и всасывания",
+          desc: "Установка охлаждает продуктовый склад в Алматы. Регулируйте обороты компрессора и открытие вентиля ТРВ."
         },
         {
-          num: "Шаг 2: Регулировка",
-          title: "Целевые параметры давления",
-          desc: "Двигайте ползунки: Высокое давление (HP) должно быть 13-15 bar, Низкое давление (LP) — 2.0-2.3 bar."
+          num: "Шаг 2",
+          title: "Вывод в зеленую рабочую зону",
+          desc: "Высокое давление (HP) должно быть 13.0 — 15.0 bar, Низкое давление (LP) — 2.0 — 2.3 bar."
         },
         {
-          num: "Шаг 3: Коэффициент",
-          title: "Оптимизация COP",
-          desc: "При попадании обоих манометров в зеленую зону холодильный коэффициент COP превысит 3.2."
+          num: "Шаг 3",
+          title: "Максимизация коэффициента COP",
+          desc: "При попадании обоих параметров в зеленый диапазон энергоэффективность COP превысит 3.20."
         }
       ]
     },
     design: {
-      title: "02110300 — Графический дизайн",
+      code: "02110300 — ГРАФИЧЕСКИЙ ДИЗАЙН",
+      title: "Профессиональный UI/UX аудит макета",
       steps: [
         {
-          num: "Шаг 1: Аудит",
-          title: "Поиск ошибок верстки",
-          desc: "Перед вами черновой макет страницы колледжа с 4 явными дефектами дизайна."
+          num: "Шаг 1",
+          title: "Поиск ошибок доступности (WCAG 2.1)",
+          desc: "Перед вами черновой макет интерфейса колледжа с 4 грубыми нарушениями эргономики и читаемости."
         },
         {
-          num: "Шаг 2: Исправление",
-          title: "Кликайте по рамкам",
-          desc: "Нажмите по каждой пунктирной рамке на макете (логотип, заголовок, текст, кнопка), чтобы устранить дефект."
+          num: "Шаг 2",
+          title: "Интерактивное устранение дефектов",
+          desc: "Кликайте прямо по пунктирным рамкам на макете (логотип, заголовок, шрифт, кнопка). Каждое исправление дает +25 баллов."
         },
         {
-          num: "Шаг 3: Итог",
-          title: "Соответствие стандартам",
-          desc: "После устранения всех 4 дефектов макет преобразится в чистый профессиональный вид."
+          num: "Шаг 3",
+          title: "Итоговая приемка по стандартам",
+          desc: "После устранения всех 4 дефектов макет примет чистый, высококонтрастный премиальный вид."
         }
       ]
     },
     furniture: {
-      title: "07221400 — Производство мебели",
+      code: "07221400 — ПРОИЗВОДСТВО МЕБЕЛИ (ЧПУ)",
+      title: "Оптимизация карт 2D раскроя ЛДСП",
       steps: [
         {
-          num: "Шаг 1: Спецификация",
-          title: "Кухонный шкаф из ЛДСП",
-          desc: "Требуется раскроить стандартный полноформатный лист ЛДСП 2800 × 2070 × 16 мм на 7 деталей корпуса."
+          num: "Шаг 1",
+          title: "Спецификация деталей кухонного гарнитура",
+          desc: "Полноформатный лист ЛДСП 2800 × 2070 × 16 мм необходимо раскроить на 7 деталей корпуса с учетом режущего диска 4.2 мм."
         },
         {
-          num: "Шаг 2: Расчет",
-          title: "Минимизация обрезков",
-          desc: "Нажмите «Сгенерировать карту раскроя». Алгоритм ЧПУ оптимально разместит заготовки с учетом толщины диска 4.2 мм."
+          num: "Шаг 2",
+          title: "Генерация карты раскроя станка ЧПУ",
+          desc: "Нажмите «Рассчитать карту раскроя». Алгоритм минимизирует технологический отход и отобразит визуальную карту распила."
         },
         {
-          num: "Шаг 3: Смета",
-          title: "Экономическая выгода",
-          desc: "Технологический отход составит всего 8.4%, что экономит до 20% себестоимости плиты."
+          num: "Шаг 3",
+          title: "Экономическая оценка выгоды",
+          desc: "Отход составит всего 8.4%, что сохраняет до 20% бюджета материала на мебельной фабрике в Алматы."
         }
       ]
     }
@@ -185,21 +225,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const data = instructions[specKey];
     if (!data) return;
 
-    document.getElementById('instTitle').textContent = data.title;
+    const instCode = document.getElementById('instCode');
+    const instTitle = document.getElementById('instTitle');
     const scroll = document.getElementById('instScroll');
-    scroll.innerHTML = data.steps.map(s => `
-      <div class="step-card">
-        <span class="step-num">${s.num}</span>
-        <h4>${s.title}</h4>
-        <p>${s.desc}</p>
-      </div>
-    `).join('');
+
+    if (instCode) instCode.textContent = data.code;
+    if (instTitle) instTitle.textContent = data.title;
+
+    if (scroll) {
+      scroll.innerHTML = data.steps.map((s, idx) => `
+        <div class="step-card" id="stepCard-${idx}">
+          <div class="step-card-top">
+            <span class="step-num">${s.num}</span>
+            <span class="step-status-icon">⚪</span>
+          </div>
+          <h4>${s.title}</h4>
+          <p>${s.desc}</p>
+        </div>
+      `).join('');
+    }
   }
 
+  // 4. Update Score & SQLite3 Sync
   function updateScore(score) {
     state.score = score;
     const badge = document.getElementById('currentScoreBadge');
     if (badge) badge.textContent = `${score} / 100 баллов`;
+
+    // Mark steps completed visually
+    if (score >= 25) markStepDone(0);
+    if (score >= 50) markStepDone(1);
+    if (score >= 100) {
+      markStepDone(2);
+      if (window.soundEngine) window.soundEngine.playSuccess();
+    }
 
     // 1. Local fallback storage
     const saved = JSON.parse(localStorage.getItem('amk_student_data')) || (window.AMK_DATA ? window.AMK_DATA.student : { skills: {} });
@@ -207,10 +266,13 @@ document.addEventListener('DOMContentLoaded', () => {
     saved.skills[state.activeSpec] = Math.max(saved.skills[state.activeSpec] || 0, score);
     localStorage.setItem('amk_student_data', JSON.stringify(saved));
 
-    // 2. Server database sync (Backend API)
+    // 2. SQLite3 Database Sync
     if (score > 0) {
       const studentId = currentUser ? (currentUser.student_id || currentUser.id) : (saved.id || 'KZ-AMK-2026-98421');
       const userId = currentUser ? currentUser.id : null;
+
+      if (syncText) syncText.textContent = 'Синхронизация...';
+
       fetch('/api/grades/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -221,9 +283,25 @@ document.addEventListener('DOMContentLoaded', () => {
           specialty_name: instructions[state.activeSpec] ? instructions[state.activeSpec].title : state.activeSpec,
           score: score
         })
-      }).catch(() => {
-        // Silent catch for offline or static GitHub Pages mode
+      })
+      .then(r => r.json())
+      .then(d => {
+        if (d.success && syncText) {
+          syncText.textContent = `БД: ${score} б. сохранено ✓`;
+        }
+      })
+      .catch(() => {
+        if (syncText) syncText.textContent = `Сессия: ${score} б. записано`;
       });
+    }
+  }
+
+  function markStepDone(stepIdx) {
+    const card = document.getElementById(`stepCard-${stepIdx}`);
+    if (card) {
+      card.classList.add('completed');
+      const icon = card.querySelector('.step-status-icon');
+      if (icon) icon.textContent = '✓';
     }
   }
 
@@ -234,32 +312,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (runCodeBtn && codeArea) {
     runCodeBtn.addEventListener('click', () => {
-      itConsole.textContent = 'Запуск юнит-тестов...\n';
+      if (window.soundEngine) window.soundEngine.playClick();
+      itConsole.textContent = '⚡ Запуск автоматических юнит-тестов...\n\n';
+
       try {
         const fn = new Function(`${codeArea.value}; return calculateScholarship;`)();
         const tests = [
-          { args: [4.8, 95], expected: 'Повышенная (45 000 ₸)', name: 'Отличник (4.8, 95%)' },
-          { args: [3.9, 80], expected: 'Обычная (35 000 ₸)', name: 'Хорошист (3.9, 80%)' },
-          { args: [3.2, 90], expected: 'Не назначена (0 ₸)', name: 'Троечник (3.2, 90%)' },
-          { args: [4.9, 50], expected: 'Не назначена (0 ₸)', name: 'Пропуски (4.9, 50%)' }
+          { args: [4.8, 95], expected: 'Повышенная (45 000 ₸)', name: 'Студент-отличник (балл 4.8, 95%)' },
+          { args: [3.9, 80], expected: 'Обычная (35 000 ₸)', name: 'Студент-хорошист (балл 3.9, 80%)' },
+          { args: [3.2, 90], expected: 'Не назначена (0 ₸)', name: 'Удовлетворительно (балл 3.2, 90%)' },
+          { args: [4.9, 50], expected: 'Не назначена (0 ₸)', name: 'Высокий балл, но пропуски (4.9, 50%)' }
         ];
 
         let passed = 0;
         tests.forEach((t, i) => {
+          const startTime = performance.now();
           const res = fn(t.args[0], t.args[1]);
+          const elapsed = (performance.now() - startTime).toFixed(2);
+
           if (res === t.expected) {
             passed++;
-            itConsole.textContent += `✓ Тест #${i+1} [${t.name}]: Пройден ("${res}")\n`;
+            itConsole.textContent += `✓ [ТЕСТ #${i+1} PASSED] (${elapsed}ms): ${t.name}\n   Результат: "${res}"\n\n`;
           } else {
-            itConsole.textContent += `✗ Тест #${i+1} [${t.name}]: Ожидалось "${t.expected}", получено "${res}"\n`;
+            itConsole.textContent += `✗ [ТЕСТ #${i+1} FAILED]: ${t.name}\n   Ожидалось: "${t.expected}"\n   Получено:   "${res}"\n\n`;
           }
         });
 
         const score = Math.round((passed / tests.length) * 100);
         updateScore(score);
-        itConsole.textContent += `\nИтоговый результат: ${score} из 100 баллов. Все требования соблюдены!`;
+        itConsole.textContent += `═══════════════════════════════════════════════\n`;
+        itConsole.textContent += `📊 ИТОГ АВТОПРОВЕРКИ: Сдано ${passed} из ${tests.length} тестов (${score}%)\n`;
+        if (score === 100) {
+          itConsole.textContent += `🏆 Квалификационный экзамен по ПО успешно сдан на отлично!`;
+        }
       } catch (err) {
-        itConsole.textContent += `❌ Ошибка в коде: ${err.message}`;
+        if (window.soundEngine) window.soundEngine.playError();
+        itConsole.textContent += `❌ СИНТАКСИЧЕСКАЯ ОШИБКА: ${err.message}\nПроверьте расстановку скобок и точек с запятой.`;
         updateScore(15);
       }
     });
@@ -273,47 +361,104 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnReplace = document.getElementById('btnAutoReplace');
   const btnClear = document.getElementById('btnAutoClear');
 
+  function drawOscilloscope() {
+    const canvas = document.getElementById('autoWaveCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.parentElement.clientWidth || 320;
+    canvas.height = 90;
+
+    ctx.fillStyle = '#060a12';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw grid
+    ctx.strokeStyle = 'rgba(14, 165, 233, 0.15)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < canvas.width; x += 30) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += 20) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+    }
+
+    // Draw waveform
+    ctx.beginPath();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = state.auto.coilReplaced ? '#10b981' : '#ef4444';
+
+    const midY = canvas.height / 2;
+    ctx.moveTo(0, midY);
+
+    for (let x = 0; x < canvas.width; x++) {
+      let y = midY;
+      if (state.auto.coilReplaced) {
+        // Healthy spark waveform with primary ionization peak
+        const cycle = (x % 70);
+        if (cycle < 10) y = midY;
+        else if (cycle === 15) y = midY - 35; // Spark spike
+        else if (cycle < 35) y = midY - 10 + Math.sin(x) * 4; // Burn line
+        else if (cycle < 45) y = midY + Math.sin(x * 0.8) * 8; // Coil oscillation
+        else y = midY;
+      } else {
+        // Broken coil: flat dead signal with occasional stray noise
+        y = midY + (Math.random() - 0.5) * 4;
+      }
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
   if (btnScan) {
     btnScan.addEventListener('click', () => {
+      if (window.soundEngine) window.soundEngine.playClick();
       state.auto.scanned = true;
       autoConsole.textContent = `[OBD-II SCANNER v4.2]:\n` +
-        `• Связь с ЭБУ Bosch: УСТАНОВЛЕНА\n` +
-        `• Код ошибки: P0301 (Пропуск зажигания в цилиндре 1)\n` +
-        `• Статус: Проверьте сопротивление первичной обмотки катушки зажигания.\n`;
+        `• Связь с ЭБУ Bosch ME17: УСТАНОВЛЕНА\n` +
+        `• DTC: P0301 (Пропуск воспламенения в цилиндре #1)\n` +
+        `• Freeze Frame: Об. двигателя 820 об/мин, Темп. ОЖ 88°C\n` +
+        `• РЕКОМЕНДАЦИЯ: Замерьте сопротивление первичной обмотки катушки #1.\n`;
       updateScore(25);
+      drawOscilloscope();
     });
   }
 
   if (btnMeter) {
     btnMeter.addEventListener('click', () => {
+      if (window.soundEngine) window.soundEngine.playClick();
       state.auto.meterTested = true;
       if (state.auto.coilReplaced) {
-        autoConsole.textContent += `\n[МУЛЬТИМЕТР]: Замер сопротивления катушки 1 = 1.12 Ом (НОРМА, исправна!)\n`;
+        autoConsole.textContent += `\n[МУЛЬТИМЕТР Fluke 87V]:\n• Замер сопротивления катушки 1 = 1.12 Ом\n• СТАТУС: Сопротивление в пределах заводского допуска (1.05 - 1.25 Ом).\n`;
       } else {
-        autoConsole.textContent += `\n[МУЛЬТИМЕТР]: Замер сопротивления катушки 1 = O.L (ОБРЫВ ПЕРВИЧНОЙ ЦЕПИ! Требуется замена)\n`;
+        autoConsole.textContent += `\n[МУЛЬТИМЕТР Fluke 87V]:\n• Замер сопротивления катушки 1 = O.L (Обрыв первичной цепи!)\n• СТАТУС: Внутренний пробой изолятора. Катушка подлежит обязательной замене.\n`;
       }
       updateScore(50);
+      drawOscilloscope();
     });
   }
 
   if (btnReplace) {
     btnReplace.addEventListener('click', () => {
+      if (window.soundEngine) window.soundEngine.playClick();
       state.auto.coilReplaced = true;
-      autoConsole.textContent += `\n[РЕМОНТ]: Установлена новая оригинальная катушка зажигания цилиндра 1.\n`;
+      autoConsole.textContent += `\n[РЕМОНТНЫЙ УЧАСТОК]:\n• Демонтирована неисправная катушка #1.\n• Установлен оригинальный модуль зажигания NGK/Bosch.\n• Разъем защелкнут, момент затяжки 10 Н·м.\n`;
       updateScore(75);
+      drawOscilloscope();
     });
   }
 
   if (btnClear) {
     btnClear.addEventListener('click', () => {
+      if (window.soundEngine) window.soundEngine.playClick();
       if (!state.auto.coilReplaced) {
-        autoConsole.textContent += `\n[ОШИБКА СБРОСА]: Неисправность катушки 1 не устранена! Сначала замените деталь.\n`;
+        if (window.soundEngine) window.soundEngine.playError();
+        autoConsole.textContent += `\n⚠️ [ОТКАЗ СБРОСА]: Аппаратная ошибка не устранена! Сначала замените неисправную катушку.\n`;
       } else {
         state.auto.cleared = true;
         checkStatusBadge.className = 'check-light good';
         checkStatusBadge.textContent = '✓ ДВС исправен (Check Engine выключен)';
-        autoConsole.textContent += `\n[ЭБУ ОЧИЩЕН]: Память DTC пуста. Check Engine погашен. Двигатель работает ровно!\n`;
+        autoConsole.textContent += `\n[ОЧИСТКА ЭБУ ЗАВЕРШЕНА]:\n• Память кодов DTC чиста.\n• Контрольная лампа Check Engine погашена.\n• Двигатель работает ровно на всех режимах.\n`;
         updateScore(100);
+        drawOscilloscope();
       }
     });
   }
@@ -355,12 +500,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // ================= MODULE 4: DESIGN AUDIT =================
   document.querySelectorAll('.clickable-bug').forEach(bug => {
     bug.addEventListener('click', () => {
+      if (window.soundEngine) window.soundEngine.playClick();
       const bugId = bug.getAttribute('data-bug');
       state.design.fixedBugs.add(bugId);
       bug.classList.add('resolved');
 
       if (bugId === 'logo') {
-        bug.querySelector('.bug-content').textContent = 'AMK COLLEGE (Пропорции восстановлены)';
+        bug.querySelector('.bug-content').textContent = 'АМК КОЛЛЕДЖ (Пропорции восстановлены)';
         bug.querySelector('.bug-content').style.transform = 'none';
         bug.querySelector('.bug-content').style.letterSpacing = 'normal';
       } else if (bugId === 'title') {
@@ -373,6 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bug.querySelector('button').style.background = '#4f46e5';
         bug.querySelector('button').style.border = 'none';
         bug.querySelector('button').style.borderRadius = '6px';
+        bug.querySelector('button').textContent = 'Подать документы онлайн ✓';
       }
 
       const score = state.design.fixedBugs.size * 25;
@@ -380,81 +527,76 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ================= MODULE 5: FURNITURE CUTTING =================
+  // ================= MODULE 5: FURNITURE SHEET CUTTING =================
   const btnRunCut = document.getElementById('btnRunCut');
-  const furnitureCanvas = document.getElementById('furnitureCanvas');
+  const fWaste = document.getElementById('fWaste');
+  const fCost = document.getElementById('fCost');
 
-  function drawFurniture() {
-    if (!furnitureCanvas) return;
-    const ctx = furnitureCanvas.getContext('2d');
-    furnitureCanvas.width = 540;
-    furnitureCanvas.height = 380;
+  function drawFurnitureSheet(isCut = false) {
+    const canvas = document.getElementById('furnitureCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    canvas.width = 460;
+    canvas.height = 320;
 
-    ctx.fillStyle = '#1e293b';
-    ctx.fillRect(0, 0, furnitureCanvas.width, furnitureCanvas.height);
-    ctx.strokeStyle = '#475569';
+    // Background sheet (2800 x 2070 mm)
+    ctx.fillStyle = '#b45309'; // Wood brown
+    ctx.fillRect(20, 20, 420, 280);
+
+    ctx.strokeStyle = '#fef3c7';
     ctx.lineWidth = 2;
-    ctx.strokeRect(2, 2, furnitureCanvas.width - 4, furnitureCanvas.height - 4);
+    ctx.strokeRect(20, 20, 420, 280);
 
+    // Dimension labels
     ctx.fillStyle = '#94a3b8';
-    ctx.font = '13px JetBrains Mono';
-    ctx.textAlign = 'center';
-    ctx.fillText('Лист ЛДСП 2800 × 2070 мм. Нажмите кнопку справа для расчета.', furnitureCanvas.width / 2, furnitureCanvas.height / 2);
-  }
+    ctx.font = '10px JetBrains Mono';
+    ctx.fillText('2800 mm', 200, 15);
+    ctx.fillText('2070 mm', 425, 160);
 
-  if (btnRunCut) {
-    btnRunCut.addEventListener('click', () => {
-      const ctx = furnitureCanvas.getContext('2d');
-      ctx.clearRect(0, 0, furnitureCanvas.width, furnitureCanvas.height);
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, furnitureCanvas.width, furnitureCanvas.height);
-
+    if (isCut) {
+      // Cut parts
       const parts = [
-        { name: 'Боковина 1', x: 8, y: 8, w: 160, h: 180, c: '#4f46e5' },
-        { name: 'Боковина 2', x: 176, y: 8, w: 160, h: 180, c: '#4f46e5' },
-        { name: 'Дно', x: 344, y: 8, w: 140, h: 180, c: '#0ea5e9' },
-        { name: 'Верх', x: 8, y: 196, w: 140, h: 170, c: '#0ea5e9' },
-        { name: 'Полка', x: 156, y: 196, w: 140, h: 170, c: '#10b981' },
-        { name: 'Фасады (2 шт)', x: 304, y: 196, w: 180, h: 170, c: '#f59e0b' }
+        { x: 25, y: 25, w: 120, h: 220, label: 'Боковина 1' },
+        { x: 150, y: 25, w: 120, h: 220, label: 'Боковина 2' },
+        { x: 275, y: 25, w: 155, h: 105, label: 'Крышка' },
+        { x: 275, y: 135, w: 155, h: 105, label: 'Дно' },
+        { x: 25, y: 250, w: 190, h: 45, label: 'Полка #1' },
+        { x: 220, y: 250, w: 190, h: 45, label: 'Полка #2' }
       ];
 
       parts.forEach(p => {
-        ctx.fillStyle = p.c;
+        ctx.fillStyle = '#d97706';
         ctx.fillRect(p.x, p.y, p.w, p.h);
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1.5;
         ctx.strokeRect(p.x, p.y, p.w, p.h);
 
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 11px Plus Jakarta Sans';
-        ctx.textAlign = 'center';
-        ctx.fillText(p.name, p.x + p.w / 2, p.y + p.h / 2);
+        ctx.font = '11px Plus Jakarta Sans';
+        ctx.fillText(p.label, p.x + 8, p.y + 20);
       });
 
-      // Saw cuts
-      ctx.strokeStyle = '#ef4444';
-      ctx.setLineDash([3, 3]);
-      ctx.strokeRect(0, 192, furnitureCanvas.width, 1);
-      ctx.setLineDash([]);
+      // Kerf sawdust lines
+      ctx.fillStyle = '#10b981';
+      ctx.font = 'bold 10px JetBrains Mono';
+      ctx.fillText('✓ ЧПУ РАСКРОЙ ВЫПОЛНЕН', 30, 312);
+    } else {
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '13px Plus Jakarta Sans';
+      ctx.fillText('Лист ЛДСП готов к расчету карт раскроя', 90, 160);
+    }
+  }
 
-      document.getElementById('fWaste').textContent = '8.4%';
-      document.getElementById('fCost').textContent = '24 800 ₸';
+  if (btnRunCut) {
+    btnRunCut.addEventListener('click', () => {
+      if (window.soundEngine) window.soundEngine.playClick();
+      drawFurnitureSheet(true);
+      if (fWaste) fWaste.textContent = '8.4 %';
+      if (fCost) fCost.textContent = '14 200 ₸ (Экономия 3 400 ₸)';
       updateScore(100);
     });
   }
 
-  // Timer Countdown
-  const timerDisplay = document.getElementById('timerDisplay');
-  setInterval(() => {
-    if (state.timerSeconds > 0) {
-      state.timerSeconds--;
-      const m = String(Math.floor(state.timerSeconds / 60)).padStart(2, '0');
-      const s = String(state.timerSeconds % 60).padStart(2, '0');
-      if (timerDisplay) timerDisplay.textContent = `${m}:${s}`;
-    }
-  }, 1000);
-
-  // Initial boot
+  // Initial load
   switchModule(state.activeSpec);
-  drawFurniture();
 });

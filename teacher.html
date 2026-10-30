@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Электронный журнал преподавателя — АМК Практикум</title>
+  <title>Электронный журнал преподавателя — АМК Практикум (amk.edu.kz)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
@@ -13,31 +13,112 @@
       padding: 40px 0 80px;
     }
     .lock-screen {
-      max-width: 440px;
+      max-width: 480px;
       margin: 80px auto;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
-      padding: 36px;
+      padding: 40px;
       text-align: center;
-      box-shadow: var(--shadow-card);
+      box-shadow: var(--shadow-modal);
     }
     .teacher-top-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
       padding: 32px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+    .teacher-top-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: var(--gradient-btn);
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition);
+    }
+    .kpi-card:hover {
+      border-color: var(--border-active);
+      transform: translateY(-2px);
+    }
+    .kpi-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .kpi-val {
+      font-size: 2rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: var(--text-primary);
+      line-height: 1.1;
+    }
+    .kpi-sub {
+      font-size: 0.75rem;
+      color: var(--accent-emerald);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+    .journal-toolbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 20px;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .search-input-box {
+      flex-grow: 1;
+      max-width: 380px;
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 10px 16px 10px 38px;
+      border-radius: var(--radius-full);
+      font-size: 0.88rem;
+      font-family: var(--font-main);
+      outline: none;
+      transition: var(--transition);
+    }
+    .search-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 14px rgba(79, 70, 229, 0.35);
+    }
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
     }
     .group-selector-pills {
       display: flex;
-      gap: 10px;
-      margin-top: 14px;
+      gap: 8px;
       flex-wrap: wrap;
     }
     .group-pill {
@@ -50,11 +131,21 @@
       font-weight: 700;
       cursor: pointer;
       transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
     .group-pill:hover, .group-pill.active {
       background: var(--accent-primary);
       color: #fff;
       border-color: var(--accent-primary);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+    }
+    .group-pill .pill-count {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 2px 6px;
+      border-radius: 9999px;
+      font-size: 0.72rem;
     }
     .journal-table-wrap {
       background: var(--bg-card);
@@ -77,36 +168,55 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
       border-bottom: 1px solid var(--border-color);
+      font-weight: 800;
     }
     .journal-table td {
       padding: 16px 20px;
       border-bottom: 1px solid var(--border-color);
+      transition: background 0.15s;
     }
-    .journal-table tr:hover td {
-      background: var(--bg-card-hover);
+    .journal-table tbody tr {
+      cursor: pointer;
+    }
+    .journal-table tbody tr:hover td {
+      background: rgba(79, 70, 229, 0.08);
     }
     .score-chip-sm {
       font-family: var(--font-mono);
       font-weight: 800;
-      padding: 4px 10px;
+      padding: 4px 12px;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       display: inline-block;
     }
     .score-chip-sm.excellent {
       background: rgba(16, 185, 129, 0.15);
       color: var(--accent-emerald);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(16, 185, 129, 0.35);
     }
     .score-chip-sm.good {
       background: rgba(14, 165, 233, 0.15);
       color: var(--accent-cyan);
-      border: 1px solid rgba(14, 165, 233, 0.3);
+      border: 1px solid rgba(14, 165, 233, 0.35);
     }
     .score-chip-sm.pending {
       background: rgba(245, 158, 11, 0.15);
       color: var(--accent-amber);
-      border: 1px solid rgba(245, 158, 11, 0.3);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    /* Print Stylesheet */
+    @media print {
+      body * { visibility: hidden; }
+      .journal-table-wrap, .journal-table-wrap * { visibility: visible; }
+      .journal-table-wrap {
+        position: absolute; left: 0; top: 0; width: 100%;
+        background: #fff !important; color: #000 !important;
+        border: none !important; box-shadow: none !important;
+      }
+      .journal-table th { background: #eee !important; color: #000 !important; }
+      .journal-table td { color: #000 !important; border-bottom: 1px solid #ccc !important; }
+      .navbar, .teacher-top-card, .kpi-grid, .journal-toolbar { display: none !important; }
     }
   </style>
 </head>
@@ -131,7 +241,10 @@
 
       <div class="nav-actions">
         <div id="teacherUserBadge" style="display: none; align-items: center; gap: 10px;">
-          <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent-emerald);" id="teacherNameDisplay"></span>
+          <div class="user-chip">
+            <span style="color: var(--accent-emerald);">👨‍🏫</span>
+            <span id="teacherNameDisplay" style="font-weight: 700;">Преподаватель</span>
+          </div>
           <button class="btn-toggle" id="btnTeacherLogout" style="color: var(--accent-rose);">Выйти</button>
         </div>
         <a href="auth.html" id="btnGoToAuth" class="btn-toggle">Вход / Регистрация</a>
@@ -139,12 +252,12 @@
     </div>
   </header>
 
-  <!-- GATE / LOCK SCREEN (Если не авторизован как преподаватель) -->
+  <!-- GATE / LOCK SCREEN (Если преподаватель не авторизован) -->
   <div id="teacherLockScreen" class="lock-screen" style="display: none;">
     <div style="font-size: 3rem; margin-bottom: 14px;">🔒</div>
-    <h2 style="font-size: 1.4rem; margin-bottom: 8px;">Закрытый доступ</h2>
+    <h2 style="font-size: 1.5rem; margin-bottom: 8px;">Закрытый электронный журнал</h2>
     <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 24px;">
-      Электронный журнал успеваемости доступен только преподавателям и учебной части колледжа АМК.
+      Доступ к экзаменационным ведомостям успеваемости ограничен преподавательским составом колледжа АМК.
     </p>
 
     <form id="quickTeacherUnlockForm">
@@ -159,41 +272,94 @@
       </button>
     </form>
 
-    <div style="margin-top: 18px;">
-      <a href="auth.html" style="font-size: 0.82rem; color: var(--accent-cyan); text-decoration: none;">
-        Регистрация нового преподавателя &rarr;
-      </a>
+    <div style="margin-top: 20px; font-size: 0.82rem; color: var(--text-muted);">
+      Для демонстрационной комиссии пароль: <strong style="color: var(--accent-cyan);">admin123</strong><br>
+      или <a href="auth.html" style="color: var(--accent-cyan); text-decoration: none;">войти через общую форму &rarr;</a>
     </div>
   </div>
 
   <!-- AUTHENTICATED TEACHER DASHBOARD -->
   <main class="container teacher-page" id="teacherJournalContent" style="display: none;">
-    <div class="teacher-top-card">
-      <div>
-        <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);">Преподавательский доступ</span>
-        <h1 style="font-size: 1.85rem; margin-top: 4px; margin-bottom: 6px;">Ведомость сдачи лабораторных тренажеров</h1>
-        <p style="margin: 0; font-size: 0.92rem; color: var(--text-muted);">
-          Реальные результаты студентов из базы данных SQLite3 колледжа.
-        </p>
 
-        <!-- Group Selector -->
-        <div class="group-selector-pills">
-          <button class="group-pill active" data-group="all">Все группы</button>
-          <button class="group-pill" data-group="ПО-22">Группа ПО-22 (IT)</button>
-          <button class="group-pill" data-group="АВ-21">Группа АВ-21 (Авто)</button>
-          <button class="group-pill" data-group="ХО-20">Группа ХО-20 (Холод)</button>
+    <!-- Top Card Header -->
+    <div class="teacher-top-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+        <div>
+          <span class="badge-tag-emerald badge-tag">
+            <span class="pulse-dot"></span>
+            Преподавательский доступ • Сессия 2026
+          </span>
+          <h1 style="font-size: 2rem; margin-top: 4px; margin-bottom: 6px;">Электронный журнал успеваемости</h1>
+          <p style="margin: 0; font-size: 0.92rem; color: var(--text-muted);">
+            Данные практических тренажеров и квалификационных испытаний из базы SQLite3 колледжа.
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" id="btnExportCSV">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Экспорт в Excel (CSV)
+          </button>
+          <button class="btn btn-secondary" onclick="window.print()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Печать ведомости
+          </button>
+          <button class="btn btn-primary" id="btnRefreshGrades">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+            Обновить из БД
+          </button>
         </div>
       </div>
+    </div>
 
-      <div style="display: flex; gap: 12px;">
-        <button class="btn btn-secondary" onclick="window.print()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-          Печать ведомости
+    <!-- 4 Key Performance Indicators (KPI) -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-label">Студентов в базе</span>
+        <div class="kpi-val" id="kpiTotalStudents">--</div>
+        <span class="kpi-sub">Группы ПО-22, АВ-21, ХО-20</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Средний балл (GPA)</span>
+        <div class="kpi-val" id="kpiAvgScore" style="color: var(--accent-emerald);">--</div>
+        <span class="kpi-sub">По 100-балльной шкале</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Сдано тренажеров</span>
+        <div class="kpi-val" id="kpiTotalPassed" style="color: var(--accent-cyan);">--</div>
+        <span class="kpi-sub">Успешных практических защит</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Аттестация WorldSkills</span>
+        <div class="kpi-val" id="kpiCertifiedPercent" style="color: #f59e0b;">-- %</div>
+        <span class="kpi-sub">Допуск к производству</span>
+      </div>
+    </div>
+
+    <!-- Toolbar: Search & Group Filters -->
+    <div class="journal-toolbar">
+      <div class="group-selector-pills">
+        <button class="group-pill active" data-group="all">
+          <span>Все группы</span>
+          <span class="pill-count" id="countAll">0</span>
         </button>
-        <button class="btn btn-primary" id="btnRefreshGrades">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
-          Обновить базу
+        <button class="group-pill" data-group="ПО-22">
+          <span>ПО-22 (IT)</span>
+          <span class="pill-count" id="countPo22">0</span>
         </button>
+        <button class="group-pill" data-group="АВ-21">
+          <span>АВ-21 (Авто)</span>
+          <span class="pill-count" id="countAv21">0</span>
+        </button>
+        <button class="group-pill" data-group="ХО-20">
+          <span>ХО-20 (Холод)</span>
+          <span class="pill-count" id="countXo20">0</span>
+        </button>
+      </div>
+
+      <div class="search-input-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="journalSearchInput" class="search-input" placeholder="Поиск по ФИО или студенческому билету...">
       </div>
     </div>
 
@@ -211,17 +377,59 @@
           </tr>
         </thead>
         <tbody id="journalTableBody">
-          <!-- Loaded from DB -->
+          <!-- Dynamically populated from SQLite3 -->
         </tbody>
       </table>
     </div>
   </main>
 
+  <!-- Student Inspection Modal -->
+  <div class="modal-backdrop" id="studentDetailModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size: 1.25rem; margin-bottom: 2px;" id="detailStudentName">Детальная карточка студента</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;" id="detailStudentSub"></p>
+        </div>
+        <button class="modal-close-btn" onclick="document.getElementById('studentDetailModal').classList.remove('active');">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="background: #090e1a; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary);">Номер билета:</span>
+            <span style="font-family: var(--font-mono); font-size: 0.95rem; font-weight: 800; color: var(--accent-cyan);" id="detailStudentId"></span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary);">Итоговый средний балл:</span>
+            <span style="font-family: var(--font-mono); font-size: 1.2rem; font-weight: 900; color: var(--accent-emerald);" id="detailStudentAvg"></span>
+          </div>
+        </div>
+
+        <div style="font-size: 0.85rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">
+          Сданные практические модули:
+        </div>
+        <div id="detailStudentGradesList" style="display: flex; flex-direction: column; gap: 8px;">
+          <!-- Dynamically injected -->
+        </div>
+
+        <div style="margin-top: 24px; text-align: right;">
+          <button class="btn btn-secondary" onclick="document.getElementById('studentDetailModal').classList.remove('active');">
+            Закрыть карточку
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="toast"></div>
 
+  <!-- Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/data.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       let currentGroup = 'all';
+      let allLoadedStudents = [];
 
       // Check current login state
       function checkAuth() {
@@ -254,6 +462,7 @@
         const pwd = document.getElementById('unlockPasswordInput').value.trim();
 
         if (pwd === 'admin123' || pwd === 'AMK-TEACHER-2026') {
+          if (window.soundEngine) window.soundEngine.playSuccess();
           const teacherObj = {
             id: 1,
             full_name: "Иванов Сергей Павлович (Зав. отделением)",
@@ -264,12 +473,14 @@
           localStorage.setItem('amk_current_user', JSON.stringify(teacherObj));
           checkAuth();
         } else {
+          if (window.soundEngine) window.soundEngine.playError();
           alert('Неверный пароль преподавателя! (Для комиссии пароль: admin123 или код: AMK-TEACHER-2026)');
         }
       });
 
       // Logout
       document.getElementById('btnTeacherLogout').addEventListener('click', () => {
+        if (window.soundEngine) window.soundEngine.playClick();
         localStorage.removeItem('amk_current_user');
         checkAuth();
       });
@@ -277,24 +488,39 @@
       // Group Pills
       document.querySelectorAll('.group-pill').forEach(pill => {
         pill.addEventListener('click', () => {
+          if (window.soundEngine) window.soundEngine.playClick();
           document.querySelectorAll('.group-pill').forEach(p => p.classList.remove('active'));
           pill.classList.add('active');
           currentGroup = pill.getAttribute('data-group');
-          loadGrades();
+          filterAndRender();
         });
       });
 
-      document.getElementById('btnRefreshGrades').addEventListener('click', loadGrades);
+      // Live search input
+      const searchInput = document.getElementById('journalSearchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', () => {
+          filterAndRender();
+        });
+      }
+
+      document.getElementById('btnRefreshGrades').addEventListener('click', () => {
+        if (window.soundEngine) window.soundEngine.playClick();
+        loadGrades();
+      });
 
       function loadGrades() {
         const tbody = document.getElementById('journalTableBody');
         tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Синхронизация с базой данных SQLite3...</td></tr>`;
 
-        fetch(`/api/teacher/journal?group=${encodeURIComponent(currentGroup)}`)
+        fetch(`/api/teacher/journal?group=all`)
           .then(r => r.json())
           .then(data => {
-            if (data.success && data.students.length > 0) {
-              renderTable(data.students);
+            if (data.success && data.students && data.students.length > 0) {
+              allLoadedStudents = data.students;
+              updatePillCounts();
+              updateKPIs();
+              filterAndRender();
             } else {
               renderFallback();
             }
@@ -302,17 +528,81 @@
           .catch(() => renderFallback());
       }
 
+      function updateKPIs() {
+        const total = allLoadedStudents.length;
+        if (total === 0) return;
+
+        let sumScores = 0;
+        let totalTests = 0;
+        let passedCount = 0;
+
+        allLoadedStudents.forEach(s => {
+          sumScores += (s.avg_score || 0);
+          totalTests += (s.tests_passed || 0);
+          if (s.avg_score >= 75) passedCount++;
+        });
+
+        const avg = (sumScores / total).toFixed(1);
+        const certPercent = Math.round((passedCount / total) * 100);
+
+        document.getElementById('kpiTotalStudents').textContent = total;
+        document.getElementById('kpiAvgScore').textContent = `${avg} / 100`;
+        document.getElementById('kpiTotalPassed').textContent = `${totalTests} треков`;
+        document.getElementById('kpiCertifiedPercent').textContent = `${certPercent} %`;
+      }
+
+      function updatePillCounts() {
+        const cAll = allLoadedStudents.length;
+        const cPo22 = allLoadedStudents.filter(s => s.group_name === 'ПО-22').length;
+        const cAv21 = allLoadedStudents.filter(s => s.group_name === 'АВ-21').length;
+        const cXo20 = allLoadedStudents.filter(s => s.group_name === 'ХО-20').length;
+
+        document.getElementById('countAll').textContent = cAll;
+        document.getElementById('countPo22').textContent = cPo22;
+        document.getElementById('countAv21').textContent = cAv21;
+        document.getElementById('countXo20').textContent = cXo20;
+      }
+
+      function filterAndRender() {
+        let list = allLoadedStudents;
+        if (currentGroup !== 'all') {
+          list = list.filter(s => s.group_name === currentGroup);
+        }
+
+        const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+        if (query) {
+          list = list.filter(s => 
+            (s.full_name || s.name || '').toLowerCase().includes(query) ||
+            (s.student_id || '').toLowerCase().includes(query) ||
+            (s.group_name || '').toLowerCase().includes(query)
+          );
+        }
+
+        renderTable(list);
+      }
+
       function renderTable(students) {
         const tbody = document.getElementById('journalTableBody');
-        tbody.innerHTML = students.map(s => {
+        if (students.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Студенты не найдены. Измените параметры фильтра.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = students.map((s, idx) => {
           const isPassed = s.avg_score >= 85;
           const statusClass = isPassed ? 'excellent' : (s.avg_score >= 70 ? 'good' : 'pending');
           const statusText = isPassed ? 'Аттестован (Отлично)' : (s.avg_score >= 70 ? 'Аттестован (Хорошо)' : 'На доработке');
+          const studentName = s.full_name || s.name;
 
           return `
-            <tr>
+            <tr onclick="window.openStudentDetail(${idx})">
               <td>
-                <strong style="color: var(--text-primary); font-size: 0.95rem;">${s.name}</strong>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--gradient-btn); display: flex; align-items: center; justify-content: center; font-size: 0.72rem; color: #fff; font-weight: 800;">
+                    ${studentName.split(' ').map(w => w[0]).join('').substring(0, 2)}
+                  </div>
+                  <strong style="color: var(--text-primary); font-size: 0.95rem;">${studentName}</strong>
+                </div>
               </td>
               <td><span style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-cyan);">${s.group_name}</span></td>
               <td><span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">${s.student_id}</span></td>
@@ -330,19 +620,63 @@
         }).join('');
       }
 
-      function renderFallback() {
-        const seed = [
-          { name: "Асылхан Бауыржанұлы", group_name: "ПО-22", student_id: "KZ-AMK-2026-98421", tests_passed: 5, avg_score: 100 },
-          { name: "Данил Панин", group_name: "ПО-22", student_id: "KZ-AMK-2026-98422", tests_passed: 4, avg_score: 92 },
-          { name: "Алина Сейдалиева", group_name: "ПО-22", student_id: "KZ-AMK-2026-98423", tests_passed: 3, avg_score: 87.5 },
-          { name: "Арман Исаев", group_name: "АВ-21", student_id: "KZ-AMK-2026-77101", tests_passed: 4, avg_score: 95 },
-          { name: "Жанибек Оразов", group_name: "ХО-20", student_id: "KZ-AMK-2026-55201", tests_passed: 3, avg_score: 92 }
-        ];
-        let list = seed;
-        if (currentGroup !== 'all') {
-          list = list.filter(s => s.group_name === currentGroup);
+      window.openStudentDetail = function(idx) {
+        const student = allLoadedStudents[idx];
+        if (!student) return;
+
+        if (window.soundEngine) window.soundEngine.playClick();
+        document.getElementById('detailStudentName').textContent = student.full_name || student.name;
+        document.getElementById('detailStudentSub').textContent = `Алматинский многопрофильный колледж • Группа ${student.group_name}`;
+        document.getElementById('detailStudentId').textContent = student.student_id;
+        document.getElementById('detailStudentAvg').textContent = `${student.avg_score} / 100`;
+
+        const listEl = document.getElementById('detailStudentGradesList');
+        if (student.grades && student.grades.length > 0) {
+          listEl.innerHTML = student.grades.map(g => `
+            <div style="background: var(--bg-surface); padding: 10px 14px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 700; font-size: 0.85rem;">${g.specialty_slug.toUpperCase()}</span>
+              <span style="font-family: var(--font-mono); font-weight: 800; color: var(--accent-emerald);">${g.score} баллов</span>
+            </div>
+          `).join('');
+        } else {
+          listEl.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">Студент успешно сдал демонстрационный экзамен с рейтингом ${student.avg_score} баллов.</p>`;
         }
-        renderTable(list);
+
+        document.getElementById('studentDetailModal').classList.add('active');
+      };
+
+      // Export to Excel / CSV
+      document.getElementById('btnExportCSV').addEventListener('click', () => {
+        if (window.soundEngine) window.soundEngine.playClick();
+        if (allLoadedStudents.length === 0) return;
+
+        let csvContent = "\uFEFFФИО Студента;Группа;Студенческий билет;Сдано треков;Средний балл GPA;Аттестация WorldSkills\n";
+        allLoadedStudents.forEach(s => {
+          const isPassed = s.avg_score >= 85 ? 'Отлично' : (s.avg_score >= 70 ? 'Хорошо' : 'Доработка');
+          csvContent += `"${s.full_name || s.name}";"${s.group_name}";"${s.student_id}";"${s.tests_passed}";"${s.avg_score}";"${isPassed}"\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `amk_journal_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
+
+      function renderFallback() {
+        allLoadedStudents = [
+          { name: "Асылхан Бауыржанұлы", full_name: "Асылхан Бауыржанұлы", group_name: "ПО-22", student_id: "KZ-AMK-2026-98421", tests_passed: 5, avg_score: 100 },
+          { name: "Данил Панин", full_name: "Данил Панин", group_name: "ПО-22", student_id: "KZ-AMK-2026-98422", tests_passed: 4, avg_score: 92 },
+          { name: "Алина Сейдалиева", full_name: "Алина Сейдалиева", group_name: "ПО-22", student_id: "KZ-AMK-2026-98423", tests_passed: 3, avg_score: 87.5 },
+          { name: "Арман Исаев", full_name: "Арман Исаев", group_name: "АВ-21", student_id: "KZ-AMK-2026-77101", tests_passed: 4, avg_score: 95 },
+          { name: "Жанибек Оразов", full_name: "Жанибек Оразов", group_name: "ХО-20", student_id: "KZ-AMK-2026-55201", tests_passed: 3, avg_score: 92 }
+        ];
+        updatePillCounts();
+        updateKPIs();
+        filterAndRender();
       }
 
       checkAuth();
