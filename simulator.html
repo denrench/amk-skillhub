@@ -6,7 +6,7 @@
   <title>AMK WorkStation — Интерактивный симулятор специальностей</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/simulator.css">
@@ -30,12 +30,12 @@
 
     <!-- Specialty Switcher Dropdown in Navbar -->
     <div class="sim-selector-wrap">
-      <label for="specialtySelect" class="sr-only">Специальность</label>
       <select id="specialtySelect" class="sim-select">
-        <option value="it">💻 06130100 — Программное обеспечение (IT)</option>
-        <option value="auto">🚗 07161300 — ТО и ремонт авто (OBD-II диагностика)</option>
-        <option value="cryo">❄️ 07150900 — Холодильно-компрессорные машины</option>
-        <option value="design">🎨 02110300 — Графический дизайн и аудит</option>
+        <option value="it">💻 06130100 — Программное обеспечение (IDE & Автотесты)</option>
+        <option value="auto">🚗 07161300 — ТО и ремонт авто (OBD-II & Кластер приборов)</option>
+        <option value="cryo">❄️ 07150900 — Холодильные машины (R134a Анимация контура)</option>
+        <option value="design">🎨 02110300 — Графический дизайн (Figma-аудит)</option>
+        <option value="furniture">🪑 07221400 — Производство мебели (Раскрой ЛДСП 2800×2070)</option>
       </select>
     </div>
 
@@ -63,7 +63,7 @@
       </button>
 
       <!-- Submit / Verify Button -->
-      <button id="runCheckBtn" class="btn btn-primary-sm">
+      <button id="runCheckBtn" class="btn-primary-sm">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <polyline points="20 6 9 17 4 12"/>
         </svg>
@@ -93,7 +93,7 @@
           <span id="statusText">Готов к выполнению</span>
         </div>
         <div class="status-score">
-          Баллы: <strong id="currentScore">0 / 100</strong>
+          Баллы: <strong id="currentScore" style="color: var(--secondary); font-family: var(--font-mono);">0 / 100</strong>
         </div>
       </div>
     </aside>
@@ -101,19 +101,27 @@
     <!-- Right Pane: Interactive Canvas / Sandbox -->
     <section class="sim-main-stage">
 
-      <!-- ================= 1. IT SANDBOX (Code Editor) ================= -->
+      <!-- ================= 1. IT SANDBOX (Monaco-Style Code Editor) ================= -->
       <div class="sim-module active" id="module-it">
         <div class="code-editor-header">
           <div class="editor-tabs">
-            <span class="e-tab active">solution.js</span>
-            <span class="e-tab">index.html</span>
+            <span class="e-tab active">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              solution.js
+            </span>
+            <span class="e-tab">test_cases.json</span>
           </div>
-          <div class="editor-actions">
-            <button class="btn-text-xs" id="resetCodeBtn">Сбросить код</button>
+          <div class="editor-stats-bar">
+            <span>Время выполнения: <strong id="execTimeBadge" style="color: var(--accent-green);">0.0 ms</strong></span>
+            <span>Память: <strong>11.4 MB</strong></span>
+            <button class="btn-text-xs" id="resetCodeBtn" style="color: var(--text-dim); cursor: pointer; background: none; border: none;">Сбросить код</button>
           </div>
         </div>
 
         <div class="code-editor-body">
+          <div class="line-numbers">
+            1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16
+          </div>
           <textarea id="codeEditor" spellcheck="false" class="code-textarea">// AMK SkillHub: 06130100 «Программное обеспечение»
 // Задание: Реализуйте функцию calculateScholarship(gradeAvg, attendanceRate)
 // Правила начисления стипендии в АМК:
@@ -122,7 +130,7 @@
 // - Иначе: вернуть "Не назначена (0 ₸)"
 
 function calculateScholarship(gradeAvg, attendanceRate) {
-  // Напишите ваш код здесь:
+  // Напишите ваш алгоритм:
   if (gradeAvg >= 4.5 && attendanceRate >= 90) {
     return "Повышенная (45 000 ₸)";
   } else if (gradeAvg >= 3.5 && attendanceRate >= 75) {
@@ -136,51 +144,97 @@ function calculateScholarship(gradeAvg, attendanceRate) {
 
         <div class="console-drawer">
           <div class="console-head">
-            <span class="console-title">🖥 Тестовая консоль (Автопроверка тестами)</span>
+            <span class="console-title">🖥 Тестовая консоль (V8 Runtime Test Runner)</span>
             <span class="console-badge" id="testResultBadge">Ожидание запуска</span>
           </div>
-          <div class="console-output" id="consoleOutput">
-            Нажмите «Проверить решение» в правом верхнем углу, чтобы запустить серию из 4 автоматических юнит-тестов.
-          </div>
+          <div class="console-output" id="consoleOutput">Нажмите «Проверить решение» в верхнем правом углу, чтобы запустить серию из 4 автоматических юнит-тестов.</div>
         </div>
       </div>
 
-      <!-- ================= 2. AUTO DIAGNOSTIC MODULE ================= -->
+      <!-- ================= 2. AUTO DIAGNOSTIC MODULE WITH INSTRUMENT CLUSTER ================= -->
       <div class="sim-module" id="module-auto">
         <div class="auto-stage">
+          <!-- Realistic Virtual Dashboard Cluster -->
+          <div class="instrument-cluster">
+            <!-- Tachometer with animated needle -->
+            <div class="cluster-gauge">
+              <div class="gauge-svg-wrap">
+                <svg width="160" height="160" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="65" stroke="#1f293d" stroke-width="8" fill="none" stroke-dasharray="320" stroke-dashoffset="80"/>
+                  <circle cx="80" cy="80" r="65" stroke="#f59e0b" stroke-width="8" fill="none" stroke-dasharray="320" stroke-dashoffset="240" stroke-linecap="round"/>
+                  <!-- Rotating Needle -->
+                  <line id="clusterRpmNeedle" x1="80" y1="80" x2="80" y2="25" stroke="#f43f5e" stroke-width="3" stroke-linecap="round" class="gauge-needle"/>
+                  <circle cx="80" cy="80" r="8" fill="#f43f5e"/>
+                </svg>
+                <div class="gauge-center-text">
+                  <div class="gauge-value" id="clusterRpmValue">820</div>
+                  <div class="gauge-unit">x1000 RPM</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Central warning icons -->
+            <div class="cluster-center-info">
+              <div class="cluster-warning-icons">
+                <div class="warn-icon check-engine active" id="warnCheckEngine" title="Check Engine">⚠️</div>
+                <div class="warn-icon" title="Oil Pressure">🛢️</div>
+                <div class="warn-icon" title="Battery Voltage">🔋</div>
+                <div class="warn-icon" title="Coolant Temp">🌡️</div>
+              </div>
+              <div style="font-family: var(--font-mono); font-size: 0.85rem; color: #94a3b8;">
+                CAN-BUS: <strong>АКТИВЕН</strong> | ЭБУ: <strong>BOSCH ME17.9.7</strong>
+              </div>
+            </div>
+
+            <!-- Speedometer -->
+            <div class="cluster-gauge">
+              <div class="gauge-svg-wrap">
+                <svg width="160" height="160" viewBox="0 0 160 160">
+                  <circle cx="80" cy="80" r="65" stroke="#1f293d" stroke-width="8" fill="none" stroke-dasharray="320" stroke-dashoffset="80"/>
+                  <circle cx="80" cy="80" r="65" stroke="#06b6d4" stroke-width="8" fill="none" stroke-dasharray="320" stroke-dashoffset="220" stroke-linecap="round"/>
+                  <line x1="80" y1="80" x2="45" y2="105" stroke="#06b6d4" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="80" cy="80" r="8" fill="#06b6d4"/>
+                </svg>
+                <div class="gauge-center-text">
+                  <div class="gauge-value">0</div>
+                  <div class="gauge-unit">KM/H</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="car-hood">
             <div class="engine-diagram">
               <div class="engine-header">
-                <h3>Диагностический стенд: ВАЗ-21179 / Toyota 2AR-FE</h3>
-                <span class="engine-state-badge warning" id="engineStatusBadge">⚠️ Check Engine Горит</span>
+                <h3>Двигатель 1.8 16V — Диагностические контрольные точки</h3>
+                <span class="level-badge" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; border-color: #f59e0b;">Пропуски зажигания</span>
               </div>
 
-              <!-- Engine Hotspots (clickable sensors) -->
-              <div class="engine-visual">
-                <div class="engine-block">
-                  <div class="cylinder-row">
-                    <button class="sensor-node" data-node="cyl1">Цилиндр 1 (Катушка A)</button>
-                    <button class="sensor-node" data-node="cyl2">Цилиндр 2 (Катушка B)</button>
-                    <button class="sensor-node" data-node="cyl3">Цилиндр 3 (Катушка C)</button>
-                    <button class="sensor-node" data-node="cyl4">Цилиндр 4 (Катушка D)</button>
-                  </div>
-                  <div class="sensor-row">
-                    <button class="sensor-node" data-node="maf">Датчик ДМРВ (MAF)</button>
-                    <button class="sensor-node" data-node="lambda">Лямбда-зонд O₂</button>
-                    <button class="sensor-node" data-node="tps">Дроссель (TPS)</button>
-                  </div>
+              <!-- Engine Hotspots -->
+              <div class="engine-block">
+                <div class="cylinder-row">
+                  <button class="sensor-node selected" data-node="cyl1">Цилиндр 1 (Катушка A)</button>
+                  <button class="sensor-node" data-node="cyl2">Цилиндр 2 (Катушка B)</button>
+                  <button class="sensor-node" data-node="cyl3">Цилиндр 3 (Катушка C)</button>
+                  <button class="sensor-node" data-node="cyl4">Цилиндр 4 (Катушка D)</button>
+                </div>
+                <div class="sensor-row">
+                  <button class="sensor-node" data-node="maf">Датчик ДМРВ (MAF)</button>
+                  <button class="sensor-node" data-node="lambda">Лямбда-зонд O₂</button>
+                  <button class="sensor-node" data-node="tps">Дроссель (TPS)</button>
+                  <button class="sensor-node" data-node="crank">Датчик коленвала (ДПКВ)</button>
                 </div>
               </div>
 
               <div class="interactive-multimeter">
                 <div class="meter-screen">
-                  <span class="meter-val" id="multimeterValue">0.00</span>
-                  <span class="meter-unit" id="multimeterUnit">V</span>
-                  <span class="meter-sub" id="multimeterStatus">Щупы не подключены</span>
+                  <span class="meter-val" id="multimeterValue">O.L</span>
+                  <span class="meter-unit" id="multimeterUnit">Ω</span>
+                  <span class="meter-sub" id="multimeterStatus">Узел: [CYL1] — ОБРЫВ КАТУШКИ!</span>
                 </div>
                 <div class="meter-controls">
-                  <button class="meter-btn active" data-mode="v">Напряжение (V)</button>
-                  <button class="meter-btn" data-mode="ohm">Сопротивление (Ω)</button>
+                  <button class="meter-btn" data-mode="v">Напряжение (V DC)</button>
+                  <button class="meter-btn active" data-mode="ohm">Сопротивление (Ω)</button>
                 </div>
               </div>
             </div>
@@ -188,69 +242,65 @@ function calculateScholarship(gradeAvg, attendanceRate) {
             <!-- OBD-II Scanner Instrument -->
             <div class="obd-scanner">
               <div class="obd-screen">
-                <div class="obd-topbar">OBD-II SCANNER v4.2 [CAN-BUS OK]</div>
+                <div class="obd-topbar">
+                  <span>AUTEL MAXICOM OBD-II</span>
+                  <span>CAN-BUS OK</span>
+                </div>
                 <div class="obd-body" id="obdDisplay">
                   <p class="obd-line red">ОШИБКА: P0301 — Пропуск зажигания в цилиндре 1</p>
                   <p class="obd-line">Обороты: 820 об/мин (нестабильно)</p>
-                  <p class="obd-line">Напряжение бортсети: 14.1 В</p>
-                  <p class="obd-line yellow">Рекомендация: Проверить цепь первичной обмотки катушки цилиндра 1.</p>
+                  <p class="obd-line">Напряжение бортсети: 13.8 В</p>
+                  <p class="obd-line yellow">Рекомендация: Проверить сопротивление первичной обмотки катушки цилиндра 1.</p>
                 </div>
               </div>
               <div class="obd-keypad">
-                <button class="obd-btn" id="obdReadBtn">Считать коды</button>
+                <button class="obd-btn" id="obdReadBtn">Считать коды DTC</button>
                 <button class="obd-btn" id="obdReplaceCoilBtn">🛠 Заменить катушку 1</button>
-                <button class="obd-btn" id="obdClearBtn">Сбросить ошибки</button>
+                <button class="obd-btn" id="obdClearBtn">Сбросить память ЭБУ</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ================= 3. CRYO / REFRIGERATION MODULE ================= -->
+      <!-- ================= 3. CRYO / REFRIGERATION ANIMATED MODULE ================= -->
       <div class="sim-module" id="module-cryo">
         <div class="cryo-stage">
           <div class="cryo-header">
             <div>
-              <h3>Холодильный контур: Компрессионная установка АМК</h3>
-              <p>Хладагент: <strong>R134a</strong> | Рабочий агент пищевого охлаждения</p>
+              <h3>Холодильная установка АМК: Термодинамический цикл R134a</h3>
+              <p style="color: var(--text-muted); font-size: 0.88rem;">Хладагент: <strong>Tetrafluoroethane (R134a)</strong> | Температура кипения: <strong>-26.3 °C</strong></p>
             </div>
             <div class="cop-indicator">
-              <span>Холодильный коэфф. (COP): </span>
-              <strong id="copValue">3.42</strong>
+              <span style="font-size: 0.85rem; color: var(--text-dim);">Энергоэффективность (COP): </span>
+              <strong id="copValue">3.45</strong>
             </div>
           </div>
 
-          <!-- Interactive Thermodynamic Schematic -->
-          <div class="cryo-schematic">
-            <!-- Compressor -->
-            <div class="schematic-node node-compressor">
-              <div class="node-icon">🌀</div>
-              <div class="node-name">Компрессор 2JS</div>
-              <div class="node-data">Ток: <span id="compAmp">4.8 A</span></div>
-            </div>
-            <div class="pipe pipe-hightemp"></div>
-
-            <!-- Condenser -->
-            <div class="schematic-node node-condenser">
-              <div class="node-icon">♨️</div>
-              <div class="node-name">Конденсатор</div>
-              <div class="node-data">Tконд: <span id="condTemp">+42 °C</span></div>
-            </div>
-            <div class="pipe pipe-liquid"></div>
-
-            <!-- TXV Valve -->
-            <div class="schematic-node node-txv">
-              <div class="node-icon">⏳</div>
-              <div class="node-name">ТРВ (Вентиль)</div>
-              <div class="node-data">Открытие: <span id="txvOpening">45%</span></div>
-            </div>
-            <div class="pipe pipe-lowtemp"></div>
-
-            <!-- Evaporator -->
-            <div class="schematic-node node-evaporator">
-              <div class="node-icon">❄️</div>
-              <div class="node-name">Испаритель</div>
-              <div class="node-data">Tкип: <span id="evapTemp">-10 °C</span></div>
+          <!-- Animated Canvas Piping Loop -->
+          <div class="cryo-canvas-wrap">
+            <canvas id="cryoCanvas"></canvas>
+            <div class="cryo-schematic-overlay">
+              <div class="schematic-node">
+                <div class="node-icon">🌀</div>
+                <div class="node-name">Компрессор 2JS</div>
+                <div class="node-data">Ток: <span id="compAmp">4.5 A</span></div>
+              </div>
+              <div class="schematic-node">
+                <div class="node-icon">♨️</div>
+                <div class="node-name">Конденсатор</div>
+                <div class="node-data">Tконд: <span id="condTemp">+43 °C</span></div>
+              </div>
+              <div class="schematic-node">
+                <div class="node-icon">⏳</div>
+                <div class="node-name">Вентиль ТРВ</div>
+                <div class="node-data">Дроссель: <span id="txvVal">45</span>%</div>
+              </div>
+              <div class="schematic-node">
+                <div class="node-icon">❄️</div>
+                <div class="node-name">Испаритель</div>
+                <div class="node-data">Tкип: <span id="evapTemp">-10 °C</span></div>
+              </div>
             </div>
           </div>
 
@@ -258,23 +308,22 @@ function calculateScholarship(gradeAvg, attendanceRate) {
           <div class="cryo-control-panel">
             <div class="gauge-box">
               <span class="gauge-label">Высокое давление (HP)</span>
-              <div class="gauge-num red" id="hpGauge">14.2 bar</div>
-              <span class="gauge-sub">Норма: 12-16 bar</span>
+              <div class="gauge-num red" id="hpGauge">14.1 bar</div>
+              <span class="gauge-sub">Норма: 13.0 - 15.0 bar</span>
             </div>
             <div class="gauge-box">
               <span class="gauge-label">Низкое давление (LP)</span>
               <div class="gauge-num blue" id="lpGauge">2.1 bar</div>
-              <span class="gauge-sub">Норма: 1.8-2.5 bar</span>
+              <span class="gauge-sub">Норма: 2.0 - 2.3 bar</span>
             </div>
 
-            <!-- Interactive Sliders -->
             <div class="sliders-box">
               <div class="slider-row">
                 <label>Обороты компрессора: <span id="compRpmVal">1400</span> об/мин</label>
                 <input type="range" id="compRpmSlider" min="800" max="2200" step="100" value="1400">
               </div>
               <div class="slider-row">
-                <label>Степень открытия ТРВ: <span id="txvVal">45</span>%</label>
+                <label>Степень открытия ТРВ: <span>45%</span></label>
                 <input type="range" id="txvSlider" min="10" max="90" step="5" value="45">
               </div>
             </div>
@@ -282,42 +331,32 @@ function calculateScholarship(gradeAvg, attendanceRate) {
         </div>
       </div>
 
-      <!-- ================= 4. DESIGN AUDIT MODULE ================= -->
+      <!-- ================= 4. FIGMA-STYLE DESIGN AUDIT ================= -->
       <div class="sim-module" id="module-design">
         <div class="design-stage">
-          <div class="design-tools-bar">
-            <span>Режим: <strong>Дизайн-аудит (Найдите 4 ошибки в макете сайта колледжа)</strong></span>
-            <div class="bugs-found-counter">Найдено ошибок: <span id="bugsFoundCount">0</span> / 4</div>
-          </div>
-
           <div class="mockup-canvas-wrapper">
             <div class="mockup-canvas" id="designMockup">
-              <!-- Banner Mockup with intentional UX/UI flaws -->
               <div class="mock-header">
-                <!-- Flaw 1: Bad logo alignment / distortion -->
                 <div class="mock-flaw" data-flaw="1" title="Нажмите, если видите ошибку">
                   <div class="mock-logo-bad">A M K   C O L L E G E</div>
                   <span class="flaw-marker">1</span>
                 </div>
-                <div class="mock-nav">О колледже | Специальности | Контакты</div>
+                <div style="font-size: 13px; color: #475569;">О колледже | Специальности | Контакты</div>
               </div>
 
               <div class="mock-hero">
-                <!-- Flaw 2: Zero contrast text (light gray on white) -->
                 <div class="mock-flaw" data-flaw="2" title="Нажмите, если видите ошибку">
-                  <h2 class="mock-unreadable-title">Поступай в лучший колледж Алматы на бюджет</h2>
+                  <h2 class="mock-unreadable-title">Поступай в лучший многопрофильный колледж Алматы на грант</h2>
                   <span class="flaw-marker">2</span>
                 </div>
 
-                <!-- Flaw 3: Inappropriate Comic Sans / unreadable font -->
                 <div class="mock-flaw" data-flaw="3" title="Нажмите, если видите ошибку">
                   <p class="mock-bad-typography">
-                    Получи диплом государственного образца по специальности программное обеспечение и дизайн интерьера за 2 года 10 месяцев!
+                    Получи диплом государственного образца по специальностям программное обеспечение, дизайн интерьера и холодильные системы за 2 года 10 месяцев!
                   </p>
                   <span class="flaw-marker">3</span>
                 </div>
 
-                <!-- Flaw 4: Broken CTA Button with 1px padding -->
                 <div class="mock-flaw" data-flaw="4" title="Нажмите, если видите ошибку">
                   <button class="mock-broken-btn">ПОДАТЬ ДОКУМЕНТЫ БЫСТРО БЕЗ СМС И РЕГИСТРАЦИИ</button>
                   <span class="flaw-marker">4</span>
@@ -326,8 +365,64 @@ function calculateScholarship(gradeAvg, attendanceRate) {
             </div>
           </div>
 
-          <div class="design-notes-panel" id="designFeedback">
-            Кликайте по элементам макета, где нарушены правила типографики, контрастности, сетки или юзабилити.
+          <!-- Figma-style CSS Inspector Sidebar -->
+          <div class="inspector-sidebar">
+            <div class="inspector-head">
+              <span style="font-weight: 800; font-size: 0.95rem;">Инспектор дефектов UI/UX</span>
+              <span style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-green);"><span id="bugsFoundCount">0</span>/4</span>
+            </div>
+            <div class="inspector-rules-box" id="inspectorCode">
+              <p style="color: #64748b;">// Кликайте по подозрительным элементам макета для анализа CSS-свойств и стандартов WCAG 2.1.</p>
+              <br>
+              <p>WCAG AA Contrast: <span class="rule-highlight">1.2:1 (FAIL)</span></p>
+              <p>Font-Family: <span class="rule-highlight">'Comic Sans MS' (Недопустимо)</span></p>
+              <p>Button Padding: <span class="rule-highlight">1px 3px (Сломано)</span></p>
+              <p>Transform: <span class="rule-highlight">skewX(-24deg) (Искажение)</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 5. NEW: FURNITURE SHEET CUTTING (07221400) ================= -->
+      <div class="sim-module" id="module-furniture">
+        <div class="furniture-stage">
+          <div class="furniture-grid-layout">
+            <div class="sheet-canvas-box">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 1.15rem;">Полноформатный раскрой ЛДСП (2800 × 2070 × 16 мм)</h3>
+                <span class="level-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border-color: var(--accent-green);">ЧПУ Раскройный центр</span>
+              </div>
+              <div class="sheet-visualizer">
+                <canvas id="sheetCanvas"></canvas>
+              </div>
+            </div>
+
+            <div class="furniture-sidebar">
+              <div>
+                <h4 style="font-size: 1rem; margin-bottom: 8px;">Параметры кухонного шкафа</h4>
+                <p style="font-size: 0.85rem; color: var(--text-dim);">Спецификация: 7 панелей (боковины, дно, полка, фасады).</p>
+
+                <div class="cut-metrics-list">
+                  <div class="cut-metric-item">
+                    <span>Технологический отход:</span>
+                    <strong id="cutWasteVal">-- %</strong>
+                  </div>
+                  <div class="cut-metric-item">
+                    <span>Длина пропилов ЧПУ:</span>
+                    <strong id="cutLengthVal">-- м</strong>
+                  </div>
+                  <div class="cut-metric-item">
+                    <span>Себестоимость плиты:</span>
+                    <strong id="cutCostVal">-- ₸</strong>
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" id="runCutBtn" style="width: 100%;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Сгенерировать карту раскроя
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -335,7 +430,7 @@ function calculateScholarship(gradeAvg, attendanceRate) {
     </section>
   </main>
 
-  <!-- Success Toast -->
+  <!-- Toast Notification -->
   <div id="simToast" class="toast"></div>
 
   <!-- Scripts -->

@@ -6,23 +6,27 @@
   <title>AMK SkillHub — Платформа профессионального обучения АМК</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
-  <!-- Chart.js for Radar Chart -->
+  <!-- Chart.js for Live Radar Chart -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <!-- Ambient background glow effects -->
-  <div class="glow-bg glow-primary"></div>
-  <div class="glow-bg glow-secondary"></div>
+  <!-- Interactive Cursor Spotlight Glow -->
+  <div id="cursorSpotlight"></div>
+
+  <!-- Ambient background glow orbs -->
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
 
   <!-- Header -->
   <header class="navbar">
     <div class="container nav-content">
       <a href="index.html" class="brand">
         <div class="logo-box">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
           </svg>
         </div>
@@ -34,14 +38,24 @@
 
       <nav class="nav-links">
         <a href="#specialties" class="nav-link active" data-i18n="nav_specialties">Специальности</a>
+        <a href="#career" class="nav-link" data-i18n="nav_career">Карьера & Зарплата</a>
         <a href="#dashboard" class="nav-link" data-i18n="nav_passport">Паспорт навыков</a>
         <a href="#demexam" class="nav-link" data-i18n="nav_demexam">Демоэкзамен</a>
-        <a href="simulator.html" class="nav-link btn-ghost-sm" data-i18n="nav_simulator">
+        <a href="simulator.html" class="nav-link btn-sim-nav" data-i18n="nav_simulator">
           <span class="pulse-dot"></span> Симуляторы
         </a>
       </nav>
 
       <div class="nav-actions">
+        <!-- Sound FX Toggle -->
+        <button id="soundToggle" class="btn-icon btn-sound" title="Включить / отключить звук">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <line x1="1" y1="1" x2="23" y2="23" style="display: none;"/>
+          </svg>
+        </button>
+
         <!-- Lang Switcher -->
         <button id="langToggle" class="btn-icon" title="Тілді ауыстыру / Сменить язык">
           <span id="currentLangLabel">KZ</span>
@@ -49,14 +63,14 @@
 
         <!-- Theme Toggle -->
         <button id="themeToggle" class="btn-icon" title="Переключить тему">
-          <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="5"/>
             <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
           </svg>
         </button>
 
         <!-- User Profile Pill -->
-        <div class="user-pill" id="userPill">
+        <div class="user-pill" id="openPassportBtn">
           <div class="user-avatar">АБ</div>
           <div class="user-info">
             <span class="user-name">Асылхан Б.</span>
@@ -90,7 +104,7 @@
             </svg>
             <span data-i18n="btn_start_sim">Запустить симулятор</span>
           </a>
-          <button id="openPassportBtn" class="btn btn-secondary">
+          <button id="openPassportHeroBtn" class="btn btn-secondary" onclick="document.getElementById('passportModal').classList.add('active');">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
               <line x1="16" y1="2" x2="16" y2="6"/>
@@ -127,25 +141,25 @@
               <span class="card-subtitle" data-i18n="radar_subtitle">Цифровой профиль студента</span>
               <h3 class="card-title" data-i18n="radar_title">Паутинка компетенций</h3>
             </div>
-            <span class="level-badge">Уровень: PRO</span>
+            <span class="level-badge">⭐ Уровень: PRO</span>
           </div>
           <div class="chart-container">
             <canvas id="heroRadarChart"></canvas>
           </div>
           <div class="radar-footer">
             <div class="score-chip">
-              <span class="score-val">870</span>
+              <span class="score-val">920</span>
               <span class="score-name">SkillPoints</span>
             </div>
             <div class="score-chip">
-              <span class="score-val">12</span>
+              <span class="score-val">14</span>
               <span class="score-name" data-i18n="streak_days">Дней стрик 🔥</span>
             </div>
             <button class="btn-text-sm" id="syncProgressBtn">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
               </svg>
-              <span data-i18n="btn_refresh">Обновить</span>
+              <span data-i18n="btn_refresh">Синхронизировать</span>
             </button>
           </div>
         </div>
@@ -153,7 +167,7 @@
     </div>
   </section>
 
-  <!-- Specialties Grid Section -->
+  <!-- Specialties Section with Filters and Live Search -->
   <section class="section" id="specialties">
     <div class="container">
       <div class="section-head text-center">
@@ -168,13 +182,78 @@
         </p>
       </div>
 
+      <!-- Filter Pills and Search Toolbar -->
+      <div class="specs-toolbar">
+        <div class="filter-pills">
+          <button class="filter-pill active" data-category="all">Все отделения</button>
+          <button class="filter-pill" data-category="tech">💻 IT и софт</button>
+          <button class="filter-pill" data-category="auto">🚗 Автотранспорт</button>
+          <button class="filter-pill" data-category="eng">❄️ Холодильные системы</button>
+          <button class="filter-pill" data-category="design">🎨 Дизайн</button>
+          <button class="filter-pill" data-category="prod">🪑 Мебель и ЧПУ</button>
+        </div>
+        <div class="search-wrap">
+          <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="specSearchInput" class="search-input" placeholder="Поиск специальности или кода...">
+        </div>
+      </div>
+
+      <!-- Specialties Dynamic Grid -->
       <div class="specialties-grid" id="specialtiesContainer">
-        <!-- Rendered by JS from data.js -->
+        <!-- Populated by app.js from data.js -->
       </div>
     </div>
   </section>
 
-  <!-- Bento Grid: Dashboard & Features -->
+  <!-- NEW: Career & Salary Navigator Section -->
+  <section class="section career-widget-section" id="career">
+    <div class="container">
+      <div class="section-head text-center">
+        <div class="badge-pill mx-auto">
+          <span data-i18n="career_badge">Карьерный навигатор в Алматы</span>
+        </div>
+        <h2 class="section-title">
+          <span data-i18n="career_heading">Сколько зарабатывают выпускники АМК?</span>
+        </h2>
+        <p class="section-desc" data-i18n="career_desc">
+          Двигай ползунок желаемой зарплаты, чтобы увидеть специальности и компании-партнеры колледжа.
+        </p>
+      </div>
+
+      <div class="career-box">
+        <div class="career-slider-side">
+          <span class="card-subtitle">Интерактивный фильтр рынка труда Алматы</span>
+          <div class="career-salary-slider-wrap">
+            <div class="salary-label-row">
+              <span style="font-weight: 700; color: var(--text-muted);">Желаемый доход:</span>
+              <span id="salaryDisplay" class="salary-big-num">450 000 ₸ / мес</span>
+            </div>
+            <input type="range" id="salarySlider" class="salary-slider" min="250000" max="850000" step="25000" value="450000">
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-dim); margin-top: 8px;">
+              <span>Старт: 250 000 ₸</span>
+              <span>Middle+: 550 000 ₸</span>
+              <span>Senior: 850 000+ ₸</span>
+            </div>
+          </div>
+          <p style="font-size: 0.92rem; color: var(--text-muted); line-height: 1.6;">
+            На основе анализа вакансий HeadHunter KZ, Kolesa Group, Astana Motors и производственных предприятий Алматы за 2026 год.
+          </p>
+        </div>
+
+        <div class="career-matches-card">
+          <span class="card-subtitle" style="margin-bottom: 12px;">Подходящие специальности АМК:</span>
+          <div id="careerMatchesList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bento Grid: Ecosystem & Features -->
   <section class="section bento-section" id="dashboard">
     <div class="container">
       <div class="section-head">
@@ -194,9 +273,9 @@
             Имитация условий сдачи итоговой аттестации WorldSkills: обратный отсчет времени, критериальное оценивание (Модули A, B, C) и анти-плагиат.
           </p>
           <div class="dem-features">
-            <div class="dem-pill">⏱ Таймер 120 мин</div>
+            <div class="dem-pill">⏱ Таймер 45 мин</div>
             <div class="dem-pill">🎯 100 балльная шкала</div>
-            <div class="dem-pill">📑 Экспорт ведомости в PDF</div>
+            <div class="dem-pill">📑 Экспорт сертификата</div>
           </div>
           <a href="simulator.html?mode=exam" class="btn btn-dem">
             <span data-i18n="btn_start_dem">Начать пробный экзамен</span>
@@ -211,14 +290,14 @@
           <span class="card-subtitle" data-i18n="partners_sub">Партнеры колледжа в Алматы</span>
           <h3 data-i18n="partners_title">Прямой выход на стажировку</h3>
           <p data-i18n="partners_desc">
-            Работодатели видят твою паутинку навыков в режиме реального времени. Лучшие студенты получают офферы уже на 3-м курсе.
+            Работодатели видят твою паутинку навыков в реальном времени. Лучшие студенты получают офферы уже на 3-м курсе.
           </p>
           <div class="partner-logos">
-            <div class="partner-tag">Almaty Auto Group</div>
-            <div class="partner-tag">Kolesa Group</div>
-            <div class="partner-tag">ТОО "АлматыХолод"</div>
-            <div class="partner-tag">Design Bureau KZ</div>
             <div class="partner-tag">Astana Motors</div>
+            <div class="partner-tag">Kolesa Group</div>
+            <div class="partner-tag">ТОО «АлматыХолод»</div>
+            <div class="partner-tag">Dasm Group</div>
+            <div class="partner-tag">Danfoss KZ</div>
           </div>
         </div>
 
@@ -236,10 +315,10 @@
           <span class="card-subtitle" data-i18n="achieve_sub">Геймификация</span>
           <h4 data-i18n="achieve_title">Ачивки и звания</h4>
           <div class="badges-row">
-            <div class="badge-item" title="Чистый код в IT">💻 CodeMaster</div>
-            <div class="badge-item" title="Мастер автодиагностики">🔧 OBD Expert</div>
-            <div class="badge-item" title="Повелитель давления">❄️ CryoPro</div>
-            <div class="badge-item" title="Глаз-алмаз в дизайне">🎨 PixelPerfect</div>
+            <div class="badge-item" title="Чистый код в IT">💻 CodeMaster 3.0</div>
+            <div class="badge-item" title="Мастер автодиагностики">🔧 OBD-II Expert</div>
+            <div class="badge-item" title="Повелитель давления">❄️ CryoPro R134a</div>
+            <div class="badge-item" title="Мастер раскроя ЧПУ">🪑 CNC Master 2800</div>
           </div>
         </div>
       </div>
@@ -255,7 +334,7 @@
           <span>ОФИЦИАЛЬНЫЙ СЕРТИФИКАТ АМК</span>
         </div>
         <h2>Цифровой паспорт компетенций</h2>
-        <p>Идентификатор: KZ-AMK-2026-98421</p>
+        <p style="font-family: var(--font-mono); color: var(--text-dim); margin-top: 4px;">ID: KZ-AMK-2026-98421</p>
       </div>
 
       <div class="modal-body passport-body">
@@ -264,7 +343,7 @@
             <div class="id-avatar">АБ</div>
             <div>
               <h3>Асылхан Бауыржанұлы</h3>
-              <p>Алматинский многопрофильный колледж • 06130100 «ПО»</p>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">Алматинский многопрофильный колледж • 06130100 «ПО»</p>
             </div>
           </div>
           
@@ -275,7 +354,7 @@
           <div class="id-stats-grid">
             <div class="id-stat">
               <span class="id-stat-num">94%</span>
-              <span class="id-stat-txt">Практика IT</span>
+              <span class="id-stat-txt">IT & Алгоритмы</span>
             </div>
             <div class="id-stat">
               <span class="id-stat-num">88%</span>
@@ -300,7 +379,7 @@
             <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
             <rect x="6" y="14" width="12" height="8"/>
           </svg>
-          Скачать PDF-паспорт
+          Печать / Экспорт в PDF
         </button>
         <button class="btn btn-primary" id="copyShareLinkBtn">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -310,7 +389,7 @@
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
             <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
           </svg>
-          Скопировать ссылку для резюме
+          Скопировать ссылку для работодателя
         </button>
       </div>
     </div>
@@ -326,15 +405,28 @@
         <div class="brand-title">AMK <span class="gradient-text">SkillHub</span></div>
         <p>Образовательная платформа Алматинского многопрофильного колледжа (АМК). г. Алматы, ул. Жандосова, 63.</p>
       </div>
-      <div class="footer-links">
-        <a href="https://amk.edu.kz" target="_blank">Официальный сайт amk.edu.kz</a>
-        <a href="simulator.html">Интерактивные симуляторы</a>
-        <a href="#demexam">Стандарты Демоэкзамена</a>
+      <div class="footer-col">
+        <h4>Навигация</h4>
+        <div class="footer-links">
+          <a href="#specialties">Специальности колледжа</a>
+          <a href="#career">Карьерный навигатор</a>
+          <a href="simulator.html">Интерактивные симуляторы</a>
+          <a href="#demexam">Стандарты WorldSkills</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Колледж</h4>
+        <div class="footer-links">
+          <a href="https://amk.edu.kz" target="_blank">Официальный сайт amk.edu.kz</a>
+          <a href="https://amk.edu.kz/contacts" target="_blank">Приемная комиссия</a>
+          <a href="https://instagram.com" target="_blank">Instagram АМК</a>
+        </div>
       </div>
     </div>
     <div class="footer-bottom">
-      <div class="container">
-        <p>© 2026 АМК SkillHub. Проект профессионального обучения студентов колледжа.</p>
+      <div class="container" style="display: flex; justify-content: space-between; width: 100%;">
+        <p>© 2026 АМК SkillHub. Все права защищены.</p>
+        <p style="font-family: var(--font-mono); color: var(--text-dim);">Release v2.4 Pro</p>
       </div>
     </div>
   </footer>
