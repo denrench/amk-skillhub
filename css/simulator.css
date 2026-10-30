@@ -1,167 +1,102 @@
 /* ========================================================
-   AMK SKILLHUB: WORKSTATION & SIMULATOR ENGINE CSS
+   AMK SKILLHUB: CLEAN & INTUITIVE WORKSTATION CSS
    ======================================================== */
 
-.simulator-body {
+.sim-page {
+  background-color: #0b0f19;
+  color: #ffffff;
   height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background-color: #080c14;
 }
 
-/* Simulator Navbar */
-.sim-navbar {
+/* Top Navigation Bar */
+.sim-topbar {
   height: 64px;
-  background: #0f1523;
-  border-bottom: 1px solid var(--border-subtle);
+  background: #111827;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 20px;
   flex-shrink: 0;
-  gap: 20px;
-  z-index: 50;
-}
-
-.sim-nav-left {
-  display: flex;
-  align-items: center;
   gap: 16px;
 }
 
-.btn-back {
+.sim-back-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--text-muted);
+  color: #94a3b8;
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 700;
   padding: 8px 14px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xs);
-  transition: var(--transition);
+  border-radius: 8px;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.2s;
 }
 
-.btn-back:hover {
+.sim-back-btn:hover {
   color: #fff;
-  border-color: var(--border-glow);
-  background: var(--bg-card-hover);
+  background: #243248;
 }
 
-.sim-title-group {
+/* Module Tabs in Header */
+.sim-module-nav {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  gap: 8px;
+  background: #0b0f19;
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
 }
 
-.sim-code-badge {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  background: rgba(99, 102, 241, 0.2);
-  color: var(--primary-light);
-  padding: 4px 10px;
-  border-radius: var(--radius-xs);
-  font-weight: 800;
-  border: 1px solid rgba(99, 102, 241, 0.35);
-}
-
-.sim-title-text {
-  font-size: 1.1rem;
-  font-weight: 800;
-  white-space: nowrap;
-}
-
-.sim-selector-wrap {
-  flex-grow: 1;
-  max-width: 460px;
-}
-
-.sim-select {
-  width: 100%;
-  background: var(--bg-elevated);
-  color: var(--text-main);
-  border: 1px solid var(--border-subtle);
-  padding: 9px 16px;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-sans);
-  font-size: 0.88rem;
+.mod-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
-  outline: none;
-  transition: var(--transition);
+  white-space: nowrap;
+  transition: all 0.2s;
 }
 
-.sim-select:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 16px var(--primary-glow);
+.mod-btn:hover {
+  color: #fff;
 }
 
-.sim-nav-right {
+.mod-btn.active {
+  background: #4f46e5;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
+}
+
+.sim-top-right {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.timer-pill {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
+.sim-timer {
   background: rgba(245, 158, 11, 0.12);
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  border-radius: var(--radius-full);
-  color: var(--accent-amber);
-  font-family: var(--font-mono);
-  font-weight: 800;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #f59e0b;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.85rem;
-}
-
-.btn-icon-sm {
-  width: 36px;
-  height: 36px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xs);
-  color: var(--text-main);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
   font-weight: 800;
-  font-size: 0.82rem;
-  transition: var(--transition);
 }
 
-.btn-icon-sm:hover {
-  border-color: var(--border-glow);
-}
-
-.btn-primary-sm {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--gradient-brand);
-  color: #fff;
-  border: none;
-  padding: 9px 20px;
-  border-radius: var(--radius-xs);
-  font-weight: 800;
-  font-size: 0.88rem;
-  cursor: pointer;
-  box-shadow: 0 4px 16px var(--primary-glow);
-  transition: var(--transition);
-}
-
-.btn-primary-sm:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5);
-}
-
-/* Split Workspace */
-.sim-workspace {
+/* Main Two-Column Layout */
+.sim-body-split {
   flex-grow: 1;
   display: grid;
   grid-template-columns: 380px 1fr;
@@ -169,182 +104,131 @@
   overflow: hidden;
 }
 
-/* Left Sidebar */
-.sim-sidebar {
-  background: #0d121c;
-  border-right: 1px solid var(--border-subtle);
+/* Left Column: Clear Step-by-Step Instructions */
+.sim-instruction-pane {
+  background: #111827;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.sidebar-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--border-subtle);
-  background: #090e17;
+.inst-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.s-tab {
-  flex: 1;
-  background: none;
-  border: none;
-  padding: 13px 8px;
-  color: var(--text-dim);
-  font-size: 0.82rem;
+.inst-header h2 {
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+}
+
+.inst-header span {
+  font-size: 0.78rem;
+  color: #0ea5e9;
   font-weight: 700;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: var(--transition);
+  font-family: 'JetBrains Mono', monospace;
 }
 
-.s-tab.active {
-  color: var(--primary-light);
-  border-bottom-color: var(--primary);
-  background: rgba(99, 102, 241, 0.08);
-}
-
-.sidebar-scroll {
+.inst-scroll {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 26px 22px;
+  padding: 24px;
   font-size: 0.92rem;
   line-height: 1.7;
 }
 
-.sidebar-scroll h3 {
-  font-size: 1.25rem;
-  margin-bottom: 14px;
+.step-card {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
-.sidebar-scroll h4 {
-  font-size: 0.98rem;
-  margin: 18px 0 10px;
-  color: var(--secondary);
-}
-
-.sidebar-scroll ul {
-  padding-left: 20px;
-  margin-bottom: 18px;
-  color: var(--text-muted);
-}
-
-.sidebar-scroll li {
+.step-num {
+  display: inline-block;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
   margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
-.sidebar-status-footer {
-  padding: 16px 22px;
-  background: #090e17;
-  border-top: 1px solid var(--border-subtle);
+.step-card h4 {
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+
+.step-card p {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.inst-footer {
+  padding: 18px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0f1523;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.85rem;
 }
 
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 600;
+.score-badge {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #10b981;
+  font-family: 'JetBrains Mono', monospace;
 }
 
-.status-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-}
-
-.status-dot.green { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
-
-/* Right Stage */
-.sim-main-stage {
-  background: #06090f;
+/* Right Column: Interactive Workstation Canvas */
+.sim-stage-pane {
+  background: #0b0f19;
   overflow-y: auto;
-  position: relative;
+  padding: 30px;
   display: flex;
   flex-direction: column;
 }
 
-.sim-module {
+.stage-module {
   display: none;
   flex-direction: column;
   height: 100%;
 }
 
-.sim-module.active {
+.stage-module.active {
   display: flex;
 }
 
-/* ================= 1. IT MONACO-STYLE IDE ================= */
-.code-editor-header {
-  height: 44px;
-  background: #0f1523;
-  border-bottom: 1px solid var(--border-subtle);
+/* ================= WORKBENCH 1: IT CODE RUNNER ================= */
+.it-workbench {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.it-top-bar {
+  background: #1e293b;
+  padding: 10px 18px;
+  display: flex;
   justify-content: space-between;
-  padding: 0 18px;
-}
-
-.editor-tabs {
-  display: flex;
-  gap: 4px;
-}
-
-.e-tab {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  padding: 9px 16px;
-  color: var(--text-dim);
-  cursor: pointer;
-  border-radius: var(--radius-xs) var(--radius-xs) 0 0;
-  display: flex;
   align-items: center;
-  gap: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.e-tab.active {
-  background: #080c14;
-  color: var(--primary-light);
-  font-weight: 700;
-  border-top: 2px solid var(--primary);
-}
-
-.editor-stats-bar {
-  display: flex;
-  gap: 16px;
-  font-size: 0.75rem;
-  font-family: var(--font-mono);
-  color: var(--text-dim);
-}
-
-.code-editor-body {
+.it-code-area {
   flex-grow: 1;
-  display: flex;
-  position: relative;
-}
-
-.line-numbers {
-  width: 48px;
-  background: #090e17;
-  border-right: 1px solid var(--border-subtle);
-  padding: 20px 0;
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  color: #3b4252;
-  text-align: right;
-  padding-right: 12px;
-  user-select: none;
-  line-height: 1.6;
-}
-
-.code-textarea {
-  flex-grow: 1;
-  height: 100%;
-  background: #06090f;
-  color: #81a1c1;
-  font-family: var(--font-mono);
+  background: #0b0f19;
+  color: #38bdf8;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 0.95rem;
   line-height: 1.6;
   padding: 20px;
@@ -353,697 +237,226 @@
   resize: none;
 }
 
-.console-drawer {
-  height: 220px;
-  background: #0a0f19;
-  border-top: 1px solid var(--border-subtle);
-  display: flex;
-  flex-direction: column;
-}
-
-.console-head {
-  padding: 10px 18px;
-  background: #111827;
-  border-bottom: 1px solid var(--border-subtle);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.console-title {
-  font-size: 0.82rem;
-  font-weight: 800;
-  color: var(--text-muted);
-}
-
-.console-badge {
-  font-size: 0.75rem;
-  padding: 3px 10px;
-  border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-dim);
-  font-weight: 700;
-}
-
-.console-badge.pass {
-  background: rgba(16, 185, 129, 0.2);
-  color: var(--accent-green);
-  border: 1px solid rgba(16, 185, 129, 0.4);
-}
-
-.console-output {
-  padding: 16px 20px;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  color: var(--text-muted);
+.it-console-pane {
+  height: 180px;
+  background: #070a10;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: #94a3b8;
   overflow-y: auto;
-  line-height: 1.65;
   white-space: pre-wrap;
 }
 
-/* ================= 2. AUTO CLUSTER & DIAGNOSTICS ================= */
-.auto-stage {
-  padding: 26px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* Realistic Virtual Dashboard Instrument Cluster */
-.instrument-cluster {
-  background: radial-gradient(circle at 50% 50%, #151d2f 0%, #0a0e17 100%);
-  border: 2px solid #1e293b;
-  border-radius: var(--radius-lg);
-  padding: 20px 30px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  box-shadow: inset 0 0 30px rgba(0,0,0,0.8), var(--shadow-md);
-  position: relative;
-}
-
-.cluster-gauge {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-}
-
-.gauge-svg-wrap {
-  width: 160px;
-  height: 160px;
-  position: relative;
-}
-
-.gauge-needle {
-  transform-origin: 80px 80px;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.gauge-center-text {
-  position: absolute;
-  top: 55%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-
-.gauge-value {
-  font-size: 1.4rem;
-  font-weight: 900;
-  font-family: var(--font-mono);
-  color: #fff;
-}
-
-.gauge-unit {
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  font-weight: 700;
-}
-
-.cluster-center-info {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.cluster-warning-icons {
-  display: flex;
-  gap: 14px;
-}
-
-.warn-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-  background: #111827;
-  border: 1px solid #1f2937;
-  color: #4b5563;
-  transition: var(--transition);
-}
-
-.warn-icon.check-engine.active {
-  color: #f59e0b;
-  border-color: #f59e0b;
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
-  animation: blinkWarn 1.2s infinite;
-}
-
-@keyframes blinkWarn {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-.warn-icon.check-engine.fixed {
-  color: #10b981;
-  border-color: #10b981;
-  box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
-}
-
-.car-hood {
+/* ================= WORKBENCH 2: AUTO DIAGNOSTICS ================= */
+.auto-workbench {
   display: grid;
-  grid-template-columns: 1fr 360px;
+  grid-template-columns: 1fr 1fr;
   gap: 24px;
   flex-grow: 1;
 }
 
-.engine-diagram {
-  background: #0f1523;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
+.auto-card {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
   padding: 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.engine-header {
+.auto-status-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
 }
 
-.engine-block {
-  background: #070a10;
-  border: 2px dashed rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-md);
-  padding: 24px;
-  position: relative;
-}
-
-.cylinder-row, .sensor-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 16px;
-}
-
-.sensor-node {
-  background: #151d2f;
-  border: 1px solid var(--border-subtle);
-  color: var(--text-main);
-  padding: 16px 10px;
-  border-radius: var(--radius-xs);
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: var(--transition);
-  text-align: center;
-}
-
-.sensor-node:hover, .sensor-node.selected {
-  border-color: var(--secondary);
-  background: rgba(6, 182, 212, 0.15);
-  box-shadow: 0 0 16px var(--secondary-glow);
-}
-
-.interactive-multimeter {
-  background: #131b2e;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.meter-screen {
-  background: #05080e;
-  border: 2px solid rgba(16, 185, 129, 0.3);
-  padding: 10px 18px;
-  border-radius: var(--radius-xs);
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.15);
-}
-
-.meter-val {
-  font-family: var(--font-mono);
-  font-size: 1.8rem;
-  font-weight: 900;
-  color: #10b981;
-}
-
-.meter-unit {
-  font-family: var(--font-mono);
+.check-light {
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 0.8rem;
   font-weight: 800;
+}
+
+.check-light.bad {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.check-light.good {
+  background: rgba(16, 185, 129, 0.15);
   color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.meter-sub {
-  font-size: 0.78rem;
-  color: var(--text-dim);
-  margin-left: 14px;
-  font-weight: 600;
-}
-
-.meter-controls {
-  display: flex;
-  gap: 10px;
-}
-
-.meter-btn {
-  background: #0b0f17;
-  color: var(--text-muted);
-  border: 1px solid var(--border-subtle);
-  padding: 9px 16px;
-  border-radius: var(--radius-xs);
-  font-size: 0.82rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.meter-btn.active {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
-  box-shadow: 0 2px 10px var(--primary-glow);
-}
-
-.obd-scanner {
-  background: #0f1523;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-}
-
-.obd-screen {
-  background: #04060a;
-  border: 2px solid #1e293b;
-  border-radius: var(--radius-xs);
-  flex-grow: 1;
-  padding: 16px;
-  font-family: var(--font-mono);
-  font-size: 0.88rem;
-  overflow-y: auto;
-}
-
-.obd-topbar {
-  border-bottom: 1px solid #1e293b;
-  padding-bottom: 8px;
-  margin-bottom: 12px;
-  color: var(--text-dim);
-  font-size: 0.75rem;
-  display: flex;
-  justify-content: space-between;
-}
-
-.obd-line { margin-bottom: 8px; color: #94a3b8; }
-.obd-line.red { color: #f43f5e; font-weight: 800; }
-.obd-line.yellow { color: #f59e0b; }
-
-.obd-keypad {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.obd-btn {
-  background: #192237;
-  border: 1px solid var(--border-subtle);
-  color: #fff;
-  padding: 12px;
-  border-radius: var(--radius-xs);
-  font-weight: 700;
-  font-size: 0.88rem;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.obd-btn:hover {
-  background: var(--primary);
-  border-color: var(--primary);
-}
-
-/* ================= 3. CRYO / REFRIGERATION SCHEMATIC ================= */
-.cryo-stage {
-  padding: 26px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.cryo-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #0f1523;
-  padding: 18px 24px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-}
-
-.cop-indicator strong {
-  color: var(--accent-green);
-  font-size: 1.6rem;
-  font-family: var(--font-mono);
-}
-
-/* Visual Piping Schematic with Animation */
-.cryo-canvas-wrap {
-  position: relative;
-  height: 320px;
-  background: radial-gradient(circle at 50% 50%, #0d1424 0%, #060910 100%);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  margin: 24px 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-#cryoCanvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.cryo-schematic-overlay {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  width: 90%;
-}
-
-.schematic-node {
-  background: rgba(15, 21, 35, 0.92);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 20px 14px;
-  text-align: center;
-  box-shadow: var(--shadow-sm);
-  transition: var(--transition);
-}
-
-.schematic-node:hover {
-  border-color: var(--secondary);
-  transform: scale(1.03);
-}
-
-.node-icon { font-size: 2.2rem; margin-bottom: 8px; }
-.node-name { font-weight: 800; font-size: 0.98rem; margin-bottom: 4px; }
-.node-data { font-family: var(--font-mono); font-size: 0.88rem; color: var(--secondary); font-weight: 700; }
-
-.cryo-control-panel {
-  display: grid;
-  grid-template-columns: 220px 220px 1fr;
-  gap: 24px;
-  background: #0f1523;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 24px;
-}
-
-.gauge-box {
+.dtc-display-box {
   background: #070a10;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
   padding: 16px;
-  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  flex-grow: 1;
 }
 
-.gauge-label { font-size: 0.78rem; color: var(--text-dim); font-weight: 700; text-transform: uppercase; }
-.gauge-num { font-size: 2rem; font-weight: 900; font-family: var(--font-mono); margin: 8px 0; }
-.gauge-num.red { color: #f43f5e; text-shadow: 0 0 12px rgba(244, 63, 94, 0.3); }
-.gauge-num.blue { color: #06b6d4; text-shadow: 0 0 12px rgba(6, 182, 212, 0.3); }
-.gauge-sub { font-size: 0.75rem; color: var(--text-dim); }
-
-.sliders-box {
+.action-buttons-col {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 12px;
+}
+
+.btn-action-step {
+  background: #1e293b;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s;
+}
+
+.btn-action-step:hover {
+  background: #4f46e5;
+  border-color: #4f46e5;
+}
+
+/* ================= WORKBENCH 3: CRYO HEATING & COOLING ================= */
+.cryo-workbench {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  flex-grow: 1;
+}
+
+.gauges-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
-.slider-row label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.88rem;
+.gauge-clean {
+  background: #0b0f19;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 18px;
+  text-align: center;
+}
+
+.g-label {
+  display: block;
+  font-size: 0.78rem;
+  color: #94a3b8;
   font-weight: 700;
   margin-bottom: 6px;
 }
 
-.slider-row input[type="range"] {
-  width: 100%;
-  accent-color: var(--primary);
-  cursor: pointer;
+.g-val {
+  font-size: 2rem;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.1;
 }
 
-/* ================= 4. FIGMA-STYLE DESIGN AUDIT ================= */
-.design-stage {
-  padding: 24px;
-  height: 100%;
-  display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 24px;
-}
+.g-val.hp { color: #ef4444; }
+.g-val.lp { color: #0ea5e9; }
+.g-val.cop { color: #10b981; }
 
-.mockup-canvas-wrapper {
+.sliders-panel {
   background: #1e293b;
-  border-radius: var(--radius-md);
-  padding: 30px;
+  border-radius: 10px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: auto;
+  gap: 18px;
 }
 
-.mockup-canvas {
-  width: 100%;
-  max-width: 660px;
-  background: #ffffff;
-  color: #1a1a1a;
-  border: 1px solid #cbd5e1;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-  border-radius: 8px;
-  padding: 28px;
-  transition: all 0.4s ease;
-}
-
-.mock-header {
+.slider-group label {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 16px;
-  margin-bottom: 24px;
-}
-
-.mock-flaw {
-  position: relative;
-  cursor: pointer;
-  border: 2px dashed transparent;
-  padding: 6px;
-  border-radius: 6px;
-  transition: var(--transition);
-}
-
-.mock-flaw:hover {
-  border-color: #6366f1;
-  background: rgba(99, 102, 241, 0.08);
-}
-
-.mock-flaw.found {
-  border-color: #10b981 !important;
-  background: rgba(16, 185, 129, 0.12) !important;
-}
-
-.flaw-marker {
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  width: 22px;
-  height: 22px;
-  background: #6366f1;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 900;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.mock-flaw:hover .flaw-marker,
-.mock-flaw.found .flaw-marker {
-  opacity: 1;
-}
-
-.mock-flaw.found .flaw-marker {
-  background: #10b981;
-}
-
-.mock-logo-bad {
-  font-size: 26px;
-  font-weight: 900;
-  letter-spacing: 12px;
-  color: #9333ea;
-  transform: skewX(-24deg);
-}
-
-.mock-unreadable-title {
-  color: #d1d5db; /* Fail contrast */
-  font-size: 24px;
-  margin-bottom: 16px;
-  line-height: 1.25;
-}
-
-.mock-bad-typography {
-  font-family: 'Comic Sans MS', cursive, sans-serif;
-  font-size: 14px;
-  line-height: 1.2;
-  color: #4b5563;
-  margin-bottom: 26px;
-}
-
-.mock-broken-btn {
-  background: #ef4444;
-  color: #fff;
-  border: 4px outset #b91c1c;
-  padding: 1px 3px;
-  font-size: 10px;
-  cursor: pointer;
-}
-
-/* CSS Inspector Sidebar */
-.inspector-sidebar {
-  background: #0f1523;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-}
-
-.inspector-head {
-  border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: 14px;
-  margin-bottom: 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.inspector-rules-box {
-  background: #05080e;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-xs);
-  padding: 14px;
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  color: #94a3b8;
-  flex-grow: 1;
-  overflow-y: auto;
-  line-height: 1.7;
-}
-
-.rule-highlight {
-  color: #f43f5e;
+  font-size: 0.88rem;
   font-weight: 700;
+  margin-bottom: 8px;
 }
 
-/* ================= 5. NEW: FURNITURE SHEET CUTTING (07221400) ================= */
-.furniture-stage {
-  padding: 26px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.furniture-grid-layout {
+/* ================= WORKBENCH 4: DESIGN AUDIT ================= */
+.design-workbench {
   display: grid;
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 1fr 320px;
   gap: 24px;
   flex-grow: 1;
 }
 
-.sheet-canvas-box {
-  background: #0f1523;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 24px;
+.mockup-preview-card {
+  background: #ffffff;
+  color: #1e293b;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
-}
-
-.sheet-visualizer {
-  flex-grow: 1;
-  background: #080c14;
-  border: 2px dashed #1e293b;
-  border-radius: var(--radius-sm);
-  position: relative;
-  display: flex;
-  align-items: center;
   justify-content: center;
 }
 
-#sheetCanvas {
-  max-width: 100%;
-  max-height: 100%;
-  box-shadow: var(--shadow-sm);
-}
-
-.furniture-sidebar {
-  background: #0f1523;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 22px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.cut-metrics-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 18px 0;
-}
-
-.cut-metric-item {
-  display: flex;
-  justify-content: space-between;
+.clickable-bug {
+  border: 2px dashed #94a3b8;
   padding: 10px;
-  background: #080c14;
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--border-subtle);
-  font-size: 0.85rem;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.cut-metric-item strong {
-  font-family: var(--font-mono);
-  color: var(--secondary);
+.clickable-bug:hover {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
 }
 
-/* Responsive Workstation */
-@media (max-width: 1024px) {
-  .sim-workspace { grid-template-columns: 1fr; }
-  .sim-sidebar { height: 280px; }
-  .car-hood { grid-template-columns: 1fr; }
-  .design-stage { grid-template-columns: 1fr; }
-  .furniture-grid-layout { grid-template-columns: 1fr; }
-  .cryo-schematic-overlay { grid-template-columns: repeat(2, 1fr); }
-  .cryo-control-panel { grid-template-columns: 1fr; }
+.clickable-bug.resolved {
+  border-color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.1) !important;
+}
+
+/* ================= WORKBENCH 5: FURNITURE CUTTING ================= */
+.furniture-workbench {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  flex-grow: 1;
+}
+
+.canvas-cutting-box {
+  background: #070a10;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+@media (max-width: 900px) {
+  .sim-body-split { grid-template-columns: 1fr; }
+  .sim-instruction-pane { height: 260px; }
+  .auto-workbench { grid-template-columns: 1fr; }
+  .design-workbench { grid-template-columns: 1fr; }
+  .furniture-workbench { grid-template-columns: 1fr; }
 }
