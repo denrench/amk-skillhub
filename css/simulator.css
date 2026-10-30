@@ -1,10 +1,10 @@
 /* ========================================================
-   AMK SKILLHUB: PROFESSIONAL WORKSTATION CSS (simulator.css)
-   Clean, Modern Industrial & EdTech Simulation Center
+   AMK SKILLHUB: PROFESSIONAL WORKSTATION & TASK SELECTOR CSS
+   High-Contrast, Vivid, 50 Tasks (10 per Specialty), Modes
    ======================================================== */
 
 .sim-page {
-  background-color: #080c14;
+  background-color: #070a12;
   color: #ffffff;
   height: 100vh;
   display: flex;
@@ -13,18 +13,19 @@
   font-family: var(--font-main);
 }
 
-/* Top Navigation Bar */
+/* ================= Top Bar ================= */
 .sim-topbar {
-  height: 68px;
+  height: 70px;
   background: #0f172a;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 20px;
   flex-shrink: 0;
-  gap: 16px;
+  gap: 14px;
   z-index: 50;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .sim-back-btn {
@@ -46,14 +47,14 @@
 .sim-back-btn:hover {
   color: #fff;
   background: #253349;
-  border-color: rgba(99, 102, 241, 0.4);
+  border-color: rgba(99, 102, 241, 0.5);
 }
 
 /* Module Tabs in Header */
 .sim-module-nav {
   display: flex;
   gap: 6px;
-  background: #080c14;
+  background: #090e1a;
   padding: 4px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -64,7 +65,7 @@
   background: transparent;
   border: none;
   color: #94a3b8;
-  padding: 8px 16px;
+  padding: 8px 14px;
   border-radius: 8px;
   font-size: 0.84rem;
   font-weight: 700;
@@ -78,13 +79,13 @@
 
 .mod-btn:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .mod-btn.active {
   background: var(--gradient-btn);
   color: #ffffff;
-  box-shadow: 0 3px 12px rgba(79, 70, 229, 0.45);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45);
 }
 
 .sim-top-right {
@@ -100,8 +101,8 @@
   font-size: 0.78rem;
   font-weight: 700;
   color: #10b981;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.25);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
   padding: 6px 12px;
   border-radius: var(--radius-full);
 }
@@ -110,14 +111,11 @@
   background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.35);
   color: #f59e0b;
-  padding: 6px 14px;
+  padding: 6px 12px;
   border-radius: 9999px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   font-weight: 800;
-  display: flex;
-  align-items: center;
-  gap: 6px;
 }
 
 .btn-sound-toggle {
@@ -134,172 +132,302 @@
   transition: all 0.2s;
 }
 
-.btn-sound-toggle:hover {
-  color: #fff;
-  background: #253349;
-}
-
-/* Main Two-Column Layout */
+/* ================= 3-Pane Workstation Split ================= */
 .sim-body-split {
   flex-grow: 1;
   display: grid;
-  grid-template-columns: 400px 1fr;
-  height: calc(100vh - 68px);
+  grid-template-columns: 360px 1fr;
+  height: calc(100vh - 70px);
   overflow: hidden;
 }
 
-/* Left Column: Clear Step-by-Step Instructions */
-.sim-instruction-pane {
-  background: #0f172a;
+/* ================= Left Column: Task Navigator (10 Tasks List) ================= */
+.sim-task-pane {
+  background: #0d1424;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.inst-header {
-  padding: 22px 26px;
+.task-pane-header {
+  padding: 16px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: #0d1527;
+  background: #090e1a;
 }
 
-.inst-header h2 {
-  font-size: 1.15rem;
-  margin-bottom: 4px;
+/* Mode Switcher: Свободный выбор vs По заданию учителя */
+.mode-toggle-bar {
+  display: flex;
+  background: #141e33;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 12px;
+  gap: 4px;
+}
+
+.mode-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 7px 10px;
+  border-radius: 7px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.mode-btn:hover {
   color: #fff;
 }
 
-.inst-header span {
-  font-size: 0.76rem;
-  color: #0ea5e9;
-  font-weight: 800;
-  font-family: 'JetBrains Mono', monospace;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+.mode-btn.active {
+  background: var(--accent-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4);
 }
 
-.inst-scroll {
+.mode-btn.teacher-mode.active {
+  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+}
+
+/* Teacher ticket prompt box */
+.teacher-ticket-prompt {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px dashed rgba(245, 158, 11, 0.4);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  color: #fcd34d;
+  display: none;
+  margin-bottom: 10px;
+}
+
+.teacher-ticket-prompt.show {
+  display: block;
+}
+
+/* Filter pills: Все (10) | Базовые | Экзамен */
+.task-filter-pills {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.task-filter-btn {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.task-filter-btn.active {
+  background: #334155;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 10 Tasks Scrollable List */
+.task-list-scroll {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 24px;
-  font-size: 0.92rem;
-  line-height: 1.7;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.step-card {
-  background: #182235;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 12px;
-  padding: 18px;
-  margin-bottom: 16px;
-  transition: all 0.25s ease;
+.task-item-card {
+  background: #141e33;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.22s ease;
   position: relative;
+  overflow: hidden;
 }
 
-.step-card:hover {
+.task-item-card:hover {
+  background: #1b2844;
   border-color: rgba(99, 102, 241, 0.4);
-  background: #1e2c44;
+  transform: translateX(3px);
 }
 
-.step-card.completed {
+.task-item-card.active {
+  background: #1e2b4d;
+  border-color: #38bdf8;
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
+}
+
+.task-item-card.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #38bdf8;
+}
+
+.task-item-card.completed {
   border-color: rgba(16, 185, 129, 0.4);
-  background: rgba(16, 185, 129, 0.06);
 }
 
-.step-card.completed .step-num {
+.task-item-card.completed .task-num-badge {
   background: var(--gradient-emerald);
+  color: #fff;
 }
 
-.step-card-top {
+.task-card-top-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
-.step-num {
-  display: inline-block;
-  background: #4f46e5;
-  color: #fff;
+.task-num-badge {
+  background: #1e293b;
+  color: #94a3b8;
+  font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 800;
-  padding: 3px 9px;
-  border-radius: 6px;
-  text-transform: uppercase;
-  font-family: 'JetBrains Mono', monospace;
+  padding: 2px 7px;
+  border-radius: 4px;
 }
 
-.step-status-icon {
-  font-size: 0.85rem;
-  color: #10b981;
+.task-difficulty-pill {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
 }
 
-.step-card h4 {
-  font-size: 0.98rem;
+.diff-junior { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.diff-middle { background: rgba(14, 165, 233, 0.15); color: #0ea5e9; }
+.diff-senior { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+
+.task-teacher-tag {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.task-item-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  line-height: 1.4;
   margin-bottom: 6px;
-  color: #f8fafc;
 }
 
-.step-card p {
-  color: #94a3b8;
-  font-size: 0.86rem;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.inst-footer {
-  padding: 18px 26px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: #0b1120;
+.task-item-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 0.72rem;
+  color: #94a3b8;
 }
 
-.score-badge {
-  font-size: 1.25rem;
-  font-weight: 900;
+.task-score-pill {
+  font-family: var(--font-mono);
+  font-weight: 800;
   color: #10b981;
-  font-family: 'JetBrains Mono', monospace;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  padding: 4px 12px;
-  border-radius: 8px;
 }
 
-/* Right Column: Interactive Workstation Stage */
+/* ================= Right Stage: Active Workbench ================= */
 .sim-stage-pane {
   background: #080c14;
   overflow-y: auto;
-  padding: 28px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
 }
 
+/* Active Task Banner */
+.active-task-banner {
+  background: linear-gradient(135deg, #111a2e 0%, #0d1526 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.active-task-meta h2 {
+  font-size: 1.25rem;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.active-task-meta p {
+  font-size: 0.86rem;
+  color: #94a3b8;
+  margin: 0;
+  max-width: 680px;
+  line-height: 1.5;
+}
+
+.active-score-badge {
+  font-size: 1.25rem;
+  font-weight: 900;
+  font-family: var(--font-mono);
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  padding: 6px 14px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+/* Modules */
 .stage-module {
   display: none;
   flex-direction: column;
-  height: 100%;
+  flex-grow: 1;
 }
 
 .stage-module.active {
   display: flex;
 }
 
-/* ================= 1. IT CODE RUNNER ================= */
+/* 1. IT Workbench */
 .it-workbench {
-  background: #0f172a;
+  background: #0e1526;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
 }
 
 .it-top-bar {
-  background: #182235;
+  background: #162035;
   padding: 12px 20px;
   display: flex;
   justify-content: space-between;
@@ -316,10 +444,10 @@
 
 .it-gutter {
   width: 44px;
-  background: #0d1424;
+  background: #0c1322;
   border-right: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 20px 8px;
-  font-family: 'JetBrains Mono', monospace;
+  padding: 18px 8px;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
   color: #475569;
   text-align: right;
@@ -331,10 +459,10 @@
   flex-grow: 1;
   background: transparent;
   color: #38bdf8;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   font-size: 0.95rem;
   line-height: 1.6;
-  padding: 20px;
+  padding: 18px;
   border: none;
   outline: none;
   resize: none;
@@ -342,30 +470,30 @@
 }
 
 .it-console-pane {
-  height: 200px;
-  background: #050811;
+  height: 190px;
+  background: #060912;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 18px;
-  font-family: 'JetBrains Mono', monospace;
+  padding: 16px;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
   color: #cbd5e1;
   overflow-y: auto;
   white-space: pre-wrap;
 }
 
-/* ================= 2. AUTO DIAGNOSTICS ================= */
+/* 2. Auto Workbench */
 .auto-workbench {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 20px;
   flex-grow: 1;
 }
 
 .auto-card {
-  background: #0f172a;
+  background: #0e1526;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  padding: 24px;
+  padding: 22px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -375,7 +503,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .check-light {
@@ -404,21 +532,20 @@
   background: #060912;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  padding: 18px;
-  font-family: 'JetBrains Mono', monospace;
+  padding: 16px;
+  font-family: var(--font-mono);
   font-size: 0.9rem;
   line-height: 1.6;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   flex-grow: 1;
 }
 
 .oscilloscope-box {
-  background: #060a12;
+  background: #060912;
   border: 1px solid rgba(14, 165, 233, 0.3);
   border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 16px;
-  position: relative;
+  padding: 10px;
+  margin-bottom: 14px;
 }
 
 .oscilloscope-canvas {
@@ -430,16 +557,16 @@
 .action-buttons-col {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .btn-action-step {
-  background: #1e293b;
+  background: #182236;
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 14px 18px;
+  padding: 12px 16px;
   border-radius: 10px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
   display: flex;
@@ -448,43 +575,36 @@
   transition: all 0.2s;
 }
 
-.btn-action-step:hover:not(:disabled) {
-  background: #4f46e5;
-  border-color: #4f46e5;
+.btn-action-step:hover {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
   transform: translateY(-1px);
 }
 
-.btn-action-step:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ================= 3. CRYO HEATING & COOLING ================= */
+/* 3. Cryo Workbench */
 .cryo-workbench {
-  background: #0f172a;
+  background: #0e1526;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  padding: 28px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
   flex-grow: 1;
 }
 
 .gauges-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  gap: 16px;
 }
 
 .gauge-clean {
   background: #080c16;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 20px;
+  padding: 18px;
   text-align: center;
-  position: relative;
-  overflow: hidden;
 }
 
 .g-label {
@@ -492,13 +612,13 @@
   font-size: 0.78rem;
   color: #94a3b8;
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .g-val {
   font-size: 2.2rem;
   font-weight: 900;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
   line-height: 1.1;
 }
 
@@ -514,28 +634,28 @@
 }
 
 .sliders-panel {
-  background: #182235;
+  background: #141e33;
   border-radius: 12px;
-  padding: 22px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .slider-group label {
   display: flex;
   justify-content: space-between;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 700;
   margin-bottom: 8px;
 }
 
-/* ================= 4. DESIGN AUDIT ================= */
+/* 4. Design Workbench */
 .design-workbench {
   display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: 24px;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
   flex-grow: 1;
 }
 
@@ -568,7 +688,7 @@
 .mockup-dot.g { background: #10b981; }
 
 .mockup-preview-card {
-  padding: 30px;
+  padding: 24px;
   flex-grow: 1;
 }
 
@@ -576,10 +696,9 @@
   border: 2px dashed #94a3b8;
   padding: 10px;
   border-radius: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   cursor: pointer;
   transition: all 0.2s;
-  position: relative;
 }
 
 .clickable-bug:hover {
@@ -593,15 +712,15 @@
   background: rgba(16, 185, 129, 0.08) !important;
 }
 
-/* ================= 5. FURNITURE CNC CUTTING ================= */
+/* 5. Furniture Workbench */
 .furniture-workbench {
-  background: #0f172a;
+  background: #0e1526;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  padding: 26px;
+  padding: 24px;
   display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 24px;
+  grid-template-columns: 1fr 280px;
+  gap: 20px;
   flex-grow: 1;
 }
 
@@ -613,15 +732,20 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
-  min-height: 380px;
+  min-height: 360px;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
-  .sim-body-split { grid-template-columns: 1fr; }
-  .sim-instruction-pane { height: 260px; }
-  .auto-workbench { grid-template-columns: 1fr; }
-  .design-workbench { grid-template-columns: 1fr; }
-  .furniture-workbench { grid-template-columns: 1fr; }
-  .gauges-row { grid-template-columns: 1fr; }
+/* Responsive adjustments */
+@media (max-width: 1000px) {
+  .sim-body-split {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow-y: auto;
+  }
+  .sim-task-pane {
+    max-height: 380px;
+  }
+  .auto-workbench, .design-workbench, .furniture-workbench {
+    grid-template-columns: 1fr;
+  }
 }

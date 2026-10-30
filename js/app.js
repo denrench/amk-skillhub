@@ -83,21 +83,38 @@ document.addEventListener('DOMContentLoaded', () => {
     grid.innerHTML = list.map(s => {
       const title = isKz ? s.title_kz : s.title_ru;
       const desc = isKz ? s.desc_kz : s.desc_ru;
-      const tags = (s.tags || []).map(t => `<span class="clean-tag">${t}</span>`).join('');
+      const tasks = (AMK_DATA.tasks && AMK_DATA.tasks[s.slug]) ? AMK_DATA.tasks[s.slug] : [];
+      const sampleTasks = tasks.slice(0, 2);
+
+      const previewHtml = sampleTasks.map(t => `
+        <div class="spec-task-preview-item">
+          <span>${t.teacherAssigned ? '⭐' : '🔹'}</span>
+          <strong style="color: #f1f5f9;">#${t.num}</strong> ${t.title}
+        </div>
+      `).join('');
 
       return `
         <div class="spec-clean-card">
-          <div class="spec-card-head">
-            <div class="spec-icon-clean">${s.icon}</div>
-            <div>
-              <span class="spec-code-clean">${s.code}</span>
+          <div class="spec-top-bar-color" style="background: ${s.gradient || 'var(--gradient-btn)'};"></div>
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span class="spec-code-clean" style="color: ${s.color || '#38bdf8'};">${s.code}</span>
+              <span class="spec-tasks-count-pill">⚡ 10 заданий</span>
+            </div>
+            <div class="spec-card-head">
+              <div class="spec-icon-clean" style="background: rgba(255,255,255,0.04);">${s.icon}</div>
               <h3>${title}</h3>
             </div>
+            <p>${desc}</p>
+
+            <div class="spec-task-preview-box">
+              <span class="spec-task-preview-label">Примеры практических кейсов:</span>
+              ${previewHtml}
+            </div>
           </div>
-          <p>${desc}</p>
-          <div class="spec-tags-clean">${tags}</div>
+
           <a href="simulator.html?spec=${s.slug}" class="btn-open-track">
-            <span>${isKz ? 'Симуляторды ашу' : 'Открыть симулятор'}</span>
+            <span>${isKz ? '10 тапсырманы ашу' : 'Открыть 10 заданий'}</span>
             <span>&rarr;</span>
           </a>
         </div>

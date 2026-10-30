@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Рабочая станция симуляторов — АМК Практикум</title>
+  <title>Рабочая станция симуляторов — АМК Практикум (50 заданий)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
@@ -12,20 +12,20 @@
 </head>
 <body class="sim-page">
 
-  <!-- Top Bar with Navigation & Authenication -->
+  <!-- Top Bar with Navigation & Authentication -->
   <header class="sim-topbar">
     <a href="index.html" class="sim-back-btn">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       <span>На главную</span>
     </a>
 
-    <!-- Module Switcher Tabs -->
+    <!-- Module Switcher Tabs (5 Specialties) -->
     <nav class="sim-module-nav">
-      <button class="mod-btn active" data-spec="it">💻 06130100 ПО</button>
-      <button class="mod-btn" data-spec="auto">🚗 07161300 Авто</button>
-      <button class="mod-btn" data-spec="cryo">❄️ 07150900 Холод</button>
-      <button class="mod-btn" data-spec="design">🎨 02110300 Дизайн</button>
-      <button class="mod-btn" data-spec="furniture">🪑 07221400 ЧПУ Мебель</button>
+      <button class="mod-btn active" data-spec="it">💻 06130100 ПО (10)</button>
+      <button class="mod-btn" data-spec="auto">🚗 07161300 Авто (10)</button>
+      <button class="mod-btn" data-spec="cryo">❄️ 07150900 Холод (10)</button>
+      <button class="mod-btn" data-spec="design">🎨 02110300 Дизайн (10)</button>
+      <button class="mod-btn" data-spec="furniture">🪑 07221400 ЧПУ Мебель (10)</button>
     </nav>
 
     <div class="sim-top-right">
@@ -53,28 +53,57 @@
     </div>
   </header>
 
-  <!-- Two-Column Workstation Split -->
+  <!-- Two-Column Workstation Split: Left = 10 Tasks Navigator, Right = Active Workbench -->
   <main class="sim-body-split">
 
-    <!-- Left Column: Step-by-Step Instructions -->
-    <aside class="sim-instruction-pane">
-      <div class="inst-header">
-        <span id="instCode">06130100 — ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ</span>
-        <h2 id="instTitle">Начисление академической стипендии</h2>
+    <!-- Left Column: 10 Tasks Selector with Modes -->
+    <aside class="sim-task-pane">
+      <div class="task-pane-header">
+        <!-- Mode Switcher -->
+        <div class="mode-toggle-bar">
+          <button class="mode-btn active" id="btnModeFree">🎯 Свободный выбор</button>
+          <button class="mode-btn teacher-mode" id="btnModeTeacher">⭐ По заданию учителя</button>
+        </div>
+
+        <!-- Teacher Ticket Box -->
+        <div class="teacher-ticket-prompt" id="teacherTicketPrompt">
+          ⭐ <strong>Экзаменационные билеты:</strong> Преподаватель назначил билеты <strong>#1, #4, #8</strong>. Выберите билет из списка или введите номер:
+          <div style="display: flex; gap: 6px; margin-top: 6px;">
+            <input type="text" id="ticketInput" placeholder="Напр. 4" style="flex:1; padding: 4px 8px; font-size: 0.8rem; border-radius: 4px; border: 1px solid rgba(245,158,11,0.5); background: #0b1120; color: #fff;">
+            <button class="btn btn-secondary" id="btnApplyTicket" style="padding: 4px 10px; font-size: 0.75rem;">Открыть билет</button>
+          </div>
+        </div>
+
+        <!-- Task Level Filter Pills -->
+        <div class="task-filter-pills">
+          <button class="task-filter-btn active" data-filter="all">Все задания (10)</button>
+          <button class="task-filter-btn" data-filter="junior">🟢 Базовые</button>
+          <button class="task-filter-btn" data-filter="middle">🟡 Средние</button>
+          <button class="task-filter-btn" data-filter="senior">🟣 Продвинутые</button>
+        </div>
       </div>
 
-      <div class="inst-scroll" id="instScroll">
-        <!-- Injected dynamically by simulator.js -->
-      </div>
-
-      <div class="inst-footer">
-        <span style="font-size: 0.82rem; color: #94a3b8; font-weight: 700;">Оценка решения:</span>
-        <span class="score-badge" id="currentScoreBadge">0 / 100 баллов</span>
+      <!-- 10 Tasks Scrollable List -->
+      <div class="task-list-scroll" id="taskListContainer">
+        <!-- Dynamically injected 10 tasks for selected specialty -->
       </div>
     </aside>
 
-    <!-- Right Column: Interactive Workbenches -->
+    <!-- Right Column: Interactive Workstation Stage -->
     <section class="sim-stage-pane">
+
+      <!-- Active Task Banner -->
+      <div class="active-task-banner">
+        <div class="active-task-meta">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+            <span id="activeSpecTag" style="font-size: 0.75rem; font-weight: 800; font-family: var(--font-mono); color: #38bdf8; text-transform: uppercase;">06130100 ПО</span>
+            <span id="activeTicketTag" style="display: none; background: rgba(245,158,11,0.2); color: #f59e0b; padding: 2px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 800;">⭐ ЭКЗАМЕНАЦИОННЫЙ БИЛЕТ</span>
+          </div>
+          <h2 id="activeTaskTitle">Загрузка задания...</h2>
+          <p id="activeTaskDesc">Изучите условия задачи и выполните практические действия на панели справа.</p>
+        </div>
+        <div class="active-score-badge" id="currentScoreBadge">0 / 100 баллов</div>
+      </div>
 
       <!-- ================= 1. IT CODE RUNNER ================= -->
       <div class="stage-module active" id="module-it">
@@ -84,33 +113,23 @@
               <span style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: #38bdf8;">solution.js</span>
               <span style="font-size: 0.72rem; color: #64748b; font-family: var(--font-mono);">ECMAScript 2024 (V8 Runtime)</span>
             </div>
-            <button class="btn btn-primary" id="runCodeBtn" style="padding: 7px 18px; font-size: 0.85rem;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Запустить автопроверку тестами
-            </button>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-secondary" id="btnResetCode" style="padding: 6px 12px; font-size: 0.8rem;" title="Сбросить код к начальному шаблону">
+                Сброс
+              </button>
+              <button class="btn btn-primary" id="runCodeBtn" style="padding: 6px 18px; font-size: 0.85rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Запустить автопроверку тестами
+              </button>
+            </div>
           </div>
 
           <div class="it-editor-container">
-            <div class="it-gutter">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16</div>
-            <textarea id="codeArea" class="it-code-area" spellcheck="false">// AMK: 06130100 «Программное обеспечение»
-// Задание: Начислить стипендию студенту колледжа:
-// - Если gradeAvg >= 4.5 и attendanceRate >= 90: вернуть "Повышенная (45 000 ₸)"
-// - Если gradeAvg >= 3.5 и attendanceRate >= 75: вернуть "Обычная (35 000 ₸)"
-// - Иначе: вернуть "Не назначена (0 ₸)"
-
-function calculateScholarship(gradeAvg, attendanceRate) {
-  if (gradeAvg >= 4.5 && attendanceRate >= 90) {
-    return "Повышенная (45 000 ₸)";
-  } else if (gradeAvg >= 3.5 && attendanceRate >= 75) {
-    return "Обычная (35 000 ₸)";
-  } else {
-    return "Не назначена (0 ₸)";
-  }
-}
-</textarea>
+            <div class="it-gutter" id="itGutter">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16</div>
+            <textarea id="codeArea" class="it-code-area" spellcheck="false"></textarea>
           </div>
 
-          <div class="it-console-pane" id="itConsole">Нажмите синюю кнопку «Запустить автопроверку тестами», чтобы выполнить 4 контрольных юнит-теста.</div>
+          <div class="it-console-pane" id="itConsole">Нажмите синюю кнопку «Запустить автопроверку тестами», чтобы выполнить контрольные юнит-тесты выбранного задания.</div>
         </div>
       </div>
 
@@ -120,27 +139,27 @@ function calculateScholarship(gradeAvg, attendanceRate) {
           <div class="auto-card">
             <div>
               <div class="auto-status-header">
-                <h3 style="font-size: 1.15rem;">Диагностический пост ДВС</h3>
+                <h3 style="font-size: 1.15rem;" id="autoDiagTitle">Диагностический пост ДВС</h3>
                 <span class="check-light bad" id="checkStatusBadge">⚠️ Check Engine Горит</span>
               </div>
-              <p style="font-size: 0.88rem; color: #94a3b8; margin-bottom: 16px;">
-                Пошагово выполните 4 действия для устранения пропусков зажигания:
+              <p style="font-size: 0.88rem; color: #94a3b8; margin-bottom: 16px;" id="autoDiagDesc">
+                Выполните пошаговую диагностику и устраните выявленный код неисправности:
               </p>
               <div class="action-buttons-col">
                 <button class="btn-action-step" id="btnAutoScan">
-                  <span>1. Считать коды ошибок сканером</span>
+                  <span>1. Считать коды ошибок сканером OBD-II</span>
                   <span>&rarr;</span>
                 </button>
                 <button class="btn-action-step" id="btnAutoMeter">
-                  <span>2. Замерить сопротивление катушки 1</span>
+                  <span>2. Замерить параметры прибором (мультиметр/осциллограф)</span>
                   <span>&rarr;</span>
                 </button>
                 <button class="btn-action-step" id="btnAutoReplace">
-                  <span>3. Заменить неисправную катушку</span>
+                  <span>3. Устранить дефект / Заменить неисправный узел</span>
                   <span>&rarr;</span>
                 </button>
                 <button class="btn-action-step" id="btnAutoClear">
-                  <span>4. Очистить память ошибок ЭБУ</span>
+                  <span>4. Очистить память ошибок ЭБУ и адаптировать</span>
                   <span>&rarr;</span>
                 </button>
               </div>
@@ -148,7 +167,7 @@ function calculateScholarship(gradeAvg, attendanceRate) {
           </div>
 
           <div class="auto-card">
-            <h4 style="font-size: 0.95rem; margin-bottom: 10px; color: #94a3b8;">Осциллограф первичной цепи катушки зажигания:</h4>
+            <h4 style="font-size: 0.95rem; margin-bottom: 8px; color: #94a3b8;">Осциллограмма измеряемой электрической цепи:</h4>
             <div class="oscilloscope-box">
               <canvas id="autoWaveCanvas" class="oscilloscope-canvas"></canvas>
             </div>
@@ -166,20 +185,20 @@ function calculateScholarship(gradeAvg, attendanceRate) {
       <div class="stage-module" id="module-cryo">
         <div class="cryo-workbench">
           <div>
-            <h3 style="font-size: 1.15rem; margin-bottom: 4px;">Балансировка холодильного контура R134a</h3>
-            <p style="font-size: 0.85rem; color: #94a3b8; margin: 0;">Регулируйте компрессор и дроссель ТРВ для вывода давлений в целевой диапазон.</p>
+            <h3 style="font-size: 1.15rem; margin-bottom: 4px;" id="cryoTitle">Балансировка холодильного контура R134a</h3>
+            <p style="font-size: 0.85rem; color: #94a3b8; margin: 0;" id="cryoDesc">Регулируйте компрессор и дроссель ТРВ для вывода давлений в целевой диапазон.</p>
           </div>
 
           <div class="gauges-row">
             <div class="gauge-clean">
               <span class="g-label">Высокое давление (HP)</span>
               <div class="g-val hp" id="hpDisplay">14.1 bar</div>
-              <span class="g-status-text" style="color: #64748b;">Целевой диапазон: 13.0 — 15.0 bar</span>
+              <span class="g-status-text" id="targetHpText" style="color: #64748b;">Целевой диапазон: 13.0 — 15.0 bar</span>
             </div>
             <div class="gauge-clean">
               <span class="g-label">Низкое давление (LP)</span>
               <div class="g-val lp" id="lpDisplay">2.1 bar</div>
-              <span class="g-status-text" style="color: #64748b;">Целевой диапазон: 2.0 — 2.3 bar</span>
+              <span class="g-status-text" id="targetLpText" style="color: #64748b;">Целевой диапазон: 2.0 — 2.3 bar</span>
             </div>
             <div class="gauge-clean">
               <span class="g-label">Холодильный коэфф. (COP)</span>
@@ -249,9 +268,9 @@ function calculateScholarship(gradeAvg, attendanceRate) {
             </div>
           </div>
 
-          <div style="background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 22px;">
-            <h4 style="font-size: 1.05rem; margin-bottom: 12px;">Инструкция эксперта WCAG 2.1:</h4>
-            <p style="font-size: 0.88rem; color: #94a3b8; line-height: 1.6; margin-bottom: 16px;">
+          <div style="background: #0e1526; border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 22px;">
+            <h4 style="font-size: 1.05rem; margin-bottom: 12px;" id="designAuditHeading">Инструкция аудитора WCAG 2.1:</h4>
+            <p style="font-size: 0.88rem; color: #94a3b8; line-height: 1.6; margin-bottom: 16px;" id="designAuditTaskDesc">
               Кликайте прямо по элементам макета слева в пунктирных рамках. Каждое нажатие устраняет ошибку верстки и начисляет +25 баллов.
             </p>
             <div style="background: #090e1a; padding: 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06); font-size: 0.82rem; color: #cbd5e1;">
@@ -273,8 +292,8 @@ function calculateScholarship(gradeAvg, attendanceRate) {
 
           <div style="display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-              <h4 style="font-size: 1.15rem; margin-bottom: 8px;">Раскрой плиты ЛДСП 2800×2070</h4>
-              <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.5; margin-bottom: 20px;">
+              <h4 style="font-size: 1.15rem; margin-bottom: 8px;" id="furnTitle">Раскрой плиты ЛДСП 2800×2070</h4>
+              <p style="font-size: 0.85rem; color: #94a3b8; line-height: 1.5; margin-bottom: 20px;" id="furnDesc">
                 Оптимизация карт распила кухонного шкафа на станке с ЧПУ с учетом режущего диска 4.2 мм.
               </p>
 
