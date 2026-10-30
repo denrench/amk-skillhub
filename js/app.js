@@ -223,28 +223,75 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 6. Passport Modal
-  const openDiplomaBtn = document.getElementById('openDiplomaBtn');
-  const closeDiplomaBtn = document.getElementById('closeDiplomaBtn');
-  const diplomaModal = document.getElementById('diplomaModal');
+  // 6. User Authentication State & Dynamic Navbar
+  function checkAuthState() {
+    const raw = localStorage.getItem('amk_current_user');
+    const user = raw ? JSON.parse(raw) : null;
 
-  if (openDiplomaBtn && diplomaModal) {
-    openDiplomaBtn.addEventListener('click', () => {
-      diplomaModal.classList.add('active');
-    });
+    const btnLogin = document.getElementById('btnNavLogin');
+    const userBadge = document.getElementById('navUserBadge');
+    const nameEl = document.getElementById('navUserName');
+    const groupEl = document.getElementById('navUserGroup');
+    const logoutBtn = document.getElementById('btnNavLogout');
+    const chip = document.getElementById('userProfileChip');
+
+    if (user && nameEl && groupEl) {
+      if (btnLogin) btnLogin.style.display = 'none';
+      if (userBadge) userBadge.style.display = 'flex';
+
+      nameEl.textContent = user.full_name;
+      groupEl.textContent = user.role === 'teacher' ? 'Преподаватель' : user.group_name;
+
+      if (chip) {
+        chip.onclick = () => {
+          if (user.role === 'teacher') {
+            window.location.href = 'teacher.html';
+          } else {
+            const modal = document.getElementById('diplomaModal');
+            if (modal) modal.classList.add('active');
+          }
+        };
+      }
+
+      // Update certificate modal with logged in user data
+      const certName = document.querySelector('#diplomaModal strong');
+      const certSub = document.querySelector('#diplomaModal span');
+      const certId = document.querySelector('#diplomaModal p');
+      if (certName) certName.textContent = user.full_name;
+      if (certSub) certSub.textContent = `Алматинский многопрофильный колледж • ${user.group_name || 'Студент'}`;
+      if (certId && user.student_id) certId.textContent = `ID: ${user.student_id}`;
+
+      // Pull actual grades from backend database
+      if (user.id) {
+        fetch(`/api/user/profile/${user.id}`)
+          .then(r => r.json())
+          .then(d => {
+            if (d.success && d.grades && d.grades.length > 0) {
+              d.grades.forEach(g => {
+                if (AMK_DATA.student.skills[g.specialty_slug] !== undefined) {
+                  AMK_DATA.student.skills[g.specialty_slug] = g.score;
+                }
+              });
+              renderCharts();
+            }
+          })
+          .catch(() => {});
+      }
+    } else {
+      if (btnLogin) btnLogin.style.display = 'inline-flex';
+      if (userBadge) userBadge.style.display = 'none';
+    }
+
+    if (logoutBtn) {
+      logoutBtn.onclick = () => {
+        localStorage.removeItem('amk_current_user');
+        checkAuthState();
+        showToast('Вы вышли из учетной записи');
+      };
+    }
   }
 
-  if (closeDiplomaBtn && diplomaModal) {
-    closeDiplomaBtn.addEventListener('click', () => {
-      diplomaModal.classList.remove('active');
-    });
-  }
-
-  if (diplomaModal) {
-    diplomaModal.addEventListener('click', (e) => {
-      if (e.target === diplomaModal) diplomaModal.classList.remove('active');
-    });
-  }
+  checkAuthState();
 
   // Toast
   window.showToast = function(msg) {

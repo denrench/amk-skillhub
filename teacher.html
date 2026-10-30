@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Кабинет преподавателя — АМК Практикум</title>
+  <title>Электронный журнал преподавателя — АМК Практикум</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
@@ -12,12 +12,22 @@
     .teacher-page {
       padding: 40px 0 80px;
     }
+    .lock-screen {
+      max-width: 440px;
+      margin: 80px auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      text-align: center;
+      box-shadow: var(--shadow-card);
+    }
     .teacher-top-card {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
       padding: 32px;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -72,9 +82,6 @@
       padding: 16px 20px;
       border-bottom: 1px solid var(--border-color);
     }
-    .journal-table tr:last-child td {
-      border-bottom: none;
-    }
     .journal-table tr:hover td {
       background: var(--bg-card-hover);
     }
@@ -112,31 +119,62 @@
         <div class="brand-badge">АМК</div>
         <div class="brand-info">
           <span class="brand-name">Практикум</span>
-          <span class="brand-sub">Электронный журнал преподавателя</span>
+          <span class="brand-sub">Кабинет преподавателя колледжа</span>
         </div>
       </a>
 
       <nav class="nav-links">
         <a href="index.html" class="nav-link">Главная</a>
         <a href="simulator.html" class="nav-link">Тренажеры</a>
-        <a href="teacher.html" class="nav-link active">Кабинет преподавателя</a>
+        <a href="teacher.html" class="nav-link active">Журнал групп</a>
       </nav>
 
       <div class="nav-actions">
-        <a href="index.html" class="btn-toggle">
-          <span>&larr; На портал</span>
-        </a>
+        <div id="teacherUserBadge" style="display: none; align-items: center; gap: 10px;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent-emerald);" id="teacherNameDisplay"></span>
+          <button class="btn-toggle" id="btnTeacherLogout" style="color: var(--accent-rose);">Выйти</button>
+        </div>
+        <a href="auth.html" id="btnGoToAuth" class="btn-toggle">Вход / Регистрация</a>
       </div>
     </div>
   </header>
 
-  <!-- Teacher Main View -->
-  <main class="container teacher-page">
+  <!-- GATE / LOCK SCREEN (Если не авторизован как преподаватель) -->
+  <div id="teacherLockScreen" class="lock-screen" style="display: none;">
+    <div style="font-size: 3rem; margin-bottom: 14px;">🔒</div>
+    <h2 style="font-size: 1.4rem; margin-bottom: 8px;">Закрытый доступ</h2>
+    <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 24px;">
+      Электронный журнал успеваемости доступен только преподавателям и учебной части колледжа АМК.
+    </p>
+
+    <form id="quickTeacherUnlockForm">
+      <div style="margin-bottom: 16px; text-align: left;">
+        <label style="font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 6px;">
+          Пароль преподавателя (или код AMK-TEACHER-2026):
+        </label>
+        <input type="password" id="unlockPasswordInput" class="form-input" placeholder="Введите пароль" style="width: 100%; padding: 12px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; color: #fff;" required>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">
+        Разблокировать журнал
+      </button>
+    </form>
+
+    <div style="margin-top: 18px;">
+      <a href="auth.html" style="font-size: 0.82rem; color: var(--accent-cyan); text-decoration: none;">
+        Регистрация нового преподавателя &rarr;
+      </a>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATED TEACHER DASHBOARD -->
+  <main class="container teacher-page" id="teacherJournalContent" style="display: none;">
     <div class="teacher-top-card">
       <div>
-        <span class="badge-tag">Учебная часть АМК</span>
-        <h1 style="font-size: 2rem; margin-top: 4px; margin-bottom: 6px;">Ведомость успеваемости групп</h1>
-        <p style="margin: 0; font-size: 0.95rem;">Данные синхронизируются в реальном времени с базы данных SQLite3.</p>
+        <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald);">Преподавательский доступ</span>
+        <h1 style="font-size: 1.85rem; margin-top: 4px; margin-bottom: 6px;">Ведомость сдачи лабораторных тренажеров</h1>
+        <p style="margin: 0; font-size: 0.92rem; color: var(--text-muted);">
+          Реальные результаты студентов из базы данных SQLite3 колледжа.
+        </p>
 
         <!-- Group Selector -->
         <div class="group-selector-pills">
@@ -154,7 +192,7 @@
         </button>
         <button class="btn btn-primary" id="btnRefreshGrades">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
-          Обновить данные
+          Обновить базу
         </button>
       </div>
     </div>
@@ -166,42 +204,94 @@
           <tr>
             <th>ФИО Студента</th>
             <th>Группа</th>
-            <th>ID Студента</th>
+            <th>Студенческий билет</th>
             <th>Сдано тренажеров</th>
-            <th>Средний балл</th>
-            <th>Статус аттестации WorldSkills</th>
+            <th>Средний балл (GPA)</th>
+            <th>Аттестация WorldSkills</th>
           </tr>
         </thead>
         <tbody id="journalTableBody">
-          <!-- Populated from SQLite via /api/grades or fallback -->
+          <!-- Loaded from DB -->
         </tbody>
       </table>
     </div>
   </main>
 
+  <div id="toast" class="toast"></div>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       let currentGroup = 'all';
 
-      const groupPills = document.querySelectorAll('.group-pill');
-      groupPills.forEach(pill => {
+      // Check current login state
+      function checkAuth() {
+        const rawUser = localStorage.getItem('amk_current_user');
+        const user = rawUser ? JSON.parse(rawUser) : null;
+
+        const lockScreen = document.getElementById('teacherLockScreen');
+        const journalContent = document.getElementById('teacherJournalContent');
+        const teacherBadge = document.getElementById('teacherUserBadge');
+        const authBtn = document.getElementById('btnGoToAuth');
+
+        if (user && user.role === 'teacher') {
+          lockScreen.style.display = 'none';
+          journalContent.style.display = 'block';
+          teacherBadge.style.display = 'flex';
+          authBtn.style.display = 'none';
+          document.getElementById('teacherNameDisplay').textContent = user.full_name;
+          loadGrades();
+        } else {
+          lockScreen.style.display = 'block';
+          journalContent.style.display = 'none';
+          teacherBadge.style.display = 'none';
+          authBtn.style.display = 'inline-flex';
+        }
+      }
+
+      // Quick Unlock inside teacher page
+      document.getElementById('quickTeacherUnlockForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const pwd = document.getElementById('unlockPasswordInput').value.trim();
+
+        if (pwd === 'admin123' || pwd === 'AMK-TEACHER-2026') {
+          const teacherObj = {
+            id: 1,
+            full_name: "Иванов Сергей Павлович (Зав. отделением)",
+            role: "teacher",
+            group_name: "Кафедра ТиПО",
+            student_id: "TEACHER-AMK-01"
+          };
+          localStorage.setItem('amk_current_user', JSON.stringify(teacherObj));
+          checkAuth();
+        } else {
+          alert('Неверный пароль преподавателя! (Для комиссии пароль: admin123 или код: AMK-TEACHER-2026)');
+        }
+      });
+
+      // Logout
+      document.getElementById('btnTeacherLogout').addEventListener('click', () => {
+        localStorage.removeItem('amk_current_user');
+        checkAuth();
+      });
+
+      // Group Pills
+      document.querySelectorAll('.group-pill').forEach(pill => {
         pill.addEventListener('click', () => {
-          groupPills.forEach(p => p.classList.remove('active'));
+          document.querySelectorAll('.group-pill').forEach(p => p.classList.remove('active'));
           pill.classList.add('active');
           currentGroup = pill.getAttribute('data-group');
           loadGrades();
         });
       });
 
-      const refreshBtn = document.getElementById('btnRefreshGrades');
-      if (refreshBtn) refreshBtn.addEventListener('click', loadGrades);
+      document.getElementById('btnRefreshGrades').addEventListener('click', loadGrades);
 
       function loadGrades() {
         const tbody = document.getElementById('journalTableBody');
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Загрузка данных из базы данных АМК...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 24px;">Синхронизация с базой данных SQLite3...</td></tr>`;
 
-        fetch(`/api/grades?group=${encodeURIComponent(currentGroup)}`)
-          .then(res => res.json())
+        fetch(`/api/teacher/journal?group=${encodeURIComponent(currentGroup)}`)
+          .then(r => r.json())
           .then(data => {
             if (data.success && data.students.length > 0) {
               renderTable(data.students);
@@ -209,10 +299,7 @@
               renderFallback();
             }
           })
-          .catch(() => {
-            // Graceful fallback for static GitHub Pages
-            renderFallback();
-          });
+          .catch(() => renderFallback());
       }
 
       function renderTable(students) {
@@ -227,7 +314,7 @@
               <td>
                 <strong style="color: var(--text-primary); font-size: 0.95rem;">${s.name}</strong>
               </td>
-              <td><span style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-cyan);">${s.group}</span></td>
+              <td><span style="font-family: var(--font-mono); font-weight: 700; color: var(--accent-cyan);">${s.group_name}</span></td>
               <td><span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">${s.student_id}</span></td>
               <td><strong>${s.tests_passed}</strong> из 5 треков</td>
               <td>
@@ -245,20 +332,20 @@
 
       function renderFallback() {
         const seed = [
-          { name: "Асылхан Бауыржанұлы", group: "ПО-22", student_id: "KZ-AMK-2026-98421", tests_passed: 5, avg_score: 100 },
-          { name: "Данил Панин", group: "ПО-22", student_id: "KZ-AMK-2026-98422", tests_passed: 4, avg_score: 90 },
-          { name: "Алина Сейдалиева", group: "ПО-22", student_id: "KZ-AMK-2026-98423", tests_passed: 3, avg_score: 87.5 },
-          { name: "Арман Исаев", group: "АВ-21", student_id: "KZ-AMK-2026-77101", tests_passed: 4, avg_score: 95 },
-          { name: "Жанибек Оразов", group: "ХО-20", student_id: "KZ-AMK-2026-55201", tests_passed: 3, avg_score: 92 }
+          { name: "Асылхан Бауыржанұлы", group_name: "ПО-22", student_id: "KZ-AMK-2026-98421", tests_passed: 5, avg_score: 100 },
+          { name: "Данил Панин", group_name: "ПО-22", student_id: "KZ-AMK-2026-98422", tests_passed: 4, avg_score: 92 },
+          { name: "Алина Сейдалиева", group_name: "ПО-22", student_id: "KZ-AMK-2026-98423", tests_passed: 3, avg_score: 87.5 },
+          { name: "Арман Исаев", group_name: "АВ-21", student_id: "KZ-AMK-2026-77101", tests_passed: 4, avg_score: 95 },
+          { name: "Жанибек Оразов", group_name: "ХО-20", student_id: "KZ-AMK-2026-55201", tests_passed: 3, avg_score: 92 }
         ];
         let list = seed;
         if (currentGroup !== 'all') {
-          list = list.filter(s => s.group === currentGroup);
+          list = list.filter(s => s.group_name === currentGroup);
         }
         renderTable(list);
       }
 
-      loadGrades();
+      checkAuth();
     });
   </script>
 </body>

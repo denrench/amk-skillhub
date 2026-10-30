@@ -28,7 +28,15 @@
       <button class="mod-btn" data-spec="furniture">🪑 Раскрой мебели (ЧПУ)</button>
     </nav>
 
-    <div class="sim-top-right">
+    <div class="sim-top-right" style="display: flex; align-items: center; gap: 12px;">
+      <a href="auth.html" id="simAuthLink" style="display: none; background: rgba(79, 70, 229, 0.15); color: #818cf8; border: 1px solid rgba(79, 70, 229, 0.4); padding: 5px 12px; border-radius: 6px; font-size: 0.82rem; font-weight: 700; text-decoration: none;">
+        Войти для зачета
+      </a>
+      <div id="simUserChip" style="display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.05); padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.82rem;">
+        <span style="color: #94a3b8;">👤</span>
+        <span id="simUserName" style="font-weight: 700; color: #fff;">Гость</span>
+        <span id="simUserGroup" style="color: var(--accent-cyan); font-weight: 700; margin-left: 2px;"></span>
+      </div>
       <div class="sim-timer" id="timerDisplay">45:00</div>
     </div>
   </header>

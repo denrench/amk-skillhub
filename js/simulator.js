@@ -30,6 +30,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // User auth state in simulator
+  const rawUser = localStorage.getItem('amk_current_user');
+  const currentUser = rawUser ? JSON.parse(rawUser) : null;
+  const simUserName = document.getElementById('simUserName');
+  const simUserGroup = document.getElementById('simUserGroup');
+  const simAuthLink = document.getElementById('simAuthLink');
+
+  if (currentUser) {
+    if (simUserName) simUserName.textContent = currentUser.full_name;
+    if (simUserGroup) simUserGroup.textContent = currentUser.role === 'teacher' ? 'Преподаватель' : currentUser.group_name;
+    if (simAuthLink) simAuthLink.style.display = 'none';
+  } else {
+    if (simUserName) simUserName.textContent = 'Гостевой режим';
+    if (simUserGroup) simUserGroup.textContent = '(без сохранения)';
+    if (simAuthLink) simAuthLink.style.display = 'inline-block';
+  }
+
   // Check URL params
   const params = new URLSearchParams(window.location.search);
   const specParam = params.get('spec');
@@ -185,17 +202,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (badge) badge.textContent = `${score} / 100 баллов`;
 
     // 1. Local fallback storage
-    const saved = JSON.parse(localStorage.getItem('amk_student_data')) || AMK_DATA.student;
+    const saved = JSON.parse(localStorage.getItem('amk_student_data')) || (window.AMK_DATA ? window.AMK_DATA.student : { skills: {} });
+    saved.skills = saved.skills || {};
     saved.skills[state.activeSpec] = Math.max(saved.skills[state.activeSpec] || 0, score);
     localStorage.setItem('amk_student_data', JSON.stringify(saved));
 
     // 2. Server database sync (Backend API)
     if (score > 0) {
+      const studentId = currentUser ? (currentUser.student_id || currentUser.id) : (saved.id || 'KZ-AMK-2026-98421');
+      const userId = currentUser ? currentUser.id : null;
       fetch('/api/grades/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          student_id: saved.id || 'KZ-AMK-2026-98421',
+          user_id: userId,
+          student_id: studentId,
           specialty_slug: state.activeSpec,
           specialty_name: instructions[state.activeSpec] ? instructions[state.activeSpec].title : state.activeSpec,
           score: score

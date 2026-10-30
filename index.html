@@ -45,9 +45,25 @@
           </svg>
         </button>
 
-        <!-- Главная кнопка перехода в симулятор -->
+        <!-- Динамический блок авторизации: Войти или Профиль -->
+        <div id="navAuthSection">
+          <a href="auth.html" id="btnNavLogin" class="btn-cta" style="background: var(--bg-surface); color: #fff; border: 1px solid var(--border-color);">
+            <span>Войти / Регистрация</span>
+          </a>
+          <div id="navUserBadge" style="display: none; align-items: center; gap: 10px;">
+            <div id="userProfileChip" style="background: var(--bg-surface); border: 1px solid var(--border-active); padding: 6px 12px; border-radius: var(--radius-sm); font-size: 0.82rem; font-weight: 700; cursor: pointer;">
+              <span id="navUserName">Асылхан Б.</span>
+              <span id="navUserGroup" style="color: var(--accent-cyan); margin-left: 4px;">ПО-22</span>
+            </div>
+            <button id="btnNavLogout" class="btn-toggle" style="color: var(--accent-rose); padding: 6px 10px;" title="Выйти из аккаунта">
+              Выйти
+            </button>
+          </div>
+        </div>
+
+        <!-- Кнопка тренажеров -->
         <a href="simulator.html" class="btn-cta">
-          <span>Войти в симулятор</span>
+          <span>Тренажеры</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
