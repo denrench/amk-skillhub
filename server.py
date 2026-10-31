@@ -760,6 +760,21 @@ def simulator_page():
 def teacher_page():
     return send_from_directory(APP_DIR, 'teacher.html')
 
+@app.route('/student')
+@app.route('/student.html')
+def student_page():
+    return send_from_directory(APP_DIR, 'student.html')
+
+@app.route('/profile')
+@app.route('/profile.html')
+def profile_page():
+    return send_from_directory(APP_DIR, 'profile.html')
+
+@app.route('/tasks')
+@app.route('/tasks.html')
+def tasks_page():
+    return send_from_directory(APP_DIR, 'tasks.html')
+
 @app.route('/<path:path>')
 def static_proxy(path):
     return send_from_directory(APP_DIR, path)

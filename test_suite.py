@@ -54,6 +54,9 @@ assert app.get('/').status_code == 200, 'Index route failed'
 assert app.get('/simulator.html').status_code == 200, 'Simulator route failed'
 assert app.get('/teacher.html').status_code == 200, 'Teacher route failed'
 assert app.get('/auth.html').status_code == 200, 'Auth route failed'
-print('Test 8: Static HTML pages OK (All 200)')
+assert app.get('/student.html').status_code == 200, 'Student route failed'
+assert app.get('/profile.html').status_code == 200, 'Profile route failed'
+assert app.get('/tasks.html').status_code == 200, 'Tasks route failed'
+print('Test 8: Static HTML pages OK (All Stitch pages 200)')
 
 print('SUCCESS: ALL TESTS COMPLETED WITHOUT ERROR!')
