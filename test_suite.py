@@ -57,6 +57,10 @@ assert app.get('/auth.html').status_code == 200, 'Auth route failed'
 assert app.get('/student.html').status_code == 200, 'Student route failed'
 assert app.get('/profile.html').status_code == 200, 'Profile route failed'
 assert app.get('/tasks.html').status_code == 200, 'Tasks route failed'
-print('Test 8: Static HTML pages OK (All Stitch pages 200)')
+assert app.get('/features.html').status_code == 200, 'Features route failed'
+assert app.get('/about.html').status_code == 200, 'About route failed'
+assert app.get('/pricing.html').status_code == 200, 'Pricing route failed'
+assert app.get('/reviews.html').status_code == 200, 'Reviews route failed'
+print('Test 8: Static HTML pages OK (All 11 Stitch pages return 200)')
 
 print('SUCCESS: ALL TESTS COMPLETED WITHOUT ERROR!')

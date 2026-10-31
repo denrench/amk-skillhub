@@ -775,6 +775,26 @@ def profile_page():
 def tasks_page():
     return send_from_directory(APP_DIR, 'tasks.html')
 
+@app.route('/features')
+@app.route('/features.html')
+def features_page():
+    return send_from_directory(APP_DIR, 'features.html')
+
+@app.route('/about')
+@app.route('/about.html')
+def about_page():
+    return send_from_directory(APP_DIR, 'about.html')
+
+@app.route('/pricing')
+@app.route('/pricing.html')
+def pricing_page():
+    return send_from_directory(APP_DIR, 'pricing.html')
+
+@app.route('/reviews')
+@app.route('/reviews.html')
+def reviews_page():
+    return send_from_directory(APP_DIR, 'reviews.html')
+
 @app.route('/<path:path>')
 def static_proxy(path):
     return send_from_directory(APP_DIR, path)
