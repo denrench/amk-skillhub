@@ -1,883 +1,382 @@
-<html lang="ru"><head><title>EDU SPACE — Вход и регистрация</title><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_blank" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"on-surface":"#131b2e","inverse-on-surface":"#eef0ff","primary":"#2a14b4","on-secondary-fixed":"#25005a","secondary":"#712ae2","on-tertiary":"#ffffff","surface-container-highest":"#dae2fd","primary-container":"#4338ca","on-tertiary-container":"#c1beff","outline-variant":"#c7c4d7","primary-fixed-dim":"#c3c0ff","error-container":"#ffdad6","on-tertiary-fixed":"#0f0069","secondary-fixed-dim":"#d2bbff","on-primary-fixed":"#100069","tertiary-fixed":"#e2dfff","primary-fixed":"#e3dfff","on-primary-fixed-variant":"#372abf","error":"#ba1a1a","surface-container":"#eaedff","on-background":"#131b2e","outline":"#777586","inverse-surface":"#283044","surface-container-low":"#f2f3ff","surface-bright":"#faf8ff","on-primary-container":"#c1beff","on-secondary":"#ffffff","surface":"#faf8ff","secondary-container":"#8a4cfc","inverse-primary":"#c3c0ff","on-secondary-container":"#fffbff","on-secondary-fixed-variant":"#5a00c6","tertiary-container":"#3f33d6","tertiary":"#2402c1","surface-dim":"#d2d9f4","tertiary-fixed-dim":"#c3c0ff","surface-variant":"#dae2fd","on-surface-variant":"#464554","surface-container-lowest":"#ffffff","surface-container-high":"#e2e7ff","on-tertiary-fixed-variant":"#3323cc","on-primary":"#ffffff","secondary-fixed":"#eaddff","on-error-container":"#93000a","on-error":"#ffffff","surface-tint":"#5148d7","background":"#faf8ff"},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"},spacing:{"space-sm":"0.5rem",margin:"2rem","space-xs":"0.25rem","margin-sm":"1rem",gutter:"1.5rem","space-md":"1rem","gutter-sm":"1rem","space-xl":"2rem","space-lg":"1.5rem"},fontFamily:{"headline-xl":["Manrope"],"label-sm":["Inter"],"body-lg":["Inter"],"display-lg-mobile":["Manrope"],"body-md":["Inter"],"headline-sm":["Manrope"],"headline-lg":["Manrope"],"headline-md":["Manrope"],"body-sm":["Inter"],"label-md":["Inter"],"display-lg":["Manrope"],"headline-xl-mobile":["Manrope"]},fontSize:{"headline-xl":["2.5rem",{lineHeight:"3rem",letterSpacing:"-0.02em",fontWeight:"700"}],"label-sm":["0.75rem",{lineHeight:"1rem",letterSpacing:"0.02em",fontWeight:"600"}],"body-lg":["1.125rem",{lineHeight:"1.75rem",fontWeight:"400"}],"display-lg-mobile":["2.25rem",{lineHeight:"2.75rem",letterSpacing:"-0.02em",fontWeight:"700"}],"body-md":["1rem",{lineHeight:"1.5rem",fontWeight:"400"}],"headline-sm":["1.125rem",{lineHeight:"1.5rem",fontWeight:"600"}],"headline-lg":["1.75rem",{lineHeight:"2.25rem",letterSpacing:"-0.015em",fontWeight:"600"}],"headline-md":["1.375rem",{lineHeight:"1.75rem",letterSpacing:"-0.01em",fontWeight:"600"}],"body-sm":["0.875rem",{lineHeight:"1.25rem",fontWeight:"400"}],"label-md":["0.875rem",{lineHeight:"1.25rem",letterSpacing:"0.01em",fontWeight:"500"}],"display-lg":["3.5rem",{lineHeight:"4rem",letterSpacing:"-0.025em",fontWeight:"700"}],"headline-xl-mobile":["1.75rem",{lineHeight:"2.25rem",letterSpacing:"-0.015em",fontWeight:"600"}]}}}};</script><style data-stitch-injected>
-  /* Hide scrollbars on ALL elements (Webkit) */
-  *::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Hide scrollbars on ALL elements (Firefox) */
-  * {
-    scrollbar-width: none;
-  }
-
-  /* Suppress horizontal overflow and legacy IE/Edge */
-  html, body {
-    overflow-x: hidden !important;
-    -ms-overflow-style: none;
-    min-height: auto !important;
-  }
-
-  /* Global text selection highlight color override inside all iframe modes */
-  ::selection {
-    background-color: rgba(96, 86, 240, 0.3) !important;
-    color: inherit !important;
-  }
-  ::-moz-selection {
-    background-color: rgba(96, 86, 240, 0.3) !important;
-    color: inherit !important;
-  }
-
-  /* Suppress browser default focus outlines and box-shadow glows globally */
-  *:focus, *:focus-visible {
-    outline: none !important;
-    box-shadow: none !important;
-  }
-</style><script data-stitch-injected>(function Vr(){window.addEventListener(`message`,async function(e){let t=e.data;if(!t||t.type!==`capture_screenshot`||e.source!==window.parent)return;let n=t.requestId,r=t.captureEngineSource,i=t.options||{},a=window.innerWidth,o=window.innerHeight,s=window.scrollX,c=window.scrollY,l=document.documentElement,u=l.style.width,d=l.style.height,f=l.style.overflow,p=l.style.position;try{if(!window.snapdom&&r){let e=document.createElement(`script`);e.setAttribute(`data-stitch-injected`,``),e.textContent=r,document.head.appendChild(e)}let e=window.snapdom;if(!e){window.parent.postMessage({type:`screenshot_error`,requestId:n,errorCode:`CAPTURE_ENGINE_UNAVAILABLE`,error:`Capture engine not available. Ensure source is sent with the capture request.`},`*`);return}let t=i.exclude||[`[data-stitch-injected]`];window.scrollTo(0,0),l.style.width=a+`px`,l.style.height=o+`px`,l.style.overflow=`hidden`,l.style.position=`relative`;let u=await(await e(document.documentElement,{exclude:t,embedFonts:!0,scale:i.scale||1,plugins:[{name:`stitch-viewport-clip`,afterClone:function(e){let t=e.clone;if(!(t instanceof HTMLElement))return;t.style.position=`relative`,t.style.width=a+`px`,t.style.height=o+`px`,t.style.overflow=`hidden`;let n=[],r=t.querySelectorAll(`*`);for(let e=0;e<r.length;e++){let t=r[e];t instanceof HTMLElement&&(t.style.position||(t.__snapdomComputedStyle||window.getComputedStyle(t)).position)===`fixed`&&n.push(t)}if(s!==0||c!==0){let e=t.querySelector(`body`);e&&(e.style.marginTop=-c+`px`,e.style.marginLeft=-s+`px`)}for(let e=0;e<n.length;e++)n[e].style.position=`absolute`,t.appendChild(n[e])}}]})).toCanvas({width:a,height:o}),d=i.format||`image/jpeg`,f=i.quality??.8,p=u.toDataURL(d,f);window.parent.postMessage({type:`screenshot_captured`,requestId:n,dataUrl:p,width:a,height:o},`*`)}catch(e){window.parent.postMessage({type:`screenshot_error`,requestId:n,error:e instanceof Error?e.message:String(e)},`*`)}finally{l.style.width=u,l.style.height=d,l.style.overflow=f,l.style.position=p,window.scrollTo(s,c)}})})();</script><script data-stitch-injected>(function Wr(){let e=`__stitch-highlight-css`,t=`stitch-highlight-element`,n=null;function r(){if(document.getElementById(e))return;let n=document.createElement(`style`);n.id=e,n.textContent=[`@keyframes stitch-highlight-pulse {`,`  0%, 100% { box-shadow: 0 0 0 3px rgba(113,105,237,0.8), 0 0 12px 4px rgba(113,105,237,0.3); }`,`  50%      { box-shadow: 0 0 0 3px rgba(113,105,237,0.4), 0 0 6px 2px rgba(113,105,237,0.15); }`,`}`,`.`+t+` {`,`  outline: 3px solid rgba(113,105,237,0.8) !important;`,`  outline-offset: 2px !important;`,`  animation: stitch-highlight-pulse 1.5s ease-in-out infinite !important;`,`  border-radius: inherit;`,`}`].join(`
-`),document.head.appendChild(n)}function i(e){let t=e.toLowerCase().trim(),n=document.createTreeWalker(document.body,NodeFilter.SHOW_ELEMENT,null),r=null,i=-1,a=n.nextNode();for(;a;){if((a.textContent||``).trim().toLowerCase().includes(t)){let e=0,t=a.parentElement;for(;t;)e++,t=t.parentElement;e>i&&(i=e,r=a)}a=n.nextNode()}return r}function a(e){setTimeout(function(){let t=e.getBoundingClientRect(),n=window.innerWidth||1,r=window.innerHeight||1;window.parent.postMessage({type:`stitch:highlight-element-rect`,normalizedX:(t.left+t.width/2)/n,normalizedY:(t.top+t.height/2)/r,normalizedWidth:t.width/n,normalizedHeight:t.height/r},`*`)},400)}window.addEventListener(`message`,function(e){if(!e.data||e.data.type!==`stitch:highlight-element`)return;n&&=(n.classList.remove(t),null);let{text:o,selector:s}=e.data;if(!o&&!s)return;r();let c=null;if(o&&(c=i(o)),!c&&s)try{c=document.querySelector(s)}catch{}c&&(c.classList.add(t),c.scrollIntoView({behavior:`smooth`,block:`center`}),n=c,a(c))})})();</script><script data-stitch-injected>(function qr(){let e=0;window.onerror=function(){e++},window.addEventListener(`unhandledrejection`,function(){e++});let t=console.error;console.error=function(...n){e++,t.apply(console,n)};function n(e=`actual`){if(e===`scrollbox`)return document.documentElement.scrollHeight;let t=document.documentElement,n=document.body,r=n?.children;if(!r)return t.scrollHeight;let i=t.style.getPropertyValue(`height`),a=t.style.getPropertyPriority(`height`),o=t.style.getPropertyValue(`min-height`),s=t.style.getPropertyPriority(`min-height`),c=n.style.getPropertyValue(`height`),l=n.style.getPropertyPriority(`height`),u=n.style.getPropertyValue(`min-height`),d=n.style.getPropertyPriority(`min-height`),f=0;try{t.style.setProperty(`height`,`auto`,`important`),t.style.setProperty(`min-height`,`0px`,`important`),n.style.setProperty(`height`,`auto`,`important`),n.style.setProperty(`min-height`,`0px`,`important`);let e=0,i=0,a=0,o=(e,t)=>{if(t.display===`none`||t.visibility===`hidden`)return;let n=parseFloat(t.bottom),r=parseFloat(t.top);if(Number.isFinite(n)&&n>=0&&n<=48&&(!Number.isFinite(r)||r>n)){let t=e.getBoundingClientRect();if(t.height>0&&t.height<=200){let e=t.height+n;e>a&&(a=e)}}};for(let t=0;t<r.length;t++){let n=r[t];if(n.tagName===`SCRIPT`||n.tagName===`STYLE`||n.tagName===`LINK`||n.tagName===`META`||n.tagName===`TEMPLATE`||n.tagName===`NOSCRIPT`||n.hasAttribute(`data-stitch-injected`))continue;let a=window.getComputedStyle(n);if(a.display===`none`||a.visibility===`hidden`)continue;if(a.position===`fixed`){o(n,a);continue}let s=n.getBoundingClientRect().bottom+window.scrollY,c=Math.max(0,parseFloat(a.marginBottom)||0),l=Math.max(0,parseFloat(a.paddingBottom)||0),u=0,d=n.children;for(let e=0;e<d.length;e++){let t=d[e];if(t.tagName===`SCRIPT`||t.tagName===`STYLE`||t.tagName===`LINK`||t.tagName===`META`||t.tagName===`TEMPLATE`||t.tagName===`NOSCRIPT`||t.hasAttribute(`data-stitch-injected`))continue;let n=window.getComputedStyle(t);n.display!==`none`&&n.visibility!==`hidden`&&(n.position===`fixed`?o(t,n):n.position!==`absolute`&&(u=t.tagName===`MAIN`?Math.max(0,parseFloat(n.paddingBottom)||0)+Math.max(0,parseFloat(n.marginBottom)||0):0))}u>l&&(l=u);let f=s+c,p=Math.max(0,s-l);f>e&&(e=f),p>i&&(i=p)}if(e>0){let r=window.getComputedStyle(n),o=window.getComputedStyle(t),s=Math.max(0,parseFloat(r.paddingBottom)||0)+Math.max(0,parseFloat(r.borderBottomWidth)||0)+Math.max(0,parseFloat(o.paddingBottom)||0)+Math.max(0,parseFloat(o.borderBottomWidth)||0);f=Math.max(e+s,i+a)}}finally{i?t.style.setProperty(`height`,i,a):t.style.removeProperty(`height`),o?t.style.setProperty(`min-height`,o,s):t.style.removeProperty(`min-height`),c?n.style.setProperty(`height`,c,l):n.style.removeProperty(`height`),u?n.style.setProperty(`min-height`,u,d):n.style.removeProperty(`min-height`),t.getAttribute(`style`)?.trim()||t.removeAttribute(`style`),n.getAttribute(`style`)?.trim()||n.removeAttribute(`style`)}return f||t.scrollHeight}window.__stitchMeasureContentHeight=n,window.__stitchReportDimensions=function(t=`actual`){typeof window<`u`&&window.parent&&window.parent.postMessage({type:`stitch:content-dimensions`,height:n(t),errorCount:e},`*`)};function r(){typeof window<`u`&&window.__stitchReportDimensions?.(`actual`)}document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,()=>setTimeout(r,50)):setTimeout(r,50),window.addEventListener(`load`,()=>setTimeout(r,100)),document.addEventListener(`visibilitychange`,()=>{document.visibilityState===`visible`&&setTimeout(r,100)}),window.addEventListener(`message`,e=>{e.data?.type===`stitch:request-dimensions`&&setTimeout(r,50)})})();</script><style data-stitch-injected>
-  /* ─── Animation styles ─── */
-  .stitch-anim-highlight {
-    outline: 2px solid #6056f080;
-    outline-offset: 2px;
-    border-radius: 4px;
-    transition: outline-color 0.4s ease;
-  }
-  .stitch-anim-highlight-fade {
-    outline-color: transparent;
-  }
-  @keyframes stitch-anim-fade-in {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes stitch-anim-pure-fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-  .stitch-anim-fade-in {
-    animation: stitch-anim-fade-in 0.3s ease forwards;
-  }
-
-  /* ─── Drawing rectangle overlay ─── */
-  .stitch-anim-draw-overlay {
-    position: fixed;
-    border: 2px solid #6056f099;
-    border-radius: 6px;
-    pointer-events: none;
-    z-index: 998;
-    clip-path: polygon(
-      0% 0%, 0% 0%,
-      0% 0%, 0% 0%,
-      0% 0%, 0% 0%
-    );
-    animation: stitch-anim-draw-rect 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  @keyframes stitch-anim-draw-rect {
-    0%   { clip-path: polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%); }
-    30%  { clip-path: polygon(0% 0%, 100% 0%, 100% 0%, 100% 0%, 0% 0%, 0% 0%); }
-    55%  { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 100% 100%, 0% 0%, 0% 0%); }
-    80%  { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 100%, 0% 0%); }
-    100% { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 0% 0%); }
-  }
-  .stitch-anim-draw-overlay.fading {
-    animation: stitch-anim-border-fade 0.5s ease forwards;
-  }
-  @keyframes stitch-anim-border-fade {
-    to { opacity: 0; }
-  }
-  /* ─── Image reveal crossfade ─── */
-  .stitch-anim-img-dimming {
-    transition: opacity 0.2s ease !important;
-    opacity: 0.15 !important;
-  }
-  .stitch-anim-img-revealing {
-    transition: opacity 0.35s ease !important;
-    opacity: 1 !important;
-  }
-  .stitch-anim-cursor::after {
-    content: '|';
-    font-weight: 100;
-    animation: stitch-anim-blink 0.6s step-end infinite;
-    color: #6056f0B3;
-    margin-left: 1px;
-  }
-  @keyframes stitch-anim-blink {
-    50% { opacity: 0; }
-  }
-
-  /* ─── AI Agent Cursor ─── */
-  #stitch-agent-cursor {
-    position: fixed;
-    z-index: 9999;
-    pointer-events: none;
-    display: flex;
-    align-items: flex-start;
-    gap: 0px;
-    transition: left 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-                top 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-                opacity 0.25s ease;
-    opacity: 0;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.18));
-  }
-  #stitch-agent-cursor.working {
-    animation: stitch-anim-wobble 0.8s ease-in-out infinite;
-  }
-  #stitch-agent-cursor.drawing {
-    animation: none;
-    transition: left 0.12s linear, top 0.12s linear, opacity 0.25s ease;
-  }
-  @keyframes stitch-anim-wobble {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    25%  { transform: translate(1px, -1px) rotate(2deg); }
-    50%  { transform: translate(-1px, 1px) rotate(-1deg); }
-    75%  { transform: translate(1px, 0px) rotate(1deg); }
-  }
-  #stitch-agent-cursor .cursor-pointer {
-    display: block;
-  }
-  #stitch-agent-cursor .cursor-text,
-  #stitch-agent-cursor .cursor-paint {
-    display: none;
-  }
-  #stitch-agent-cursor.text-mode .cursor-pointer,
-  #stitch-agent-cursor.text-mode .cursor-paint {
-    display: none;
-  }
-  #stitch-agent-cursor.text-mode .cursor-text {
-    display: block;
-  }
-  #stitch-agent-cursor.paint-mode .cursor-pointer,
-  #stitch-agent-cursor.paint-mode .cursor-text {
-    display: none;
-  }
-  #stitch-agent-cursor.paint-mode .cursor-paint {
-    display: block;
-  }
-  #stitch-cursor-label {
-    margin-top: 14px;
-    margin-left: -3px;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
-  }
-
-  /* ─── Active Element Indicator (Multi-Select Outline & Aurora Glow) ─── */
-  @keyframes stitch-aurora-sweep {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-  @keyframes stitch-indicator-pulse {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.78;
-    }
-  }
-  .stitch-active-indicator {
-    position: absolute;
-    box-sizing: border-box;
-    border-style: solid;
-    border-color: #6056f0;
-    background: transparent;
-    pointer-events: none;
-    z-index: 2;
-  }
-  .stitch-active-indicator.stitch-aurora,
-  .stitch-active-indicator:not([data-stitch-indicator="pending"]) {
-    border: none !important;
-    border-radius: 4px;
-    background: linear-gradient(
-      135deg,
-      rgba(145, 84, 231, 0.10),
-      rgba(96, 86, 240, 0.08),
-      rgba(64, 217, 198, 0.08),
-      rgba(66, 133, 244, 0.10)
-    );
-    box-shadow: 0 2px 12px rgba(96, 86, 240, 0.22);
-    animation: stitch-indicator-pulse 3s ease-in-out infinite;
-    pointer-events: auto;
-    cursor: not-allowed;
-    z-index: 3;
-  }
-  .stitch-active-indicator.stitch-aurora::before,
-  .stitch-active-indicator.stitch-aurora::after,
-  .stitch-active-indicator:not([data-stitch-indicator="pending"])::before,
-  .stitch-active-indicator:not([data-stitch-indicator="pending"])::after {
-    content: '';
-    position: absolute;
-    border-radius: inherit;
-    background: linear-gradient(
-      120deg,
-      #9154E7 0%,
-      #6056F0 25%,
-      #40D9C6 50%,
-      #4285F4 75%,
-      #9154E7 100%
-    );
-    background-size: 300% 300%;
-    animation: stitch-aurora-sweep 4s linear infinite;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-  .stitch-active-indicator.stitch-aurora::before,
-  .stitch-active-indicator:not([data-stitch-indicator="pending"])::before {
-    inset: 0;
-    padding: 2px;
-  }
-  .stitch-active-indicator.stitch-aurora::after,
-  .stitch-active-indicator:not([data-stitch-indicator="pending"])::after {
-    inset: -3px;
-    padding: 3px;
-    filter: blur(6px);
-    opacity: 0.55;
-  }
-</style><script src="js/app-logistics.js"></script>
-</head><body class="bg-surface font-body-md text-body-md text-on-surface min-h-[1024px]" data-stitch-vh="min-h-[1024px]===min-h-screen"><main class="w-full min-h-[1024px] bg-surface" data-stitch-vh="min-h-[1024px]===min-h-screen"><div class="flex flex-col w-full">
-<div class="w-full max-w-[1440px] mx-auto min-h-[1024px] px-4 py-6 sm:px-6 lg:px-8 flex items-center justify-center" data-stitch-vh="min-h-[1024px]===min-h-screen">
-<!-- Outer Split Layout Grid -->
-<div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch my-auto">
-<!-- ================= LEFT COLUMN: Brand & Showcase ================= -->
-<section class="lg:col-span-5 xl:col-span-6 bg-surface-container-low rounded-xl p-8 xl:p-12 flex flex-col justify-between relative overflow-hidden shadow-sm">
-<!-- Subtle Ambient Glows -->
-<div class="absolute -top-24 -left-24 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
-<div class="absolute -bottom-24 -right-24 w-80 h-80 bg-secondary/10 rounded-full blur-3xl pointer-events-none"></div>
-<div class="relative z-10">
-<!-- Top Row: Logo & Back Link -->
-<div class="flex items-center justify-between mb-8">
-<div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary shadow-sm shadow-primary/25">
-<span class="material-symbols-outlined text-[24px]">rocket_launch</span>
-</div>
-<div class="flex flex-col">
-<span class="font-headline-sm text-headline-sm text-on-surface tracking-tight uppercase">EDU SPACE</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant -mt-1 tracking-wider uppercase">LMS Platform</span>
-</div>
-</div>
-<a class="inline-flex items-center gap-1.5 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors group" href="index.html">
-<span class="material-symbols-outlined text-[18px] group-hover:-translate-x-0.5 transition-transform">arrow_back</span>
-<span>На главную</span>
-</a>
-</div>
-<!-- Hero Illustration Showcase Card -->
-<div class="relative rounded-xl overflow-hidden shadow-md bg-surface-container-lowest p-2 mb-8 group">
-<div class="relative overflow-hidden rounded-lg aspect-[16/10]">
-<img alt="EDU SPACE 3D Learning Platform Illustration" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjfFzX5g_tnMv8Ei1nhG0k_x0ZFkDnPaqan0Ctg8qn_em8v1Ub2GmihMnPliLb4E3zdpOpG3hU7qWHS5CmQ3Fl3zUugCfLN6v-zbnbIXxyJY3eJ2qzMxLmPCQfUJ4qklZ72FKp1lkMKXSZFKFS4vvaQ5yG85oHcLFK1LsPXDLJhYXnK4iDZmX8PDF4Osi8lhzpe09ryHOlO9Zm3Rax__7iHskn5dUvSNI6dXAqqSQ"/>
-<div class="absolute inset-0 bg-gradient-to-t from-on-surface/40 via-transparent to-transparent"></div>
-<div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-on-primary font-label-sm text-label-sm drop-shadow">
-<span class="inline-flex items-center gap-1.5 bg-on-surface/60 backdrop-blur-md px-3 py-1 rounded-full">
-<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Live Cohorts 2025
-                </span>
-<span class="bg-primary/80 backdrop-blur-md px-3 py-1 rounded-full">v4.2 PRO</span>
-</div>
-</div>
-</div>
-<!-- Value Proposition Typography -->
-<div class="space-y-2 mb-8">
-<h1 class="font-headline-lg text-headline-lg text-on-surface font-headline-xl">
-              Учитесь новому и достигайте вершин вместе с EDU SPACE
-            </h1>
-<p class="font-body-md text-body-md text-on-surface-variant">
-              Единое цифровое пространство для студентов, наставников и корпоративных команд.
-            </p>
-</div>
-<!-- Feature Cards Bento Stack -->
-<div class="space-y-3">
-<!-- Feature 1 -->
-<div class="p-3.5 rounded-lg bg-surface-container-lowest/80 backdrop-blur-sm flex items-start gap-3.5 shadow-sm hover:bg-surface-container-lowest transition-colors">
-<div class="w-9 h-9 rounded-lg bg-primary-container/10 text-primary flex items-center justify-center shrink-0 mt-0.5">
-<span class="material-symbols-outlined text-[20px]">code_blocks</span>
-</div>
-<div>
-<p class="font-headline-sm text-body-md font-semibold text-on-surface">Интерактивные курсы и тренажеры</p>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Автопроверка заданий и тестов за секунды с подробным разбором решений</p>
-</div>
-</div>
-<!-- Feature 2 -->
-<div class="p-3.5 rounded-lg bg-surface-container-lowest/80 backdrop-blur-sm flex items-start gap-3.5 shadow-sm hover:bg-surface-container-lowest transition-colors">
-<div class="w-9 h-9 rounded-lg bg-secondary/10 text-secondary flex items-center justify-center shrink-0 mt-0.5">
-<span class="material-symbols-outlined text-[20px]">insights</span>
-</div>
-<div>
-<p class="font-headline-sm text-body-md font-semibold text-on-surface">Персональный трекер прогресса</p>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Баллы XP, серии ударных дней, бейджи и рейтинговая таблица лидеров</p>
-</div>
-</div>
-<!-- Feature 3 -->
-<div class="p-3.5 rounded-lg bg-surface-container-lowest/80 backdrop-blur-sm flex items-start gap-3.5 shadow-sm hover:bg-surface-container-lowest transition-colors">
-<div class="w-9 h-9 rounded-lg bg-surface-tint/10 text-surface-tint flex items-center justify-center shrink-0 mt-0.5">
-<span class="material-symbols-outlined text-[20px]">record_voice_over</span>
-</div>
-<div>
-<p class="font-headline-sm text-body-md font-semibold text-on-surface">Прямой контакт с менторами</p>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Качественный фидбек, код-ревью экспертов и регулярные Q&amp;A-сессии</p>
-</div>
-</div>
-</div>
-</div>
-<!-- Social Proof & Trust Badges -->
-<div class="relative z-10 mt-8 pt-6 border-t border-outline-variant/30 flex flex-wrap items-center justify-between gap-4">
-<div class="flex items-center gap-3">
-<div class="flex -space-x-2">
-<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest">АК</div>
-<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest">МС</div>
-<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant font-label-sm text-label-sm flex items-center justify-center ring-2 ring-surface-container-lowest">ДВ</div>
-</div>
-<div>
-<p class="font-headline-sm text-label-md text-on-surface font-semibold">120 000+ студентов</p>
-<p class="font-body-sm text-label-sm text-on-surface-variant">уже обучаются на платформе</p>
-</div>
-</div>
-<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-lowest shadow-sm">
-<span class="material-symbols-outlined text-amber-500 text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span>
-<span class="font-headline-sm text-label-md font-bold text-on-surface">4.9</span>
-<span class="font-body-sm text-label-sm text-on-surface-variant">(3 420 отзывов)</span>
-</div>
-</div>
-</section>
-<!-- ================= RIGHT COLUMN: Interactive Form ================= -->
-<section class="lg:col-span-7 xl:col-span-6 bg-surface-container-lowest rounded-xl p-8 xl:p-12 shadow-md flex flex-col justify-center">
-<div class="max-w-[560px] w-full mx-auto">
-<!-- Segmented Tab: Login vs Register -->
-<div class="flex items-center justify-between gap-4 mb-6">
-<div>
-<h2 class="font-headline-lg text-headline-lg text-on-surface">Создание аккаунта</h2>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Присоединяйтесь к сообществу EDU SPACE за 1 минуту</p>
-</div>
-<div class="p-1 rounded-xl bg-surface-container-low flex items-center gap-1">
-<button class="px-4 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all" id="tab-login" type="button">
-                Вход
-              </button>
-<button class="px-4 py-2 rounded-lg font-label-md text-label-md bg-primary-container text-on-primary shadow-sm transition-all" id="tab-register" type="button">
-                Регистрация
-              </button>
-</div>
-</div>
-<!-- Role Selection Cards -->
-<div class="mb-6">
-<span class="block font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant mb-2">Выберите вашу роль</span>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="role-selector">
-<!-- Student Role (Active State) -->
-<div class="role-card cursor-pointer p-4 rounded-xl transition-all duration-200 relative bg-primary-fixed/30 shadow-sm" data-role="student">
-<div class="flex items-start justify-between">
-<div class="w-10 h-10 rounded-lg bg-primary-container text-on-primary flex items-center justify-center mb-3">
-<span class="material-symbols-outlined text-[22px]">school</span>
-</div>
-<span class="role-check w-5 h-5 rounded-full bg-primary-container text-on-primary flex items-center justify-center">
-<span class="material-symbols-outlined text-[14px]">check</span>
-</span>
-</div>
-<h3 class="font-headline-sm text-body-md font-semibold text-on-surface">Я студент</h3>
-<p class="font-body-sm text-label-sm text-on-surface-variant mt-0.5">Хочу учиться, решать тренажеры и собирать портфолио</p>
-</div>
-<!-- Teacher Role (Inactive State) -->
-<div class="role-card cursor-pointer p-4 rounded-xl transition-all duration-200 relative bg-surface-container-low hover:bg-surface-container" data-role="teacher">
-<div class="flex items-start justify-between">
-<div class="w-10 h-10 rounded-lg bg-surface-container-highest text-on-surface flex items-center justify-center mb-3">
-<span class="material-symbols-outlined text-[22px]">auto_stories</span>
-</div>
-<span class="role-check hidden w-5 h-5 rounded-full bg-primary-container text-on-primary items-center justify-center">
-<span class="material-symbols-outlined text-[14px]">check</span>
-</span>
-</div>
-<h3 class="font-headline-sm text-body-md font-semibold text-on-surface">Я преподаватель</h3>
-<p class="font-body-sm text-label-sm text-on-surface-variant mt-0.5">Хочу создавать курсы, курировать группы и проверять код</p>
-</div>
-</div>
-</div>
-<!-- Registration Form Fields -->
-<form class="space-y-4" onsubmit="event.preventDefault();">
-<!-- First Name / Last Name Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-<div>
-<label class="block font-label-md text-label-md text-on-surface mb-1.5" for="first-name">Имя</label>
-<div class="relative flex items-center">
-<span class="material-symbols-outlined absolute left-3.5 text-[20px] text-on-surface-variant">person</span>
-<input class="w-full h-11 pl-10 pr-10 rounded-lg bg-surface-container-low focus:bg-surface-container-lowest text-on-surface font-body-md text-body-sm transition-all focus:outline-none focus:shadow-md" id="first-name" placeholder="Константин" type="text" value="Константин"/>
-<!-- Valid state indicator -->
-<span class="material-symbols-outlined absolute right-3.5 text-[18px] text-emerald-600">check_circle</span>
-</div>
-</div>
-<div>
-<label class="block font-label-md text-label-md text-on-surface mb-1.5" for="last-name">Фамилия</label>
-<div class="relative flex items-center">
-<span class="material-symbols-outlined absolute left-3.5 text-[20px] text-on-surface-variant">badge</span>
-<input class="w-full h-11 pl-10 pr-4 rounded-lg bg-surface-container-low focus:bg-surface-container-lowest text-on-surface font-body-md text-body-sm transition-all focus:outline-none focus:shadow-md" id="last-name" placeholder="Воронов" type="text" value="Воронов"/>
-</div>
-</div>
-</div>
-<!-- Email Field -->
-<div>
-<label class="block font-label-md text-label-md text-on-surface mb-1.5" for="email">Рабочий или личный Email</label>
-<div class="relative flex items-center">
-<span class="material-symbols-outlined absolute left-3.5 text-[20px] text-on-surface-variant">alternate_email</span>
-<input class="w-full h-11 pl-10 pr-10 rounded-lg bg-surface-container-low focus:bg-surface-container-lowest text-on-surface font-body-md text-body-sm transition-all focus:outline-none focus:shadow-md" id="email" placeholder="name@example.com" type="email" value="k.voronov@example.com"/>
-<span class="material-symbols-outlined absolute right-3.5 text-[18px] text-emerald-600">check_circle</span>
-</div>
-</div>
-<!-- Password Fields Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-<!-- Password -->
-<div>
-<div class="flex items-center justify-between mb-1.5">
-<label class="font-label-md text-label-md text-on-surface" for="password">Пароль</label>
-<span class="font-label-sm text-label-sm text-emerald-700">Надежный</span>
-</div>
-<div class="relative flex items-center">
-<span class="material-symbols-outlined absolute left-3.5 text-[20px] text-on-surface-variant">lock</span>
-<input class="w-full h-11 pl-10 pr-10 rounded-lg bg-surface-container-low focus:bg-surface-container-lowest text-on-surface font-body-md text-body-sm transition-all focus:outline-none focus:shadow-md" id="password" type="password" value="SecureEdTechPass!9"/>
-<button class="absolute right-3.5 text-on-surface-variant hover:text-on-surface toggle-pwd" data-target="password" type="button">
-<span class="material-symbols-outlined text-[18px]">visibility</span>
-</button>
-</div>
-<!-- Strength Indicator Bar -->
-<div class="flex gap-1.5 mt-2">
-<div class="h-1 flex-1 rounded-full bg-emerald-500"></div>
-<div class="h-1 flex-1 rounded-full bg-emerald-500"></div>
-<div class="h-1 flex-1 rounded-full bg-emerald-500"></div>
-<div class="h-1 flex-1 rounded-full bg-emerald-500"></div>
-</div>
-</div>
-<!-- Password Confirmation -->
-<div>
-<div class="flex items-center justify-between mb-1.5">
-<label class="font-label-md text-label-md text-on-surface" for="password-confirm">Подтверждение</label>
-<span class="font-label-sm text-label-sm text-emerald-700">Совпадает</span>
-</div>
-<div class="relative flex items-center">
-<span class="material-symbols-outlined absolute left-3.5 text-[20px] text-on-surface-variant">lock_reset</span>
-<input class="w-full h-11 pl-10 pr-10 rounded-lg bg-surface-container-low focus:bg-surface-container-lowest text-on-surface font-body-md text-body-sm transition-all focus:outline-none focus:shadow-md" id="password-confirm" type="password" value="SecureEdTechPass!9"/>
-<button class="absolute right-3.5 text-on-surface-variant hover:text-on-surface toggle-pwd" data-target="password-confirm" type="button">
-<span class="material-symbols-outlined text-[18px]">visibility</span>
-</button>
-</div>
-<div class="flex gap-1.5 mt-2">
-<div class="h-1 flex-1 rounded-full bg-emerald-500"></div>
-<div class="h-1 flex-1 rounded-full bg-emerald-500"></div>
-<div class="h-1 flex-1 rounded-full bg-emerald-500"></div>
-<div class="h-1 flex-1 rounded-full bg-emerald-500"></div>
-</div>
-</div>
-</div>
-<!-- Agreement Checkbox -->
-<div class="pt-1">
-<label class="flex items-start gap-2.5 cursor-pointer select-none">
-<input checked="" class="mt-1 w-4 h-4 rounded text-primary-container focus:ring-0 focus:ring-offset-0 bg-surface-container-low" type="checkbox"/>
-<span class="font-body-sm text-label-sm text-on-surface-variant leading-snug">
-                  Я принимаю условия 
-                  <a class="text-primary underline hover:text-secondary" href="index.html">Пользовательского соглашения</a> 
-                  и 
-                  <a class="text-primary underline hover:text-secondary" href="#">Политику конфиденциальности</a>
-</span>
-</label>
-</div>
-<!-- Submit Primary Button -->
-<button class="w-full h-12 mt-2 rounded-xl bg-primary-container hover:bg-primary text-on-primary font-headline-sm text-body-md font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:shadow-primary-container/20 transition-all active:scale-[0.99]" type="submit">
-<span>Создать аккаунт</span>
-<span class="material-symbols-outlined text-[20px]">arrow_forward</span>
-</button>
-</form>
-<!-- Alternative Social Auth Options -->
-<div class="mt-6">
-<div class="relative flex items-center justify-center my-4">
-<div class="absolute inset-0 flex items-center">
-<div class="w-full bg-surface-container-highest h-[1px]"></div>
-</div>
-<span class="relative px-3 bg-surface-container-lowest font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
-                или зарегистрируйтесь через
-              </span>
-</div>
-<div class="grid grid-cols-3 gap-3">
-<!-- Google -->
-<button class="h-11 px-3 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center gap-2 text-on-surface font-label-md text-label-md transition-colors shadow-sm" type="button">
-<svg class="w-4 h-4" viewbox="0 0 24 24">
-<path d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.14z" fill="#4285F4"></path>
-<path d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z" fill="#34A853"></path>
-<path d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z" fill="#FBBC05"></path>
-<path d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" fill="#EA4335"></path>
-</svg>
-<span>Google</span>
-</button>
-<!-- VK ID -->
-<button class="h-11 px-3 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center gap-2 text-on-surface font-label-md text-label-md transition-colors shadow-sm" type="button">
-<div class="w-4 h-4 rounded bg-[#0077FF] flex items-center justify-center text-white text-[10px] font-bold">VK</div>
-<span>VK ID</span>
-</button>
-<!-- Yandex ID -->
-<button class="h-11 px-3 rounded-lg bg-surface-container-low hover:bg-surface-container flex items-center justify-center gap-2 text-on-surface font-label-md text-label-md transition-colors shadow-sm" type="button">
-<div class="w-4 h-4 rounded-full bg-[#FC3F1D] flex items-center justify-center text-white text-[10px] font-bold">Я</div>
-<span>Яндекс</span>
-</button>
-</div>
-</div>
-<!-- Bottom Switcher -->
-<div class="mt-6 pt-4 text-center">
-<p class="font-body-md text-body-sm text-on-surface-variant">
-              Уже есть аккаунт? 
-              <a class="font-headline-sm font-semibold text-primary hover:text-secondary transition-colors inline-flex items-center gap-0.5" href="#">
-<span>Войти в систему</span>
-<span class="material-symbols-outlined text-[16px]">arrow_right_alt</span>
-</a>
-</p>
-</div>
-</div>
-</section>
-</div>
-</div>
-</div>
-<script>
-  // Interactive Role Selector
-  const roleCards = document.querySelectorAll('.role-card');
-  roleCards.forEach(card => {
-    card.addEventListener('click', () => {
-      roleCards.forEach(c => {
-        c.classList.remove('bg-primary-fixed/30', 'shadow-sm');
-        c.classList.add('bg-surface-container-low');
-        const badge = c.querySelector('.role-check');
-        if (badge) {
-          badge.classList.add('hidden');
-          badge.classList.remove('flex');
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Вход и регистрация — EDU SPACE | Алматинский многопрофильный колледж</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#4F46E5",
+            "primary-container": "#4338CA",
+            secondary: "#7C3AED",
+            surface: "#F8FAFC",
+            "surface-container": "#F1F5F9",
+            "surface-container-high": "#E2E8F0",
+            "surface-container-lowest": "#FFFFFF",
+            "on-surface": "#0F172A",
+            "on-surface-variant": "#475569"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            display: ["Manrope", "sans-serif"]
+          }
         }
-      });
-      card.classList.remove('bg-surface-container-low');
-      card.classList.add('bg-primary-fixed/30', 'shadow-sm');
-      const activeBadge = card.querySelector('.role-check');
-      if (activeBadge) {
-        activeBadge.classList.remove('hidden');
-        activeBadge.classList.add('flex');
       }
-    });
-  });
+    };
+  </script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+    body {
+      min-height: 100vh;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      scrollbar-width: thin;
+      scrollbar-color: #6366f1 #f1f5f9;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+      display: block !important;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6366f1;
+    }
+  </style>
+  <script src="js/app-logistics.js"></script>
+</head>
+<body class="bg-surface font-sans text-on-surface antialiased min-h-screen flex flex-col justify-between">
 
-  // Password Visibility Toggle
-  const toggleButtons = document.querySelectorAll('.toggle-pwd');
-  toggleButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetId = btn.getAttribute('data-target');
-      const input = document.getElementById(targetId);
-      const icon = btn.querySelector('.material-symbols-outlined');
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.textContent = 'visibility_off';
+  <!-- TOP HEADER -->
+  <header class="w-full h-20 bg-white/90 backdrop-blur-md border-b border-slate-200 z-50">
+    <div class="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md">
+          <span class="material-symbols-outlined text-[24px]">rocket_launch</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-display font-bold text-lg text-slate-900 leading-none">EDU SPACE</span>
+          <span class="text-[11px] font-semibold text-indigo-600 tracking-wider uppercase mt-1">АМК Колледж</span>
+        </div>
+      </a>
+
+      <a href="index.html" class="text-xs font-bold text-slate-600 hover:text-indigo-600 flex items-center gap-1.5 transition-colors">
+        <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+        <span>Вернуться на главную</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-12 flex items-center justify-center">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 w-full max-w-5xl items-center">
+
+      <!-- LEFT COLUMN: BRAND PROMO CARD -->
+      <div class="lg:col-span-5 bg-gradient-to-br from-indigo-700 via-indigo-800 to-purple-900 text-white rounded-3xl p-8 sm:p-10 shadow-xl space-y-6 relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="space-y-2">
+          <span class="px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
+            Платформа ТиПО РК
+          </span>
+          <h2 class="font-display font-extrabold text-2xl sm:text-3xl leading-tight">
+            Единое цифровое пространство
+          </h2>
+          <p class="text-indigo-200 text-xs sm:text-sm leading-relaxed">
+            Интерактивные онлайн-тренажеры, автопроверка решений в изолированной среде V8, электронный табель и постепенный график обучения.
+          </p>
+        </div>
+
+        <div class="space-y-3 pt-2 text-xs">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px] text-emerald-300">verified</span>
+            </div>
+            <span>Постепенное открытие заданий по графику</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px] text-emerald-300">terminal</span>
+            </div>
+            <span>50 профильных симуляторов и автотесты</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px] text-emerald-300">fact_check</span>
+            </div>
+            <span>Электронный журнал и ведомость для преподавателей</span>
+          </div>
+        </div>
+
+        <!-- FAST 1-CLICK DEMO BUTTONS -->
+        <div class="pt-4 border-t border-white/20 space-y-2.5">
+          <div class="text-[11px] font-bold text-indigo-200 uppercase tracking-wider">
+            Быстрый вход для проверки (1 клик):
+          </div>
+          <button onclick="demoLogin('student')" class="w-full py-2.5 px-4 bg-white text-indigo-700 hover:bg-indigo-50 font-bold rounded-xl text-xs shadow-md transition-all flex items-center justify-between">
+            <span class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">school</span>
+              <span>Войти как Студент (Константин Воронов)</span>
+            </span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </button>
+          <button onclick="demoLogin('teacher')" class="w-full py-2.5 px-4 bg-indigo-900/60 hover:bg-indigo-900 text-white font-bold rounded-xl text-xs border border-white/30 transition-all flex items-center justify-between">
+            <span class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">badge</span>
+              <span>Войти как Преподаватель (Иванов С. П.)</span>
+            </span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: LOGIN & REGISTER FORMS -->
+      <div class="lg:col-span-7 bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-xl space-y-6">
+
+        <!-- Tab Switcher -->
+        <div class="flex items-center p-1 bg-slate-100 rounded-2xl">
+          <button id="tab-btn-login" onclick="switchAuthTab('login')" class="flex-1 py-2.5 rounded-xl font-bold text-xs bg-white text-indigo-600 shadow-sm transition-all">
+            Вход в систему
+          </button>
+          <button id="tab-btn-register" onclick="switchAuthTab('register')" class="flex-1 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:text-slate-900 transition-all">
+            Регистрация нового аккаунта
+          </button>
+        </div>
+
+        <!-- 1. LOGIN FORM -->
+        <form id="form-login" onsubmit="event.preventDefault(); submitLogin();" class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Email пользователя</label>
+            <input type="email" id="login-email" value="voronov@student.amk.kz" placeholder="student@amk.kz" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label class="block text-xs font-bold text-slate-700">Пароль</label>
+              <a href="javascript:void(0)" onclick="showToast('Для демоверсии используйте пароль: student123', 'info')" class="text-[11px] text-indigo-600 hover:underline font-semibold">Забыли пароль?</a>
+            </div>
+            <input type="password" id="login-password" value="student123" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+          </div>
+
+          <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-all">
+            Войти в личный кабинет
+          </button>
+        </form>
+
+        <!-- 2. REGISTRATION FORM (Hidden by default) -->
+        <form id="form-register" onsubmit="event.preventDefault(); submitRegister();" class="hidden space-y-4">
+          <!-- Role Selector -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-2">Выберите вашу роль:</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="role-card cursor-pointer p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/50 flex items-center gap-3">
+                <input type="radio" name="reg-role" value="student" checked onchange="toggleRoleCard(this)" class="text-indigo-600" />
+                <div>
+                  <div class="font-bold text-xs text-slate-900">Студент</div>
+                  <div class="text-[10px] text-slate-500">Доступ к тренажерам</div>
+                </div>
+              </label>
+
+              <label class="role-card cursor-pointer p-3 rounded-xl border border-slate-300 hover:border-slate-400 bg-white flex items-center gap-3">
+                <input type="radio" name="reg-role" value="teacher" onchange="toggleRoleCard(this)" class="text-indigo-600" />
+                <div>
+                  <div class="font-bold text-xs text-slate-900">Преподаватель</div>
+                  <div class="text-[10px] text-slate-500">Журнал и проверка</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">ФИО полностью</label>
+            <input type="text" id="reg-name" placeholder="например: Константин Воронов" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Email</label>
+              <input type="email" id="reg-email" placeholder="student@amk.kz" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Группа / Отделение</label>
+              <input type="text" id="reg-group" value="ИС-21" placeholder="ИС-21" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Придумайте пароль</label>
+            <input type="password" id="reg-password" placeholder="минимум 6 символов" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+          </div>
+
+          <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-all">
+            Зарегистрироваться
+          </button>
+        </form>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="w-full py-6 border-t border-slate-200 text-center text-xs text-slate-500 bg-white">
+    Алматинский многопрофильный колледж (АМК) • Цифровая образовательная платформа EDU SPACE 2026
+  </footer>
+
+  <script>
+    function switchAuthTab(tab) {
+      const btnLogin = document.getElementById('tab-btn-login');
+      const btnReg = document.getElementById('tab-btn-register');
+      const formLogin = document.getElementById('form-login');
+      const formReg = document.getElementById('form-register');
+
+      if (tab === 'login') {
+        btnLogin.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs bg-white text-indigo-600 shadow-sm transition-all';
+        btnReg.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:text-slate-900 transition-all';
+        formLogin.classList.remove('hidden');
+        formReg.classList.add('hidden');
       } else {
-        input.type = 'password';
-        icon.textContent = 'visibility';
+        btnReg.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs bg-white text-indigo-600 shadow-sm transition-all';
+        btnLogin.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:text-slate-900 transition-all';
+        formReg.classList.remove('hidden');
+        formLogin.classList.add('hidden');
       }
-    });
-  });
-
-  // Top Tabs Switcher (Vhod / Registratsiya)
-  const tabLogin = document.getElementById('tab-login');
-  const tabRegister = document.getElementById('tab-register');
-
-  tabLogin.addEventListener('click', () => {
-    tabLogin.className = 'px-4 py-2 rounded-lg font-label-md text-label-md bg-primary-container text-on-primary shadow-sm transition-all';
-    tabRegister.className = 'px-4 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all';
-  });
-
-  tabRegister.addEventListener('click', () => {
-    tabRegister.className = 'px-4 py-2 rounded-lg font-label-md text-label-md bg-primary-container text-on-primary shadow-sm transition-all';
-    tabLogin.className = 'px-4 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all';
-  });
-</script></main>
-
-<!-- EDU SPACE Master Interactive Engine -->
-<script src="js/app-logistics.js"></script>
-<script>
-(function() {
-  // Ensure every button and link works immediately
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('[EDU SPACE] Interactive Engine Initialized on ' + window.location.pathname);
-
-    // 1. Fix all anchor tags with href="#" or data-path
-    document.querySelectorAll('a').forEach(a => {
-      const dp = a.getAttribute('data-path') || '';
-      const href = a.getAttribute('href') || '';
-      const text = (a.textContent || '').trim().toLowerCase();
-
-      // Navigation mapping
-      if (dp === 'main-page' || text === 'edu space' || text === 'главная') {
-        a.href = 'index.html';
-      } else if (dp === 'login' || text === 'войти') {
-        a.href = 'auth.html?mode=login';
-      } else if (dp === 'registration' || text === 'регистрация' || text.includes('начать обучение') || text.includes('зарегистрироваться')) {
-        a.href = 'auth.html?mode=register';
-      } else if (dp === 'for-teachers' || text.includes('я преподаватель') || text.includes('конструктор курсов')) {
-        a.href = 'teacher.html';
-      } else if (dp === 'course-catalog' || dp === 'interactive-courses' || text.includes('каталог курсов') || text.includes('задания') || text.includes('предметы')) {
-        a.href = 'tasks.html';
-      } else if (dp === 'demo' || text.includes('демо')) {
-        a.href = 'simulator.html';
-      } else if (dp === 'analytics' || dp === 'certificates' || text.includes('оценки') || text.includes('профиль')) {
-        a.href = 'profile.html';
-      } else if (href === '#' || !href) {
-        // Fallback for any remaining empty link: prevent jump to top, open informative modal or toast
-        a.addEventListener('click', function(e) {
-          e.preventDefault();
-          if (text.includes('сообщество')) {
-            openModal('🌐 Сообщество авторов и преподавателей', '<p>Форум и библиотека открытых методических материалов EDU SPACE. Доступно более 1,200 методичек и практик.</p>');
-          } else if (text.includes('вебинар')) {
-            openModal('🎙️ Вебинарная комната', '<p>Ближайший открытый вебинар: "Современные практики в EdTech" состоится в четверг в 18:00.</p>');
-          } else if (text.includes('политика') || text.includes('конфиденциальност')) {
-            openModal('🔒 Политика конфиденциальности', '<p>Платформа EDU SPACE соблюдает все стандарты защиты персональных данных студентов и преподавателей в соответствии с законодательством РК и международными нормами GDPR.</p>');
-          } else if (text.includes('условия') || text.includes('оферта')) {
-            openModal('📄 Пользовательское соглашение', '<p>Используя платформу EDU SPACE, вы соглашаетесь с правилами академической честности и условиями использования интерактивных тренажеров.</p>');
-          } else if (text.includes('cookie')) {
-            openModal('🍪 Настройки файлов cookie', '<p>Мы используем только необходимые технические cookies для сохранения вашей сессии авторизации и прогресса выполнения заданий.</p>');
-          } else if (text.includes('расписание')) {
-            openModal('📅 Расписание занятий', '<div class="space-y-2"><div class="p-2 bg-slate-100 rounded"><b>Понедельник 09:00:</b> Веб-разработка (Ауд. 302)</div><div class="p-2 bg-slate-100 rounded"><b>Вторник 11:30:</b> Базы данных (Лаб. 405)</div><div class="p-2 bg-slate-100 rounded"><b>Среда 14:00:</b> Защита практических работ</div></div>');
-          } else if (text.includes('календарь')) {
-            openModal('🗓️ Академический календарь', '<div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-indigo-950 font-medium">Текущий семестр: 1 сентября — 25 декабря.<br>Сессия: с 10 января по 28 января.</div>');
-          } else if (text.includes('настройки') || text.includes('приватность')) {
-            openModal('⚙️ Настройки аккаунта', '<div class="space-y-3"><label class="flex items-center gap-2"><input type="checkbox" checked class="rounded text-indigo-600" /> Получать уведомления о новых оценках</label><label class="flex items-center gap-2"><input type="checkbox" checked class="rounded text-indigo-600" /> Публичный профиль студента</label><button class="w-full py-2 bg-indigo-600 text-white rounded-xl font-bold mt-2" onclick="showToast(\'Настройки сохранены!\'); closeModal();">Сохранить</button></div>');
-          } else {
-            showToast('Раздел: ' + (a.textContent.trim() || 'Информация'), 'info');
-          }
-        });
-      }
-    });
-
-    // 2. Ensure ALL buttons have active feedback and click handlers
-    document.querySelectorAll('button').forEach(btn => {
-      // Add hover and active click feel
-      btn.style.cursor = 'pointer';
-
-      // Avoid double binding if already has specific onclick
-      if (!btn.getAttribute('data-bound-click')) {
-        btn.setAttribute('data-bound-click', 'true');
-        
-        btn.addEventListener('click', function(e) {
-          const t = btn.textContent.toLowerCase();
-          const icon = btn.querySelector('.material-symbols-outlined')?.textContent.trim() || '';
-
-          if (t.includes('продолжить') || t.includes('приступить')) {
-            e.preventDefault();
-            window.location.href = 'simulator.html?task_id=3';
-          } else if (t.includes('смотреть работу')) {
-            e.preventDefault();
-            window.location.href = 'simulator.html?task_id=3';
-          } else if (t.includes('сдать работу')) {
-            e.preventDefault();
-            window.location.href = 'simulator.html';
-          } else if (t.includes('подключить свою школу') || t.includes('заказать демо')) {
-            e.preventDefault();
-            openModal('🏫 Подключение учебного заведения к EDU SPACE', `
-              <form onsubmit="event.preventDefault(); showToast('Заявка на подключение принята! Наш методист свяжется с вами.'); closeModal();">
-                <div class="mb-3">
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Название колледжа / школы</label>
-                  <input type="text" placeholder="например: Алматинский многопрофильный колледж" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
-                </div>
-                <div class="mb-3">
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Контактный телефон или Email</label>
-                  <input type="text" placeholder="+7 (777) 000-00-00" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
-                </div>
-                <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700">Отправить заявку на демо</button>
-              </form>
-            `);
-          } else if (t.includes('фильтр') || icon === 'filter_list' || icon === 'tune') {
-            showToast('Фильтры применены', 'info');
-          }
-        });
-      }
-    });
-
-    // 3. User session chip in navbar
-    const user = getActiveUser();
-    if (user) {
-      document.querySelectorAll('[data-user-name]').forEach(el => el.textContent = user.full_name || user.username);
     }
-  });
-})();
-</script>
 
+    function toggleRoleCard(radio) {
+      document.querySelectorAll('.role-card').forEach(c => {
+        c.className = 'role-card cursor-pointer p-3 rounded-xl border border-slate-300 hover:border-slate-400 bg-white flex items-center gap-3';
+      });
+      radio.closest('.role-card').className = 'role-card cursor-pointer p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/50 flex items-center gap-3';
+    }
 
-<script>
+    async function submitLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value.trim();
 
-document.addEventListener('DOMContentLoaded', function() {
-  const urlParams = new URLSearchParams(window.location.search);
-  let mode = urlParams.get('mode') === 'login' ? 'login' : 'register';
-  let currentRole = 'student';
-
-  const tabLogin = document.getElementById('tab-login');
-  const tabRegister = document.getElementById('tab-register');
-  const roleCards = document.querySelectorAll('.role-card');
-  const form = document.querySelector('form');
-  const submitBtn = form?.querySelector('button[type="submit"]');
-  const firstNameInput = document.getElementById('first-name');
-  const lastNameInput = document.getElementById('last-name');
-  const emailInput = document.getElementById('email');
-  const passwordInput = document.getElementById('password');
-  const confirmPasswordInput = document.getElementById('password-confirm');
-  
-  const namesGrid = firstNameInput?.closest('.grid');
-  const confirmGrid = confirmPasswordInput?.closest('div:has(label)') || confirmPasswordInput?.closest('.grid > div');
-  const roleSection = document.getElementById('role-selector')?.closest('.mb-6');
-  const titleH2 = document.querySelector('h2') || document.querySelector('main h1');
-
-  // 1. Password Visibility Toggle
-  document.querySelectorAll('.toggle-pwd').forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      const targetId = btn.getAttribute('data-target');
-      const input = document.getElementById(targetId);
-      const icon = btn.querySelector('.material-symbols-outlined');
-      if (input) {
-        if (input.type === 'password') {
-          input.type = 'text';
-          if (icon) icon.textContent = 'visibility_off';
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setActiveUser(data.user);
+          showToast(data.message || 'Успешный вход!', 'success');
+          setTimeout(() => {
+            window.location.href = data.user.role === 'teacher' ? 'teacher.html' : 'student.html';
+          }, 400);
         } else {
-          input.type = 'password';
-          if (icon) icon.textContent = 'visibility';
+          showToast(data.message || 'Ошибка входа', 'error');
+        }
+      } catch (e) {
+        // Local fallback
+        const mockUser = {
+          id: 1,
+          email: email,
+          full_name: 'Константин Воронов',
+          role: email.includes('teacher') ? 'teacher' : 'student',
+          group_name: 'ИС-21'
+        };
+        setActiveUser(mockUser);
+        showToast('Вход выполнен!', 'success');
+        setTimeout(() => {
+          window.location.href = mockUser.role === 'teacher' ? 'teacher.html' : 'student.html';
+        }, 400);
+      }
+    }
+
+    async function submitRegister() {
+      const role = document.querySelector('input[name="reg-role"]:checked').value;
+      const full_name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const group_name = document.getElementById('reg-group').value.trim();
+      const password = document.getElementById('reg-password').value.trim();
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ email, password, full_name, role, group_name })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setActiveUser(data.user);
+          showToast(data.message || 'Регистрация успешна!', 'success');
+          setTimeout(() => {
+            window.location.href = role === 'teacher' ? 'teacher.html' : 'student.html';
+          }, 400);
+        } else {
+          showToast(data.message || 'Ошибка регистрации', 'error');
+        }
+      } catch (e) {
+        showToast('Регистрация завершена!', 'success');
+        setTimeout(() => {
+          window.location.href = role === 'teacher' ? 'teacher.html' : 'student.html';
+        }, 400);
+      }
+    }
+
+    function demoLogin(role) {
+      if (role === 'student') {
+        const user = {
+          id: 1,
+          email: 'voronov@student.amk.kz',
+          full_name: 'Константин Воронов',
+          role: 'student',
+          group_name: 'ИС-21',
+          student_id: 'KZ-AMK-2026-98421'
+        };
+        setActiveUser(user);
+        showToast('Вход как студент Константин Воронов...', 'success');
+        setTimeout(() => window.location.href = 'student.html', 300);
+      } else {
+        const user = {
+          id: 2,
+          email: 'teacher@amk.kz',
+          full_name: 'Иванов Сергей Павлович',
+          role: 'teacher',
+          group_name: 'Кафедра ТиПО'
+        };
+        setActiveUser(user);
+        showToast('Вход как преподаватель Иванов С. П....', 'success');
+        setTimeout(() => window.location.href = 'teacher.html', 300);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('mode') === 'register') {
+        switchAuthTab('register');
+      }
+      if (params.get('role') === 'teacher') {
+        const teacherRadio = document.querySelector('input[value="teacher"]');
+        if (teacherRadio) {
+          teacherRadio.checked = true;
+          toggleRoleCard(teacherRadio);
         }
       }
     });
-  });
-
-  // 2. Role Selection Cards
-  roleCards.forEach(card => {
-    card.addEventListener('click', function() {
-      currentRole = card.getAttribute('data-role');
-      roleCards.forEach(c => {
-        c.className = 'role-card cursor-pointer p-4 rounded-xl transition-all duration-200 relative bg-surface-container-low hover:bg-surface-container';
-        const chk = c.querySelector('.role-check');
-        if (chk) chk.classList.add('hidden');
-        const iconBox = c.querySelector('.w-10.h-10');
-        if (iconBox) iconBox.className = 'w-10 h-10 rounded-lg bg-surface-container-highest text-on-surface flex items-center justify-center mb-3';
-      });
-      card.className = 'role-card cursor-pointer p-4 rounded-xl transition-all duration-200 relative bg-primary-fixed/30 shadow-sm border border-primary/20';
-      const chk = card.querySelector('.role-check');
-      if (chk) chk.classList.remove('hidden');
-      const iconBox = card.querySelector('.w-10.h-10');
-      if (iconBox) iconBox.className = 'w-10 h-10 rounded-lg bg-primary-container text-on-primary flex items-center justify-center mb-3';
-      
-      showToast(`Выбрана роль: ${currentRole === 'teacher' ? 'Преподаватель' : 'Студент'}`, 'info');
-    });
-  });
-
-  // 3. Tab Switching (Login vs Register)
-  function setMode(newMode) {
-    mode = newMode;
-    if (mode === 'login') {
-      if (tabLogin) tabLogin.className = 'px-4 py-2 rounded-lg font-label-md text-label-md bg-primary-container text-on-primary shadow-sm transition-all font-bold';
-      if (tabRegister) tabRegister.className = 'px-4 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all';
-      if (namesGrid) namesGrid.style.display = 'none';
-      if (confirmGrid) confirmGrid.style.display = 'none';
-      if (roleSection) roleSection.style.display = 'none';
-      if (titleH2) titleH2.textContent = 'Вход в EDU SPACE';
-      if (submitBtn) {
-        submitBtn.querySelector('span:first-child').textContent = 'Войти в аккаунт';
-      }
-    } else {
-      if (tabRegister) tabRegister.className = 'px-4 py-2 rounded-lg font-label-md text-label-md bg-primary-container text-on-primary shadow-sm transition-all font-bold';
-      if (tabLogin) tabLogin.className = 'px-4 py-2 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all';
-      if (namesGrid) namesGrid.style.display = 'grid';
-      if (confirmGrid) confirmGrid.style.display = 'block';
-      if (roleSection) roleSection.style.display = 'block';
-      if (titleH2) titleH2.textContent = 'Создание аккаунта';
-      if (submitBtn) {
-        submitBtn.querySelector('span:first-child').textContent = 'Создать аккаунт';
-      }
-    }
-  }
-
-  tabLogin?.addEventListener('click', () => setMode('login'));
-  tabRegister?.addEventListener('click', () => setMode('register'));
-  setMode(mode);
-
-  // 4. Form Submit
-  form?.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const email = emailInput?.value.trim() || '';
-    const password = passwordInput?.value.trim() || '';
-    const firstName = firstNameInput?.value.trim() || 'Константин';
-    const lastName = lastNameInput?.value.trim() || 'Воронов';
-    const fullName = `${firstName} ${lastName}`.trim();
-
-    if (!email || !password) {
-      showToast('Пожалуйста, введите Email и пароль', 'error');
-      return;
-    }
-
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">sync</span> Выполняется...';
-    }
-
-    try {
-      const endpoint = mode === 'login' ? '/api/auth/login' : '/api/auth/register';
-      const payload = mode === 'login' 
-        ? { email, username: email.split('@')[0], password }
-        : { username: email.split('@')[0], email, password, full_name: fullName, role: currentRole, specialty: 'Информационные технологии' };
-
-      const resp = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const data = await resp.json();
-      const user = data.user || {
-        id: 1,
-        email: email,
-        full_name: fullName,
-        role: currentRole,
-        specialty: 'Информационные технологии'
-      };
-      setActiveUser(user);
-      showToast('Успешный вход в аккаунт!', 'success');
-      setTimeout(() => {
-        window.location.href = user.role === 'teacher' ? 'teacher.html' : 'student.html';
-      }, 500);
-    } catch(err) {
-      const fallbackUser = { id: 1, email, full_name: fullName, role: currentRole };
-      setActiveUser(fallbackUser);
-      showToast('Вход выполнен успешно!', 'success');
-      setTimeout(() => {
-        window.location.href = currentRole === 'teacher' ? 'teacher.html' : 'student.html';
-      }, 500);
-    }
-  });
-
-  // 5. Fast 1-click Demo Login Bar
-  const socialGrid = document.querySelector('.grid-cols-3');
-  if (socialGrid && !document.getElementById('demo-quick-auth')) {
-    const demoDiv = document.createElement('div');
-    demoDiv.id = 'demo-quick-auth';
-    demoDiv.className = 'mt-5 pt-4 border-t border-surface-container-high flex flex-col gap-2';
-    demoDiv.innerHTML = `
-      <div class="text-xs font-bold text-center text-on-surface-variant uppercase tracking-wider">
-        🚀 Быстрый вход в один клик:
-      </div>
-      <div class="grid grid-cols-2 gap-2">
-        <button type="button" id="fastStudentBtn" class="py-2.5 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs border border-indigo-200 flex items-center justify-center gap-1.5 transition-all shadow-sm">
-          <span class="material-symbols-outlined text-[18px]">school</span> Вход: Студент
-        </button>
-        <button type="button" id="fastTeacherBtn" class="py-2.5 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 flex items-center justify-center gap-1.5 transition-all shadow-sm">
-          <span class="material-symbols-outlined text-[18px]">co_present</span> Вход: Преподаватель
-        </button>
-      </div>
-    `;
-    socialGrid.parentNode.appendChild(demoDiv);
-
-    document.getElementById('fastStudentBtn')?.addEventListener('click', () => {
-      const studentUser = { id: 1, username: 'k_voronov', full_name: 'Константин Воронов', role: 'student', specialty: 'Информационные технологии', email: 'voronov@student.amk.kz' };
-      setActiveUser(studentUser);
-      showToast('Вход выполнен: Студент Константин Воронов!', 'success');
-      setTimeout(() => window.location.href = 'student.html', 400);
-    });
-
-    document.getElementById('fastTeacherBtn')?.addEventListener('click', () => {
-      const teacherUser = { id: 99, username: 'prof_kuznetsov', full_name: 'Профессор Кузнецов', role: 'teacher', specialty: 'Информационные технологии', email: 'kuznetsov@amk.kz' };
-      setActiveUser(teacherUser);
-      showToast('Вход выполнен: Профессор Кузнецов!', 'success');
-      setTimeout(() => window.location.href = 'teacher.html', 400);
-    });
-  }
-});
-
-</script>
+  </script>
 </body>
 </html>

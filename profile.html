@@ -1,1109 +1,320 @@
-<html lang="ru"><head><title>EDU SPACE — Академический профиль и успеваемость</title><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"on-primary-container":"#c1beff","surface-tint":"#5148d7","on-secondary-fixed-variant":"#5a00c6","surface-dim":"#d2d9f4","primary-fixed":"#e3dfff","secondary":"#712ae2","surface-bright":"#faf8ff","surface":"#faf8ff","surface-container-lowest":"#ffffff","on-primary-fixed-variant":"#372abf","primary-fixed-dim":"#c3c0ff","on-error-container":"#93000a","secondary-fixed":"#eaddff","on-background":"#131b2e","inverse-on-surface":"#eef0ff","surface-container-low":"#f2f3ff","on-surface-variant":"#464554","on-tertiary-fixed":"#0f0069","primary":"#2a14b4","primary-container":"#4338ca","on-primary":"#ffffff","surface-container":"#eaedff","on-tertiary-fixed-variant":"#3323cc","on-tertiary-container":"#c1beff","tertiary":"#2402c1","error-container":"#ffdad6","tertiary-fixed-dim":"#c3c0ff","inverse-surface":"#283044","on-secondary-container":"#fffbff","secondary-container":"#8a4cfc","surface-variant":"#dae2fd","outline":"#777586","on-secondary":"#ffffff","secondary-fixed-dim":"#d2bbff","on-primary-fixed":"#100069","on-surface":"#131b2e","surface-container-highest":"#dae2fd","on-error":"#ffffff","outline-variant":"#c7c4d7","tertiary-container":"#3f33d6","tertiary-fixed":"#e2dfff","error":"#ba1a1a","surface-container-high":"#e2e7ff","background":"#faf8ff","inverse-primary":"#c3c0ff","on-secondary-fixed":"#25005a","on-tertiary":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-lg":"1.5rem","space-md":"1rem","gutter-sm":"1rem","space-sm":"0.5rem","space-xl":"2rem","margin":"2rem","space-xs":"0.25rem","margin-sm":"1rem","gutter":"1.5rem"},"fontFamily":{"label-sm":["Inter"],"body-md":["Inter"],"headline-sm":["Manrope"],"body-lg":["Inter"],"headline-xl":["Manrope"],"headline-md":["Manrope"],"headline-lg":["Manrope"],"body-sm":["Inter"],"display-lg-mobile":["Manrope"],"display-lg":["Manrope"],"label-md":["Inter"],"headline-xl-mobile":["Manrope"]},"fontSize":{"label-sm":["0.75rem",{"lineHeight":"1rem","letterSpacing":"0.02em","fontWeight":"600"}],"body-md":["1rem",{"lineHeight":"1.5rem","fontWeight":"400"}],"headline-sm":["1.125rem",{"lineHeight":"1.5rem","fontWeight":"600"}],"body-lg":["1.125rem",{"lineHeight":"1.75rem","fontWeight":"400"}],"headline-xl":["2.5rem",{"lineHeight":"3rem","letterSpacing":"-0.02em","fontWeight":"700"}],"headline-md":["1.375rem",{"lineHeight":"1.75rem","letterSpacing":"-0.01em","fontWeight":"600"}],"headline-lg":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.015em","fontWeight":"600"}],"body-sm":["0.875rem",{"lineHeight":"1.25rem","fontWeight":"400"}],"display-lg-mobile":["2.25rem",{"lineHeight":"2.75rem","letterSpacing":"-0.02em","fontWeight":"700"}],"display-lg":["3.5rem",{"lineHeight":"4rem","letterSpacing":"-0.025em","fontWeight":"700"}],"label-md":["0.875rem",{"lineHeight":"1.25rem","letterSpacing":"0.01em","fontWeight":"500"}],"headline-xl-mobile":["1.75rem",{"lineHeight":"2.25rem","letterSpacing":"-0.015em","fontWeight":"600"}]}}}};</script><style data-stitch-injected>
-  /* Hide scrollbars on ALL elements (Webkit) */
-  *::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Hide scrollbars on ALL elements (Firefox) */
-  * {
-    scrollbar-width: none;
-  }
-
-  /* Suppress horizontal overflow and legacy IE/Edge */
-  html, body {
-    overflow-x: hidden !important;
-    -ms-overflow-style: none;
-    min-height: auto !important;
-  }
-
-  /* Global text selection highlight color override inside all iframe modes */
-  ::selection {
-    background-color: rgba(96, 86, 240, 0.3) !important;
-    color: inherit !important;
-  }
-  ::-moz-selection {
-    background-color: rgba(96, 86, 240, 0.3) !important;
-    color: inherit !important;
-  }
-
-  /* Suppress browser default focus outlines and box-shadow glows globally */
-  *:focus, *:focus-visible {
-    outline: none !important;
-    box-shadow: none !important;
-  }
-</style><script data-stitch-injected>(function Vr(){window.addEventListener(`message`,async function(e){let t=e.data;if(!t||t.type!==`capture_screenshot`||e.source!==window.parent)return;let n=t.requestId,r=t.captureEngineSource,i=t.options||{},a=window.innerWidth,o=window.innerHeight,s=window.scrollX,c=window.scrollY,l=document.documentElement,u=l.style.width,d=l.style.height,f=l.style.overflow,p=l.style.position;try{if(!window.snapdom&&r){let e=document.createElement(`script`);e.setAttribute(`data-stitch-injected`,``),e.textContent=r,document.head.appendChild(e)}let e=window.snapdom;if(!e){window.parent.postMessage({type:`screenshot_error`,requestId:n,errorCode:`CAPTURE_ENGINE_UNAVAILABLE`,error:`Capture engine not available. Ensure source is sent with the capture request.`},`*`);return}let t=i.exclude||[`[data-stitch-injected]`];window.scrollTo(0,0),l.style.width=a+`px`,l.style.height=o+`px`,l.style.overflow=`hidden`,l.style.position=`relative`;let u=await(await e(document.documentElement,{exclude:t,embedFonts:!0,scale:i.scale||1,plugins:[{name:`stitch-viewport-clip`,afterClone:function(e){let t=e.clone;if(!(t instanceof HTMLElement))return;t.style.position=`relative`,t.style.width=a+`px`,t.style.height=o+`px`,t.style.overflow=`hidden`;let n=[],r=t.querySelectorAll(`*`);for(let e=0;e<r.length;e++){let t=r[e];t instanceof HTMLElement&&(t.style.position||(t.__snapdomComputedStyle||window.getComputedStyle(t)).position)===`fixed`&&n.push(t)}if(s!==0||c!==0){let e=t.querySelector(`body`);e&&(e.style.marginTop=-c+`px`,e.style.marginLeft=-s+`px`)}for(let e=0;e<n.length;e++)n[e].style.position=`absolute`,t.appendChild(n[e])}}]})).toCanvas({width:a,height:o}),d=i.format||`image/jpeg`,f=i.quality??.8,p=u.toDataURL(d,f);window.parent.postMessage({type:`screenshot_captured`,requestId:n,dataUrl:p,width:a,height:o},`*`)}catch(e){window.parent.postMessage({type:`screenshot_error`,requestId:n,error:e instanceof Error?e.message:String(e)},`*`)}finally{l.style.width=u,l.style.height=d,l.style.overflow=f,l.style.position=p,window.scrollTo(s,c)}})})();</script><script data-stitch-injected>(function Wr(){let e=`__stitch-highlight-css`,t=`stitch-highlight-element`,n=null;function r(){if(document.getElementById(e))return;let n=document.createElement(`style`);n.id=e,n.textContent=[`@keyframes stitch-highlight-pulse {`,`  0%, 100% { box-shadow: 0 0 0 3px rgba(113,105,237,0.8), 0 0 12px 4px rgba(113,105,237,0.3); }`,`  50%      { box-shadow: 0 0 0 3px rgba(113,105,237,0.4), 0 0 6px 2px rgba(113,105,237,0.15); }`,`}`,`.`+t+` {`,`  outline: 3px solid rgba(113,105,237,0.8) !important;`,`  outline-offset: 2px !important;`,`  animation: stitch-highlight-pulse 1.5s ease-in-out infinite !important;`,`  border-radius: inherit;`,`}`].join(`
-`),document.head.appendChild(n)}function i(e){let t=e.toLowerCase().trim(),n=document.createTreeWalker(document.body,NodeFilter.SHOW_ELEMENT,null),r=null,i=-1,a=n.nextNode();for(;a;){if((a.textContent||``).trim().toLowerCase().includes(t)){let e=0,t=a.parentElement;for(;t;)e++,t=t.parentElement;e>i&&(i=e,r=a)}a=n.nextNode()}return r}function a(e){setTimeout(function(){let t=e.getBoundingClientRect(),n=window.innerWidth||1,r=window.innerHeight||1;window.parent.postMessage({type:`stitch:highlight-element-rect`,normalizedX:(t.left+t.width/2)/n,normalizedY:(t.top+t.height/2)/r,normalizedWidth:t.width/n,normalizedHeight:t.height/r},`*`)},400)}window.addEventListener(`message`,function(e){if(!e.data||e.data.type!==`stitch:highlight-element`)return;n&&=(n.classList.remove(t),null);let{text:o,selector:s}=e.data;if(!o&&!s)return;r();let c=null;if(o&&(c=i(o)),!c&&s)try{c=document.querySelector(s)}catch{}c&&(c.classList.add(t),c.scrollIntoView({behavior:`smooth`,block:`center`}),n=c,a(c))})})();</script><script data-stitch-injected>(function qr(){let e=0;window.onerror=function(){e++},window.addEventListener(`unhandledrejection`,function(){e++});let t=console.error;console.error=function(...n){e++,t.apply(console,n)};function n(e=`actual`){if(e===`scrollbox`)return document.documentElement.scrollHeight;let t=document.documentElement,n=document.body,r=n?.children;if(!r)return t.scrollHeight;let i=t.style.getPropertyValue(`height`),a=t.style.getPropertyPriority(`height`),o=t.style.getPropertyValue(`min-height`),s=t.style.getPropertyPriority(`min-height`),c=n.style.getPropertyValue(`height`),l=n.style.getPropertyPriority(`height`),u=n.style.getPropertyValue(`min-height`),d=n.style.getPropertyPriority(`min-height`),f=0;try{t.style.setProperty(`height`,`auto`,`important`),t.style.setProperty(`min-height`,`0px`,`important`),n.style.setProperty(`height`,`auto`,`important`),n.style.setProperty(`min-height`,`0px`,`important`);let e=0,i=0,a=0,o=(e,t)=>{if(t.display===`none`||t.visibility===`hidden`)return;let n=parseFloat(t.bottom),r=parseFloat(t.top);if(Number.isFinite(n)&&n>=0&&n<=48&&(!Number.isFinite(r)||r>n)){let t=e.getBoundingClientRect();if(t.height>0&&t.height<=200){let e=t.height+n;e>a&&(a=e)}}};for(let t=0;t<r.length;t++){let n=r[t];if(n.tagName===`SCRIPT`||n.tagName===`STYLE`||n.tagName===`LINK`||n.tagName===`META`||n.tagName===`TEMPLATE`||n.tagName===`NOSCRIPT`||n.hasAttribute(`data-stitch-injected`))continue;let a=window.getComputedStyle(n);if(a.display===`none`||a.visibility===`hidden`)continue;if(a.position===`fixed`){o(n,a);continue}let s=n.getBoundingClientRect().bottom+window.scrollY,c=Math.max(0,parseFloat(a.marginBottom)||0),l=Math.max(0,parseFloat(a.paddingBottom)||0),u=0,d=n.children;for(let e=0;e<d.length;e++){let t=d[e];if(t.tagName===`SCRIPT`||t.tagName===`STYLE`||t.tagName===`LINK`||t.tagName===`META`||t.tagName===`TEMPLATE`||t.tagName===`NOSCRIPT`||t.hasAttribute(`data-stitch-injected`))continue;let n=window.getComputedStyle(t);n.display!==`none`&&n.visibility!==`hidden`&&(n.position===`fixed`?o(t,n):n.position!==`absolute`&&(u=t.tagName===`MAIN`?Math.max(0,parseFloat(n.paddingBottom)||0)+Math.max(0,parseFloat(n.marginBottom)||0):0))}u>l&&(l=u);let f=s+c,p=Math.max(0,s-l);f>e&&(e=f),p>i&&(i=p)}if(e>0){let r=window.getComputedStyle(n),o=window.getComputedStyle(t),s=Math.max(0,parseFloat(r.paddingBottom)||0)+Math.max(0,parseFloat(r.borderBottomWidth)||0)+Math.max(0,parseFloat(o.paddingBottom)||0)+Math.max(0,parseFloat(o.borderBottomWidth)||0);f=Math.max(e+s,i+a)}}finally{i?t.style.setProperty(`height`,i,a):t.style.removeProperty(`height`),o?t.style.setProperty(`min-height`,o,s):t.style.removeProperty(`min-height`),c?n.style.setProperty(`height`,c,l):n.style.removeProperty(`height`),u?n.style.setProperty(`min-height`,u,d):n.style.removeProperty(`min-height`),t.getAttribute(`style`)?.trim()||t.removeAttribute(`style`),n.getAttribute(`style`)?.trim()||n.removeAttribute(`style`)}return f||t.scrollHeight}window.__stitchMeasureContentHeight=n,window.__stitchReportDimensions=function(t=`actual`){typeof window<`u`&&window.parent&&window.parent.postMessage({type:`stitch:content-dimensions`,height:n(t),errorCount:e},`*`)};function r(){typeof window<`u`&&window.__stitchReportDimensions?.(`actual`)}document.readyState===`loading`?document.addEventListener(`DOMContentLoaded`,()=>setTimeout(r,50)):setTimeout(r,50),window.addEventListener(`load`,()=>setTimeout(r,100)),document.addEventListener(`visibilitychange`,()=>{document.visibilityState===`visible`&&setTimeout(r,100)}),window.addEventListener(`message`,e=>{e.data?.type===`stitch:request-dimensions`&&setTimeout(r,50)})})();</script><style data-stitch-injected>
-  /* ─── Animation styles ─── */
-  .stitch-anim-highlight {
-    outline: 2px solid #6056f080;
-    outline-offset: 2px;
-    border-radius: 4px;
-    transition: outline-color 0.4s ease;
-  }
-  .stitch-anim-highlight-fade {
-    outline-color: transparent;
-  }
-  @keyframes stitch-anim-fade-in {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes stitch-anim-pure-fade-in {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-  .stitch-anim-fade-in {
-    animation: stitch-anim-fade-in 0.3s ease forwards;
-  }
-
-  /* ─── Drawing rectangle overlay ─── */
-  .stitch-anim-draw-overlay {
-    position: fixed;
-    border: 2px solid #6056f099;
-    border-radius: 6px;
-    pointer-events: none;
-    z-index: 998;
-    clip-path: polygon(
-      0% 0%, 0% 0%,
-      0% 0%, 0% 0%,
-      0% 0%, 0% 0%
-    );
-    animation: stitch-anim-draw-rect 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  }
-  @keyframes stitch-anim-draw-rect {
-    0%   { clip-path: polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%); }
-    30%  { clip-path: polygon(0% 0%, 100% 0%, 100% 0%, 100% 0%, 0% 0%, 0% 0%); }
-    55%  { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 100% 100%, 0% 0%, 0% 0%); }
-    80%  { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 100%, 0% 0%); }
-    100% { clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 0% 0%); }
-  }
-  .stitch-anim-draw-overlay.fading {
-    animation: stitch-anim-border-fade 0.5s ease forwards;
-  }
-  @keyframes stitch-anim-border-fade {
-    to { opacity: 0; }
-  }
-  /* ─── Image reveal crossfade ─── */
-  .stitch-anim-img-dimming {
-    transition: opacity 0.2s ease !important;
-    opacity: 0.15 !important;
-  }
-  .stitch-anim-img-revealing {
-    transition: opacity 0.35s ease !important;
-    opacity: 1 !important;
-  }
-  .stitch-anim-cursor::after {
-    content: '|';
-    font-weight: 100;
-    animation: stitch-anim-blink 0.6s step-end infinite;
-    color: #6056f0B3;
-    margin-left: 1px;
-  }
-  @keyframes stitch-anim-blink {
-    50% { opacity: 0; }
-  }
-
-  /* ─── AI Agent Cursor ─── */
-  #stitch-agent-cursor {
-    position: fixed;
-    z-index: 9999;
-    pointer-events: none;
-    display: flex;
-    align-items: flex-start;
-    gap: 0px;
-    transition: left 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-                top 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-                opacity 0.25s ease;
-    opacity: 0;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.18));
-  }
-  #stitch-agent-cursor.working {
-    animation: stitch-anim-wobble 0.8s ease-in-out infinite;
-  }
-  #stitch-agent-cursor.drawing {
-    animation: none;
-    transition: left 0.12s linear, top 0.12s linear, opacity 0.25s ease;
-  }
-  @keyframes stitch-anim-wobble {
-    0%, 100% { transform: translate(0, 0) rotate(0deg); }
-    25%  { transform: translate(1px, -1px) rotate(2deg); }
-    50%  { transform: translate(-1px, 1px) rotate(-1deg); }
-    75%  { transform: translate(1px, 0px) rotate(1deg); }
-  }
-  #stitch-agent-cursor .cursor-pointer {
-    display: block;
-  }
-  #stitch-agent-cursor .cursor-text,
-  #stitch-agent-cursor .cursor-paint {
-    display: none;
-  }
-  #stitch-agent-cursor.text-mode .cursor-pointer,
-  #stitch-agent-cursor.text-mode .cursor-paint {
-    display: none;
-  }
-  #stitch-agent-cursor.text-mode .cursor-text {
-    display: block;
-  }
-  #stitch-agent-cursor.paint-mode .cursor-pointer,
-  #stitch-agent-cursor.paint-mode .cursor-text {
-    display: none;
-  }
-  #stitch-agent-cursor.paint-mode .cursor-paint {
-    display: block;
-  }
-  #stitch-cursor-label {
-    margin-top: 14px;
-    margin-left: -3px;
-    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
-  }
-
-  /* ─── Active Element Indicator (Multi-Select Outline & Aurora Glow) ─── */
-  @keyframes stitch-aurora-sweep {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-  @keyframes stitch-indicator-pulse {
-    0%, 100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.78;
-    }
-  }
-  .stitch-active-indicator {
-    position: absolute;
-    box-sizing: border-box;
-    border-style: solid;
-    border-color: #6056f0;
-    background: transparent;
-    pointer-events: none;
-    z-index: 2;
-  }
-  .stitch-active-indicator.stitch-aurora,
-  .stitch-active-indicator:not([data-stitch-indicator="pending"]) {
-    border: none !important;
-    border-radius: 4px;
-    background: linear-gradient(
-      135deg,
-      rgba(145, 84, 231, 0.10),
-      rgba(96, 86, 240, 0.08),
-      rgba(64, 217, 198, 0.08),
-      rgba(66, 133, 244, 0.10)
-    );
-    box-shadow: 0 2px 12px rgba(96, 86, 240, 0.22);
-    animation: stitch-indicator-pulse 3s ease-in-out infinite;
-    pointer-events: auto;
-    cursor: not-allowed;
-    z-index: 3;
-  }
-  .stitch-active-indicator.stitch-aurora::before,
-  .stitch-active-indicator.stitch-aurora::after,
-  .stitch-active-indicator:not([data-stitch-indicator="pending"])::before,
-  .stitch-active-indicator:not([data-stitch-indicator="pending"])::after {
-    content: '';
-    position: absolute;
-    border-radius: inherit;
-    background: linear-gradient(
-      120deg,
-      #9154E7 0%,
-      #6056F0 25%,
-      #40D9C6 50%,
-      #4285F4 75%,
-      #9154E7 100%
-    );
-    background-size: 300% 300%;
-    animation: stitch-aurora-sweep 4s linear infinite;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: exclude;
-    pointer-events: none;
-  }
-  .stitch-active-indicator.stitch-aurora::before,
-  .stitch-active-indicator:not([data-stitch-indicator="pending"])::before {
-    inset: 0;
-    padding: 2px;
-  }
-  .stitch-active-indicator.stitch-aurora::after,
-  .stitch-active-indicator:not([data-stitch-indicator="pending"])::after {
-    inset: -3px;
-    padding: 3px;
-    filter: blur(6px);
-    opacity: 0.55;
-  }
-</style><script src="js/app-logistics.js"></script>
-</head><body class="bg-surface font-body-md text-on-surface antialiased"><aside class="fixed left-0 top-0 h-full w-64 bg-surface-container-lowest z-50 flex flex-col justify-between shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex flex-col flex-1 overflow-y-auto px-4 py-6"><div class="flex items-center gap-3 px-3 mb-8"><div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary shadow-sm"><span class="material-symbols-outlined text-[24px]">rocket_launch</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm font-bold text-on-surface leading-none">EDU SPACE</span><span class="font-label-sm text-label-sm text-on-surface-variant">LMS Platform</span></div></div><nav class="space-y-1" data-active-classes="bg-primary-container text-on-primary font-semibold"><a class="flex items-center justify-between px-3 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="glavnaya" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">grid_view</span><span class="font-label-md text-label-md">Главная</span></div></a><a class="flex items-center justify-between px-3 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="moi-predmety" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">menu_book</span><span class="font-label-md text-label-md">Мои предметы</span></div></a><a class="flex items-center justify-between px-3 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="zadaniya" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">assignment</span><span class="font-label-md text-label-md">Задания</span></div><span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">3</span></a><a class="flex items-center justify-between px-3 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="otsenki" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">grade</span><span class="font-label-md text-label-md">Оценки</span></div></a><a class="flex items-center justify-between px-3 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="raspisanie" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">schedule</span><span class="font-label-md text-label-md">Расписание</span></div></a><a class="flex items-center justify-between px-3 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="kalendar" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">calendar_month</span><span class="font-label-md text-label-md">Календарь</span></div></a><a class="flex items-center justify-between px-3 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="soobshcheniya" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">chat_bubble</span><span class="font-label-md text-label-md">Сообщения</span></div><span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold">2</span></a><a class="flex items-center justify-between px-3 py-2.5 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="uvedomleniya" href="#"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="font-label-md text-label-md">Уведомления</span></div></a></nav><div class="my-4 h-[1px] bg-surface-container"></div><nav class="space-y-1"><a class="flex items-center gap-3 px-3 py-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="profil" href="#"><span class="material-symbols-outlined text-[20px]">account_circle</span><span class="font-label-md text-label-md">Профиль</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" data-path="nastrojki" href="#"><span class="material-symbols-outlined text-[20px]">settings</span><span class="font-label-md text-label-md">Настройки</span></a><a class="flex items-center gap-3 px-3 py-2 rounded-xl text-on-surface-variant hover:bg-error-container hover:text-on-error-container transition-colors" data-path="login" href="#"><span class="material-symbols-outlined text-[20px]">logout</span><span class="font-label-md text-label-md">Выход</span></a></nav></div><div class="p-4 mx-3 mb-4 rounded-xl bg-surface-container-low flex flex-col gap-2"><div class="flex items-center justify-between"><span class="font-label-sm text-label-sm font-semibold text-primary">3 семестр • Активен</span><span class="w-2 h-2 rounded-full bg-primary"></span></div><div class="w-full bg-surface-container rounded-full h-1.5"><div class="bg-primary h-1.5 rounded-full w-[78%]"></div></div><div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant"><span>Прогресс</span><span class="font-semibold text-on-surface">78%</span></div></div></aside><div class="pl-64 flex flex-col min-h-[1024px]" data-stitch-vh="min-h-[1024px]===min-h-screen"><header class="fixed top-0 left-64 right-0 h-16 bg-surface-container-lowest/80 backdrop-blur-xl z-40 flex items-center justify-between px-8 shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="flex items-center gap-3 w-96"><div class="relative w-full"><span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span><input class="w-full pl-10 pr-16 py-2 rounded-xl bg-surface text-on-surface placeholder:text-on-surface-variant font-body-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Поиск по курсам, урокам и заданиям..." type="text"/><kbd class="absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant font-label-sm text-label-sm">Ctrl+K</kbd></div></div><div class="flex items-center gap-4"><button class="relative p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">chat</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-secondary"></span></button><button class="relative p-2 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary"></span></button><div class="h-6 w-[1px] bg-surface-container"></div><div class="flex items-center gap-3"><div class="flex flex-col text-right"><div class="flex items-center justify-end gap-1.5"><span class="font-label-md text-label-md font-semibold text-on-surface">Константин Воронов</span><span class="px-1.5 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold">PRO</span></div><span class="font-label-sm text-label-sm text-on-surface-variant">3 курс • Информатика</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-16 p-8 bg-surface"><div class="flex flex-col w-full space-y-8">
-<!-- Хлебные крошки и тулбар верхнего уровня -->
-<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-<div class="flex flex-col space-y-1">
-<nav class="flex items-center gap-2 font-label-sm text-label-sm text-on-surface-variant">
-<a class="hover:text-primary transition-colors" href="student.html">Главная</a>
-<span class="material-symbols-outlined text-[14px]">chevron_right</span>
-<a class="hover:text-primary transition-colors" href="#">Личный кабинет</a>
-<span class="material-symbols-outlined text-[14px]">chevron_right</span>
-<span class="text-on-surface font-semibold">Профиль студента</span>
-</nav>
-<h1 class="font-headline-lg text-headline-lg font-bold text-on-surface tracking-tight">
-        Академический профиль и успеваемость
-      </h1>
-</div>
-<!-- Быстрые действия -->
-<div class="flex items-center gap-3">
-<button class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface-container-lowest shadow-sm hover:shadow-md text-on-surface-variant hover:text-on-surface transition-all text-label-md font-label-md group" type="button">
-<span class="material-symbols-outlined text-[18px] text-primary group-hover:scale-110 transition-transform">share</span>
-<span>Поделиться портфолио</span>
-</button>
-<button class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-container to-secondary text-on-primary shadow-sm hover:shadow-md hover:brightness-105 active:scale-95 transition-all text-label-md font-label-md" type="button">
-<span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
-<span>Экспорт справки (PDF)</span>
-</button>
-</div>
-</div>
-<!-- Главная карточка студента (Hero Profile Card) -->
-<section class="bg-surface-container-lowest rounded-2xl p-6 lg:p-8 shadow-sm relative overflow-hidden">
-<!-- Декоративный градиентный акцент -->
-<div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-gradient-to-bl from-primary-fixed/30 to-secondary-fixed/10 pointer-events-none blur-3xl"></div>
-<div class="relative z-10 flex flex-col xl:flex-row xl:items-start justify-between gap-8">
-<!-- Аватар и персональная инфа -->
-<div class="flex flex-col sm:flex-row gap-6 items-start sm:items-center">
-<div class="relative">
-<div class="w-28 h-28 lg:w-32 lg:h-32 rounded-2xl overflow-hidden shadow-md bg-surface-container">
-<img class="w-full h-full object-cover" data-alt="Close-up professional portrait of a stylish male university student with dark hair, smart casual navy shirt, soft natural indoor studio lighting with high tech EdTech university vibes, crisp clear focal detail and modern friendly confident expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnqvxLMTvbp4XjvELdLLqZNhom9AWV1br4I4klm6QX5KO9mgOeBlreLgS4od7Yr87SAxUgSf5ySVsq3Dkf5-Jd2SZ-rqvI7ppaLPeKcoPuqe5Kt03JiuWroPgJ1ZSba46dnOvhuA2TrGnAb_YGajMre3vWphzZ1hpndor5wWk79VeRjwn8SN83MH-N4AX4lAhTLkacOYA_hd7L-_zPi5slMx1BrP77fJmLNMAC4OI"/>
-</div>
-<span class="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm shadow flex items-center gap-1">
-<span class="w-1.5 h-1.5 rounded-full bg-surface-bright animate-pulse"></span>
-            3 курс
-          </span>
-</div>
-<div class="space-y-2">
-<div class="flex flex-wrap items-center gap-2.5">
-<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Константин Воронов</h2>
-<span class="px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold flex items-center gap-1">
-<span class="material-symbols-outlined text-[14px]">verified</span>
-              Студент PRO
-            </span>
-<span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm font-medium">
-              Бюджетная форма
-            </span>
-</div>
-<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-2">
-<span class="material-symbols-outlined text-[18px] text-primary">school</span>
-            Факультет информационных технологий • <span class="text-on-surface font-medium">Группа CS-22</span>
-</p>
-<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-2">
-<span class="material-symbols-outlined text-[18px]">terminal</span>
-            Специальность: Программная инженерия и разработка цифровых систем
-          </p>
-<!-- Навыки -->
-<div class="flex flex-wrap gap-1.5 pt-2">
-<span class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">TypeScript</span>
-<span class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">React 19</span>
-<span class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">PostgreSQL</span>
-<span class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">Docker</span>
-<span class="px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">UX/UI Design</span>
-</div>
-</div>
-</div>
-<!-- Мета-данные и служебные кнопки -->
-<div class="flex flex-col justify-between sm:items-end gap-6 border-t xl:border-t-0 pt-4 xl:pt-0">
-<div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-left sm:text-right">
-<div class="bg-surface-container-low rounded-xl p-3 sm:bg-transparent sm:p-0">
-<span class="block font-label-sm text-label-sm text-on-surface-variant">Студенческий ID</span>
-<span class="font-label-md text-label-md font-semibold text-on-surface">#EDU-88421</span>
-</div>
-<div class="bg-surface-container-low rounded-xl p-3 sm:bg-transparent sm:p-0">
-<span class="block font-label-sm text-label-sm text-on-surface-variant">E-mail</span>
-<span class="font-label-md text-label-md font-semibold text-on-surface">k.voronov@eduspace.ru</span>
-</div>
-<div class="bg-surface-container-low rounded-xl p-3 sm:bg-transparent sm:p-0 col-span-2 sm:col-span-1">
-<span class="block font-label-sm text-label-sm text-on-surface-variant">Регистрация</span>
-<span class="font-label-md text-label-md font-semibold text-on-surface">01.09.2023 (Сем. 4)</span>
-</div>
-</div>
-<div class="flex items-center gap-3">
-<button class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors font-label-sm text-label-sm font-medium" type="button">
-<span class="material-symbols-outlined text-[16px]">tune</span>
-<span>Приватность</span>
-</button>
-<button class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-container text-on-primary hover:bg-primary transition-all font-label-sm text-label-sm font-medium shadow-sm" type="button">
-<span class="material-symbols-outlined text-[16px]">edit</span>
-<span>Редактировать профиль</span>
-</button>
-</div>
-</div>
-</div>
-</section>
-<!-- Блок KPI метрик успеваемости (4 Bento Cards) -->
-<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-<!-- Карточка 1: GPA -->
-<div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-<div class="flex items-start justify-between">
-<div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Средний балл (GPA)</span>
-<div class="flex items-baseline gap-2 mt-1">
-<span class="font-headline-xl text-headline-xl font-bold text-on-surface">4.85</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">/ 5.0</span>
-</div>
-</div>
-<div class="w-10 h-10 rounded-xl bg-secondary-fixed flex items-center justify-center text-secondary">
-<span class="material-symbols-outlined text-[20px]">grade</span>
-</div>
-</div>
-<div class="mt-4 pt-3 bg-surface-container-low rounded-xl px-3 py-2 flex items-center justify-between text-label-sm font-label-sm">
-<span class="text-secondary font-semibold flex items-center gap-1">
-<span class="material-symbols-outlined text-[16px]">trending_up</span>
-          +0.12 за месяц
-        </span>
-<span class="text-on-surface-variant">Топ-5% факультета</span>
-</div>
-</div>
-<!-- Карточка 2: Сдано заданий -->
-<div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-<div class="flex items-start justify-between">
-<div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Сдано заданий</span>
-<div class="flex items-baseline gap-2 mt-1">
-<span class="font-headline-xl text-headline-xl font-bold text-on-surface">42</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">из 46 план</span>
-</div>
-</div>
-<div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-primary">
-<span class="material-symbols-outlined text-[20px]">task_alt</span>
-</div>
-</div>
-<div class="mt-4 pt-3 bg-surface-container-low rounded-xl px-3 py-2 flex items-center justify-between text-label-sm font-label-sm">
-<span class="text-primary font-semibold">38 с 1-й попытки</span>
-<span class="text-on-surface-variant">4 в ревью</span>
-</div>
-</div>
-<!-- Карточка 3: Выполнение учебного плана -->
-<div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-<div class="flex items-start justify-between">
-<div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Прогресс семестра</span>
-<div class="flex items-baseline gap-2 mt-1">
-<span class="font-headline-xl text-headline-xl font-bold text-on-surface">91.3%</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">норма 85%</span>
-</div>
-</div>
-<div class="w-10 h-10 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary">
-<span class="material-symbols-outlined text-[20px]">pie_chart</span>
-</div>
-</div>
-<div class="mt-4 space-y-1.5">
-<div class="w-full h-2 rounded-full bg-surface-container overflow-hidden">
-<div class="h-full rounded-full bg-gradient-to-r from-primary-container to-secondary" style="width: 91.3%"></div>
-</div>
-<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant">
-<span>Опережение графика</span>
-<span class="text-primary font-semibold">+1.5 недели</span>
-</div>
-</div>
-</div>
-<!-- Карточка 4: Просроченные работы -->
-<div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
-<div class="flex items-start justify-between">
-<div>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Просроченные работы</span>
-<div class="flex items-baseline gap-2 mt-1">
-<span class="font-headline-xl text-headline-xl font-bold text-on-surface">1</span>
-<span class="font-body-sm text-body-sm text-on-surface-variant">из всех курсов</span>
-</div>
-</div>
-<div class="w-10 h-10 rounded-xl bg-error-container flex items-center justify-center text-error">
-<span class="material-symbols-outlined text-[20px]">warning</span>
-</div>
-</div>
-<div class="mt-4 pt-3 bg-surface-container-low rounded-xl px-3 py-2 flex items-center justify-between text-label-sm font-label-sm">
-<span class="text-on-surface-variant font-medium">Базы данных (лаб. 5)</span>
-<span class="text-primary font-semibold">-2 к прошлому году</span>
-</div>
-</div>
-</section>
-<!-- Аналитический блок: График динамики + Donut Chart категорий -->
-<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-<!-- График динамики баллов (8 колонок) -->
-<div class="lg:col-span-8 bg-surface-container-lowest rounded-2xl p-6 lg:p-7 shadow-sm flex flex-col justify-between">
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4">
-<div>
-<div class="flex items-center gap-2">
-<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Динамика успеваемости по неделям</h3>
-<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm">Семестр IV</span>
-</div>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Среднеакадемический суммарный балл за учебные модули (шкала 0-100)</p>
-</div>
-<div class="flex items-center gap-4 text-label-sm font-label-sm">
-<div class="flex items-center gap-1.5">
-<span class="w-3 h-3 rounded-sm bg-primary-container"></span>
-<span class="text-on-surface-variant">Баллы студента</span>
-</div>
-<div class="flex items-center gap-1.5">
-<span class="w-3 h-0.5 bg-outline-variant"></span>
-<span class="text-on-surface-variant">Порог "Отлично" (85)</span>
-</div>
-</div>
-</div>
-<!-- SVG Visualization Canvas -->
-<div class="w-full mt-4">
-<div class="relative w-full h-64">
-<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 700 220">
-<defs>
-<lineargradient id="curveGradient" x1="0" x2="0" y1="0" y2="1">
-<stop offset="0%" stop-color="#4338ca" stop-opacity="0.25"></stop>
-<stop offset="100%" stop-color="#4338ca" stop-opacity="0.0"></stop>
-</lineargradient>
-</defs>
-<!-- Линии сетки 100, 75, 50, 25 -->
-<line stroke="#eaedff" stroke-dasharray="4,4" stroke-width="1" x1="40" x2="680" y1="20" y2="20"></line>
-<text fill="#777586" font-family="Inter" font-size="10" x="15" y="24">100</text>
-<line stroke="#c7c4d7" stroke-dasharray="6,4" stroke-width="1.5" x1="40" x2="680" y1="65" y2="65"></line>
-<text fill="#4338ca" font-family="Inter" font-size="10" font-weight="600" x="15" y="69">85</text>
-<line stroke="#eaedff" stroke-dasharray="4,4" stroke-width="1" x1="40" x2="680" y1="120" y2="120"></line>
-<text fill="#777586" font-family="Inter" font-size="10" x="15" y="124">60</text>
-<line stroke="#eaedff" stroke-width="1" x1="40" x2="680" y1="175" y2="175"></line>
-<text fill="#777586" font-family="Inter" font-size="10" x="15" y="179">30</text>
-<!-- Заливка под кривой -->
-<polygon fill="url(#curveGradient)" points="60,60 115,50 170,40 225,55 280,35 335,28 390,38 445,30 500,22 555,25 610,20 665,18 665,180 60,180"></polygon>
-<!-- Столбики за прошлые контрольные точки (полупрозрачные акценты) -->
-<rect fill="#eaedff" height="130" rx="4" width="16" x="107" y="50"></rect>
-<rect fill="#eaedff" height="125" rx="4" width="16" x="217" y="55"></rect>
-<rect fill="#eaedff" height="152" rx="4" width="16" x="327" y="28"></rect>
-<rect fill="#eaedff" height="150" rx="4" width="16" x="437" y="30"></rect>
-<rect fill="#e2e7ff" height="155" rx="4" width="16" x="547" y="25"></rect>
-<rect fill="#4338ca" fill-opacity="0.85" height="162" rx="4" width="16" x="657" y="18"></rect>
-<!-- Основная линия тренда -->
-<polyline fill="none" points="60,60 115,50 170,40 225,55 280,35 335,28 390,38 445,30 500,22 555,25 610,20 665,18" stroke="#4338ca" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></polyline>
-<!-- Точки на графике -->
-<circle cx="60" cy="60" fill="#ffffff" r="4" stroke="#4338ca" stroke-width="2.5"></circle>
-<circle cx="170" cy="40" fill="#ffffff" r="4" stroke="#4338ca" stroke-width="2.5"></circle>
-<circle cx="280" cy="35" fill="#ffffff" r="4" stroke="#4338ca" stroke-width="2.5"></circle>
-<circle cx="390" cy="38" fill="#ffffff" r="4" stroke="#4338ca" stroke-width="2.5"></circle>
-<circle cx="500" cy="22" fill="#ffffff" r="4" stroke="#4338ca" stroke-width="2.5"></circle>
-<circle cx="610" cy="20" fill="#ffffff" r="4" stroke="#4338ca" stroke-width="2.5"></circle>
-<!-- Текущая рекордная точка с пином -->
-<circle cx="665" cy="18" fill="#712ae2" r="6" stroke="#ffffff" stroke-width="2"></circle>
-<text fill="#2a14b4" font-family="Manrope" font-size="11" font-weight="700" x="645" y="10">98 б.</text>
-<!-- Подписи недель -->
-<text fill="#777586" font-family="Inter" font-size="11" x="50" y="200">W1</text>
-<text fill="#777586" font-family="Inter" font-size="11" x="105" y="200">W2</text>
-<text fill="#777586" font-family="Inter" font-size="11" x="160" y="200">W3</text>
-<text fill="#777586" font-family="Inter" font-size="11" x="215" y="200">W4</text>
-<text fill="#777586" font-family="Inter" font-size="11" x="270" y="200">W5</text>
-<text fill="#777586" font-family="Inter" font-size="11" x="325" y="200">W6</text>
-<text fill="#777586" font-family="Inter" font-size="11" x="380" y="200">W7</text>
-<text fill="#777586" font-family="Inter" font-size="11" x="435" y="200">W8</text>
-<text fill="#777586" font-family="Inter" font-size="11" x="490" y="200">W9</text>
-<text fill="#777586" font-family="Inter" font-size="11" x="545" y="200">W10</text>
-<text fill="#777586" font-family="Inter" font-size="11" x="600" y="200">W11</text>
-<text fill="#4338ca" font-family="Inter" font-size="11" font-weight="700" x="655" y="200">W12</text>
-</svg>
-</div>
-</div>
-<div class="mt-4 pt-3 flex flex-wrap items-center justify-between gap-3 text-body-sm font-body-sm bg-surface-container-low rounded-xl px-4 py-2.5">
-<span class="text-on-surface-variant flex items-center gap-1.5">
-<span class="material-symbols-outlined text-[18px] text-primary">insights</span>
-          Максимум достигнут на 12-й неделе по курсу «UI/UX Архитектура»
-        </span>
-<a class="font-label-sm text-label-sm font-semibold text-primary hover:underline" href="#">Подробный отчет за семестр →</a>
-</div>
-</div>
-<!-- Donut Chart структуры оценок (4 колонки) -->
-<div class="lg:col-span-4 bg-surface-container-lowest rounded-2xl p-6 lg:p-7 shadow-sm flex flex-col justify-between">
-<div>
-<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Распределение заданий</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">По качеству и итоговым оценкам</p>
-<!-- Donut SVG -->
-<div class="relative flex items-center justify-center my-6">
-<svg class="w-44 h-44 -rotate-90 transform" viewbox="0 0 120 120">
-<!-- Background circle track -->
-<circle cx="60" cy="60" fill="transparent" r="48" stroke="#eaedff" stroke-width="12"></circle>
-<!-- Отлично (68%) = 301.6 * 0.68 = 205.1 -->
-<circle cx="60" cy="60" fill="transparent" r="48" stroke="#4338ca" stroke-dasharray="205.1 301.6" stroke-dashoffset="0" stroke-width="12"></circle>
-<!-- Хорошо (24%) = 301.6 * 0.24 = 72.4 -->
-<circle cx="60" cy="60" fill="transparent" r="48" stroke="#8a4cfc" stroke-dasharray="72.4 301.6" stroke-dashoffset="-205.1" stroke-width="12"></circle>
-<!-- На доработке (6%) = 301.6 * 0.06 = 18.1 -->
-<circle cx="60" cy="60" fill="transparent" r="48" stroke="#eaddff" stroke-dasharray="18.1 301.6" stroke-dashoffset="-277.5" stroke-width="12"></circle>
-<!-- Просрочено (2%) = 301.6 * 0.02 = 6.0 -->
-<circle cx="60" cy="60" fill="transparent" r="48" stroke="#ba1a1a" stroke-dasharray="6.0 301.6" stroke-dashoffset="-295.6" stroke-width="12"></circle>
-</svg>
-<div class="absolute flex flex-col items-center justify-center text-center">
-<span class="font-headline-md text-headline-md font-bold text-on-surface">42</span>
-<span class="font-label-sm text-label-sm text-on-surface-variant">Всего работ</span>
-</div>
-</div>
-</div>
-<!-- Легенда -->
-<div class="space-y-2.5">
-<div class="flex items-center justify-between text-label-md font-label-md">
-<div class="flex items-center gap-2">
-<span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
-<span class="text-on-surface font-medium">Отлично (90–100 б.)</span>
-</div>
-<span class="font-semibold text-on-surface">68% <span class="text-on-surface-variant font-normal">(29)</span></span>
-</div>
-<div class="flex items-center justify-between text-label-md font-label-md">
-<div class="flex items-center gap-2">
-<span class="w-2.5 h-2.5 rounded-full bg-secondary-container"></span>
-<span class="text-on-surface font-medium">Хорошо (75–89 б.)</span>
-</div>
-<span class="font-semibold text-on-surface">24% <span class="text-on-surface-variant font-normal">(10)</span></span>
-</div>
-<div class="flex items-center justify-between text-label-md font-label-md">
-<div class="flex items-center gap-2">
-<span class="w-2.5 h-2.5 rounded-full bg-secondary-fixed"></span>
-<span class="text-on-surface font-medium">На доработке</span>
-</div>
-<span class="font-semibold text-on-surface">6% <span class="text-on-surface-variant font-normal">(2)</span></span>
-</div>
-<div class="flex items-center justify-between text-label-md font-label-md">
-<div class="flex items-center gap-2">
-<span class="w-2.5 h-2.5 rounded-full bg-error"></span>
-<span class="text-on-surface font-medium">Просрочено</span>
-</div>
-<span class="font-semibold text-error">2% <span class="text-on-surface-variant font-normal">(1)</span></span>
-</div>
-</div>
-</div>
-</section>
-<!-- Детализированная таблица успеваемости и выполненных заданий -->
-<section class="bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden flex flex-col">
-<!-- Шапка и фильтры таблицы -->
-<div class="p-6 lg:p-7 space-y-4">
-<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-<div>
-<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Ведомость оценок и текущих заданий</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Полная история сдачи лабораторных работ, тестов и проектов</p>
-</div>
-<div class="flex items-center gap-2">
-<button class="p-2 rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" title="Обновить" type="button">
-<span class="material-symbols-outlined text-[18px]">refresh</span>
-</button>
-<button class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface-container text-on-surface font-label-sm text-label-sm hover:bg-surface-container-high transition-colors" type="button">
-<span class="material-symbols-outlined text-[16px]">file_download</span>
-<span>Экспорт в XLSX</span>
-</button>
-</div>
-</div>
-<!-- Панель интерактивных фильтров -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 pt-2">
-<div class="lg:col-span-4 relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
-<input class="w-full pl-9 pr-3 py-2 rounded-xl bg-surface text-on-surface font-body-sm text-body-sm placeholder:text-on-surface-variant focus:outline-none focus:bg-surface-container-low transition-colors" placeholder="Поиск задания по теме..." type="text"/>
-</div>
-<div class="lg:col-span-3">
-<select class="w-full px-3 py-2 rounded-xl bg-surface text-on-surface font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-low transition-colors">
-<option value="all">Все дисциплины (4)</option>
-<option value="fe">Frontend Architecture</option>
-<option value="ux">UI/UX Design Systems</option>
-<option value="db">Базы данных и NoSQL</option>
-<option value="algo">Алгоритмы и структуры</option>
-</select>
-</div>
-<div class="lg:col-span-3">
-<select class="w-full px-3 py-2 rounded-xl bg-surface text-on-surface font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-low transition-colors">
-<option value="s4">Текущий семестр (IV)</option>
-<option value="s3">Семестр III</option>
-<option value="s2">Семестр II</option>
-<option value="all">Все время обучения</option>
-</select>
-</div>
-<div class="lg:col-span-2">
-<select class="w-full px-3 py-2 rounded-xl bg-surface text-on-surface font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-low transition-colors">
-<option value="all">Все статусы</option>
-<option value="checked">Проверено</option>
-<option value="credited">Зачтено</option>
-<option value="review">На доработке</option>
-</select>
-</div>
-</div>
-</div>
-<!-- Таблица данных -->
-<div class="overflow-x-auto w-full">
-<table class="w-full text-left border-collapse">
-<thead>
-<tr class="bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm">
-<th class="py-3 px-6 font-semibold">Предмет</th>
-<th class="py-3 px-6 font-semibold">Задание / Практика</th>
-<th class="py-3 px-6 font-semibold">Преподаватель</th>
-<th class="py-3 px-6 font-semibold">Сдано</th>
-<th class="py-3 px-6 font-semibold">Оценка</th>
-<th class="py-3 px-6 font-semibold">Статус</th>
-<th class="py-3 px-6 font-semibold text-right">Фидбек</th>
-</tr>
-</thead>
-<tbody class="divide-y divide-surface-container">
-<!-- Строка 1 -->
-<tr class="hover:bg-surface transition-colors group">
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-high text-primary font-label-sm text-label-sm font-semibold">
-<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                Frontend Архитектура
-              </span>
-</td>
-<td class="py-4 px-6 min-w-0 max-w-xs">
-<div class="font-body-md text-body-md font-semibold text-on-surface">Практическая работа №3: Интерактивный UI-компонент</div>
-<div class="font-body-sm text-body-sm text-on-surface-variant truncate">Реализация доступных модальных окон и клавиатурных хоткеев</div>
-</td>
-<td class="py-4 px-6 whitespace-nowrap">
-<div class="flex items-center gap-2">
-<div class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-primary font-semibold text-xs">МВ</div>
-<span class="font-body-sm text-body-sm text-on-surface">М. Власов, к.т.н.</span>
-</div>
-</td>
-<td class="py-4 px-6 whitespace-nowrap font-body-sm text-body-sm text-on-surface-variant">
-              18 мая, 14:30
-            </td>
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container-high text-primary font-label-md text-label-md font-bold">
-                98 / 100
-              </span>
-</td>
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">
-<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                Зачтено
-              </span>
-</td>
-<td class="py-4 px-6 whitespace-nowrap text-right">
-<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" title="Посмотреть рецензию" type="button">
-<span class="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
-</button>
-</td>
-</tr>
-<!-- Строка 2 -->
-<tr class="hover:bg-surface transition-colors group">
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                UI/UX Design Systems
-              </span>
-</td>
-<td class="py-4 px-6 min-w-0 max-w-xs">
-<div class="font-body-md text-body-md font-semibold text-on-surface">Кейс: Проектирование дизайн-системы</div>
-<div class="font-body-sm text-body-sm text-on-surface-variant truncate">Спецификация токенов, композиционные сетки и typography scales</div>
-</td>
-<td class="py-4 px-6 whitespace-nowrap">
-<div class="flex items-center gap-2">
-<div class="w-7 h-7 rounded-full bg-secondary-fixed flex items-center justify-center text-secondary font-semibold text-xs">АС</div>
-<span class="font-body-sm text-body-sm text-on-surface">А. Соколова</span>
-</div>
-</td>
-<td class="py-4 px-6 whitespace-nowrap font-body-sm text-body-sm text-on-surface-variant">
-              15 мая, 21:05
-            </td>
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container-high text-secondary font-label-md text-label-md font-bold">
-                95 / 100
-              </span>
-</td>
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                Проверено
-              </span>
-</td>
-<td class="py-4 px-6 whitespace-nowrap text-right">
-<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" title="Посмотреть рецензию" type="button">
-<span class="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
-</button>
-</td>
-</tr>
-<!-- Строка 3 -->
-<tr class="hover:bg-surface transition-colors group">
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-highest text-on-surface font-label-sm text-label-sm font-semibold">
-<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
-                Базы данных и NoSQL
-              </span>
-</td>
-<td class="py-4 px-6 min-w-0 max-w-xs">
-<div class="font-body-md text-body-md font-semibold text-on-surface">Лабораторная №4: B-Tree индексы &amp; Explain</div>
-<div class="font-body-sm text-body-sm text-on-surface-variant truncate">Оптимизация сложных JOIN-запросов и партиционирование таблиц</div>
-</td>
-<td class="py-4 px-6 whitespace-nowrap">
-<div class="flex items-center gap-2">
-<div class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-primary font-semibold text-xs">ДР</div>
-<span class="font-body-sm text-body-sm text-on-surface">Д. Романов</span>
-</div>
-</td>
-<td class="py-4 px-6 whitespace-nowrap font-body-sm text-body-sm text-on-surface-variant">
-              11 мая, 19:40
-            </td>
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container text-on-surface font-label-md text-label-md font-bold">
-                88 / 100
-              </span>
-</td>
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">
-<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
-                Зачтено
-              </span>
-</td>
-<td class="py-4 px-6 whitespace-nowrap text-right">
-<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" title="Посмотреть рецензию" type="button">
-<span class="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
-</button>
-</td>
-</tr>
-<!-- Строка 4 -->
-<tr class="hover:bg-surface transition-colors group">
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-high text-primary font-label-sm text-label-sm font-semibold">
-<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                Алгоритмы и структуры
-              </span>
-</td>
-<td class="py-4 px-6 min-w-0 max-w-xs">
-<div class="font-body-md text-body-md font-semibold text-on-surface">Курсовой модуль: Графовые алгоритмы (Dijkstra)</div>
-<div class="font-body-sm text-body-sm text-on-surface-variant truncate">Поиск кратчайшего маршрута в ориентированных мультиграфах</div>
-</td>
-<td class="py-4 px-6 whitespace-nowrap">
-<div class="flex items-center gap-2">
-<div class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-primary font-semibold text-xs">ЕК</div>
-<span class="font-body-sm text-body-sm text-on-surface">Е. Ковалева</span>
-</div>
-</td>
-<td class="py-4 px-6 whitespace-nowrap font-body-sm text-body-sm text-on-surface-variant">
-              06 мая, 11:15
-            </td>
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container-high text-primary font-label-md text-label-md font-bold">
-                100 / 100
-              </span>
-</td>
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">
-<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                Зачтено
-              </span>
-</td>
-<td class="py-4 px-6 whitespace-nowrap text-right">
-<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" title="Посмотреть рецензию" type="button">
-<span class="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
-</button>
-</td>
-</tr>
-<!-- Строка 5: На доработке -->
-<tr class="hover:bg-surface transition-colors group">
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-highest text-on-surface font-label-sm text-label-sm font-semibold">
-<span class="w-1.5 h-1.5 rounded-full bg-on-surface-variant"></span>
-                Базы данных и NoSQL
-              </span>
-</td>
-<td class="py-4 px-6 min-w-0 max-w-xs">
-<div class="font-body-md text-body-md font-semibold text-on-surface">Лабораторная №5: Шардирование в MongoDB</div>
-<div class="font-body-sm text-body-sm text-on-surface-variant truncate">Конфигурация Shard Key и тестирование отказоустойчивости</div>
-</td>
-<td class="py-4 px-6 whitespace-nowrap">
-<div class="flex items-center gap-2">
-<div class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-primary font-semibold text-xs">ДР</div>
-<span class="font-body-sm text-body-sm text-on-surface">Д. Романов</span>
-</div>
-</td>
-<td class="py-4 px-6 whitespace-nowrap font-body-sm text-body-sm text-error font-medium">
-              01 мая, 23:59 (Дедлайн)
-            </td>
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md font-bold">
-                74 / 100
-              </span>
-</td>
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container-high text-secondary font-label-sm text-label-sm font-semibold">
-<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
-                На доработке
-              </span>
-</td>
-<td class="py-4 px-6 whitespace-nowrap text-right">
-<button class="p-1.5 rounded-lg text-primary hover:bg-surface-container-high transition-colors" title="Требуются правки: См. комментарий" type="button">
-<span class="material-symbols-outlined text-[20px]">feedback</span>
-</button>
-</td>
-</tr>
-<!-- Строка 6 -->
-<tr class="hover:bg-surface transition-colors group">
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-high text-primary font-label-sm text-label-sm font-semibold">
-<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                Frontend Архитектура
-              </span>
-</td>
-<td class="py-4 px-6 min-w-0 max-w-xs">
-<div class="font-body-md text-body-md font-semibold text-on-surface">Семинар: Стейт-менеджмент и Zustand</div>
-<div class="font-body-sm text-body-sm text-on-surface-variant truncate">Сравнение производительности Context API vs Zustand в сложных деревьях</div>
-</td>
-<td class="py-4 px-6 whitespace-nowrap">
-<div class="flex items-center gap-2">
-<div class="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center text-primary font-semibold text-xs">МВ</div>
-<span class="font-body-sm text-body-sm text-on-surface">М. Власов, к.т.н.</span>
-</div>
-</td>
-<td class="py-4 px-6 whitespace-nowrap font-body-sm text-body-sm text-on-surface-variant">
-              27 апр, 16:20
-            </td>
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container-high text-primary font-label-md text-label-md font-bold">
-                92 / 100
-              </span>
-</td>
-<td class="py-4 px-6 whitespace-nowrap">
-<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-surface font-label-sm text-label-sm font-medium">
-<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
-                Зачтено
-              </span>
-</td>
-<td class="py-4 px-6 whitespace-nowrap text-right">
-<button class="p-1.5 rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors" title="Посмотреть рецензию" type="button">
-<span class="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
-</button>
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<!-- Футер пагинации таблицы -->
-<div class="p-4 sm:px-6 bg-surface-container-lowest flex flex-col sm:flex-row items-center justify-between gap-4">
-<span class="font-body-sm text-body-sm text-on-surface-variant">
-        Показано <span class="font-semibold text-on-surface">6</span> из <span class="font-semibold text-on-surface">42</span> заданий
-      </span>
-<div class="flex items-center gap-1.5">
-<button class="p-2 rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface disabled:opacity-40" disabled="" type="button">
-<span class="material-symbols-outlined text-[18px]">chevron_left</span>
-</button>
-<button class="w-9 h-9 rounded-xl bg-primary-container text-on-primary font-label-sm text-label-sm font-semibold shadow-sm" type="button">1</button>
-<button class="w-9 h-9 rounded-xl bg-surface text-on-surface hover:bg-surface-container font-label-sm text-label-sm" type="button">2</button>
-<button class="w-9 h-9 rounded-xl bg-surface text-on-surface hover:bg-surface-container font-label-sm text-label-sm" type="button">3</button>
-<span class="px-1 text-on-surface-variant">...</span>
-<button class="w-9 h-9 rounded-xl bg-surface text-on-surface hover:bg-surface-container font-label-sm text-label-sm" type="button">7</button>
-<button class="p-2 rounded-xl bg-surface-container text-on-surface-variant hover:text-on-surface" type="button">
-<span class="material-symbols-outlined text-[18px]">chevron_right</span>
-</button>
-</div>
-</div>
-</section>
-<!-- Дополнительные блоки: Достижения и Лента недавней активности -->
-<section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-<!-- Блок достижений (7 колонок) -->
-<div class="lg:col-span-7 bg-surface-container-lowest rounded-2xl p-6 lg:p-7 shadow-sm space-y-5">
-<div class="flex items-center justify-between">
-<div>
-<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Академические достижения</h3>
-<p class="font-body-sm text-body-sm text-on-surface-variant">Сертификаты, знаки отличия и статус в рейтинге</p>
-</div>
-<span class="px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm font-semibold">
-          4 получено
-        </span>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-<!-- Бейдж 1 -->
-<div class="p-4 rounded-xl bg-surface-container-low flex items-start gap-3.5 group hover:bg-surface-container transition-colors">
-<div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-primary to-primary-container text-on-primary flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-<span class="material-symbols-outlined text-[24px]">verified_user</span>
-</div>
-<div class="space-y-1">
-<h4 class="font-label-md text-label-md font-semibold text-on-surface leading-snug">Код-мастер</h4>
-<p class="font-body-sm text-body-sm text-on-surface-variant leading-tight">100% покрытие тестами во всех курсовых проектах семестра</p>
-<span class="inline-block pt-1 font-label-sm text-label-sm text-primary font-medium">Получен 12 мая 2024</span>
-</div>
-</div>
-<!-- Бейдж 2 -->
-<div class="p-4 rounded-xl bg-surface-container-low flex items-start gap-3.5 group hover:bg-surface-container transition-colors">
-<div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-secondary to-secondary-container text-on-secondary flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-<span class="material-symbols-outlined text-[24px]">speed</span>
-</div>
-<div class="space-y-1">
-<h4 class="font-label-md text-label-md font-semibold text-on-surface leading-snug">Академический спринтер</h4>
-<p class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Сдача 5 сложных работ подряд за 48 часов до дедлайна</p>
-<span class="inline-block pt-1 font-label-sm text-label-sm text-secondary font-medium">Получен 28 апр 2024</span>
-</div>
-</div>
-<!-- Бейдж 3 -->
-<div class="p-4 rounded-xl bg-surface-container-low flex items-start gap-3.5 group hover:bg-surface-container transition-colors">
-<div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-primary-container to-secondary text-on-primary flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-<span class="material-symbols-outlined text-[24px]">workspace_premium</span>
-</div>
-<div class="space-y-1">
-<h4 class="font-label-md text-label-md font-semibold text-on-surface leading-snug">Топ успеваемости Q1</h4>
-<p class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Поддержание среднего академического балла выше 4.8</p>
-<span class="inline-block pt-1 font-label-sm text-label-sm text-primary font-medium">Получен 15 апр 2024</span>
-</div>
-</div>
-<!-- Бейдж 4 -->
-<div class="p-4 rounded-xl bg-surface-container-low flex items-start gap-3.5 group hover:bg-surface-container transition-colors">
-<div class="w-12 h-12 rounded-xl bg-surface-container-high text-primary flex items-center justify-center shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-<span class="material-symbols-outlined text-[24px]">handshake</span>
-</div>
-<div class="space-y-1">
-<h4 class="font-label-md text-label-md font-semibold text-on-surface leading-snug">Ассистент ментора</h4>
-<p class="font-body-sm text-body-sm text-on-surface-variant leading-tight">Более 20 полезных ответов одногруппникам на учебном форуме</p>
-<span class="inline-block pt-1 font-label-sm text-label-sm text-primary font-medium">Получен 02 апр 2024</span>
-</div>
-</div>
-</div>
-</div>
-<!-- Лента активности (5 колонок) -->
-<div class="lg:col-span-5 bg-surface-container-lowest rounded-2xl p-6 lg:p-7 shadow-sm flex flex-col justify-between">
-<div>
-<div class="flex items-center justify-between pb-4">
-<h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">История активности</h3>
-<span class="material-symbols-outlined text-on-surface-variant text-[20px]">history</span>
-</div>
-<!-- Таймлайн активности -->
-<div class="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-surface-container">
-<!-- Событие 1 -->
-<div class="relative">
-<span class="absolute -left-[27px] top-0.5 w-3.5 h-3.5 rounded-full bg-primary ring-4 ring-surface-container-lowest"></span>
-<div class="flex flex-col">
-<span class="font-label-sm text-label-sm text-on-surface-variant">Сегодня, 14:30</span>
-<span class="font-body-sm text-body-sm text-on-surface font-semibold">Оценка 98 б. от М. Власова</span>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Практическая работа №3 по фронтенд-архитектуре проверена</p>
-</div>
-</div>
-<!-- Событие 2 -->
-<div class="relative">
-<span class="absolute -left-[27px] top-0.5 w-3.5 h-3.5 rounded-full bg-secondary ring-4 ring-surface-container-lowest"></span>
-<div class="flex flex-col">
-<span class="font-label-sm text-label-sm text-on-surface-variant">Вчера, 19:12</span>
-<span class="font-body-sm text-body-sm text-on-surface font-semibold">Синхронизация репозитория GitHub</span>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Загружен коммит для курсового проекта (v1.4-beta)</p>
-</div>
-</div>
-<!-- Событие 3 -->
-<div class="relative">
-<span class="absolute -left-[27px] top-0.5 w-3.5 h-3.5 rounded-full bg-surface-container-highest ring-4 ring-surface-container-lowest"></span>
-<div class="flex flex-col">
-<span class="font-label-sm text-label-sm text-on-surface-variant">16 мая, 11:00</span>
-<span class="font-body-sm text-body-sm text-on-surface font-semibold">Пройден онлайн-тест: SQL &amp; Индексы</span>
-<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">Результат 100/100 б. за 12 минут (рекорд группы)</p>
-</div>
-</div>
-</div>
-</div>
-<div class="pt-6">
-<a class="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-surface-container-low text-primary hover:bg-surface-container font-label-sm text-label-sm font-semibold transition-colors" href="#">
-<span>Смотреть всю историю действий</span>
-<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-</a>
-</div>
-</div>
-</section>
-</div></main></div>
-
-<!-- EDU SPACE Master Interactive Engine -->
-<script src="js/app-logistics.js"></script>
-<script>
-(function() {
-  // Ensure every button and link works immediately
-  document.addEventListener('DOMContentLoaded', function() {
-    console.log('[EDU SPACE] Interactive Engine Initialized on ' + window.location.pathname);
-
-    // 1. Fix all anchor tags with href="#" or data-path
-    document.querySelectorAll('a').forEach(a => {
-      const dp = a.getAttribute('data-path') || '';
-      const href = a.getAttribute('href') || '';
-      const text = (a.textContent || '').trim().toLowerCase();
-
-      // Navigation mapping
-      if (dp === 'main-page' || text === 'edu space' || text === 'главная') {
-        a.href = 'index.html';
-      } else if (dp === 'login' || text === 'войти') {
-        a.href = 'auth.html?mode=login';
-      } else if (dp === 'registration' || text === 'регистрация' || text.includes('начать обучение') || text.includes('зарегистрироваться')) {
-        a.href = 'auth.html?mode=register';
-      } else if (dp === 'for-teachers' || text.includes('я преподаватель') || text.includes('конструктор курсов')) {
-        a.href = 'teacher.html';
-      } else if (dp === 'course-catalog' || dp === 'interactive-courses' || text.includes('каталог курсов') || text.includes('задания') || text.includes('предметы')) {
-        a.href = 'tasks.html';
-      } else if (dp === 'demo' || text.includes('демо')) {
-        a.href = 'simulator.html';
-      } else if (dp === 'analytics' || dp === 'certificates' || text.includes('оценки') || text.includes('профиль')) {
-        a.href = 'profile.html';
-      } else if (href === '#' || !href) {
-        // Fallback for any remaining empty link: prevent jump to top, open informative modal or toast
-        a.addEventListener('click', function(e) {
-          e.preventDefault();
-          if (text.includes('сообщество')) {
-            openModal('🌐 Сообщество авторов и преподавателей', '<p>Форум и библиотека открытых методических материалов EDU SPACE. Доступно более 1,200 методичек и практик.</p>');
-          } else if (text.includes('вебинар')) {
-            openModal('🎙️ Вебинарная комната', '<p>Ближайший открытый вебинар: "Современные практики в EdTech" состоится в четверг в 18:00.</p>');
-          } else if (text.includes('политика') || text.includes('конфиденциальност')) {
-            openModal('🔒 Политика конфиденциальности', '<p>Платформа EDU SPACE соблюдает все стандарты защиты персональных данных студентов и преподавателей в соответствии с законодательством РК и международными нормами GDPR.</p>');
-          } else if (text.includes('условия') || text.includes('оферта')) {
-            openModal('📄 Пользовательское соглашение', '<p>Используя платформу EDU SPACE, вы соглашаетесь с правилами академической честности и условиями использования интерактивных тренажеров.</p>');
-          } else if (text.includes('cookie')) {
-            openModal('🍪 Настройки файлов cookie', '<p>Мы используем только необходимые технические cookies для сохранения вашей сессии авторизации и прогресса выполнения заданий.</p>');
-          } else if (text.includes('расписание')) {
-            openModal('📅 Расписание занятий', '<div class="space-y-2"><div class="p-2 bg-slate-100 rounded"><b>Понедельник 09:00:</b> Веб-разработка (Ауд. 302)</div><div class="p-2 bg-slate-100 rounded"><b>Вторник 11:30:</b> Базы данных (Лаб. 405)</div><div class="p-2 bg-slate-100 rounded"><b>Среда 14:00:</b> Защита практических работ</div></div>');
-          } else if (text.includes('календарь')) {
-            openModal('🗓️ Академический календарь', '<div class="p-3 bg-indigo-50 border border-indigo-200 rounded-xl text-indigo-950 font-medium">Текущий семестр: 1 сентября — 25 декабря.<br>Сессия: с 10 января по 28 января.</div>');
-          } else if (text.includes('настройки') || text.includes('приватность')) {
-            openModal('⚙️ Настройки аккаунта', '<div class="space-y-3"><label class="flex items-center gap-2"><input type="checkbox" checked class="rounded text-indigo-600" /> Получать уведомления о новых оценках</label><label class="flex items-center gap-2"><input type="checkbox" checked class="rounded text-indigo-600" /> Публичный профиль студента</label><button class="w-full py-2 bg-indigo-600 text-white rounded-xl font-bold mt-2" onclick="showToast(\'Настройки сохранены!\'); closeModal();">Сохранить</button></div>');
-          } else {
-            showToast('Раздел: ' + (a.textContent.trim() || 'Информация'), 'info');
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Цифровой профиль студента — EDU SPACE | Алматинский многопрофильный колледж</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#4F46E5",
+            "primary-container": "#4338CA",
+            secondary: "#7C3AED",
+            surface: "#F8FAFC",
+            "surface-container": "#F1F5F9",
+            "surface-container-high": "#E2E8F0",
+            "surface-container-lowest": "#FFFFFF",
+            "on-surface": "#0F172A",
+            "on-surface-variant": "#475569"
+          },
+          fontFamily: {
+            sans: ["Inter", "sans-serif"],
+            display: ["Manrope", "sans-serif"]
           }
-        });
+        }
       }
-    });
-
-    // 2. Ensure ALL buttons have active feedback and click handlers
-    document.querySelectorAll('button').forEach(btn => {
-      // Add hover and active click feel
-      btn.style.cursor = 'pointer';
-
-      // Avoid double binding if already has specific onclick
-      if (!btn.getAttribute('data-bound-click')) {
-        btn.setAttribute('data-bound-click', 'true');
-        
-        btn.addEventListener('click', function(e) {
-          const t = btn.textContent.toLowerCase();
-          const icon = btn.querySelector('.material-symbols-outlined')?.textContent.trim() || '';
-
-          if (t.includes('продолжить') || t.includes('приступить')) {
-            e.preventDefault();
-            window.location.href = 'simulator.html?task_id=3';
-          } else if (t.includes('смотреть работу')) {
-            e.preventDefault();
-            window.location.href = 'simulator.html?task_id=3';
-          } else if (t.includes('сдать работу')) {
-            e.preventDefault();
-            window.location.href = 'simulator.html';
-          } else if (t.includes('подключить свою школу') || t.includes('заказать демо')) {
-            e.preventDefault();
-            openModal('🏫 Подключение учебного заведения к EDU SPACE', `
-              <form onsubmit="event.preventDefault(); showToast('Заявка на подключение принята! Наш методист свяжется с вами.'); closeModal();">
-                <div class="mb-3">
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Название колледжа / школы</label>
-                  <input type="text" placeholder="например: Алматинский многопрофильный колледж" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
-                </div>
-                <div class="mb-3">
-                  <label class="block text-xs font-bold text-slate-700 mb-1">Контактный телефон или Email</label>
-                  <input type="text" placeholder="+7 (777) 000-00-00" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
-                </div>
-                <button type="submit" class="w-full py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-700">Отправить заявку на демо</button>
-              </form>
-            `);
-          } else if (t.includes('фильтр') || icon === 'filter_list' || icon === 'tune') {
-            showToast('Фильтры применены', 'info');
-          }
-        });
-      }
-    });
-
-    // 3. User session chip in navbar
-    const user = getActiveUser();
-    if (user) {
-      document.querySelectorAll('[data-user-name]').forEach(el => el.textContent = user.full_name || user.username);
+    };
+  </script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
     }
-  });
-})();
-</script>
+    body {
+      min-height: 100vh;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      scrollbar-width: thin;
+      scrollbar-color: #6366f1 #f1f5f9;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+      display: block !important;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6366f1;
+    }
+  </style>
+  <script src="js/app-logistics.js"></script>
+</head>
+<body class="bg-surface font-sans text-on-surface antialiased min-h-screen flex">
 
+  <!-- SIDEBAR -->
+  <aside class="fixed left-0 top-0 h-full w-64 bg-white border-r border-slate-200 z-50 flex flex-col justify-between shadow-sm">
+    <div class="flex flex-col flex-1 overflow-y-auto px-4 py-6">
+      <a href="index.html" class="flex items-center gap-3 px-3 mb-8">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-md">
+          <span class="material-symbols-outlined text-[24px]">rocket_launch</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-display font-bold text-lg text-slate-900 leading-none">EDU SPACE</span>
+          <span class="text-[11px] font-semibold text-indigo-600 tracking-wider uppercase mt-1">АМК Колледж</span>
+        </div>
+      </a>
+
+      <nav class="space-y-1.5">
+        <a href="student.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">grid_view</span>
+          <span>Главная</span>
+        </a>
+        <a href="javascript:void(0)" onclick="openSubjectsModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">menu_book</span>
+          <span>Мои предметы</span>
+        </a>
+        <a href="tasks.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[20px]">assignment</span>
+            <span>Задания</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">Каталог</span>
+        </a>
+        <a href="javascript:void(0)" onclick="openGradesModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">grade</span>
+          <span>Оценки и табель</span>
+        </a>
+        <a href="javascript:void(0)" onclick="openScheduleModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">schedule</span>
+          <span>Расписание пар</span>
+        </a>
+        <a href="javascript:void(0)" onclick="openCalendarModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+          <span>Календарь</span>
+        </a>
+        <a href="javascript:void(0)" onclick="openMessengerModal('Куратор Михаил Власов')" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+            <span>Чат с куратором</span>
+          </div>
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        </a>
+        <a href="javascript:void(0)" onclick="openNotificationsModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">notifications</span>
+          <span>Уведомления</span>
+        </a>
+        <a href="profile.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-50 text-indigo-700 font-bold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">account_circle</span>
+          <span>Мой профиль</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-slate-100 space-y-2">
+      <button onclick="resetDemoMode()" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold transition-all border border-amber-200">
+        <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+        <span>Сбросить демо в начало (0%)</span>
+      </button>
+      <div class="flex items-center justify-between pt-2">
+        <a href="javascript:void(0)" onclick="openSettingsModal()" class="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900">
+          <span class="material-symbols-outlined text-[18px]">settings</span>
+          <span>Настройки</span>
+        </a>
+        <button onclick="logoutUser()" class="flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700">
+          <span class="material-symbols-outlined text-[18px]">logout</span>
+          <span>Выход</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="pl-64 flex-1 flex flex-col min-h-screen">
+
+    <!-- HEADER -->
+    <header class="fixed top-0 left-64 right-0 h-16 bg-white/90 backdrop-blur-md border-b border-slate-200 z-40 flex items-center justify-between px-8 shadow-sm">
+      <div class="flex items-center gap-3">
+        <a href="student.html" class="text-slate-500 hover:text-slate-800 flex items-center gap-1 text-xs font-bold transition-colors">
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+          <span>В кабинет студента</span>
+        </a>
+        <span class="text-slate-300">/</span>
+        <span class="text-xs font-bold text-slate-800">Цифровой паспорт студента</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="sharePortfolio()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">share</span>
+          <span>Поделиться</span>
+        </button>
+        <button onclick="exportPdfStatement()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+          <span>Справка PDF</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN BODY -->
+    <main class="w-full pt-20 p-8 bg-surface space-y-8 flex-1">
+
+      <!-- PROFILE HERO CARD -->
+      <section class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-slate-100">
+          <div class="flex items-center gap-5">
+            <div class="w-20 h-20 rounded-2xl bg-indigo-600 text-white font-extrabold flex items-center justify-center text-2xl shadow-lg">
+              КВ
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h1 class="font-display font-extrabold text-2xl text-slate-900" id="prof-user-name">Константин Воронов</h1>
+                <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-200">Студент</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">
+                Специальность: 06130100 - Программное обеспечение • Группа ИС-21
+              </p>
+              <p class="text-xs text-slate-400 mt-0.5" id="prof-user-email">
+                Email: voronov@student.amk.kz • Студенческий ID: KZ-AMK-2026-98421
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <button onclick="openSettingsModal()" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 transition-colors flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">edit</span>
+              <span>Редактировать профиль</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3 Quick Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-[11px] font-bold text-slate-500 uppercase">Сдано заданий:</div>
+            <div class="font-display font-bold text-xl text-slate-900 mt-1" id="prof-completed-cnt">0 из 10 работ</div>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-[11px] font-bold text-slate-500 uppercase">Текущий GPA:</div>
+            <div class="font-display font-bold text-xl text-emerald-600 mt-1" id="prof-gpa-val">— (Старт с нуля)</div>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-[11px] font-bold text-slate-500 uppercase">Накопленный XP:</div>
+            <div class="font-display font-bold text-xl text-purple-600 mt-1" id="prof-xp-val">0 XP (Уровень 1)</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SKILLS RADAR & COMPETENCE PROGRESS -->
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+          <h3 class="font-display font-bold text-base text-slate-900">Профиль профессиональных навыков</h3>
+          <div class="space-y-4 text-xs">
+            <div>
+              <div class="flex justify-between font-semibold mb-1">
+                <span>Front-end (HTML5 / Tailwind CSS / V8 Engine)</span>
+                <span class="text-indigo-600 font-bold">15%</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div class="bg-indigo-600 h-full rounded-full" style="width: 15%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between font-semibold mb-1">
+                <span>Базы данных (PostgreSQL / Реляционные связи / 3НФ)</span>
+                <span class="text-slate-400">0% (Откроется на День 4)</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div class="bg-slate-300 h-full rounded-full" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between font-semibold mb-1">
+                <span>Алгоритмы и структуры данных (QuickSort / Сложность)</span>
+                <span class="text-slate-400">0% (Откроется на День 3)</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div class="bg-slate-300 h-full rounded-full" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between font-semibold mb-1">
+                <span>DevOps и контейнеризация (Docker / Docker Compose)</span>
+                <span class="text-slate-400">0% (Откроется на День 9)</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div class="bg-slate-300 h-full rounded-full" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACADEMIC INTEGRITY & VERIFICATION -->
+        <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 text-indigo-600 mb-2">
+              <span class="material-symbols-outlined text-[22px]">verified</span>
+              <span class="font-bold text-xs uppercase tracking-wider">Верификация результатов</span>
+            </div>
+            <h3 class="font-display font-bold text-base text-slate-900">Цифровой сертификат компетенций АМК</h3>
+            <p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              Все решения студента валидируются серверными автотестами и заверяются электронной подписью преподавателя. Результаты формируют единую ведомость для дипломного приложения.
+            </p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+            <button onclick="exportCsvJournal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition-colors flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">download</span>
+              <span>Выгрузить табель (CSV)</span>
+            </button>
+            <button onclick="resetDemoMode()" class="px-4 py-2 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold rounded-xl transition-colors">
+              Сброс демо в 0%
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    async function initProfile() {
+      try {
+        const res = await fetch('/api/demo/status');
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('prof-completed-cnt').textContent = `${data.completed_count || 0} из 10 работ`;
+          document.getElementById('prof-gpa-val').textContent = data.avg_score > 0 ? `${data.avg_score} / 100` : '— (Старт с нуля)';
+          document.getElementById('prof-xp-val').textContent = `${(data.completed_count || 0) * 150} XP (Уровень 1)`;
+        }
+      } catch (e) {}
+    }
+
+    async function resetDemoMode() {
+      if (confirm('Сбросить демоверсию ко Дню 1 (0% прогресса)?')) {
+        await fetch('/api/demo/reset', { method: 'POST' });
+        showToast('Демоверсия сброшена ко Дню 1!', 'success');
+        setTimeout(() => window.location.href = 'student.html', 400);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initProfile);
+  </script>
 </body>
 </html>
