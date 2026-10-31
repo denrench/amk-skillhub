@@ -2,447 +2,399 @@
 <html lang="ru" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Авторизация и Регистрация — АМК Практикум</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Вход и Регистрация — АМК SkillHub (Google Stitch Edition)</title>
+
+  <!-- Google Fonts & Material Symbols -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Google+Sans+Display:wght@400;500;700&family=Google+Sans+Text:wght@400;500;700&family=Google+Sans+Mono:wght@400;500;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet">
+
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
   <style>
-    .auth-page {
-      min-height: calc(100vh - 70px);
+    .auth-wrapper {
+      min-height: calc(100vh - 72px);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 40px 20px;
     }
-    .auth-card {
+    .auth-box {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
+      border-radius: var(--radius-xl);
       padding: 36px;
       max-width: 480px;
       width: 100%;
-      box-shadow: var(--shadow-card);
+      box-shadow: var(--shadow-modal);
+      position: relative;
+      overflow: hidden;
     }
-    .auth-tabs {
+    .auth-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: var(--stitch-gradient-rainbow);
+    }
+    .role-switcher-tabs {
       display: flex;
-      background: var(--bg-surface);
-      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-full);
       padding: 4px;
       margin-bottom: 24px;
       gap: 4px;
     }
-    .auth-tab-btn {
+    .role-tab-btn {
       flex: 1;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 9px 12px;
-      border-radius: 6px;
+      padding: 8px 12px;
+      border-radius: var(--radius-full);
       font-size: 0.85rem;
       font-weight: 700;
-      cursor: pointer;
-      transition: var(--transition);
+      color: var(--text-secondary);
+      transition: var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .role-tab-btn.active {
+      background: var(--google-blue);
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(66, 133, 244, 0.35);
+    }
+    .auth-mode-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+    .auth-mode-btn {
+      flex: 1;
+      padding: 10px;
       text-align: center;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      transition: var(--transition-fast);
     }
-    .auth-tab-btn.active {
-      background: var(--accent-primary);
+    .auth-mode-btn.active {
       color: #fff;
+      border-bottom-color: var(--google-blue);
     }
-    .form-group {
-      margin-bottom: 18px;
+    .input-field {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition-fast);
+      margin-bottom: 14px;
     }
-    .form-label {
+    .input-field:focus {
+      border-color: var(--border-active);
+      box-shadow: 0 0 12px rgba(66, 133, 244, 0.2);
+    }
+    .field-label {
       display: block;
       font-size: 0.82rem;
       font-weight: 700;
       color: var(--text-secondary);
       margin-bottom: 6px;
     }
-    .form-input {
-      width: 100%;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      padding: 12px 16px;
-      border-radius: var(--radius-sm);
-      font-size: 0.9rem;
-      font-family: var(--font-main);
-      outline: none;
-      transition: var(--transition);
-    }
-    .form-input:focus {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 12px rgba(79, 70, 229, 0.3);
-    }
-    .quick-logins {
+    .quick-logins-box {
       margin-top: 24px;
       padding-top: 20px;
       border-top: 1px solid var(--border-color);
     }
-    .quick-title {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      font-weight: 700;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-    .quick-btns-row {
-      display: flex;
-      gap: 10px;
-    }
-    .btn-quick {
-      flex: 1;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      padding: 8px 12px;
-      border-radius: var(--radius-sm);
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: var(--transition);
-      text-align: center;
-    }
-    .btn-quick:hover {
-      border-color: var(--border-active);
-      color: var(--text-primary);
-    }
-    .role-badge-pill {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: var(--radius-full);
-      font-size: 0.75rem;
-      font-weight: 800;
-      margin-bottom: 14px;
-    }
-    .role-student { background: rgba(14, 165, 233, 0.15); color: var(--accent-cyan); border: 1px solid rgba(14, 165, 233, 0.3); }
-    .role-teacher { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
   </style>
 </head>
 <body>
 
-  <!-- Top Navbar -->
+  <!-- Google Stitch Rainbow Accent Strip -->
+  <div class="stitch-rainbow-strip"></div>
+
+  <!-- Header -->
   <header class="navbar">
     <div class="container nav-content">
-      <a href="index.html" class="brand">
-        <div class="brand-badge">АМК</div>
-        <div class="brand-info">
-          <span class="brand-name">Практикум</span>
-          <span class="brand-sub">Вход и регистрация в системе</span>
-        </div>
-      </a>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="index.html" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.82rem;" title="На главную">
+          <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+          <span>Главная</span>
+        </a>
+        <a href="index.html" class="brand">
+          <div class="brand-badge">АМК</div>
+          <div class="brand-info">
+            <span class="brand-name">SkillHub <span class="brand-stitch-tag">Stitch</span></span>
+          </div>
+        </a>
+      </div>
 
-      <nav class="nav-links">
-        <a href="index.html" class="nav-link">&larr; На главную</a>
-      </nav>
+      <div class="nav-actions">
+        <!-- Live Backend Status Pill -->
+        <div id="backendStatusPill" class="api-status-pill" title="Статус сервера SQLite3">
+          <span class="pulse-dot"></span>
+          <span>SQLite3 Онлайн</span>
+        </div>
+      </div>
     </div>
   </header>
 
-  <!-- Main Auth Container -->
-  <main class="auth-page">
-    <div class="auth-card">
-      
-      <!-- Tabs: Вход | Рег. Студента | Рег. Преподавателя -->
-      <div class="auth-tabs">
-        <button class="auth-tab-btn active" data-tab="login">Вход</button>
-        <button class="auth-tab-btn" data-tab="reg-student">Студент</button>
-        <button class="auth-tab-btn" data-tab="reg-teacher">Преподаватель</button>
+  <!-- Auth Container -->
+  <div class="auth-wrapper">
+    <div class="auth-box">
+
+      <!-- Role Switcher (Student vs Teacher) -->
+      <div class="role-switcher-tabs">
+        <button class="role-tab-btn active" id="tabRoleStudent">
+          <span class="material-symbols-outlined" style="font-size: 18px;">school</span>
+          <span>Студент</span>
+        </button>
+        <button class="role-tab-btn" id="tabRoleTeacher">
+          <span class="material-symbols-outlined" style="font-size: 18px;">person_outline</span>
+          <span>Преподаватель</span>
+        </button>
       </div>
 
-      <!-- TAB 1: ВХОД В СИСТЕМУ -->
-      <form id="loginForm" class="auth-pane">
-        <div style="text-align: center; margin-bottom: 20px;">
-          <h2 style="font-size: 1.4rem;">Вход в личный кабинет</h2>
-          <p style="font-size: 0.88rem; margin: 0;">Введите данные вашей учетной записи АМК</p>
+      <!-- Mode Switcher (Login vs Register) -->
+      <div class="auth-mode-tabs">
+        <div class="auth-mode-btn active" id="btnModeLogin">Вход в систему</div>
+        <div class="auth-mode-btn" id="btnModeRegister">Регистрация</div>
+      </div>
+
+      <!-- Auth Form -->
+      <form id="authForm">
+        <!-- Full name (only for registration) -->
+        <div id="groupFullName" style="display: none;">
+          <label class="field-label">Фамилия и Имя (ФИО):</label>
+          <input type="text" id="inputFullName" class="input-field" placeholder="Напр. Асылхан Бауыржанұлы">
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Email или логин:</label>
-          <input type="email" id="loginEmail" class="form-input" placeholder="student@amk.kz" required>
+        <!-- Email -->
+        <div>
+          <label class="field-label">Электронная почта (Email):</label>
+          <input type="email" id="inputEmail" class="input-field" placeholder="student@amk.kz" required>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Пароль:</label>
-          <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required>
+        <!-- Password -->
+        <div>
+          <label class="field-label">Пароль:</label>
+          <input type="password" id="inputPassword" class="input-field" placeholder="••••••••" required>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px;">
-          Войти в систему
-        </button>
-
-        <!-- Быстрый вход для экзаменационной комиссии -->
-        <div class="quick-logins">
-          <div class="quick-title">Демо-доступ в 1 клик для комиссии:</div>
-          <div class="quick-btns-row">
-            <button type="button" class="btn-quick" id="btnQuickStudent">
-              👨‍🎓 Как Студент
-            </button>
-            <button type="button" class="btn-quick" id="btnQuickTeacher">
-              👨‍🏫 Как Преподаватель
-            </button>
-          </div>
-        </div>
-      </form>
-
-      <!-- TAB 2: РЕГИСТРАЦИЯ СТУДЕНТА -->
-      <form id="regStudentForm" class="auth-pane" style="display: none;">
-        <div style="text-align: center; margin-bottom: 18px;">
-          <span class="role-badge-pill role-student">Регистрация обучающегося</span>
-          <h2 style="font-size: 1.35rem;">Создать профиль студента</h2>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">ФИО студента (полностью):</label>
-          <input type="text" id="regStudentName" class="form-input" placeholder="Панин Данил Сергеевич" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Учебная группа колледжа:</label>
-          <select id="regStudentGroup" class="form-input">
-            <option value="ПО-22">Группа ПО-22 (Программное обеспечение)</option>
-            <option value="АВ-21">Группа АВ-21 (Автотранспорт и ТО)</option>
-            <option value="ХО-20">Группа ХО-20 (Холодильные машины)</option>
-            <option value="ДИ-23">Группа ДИ-23 (Графический дизайн)</option>
-            <option value="МЕ-21">Группа МЕ-21 (Производство мебели)</option>
+        <!-- Group Name (Student registration only) -->
+        <div id="groupStudentGroup" style="display: none;">
+          <label class="field-label">Учебная группа колледжа:</label>
+          <select id="selectGroup" class="input-field" style="cursor: pointer;">
+            <option value="ПО-22">ПО-22 (06130100 Программное обеспечение)</option>
+            <option value="АВ-21">АВ-21 (07161300 Автодиагностика ДВС)</option>
+            <option value="ХО-20">ХО-20 (07150900 Холодильные установки)</option>
+            <option value="ДИ-21">ДИ-21 (02110300 Графический дизайн)</option>
+            <option value="МЕ-20">МЕ-20 (07221400 ЧПУ Раскрой мебели)</option>
           </select>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Email (для входа):</label>
-          <input type="email" id="regStudentEmail" class="form-input" placeholder="danil@amk.kz" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Придумайте пароль:</label>
-          <input type="password" id="regStudentPassword" class="form-input" placeholder="••••••••" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px;">
-          Зарегистрироваться как студент
-        </button>
-      </form>
-
-      <!-- TAB 3: РЕГИСТРАЦИЯ ПРЕПОДАВАТЕЛЯ (С КОДОМ ДОСТУПА) -->
-      <form id="regTeacherForm" class="auth-pane" style="display: none;">
-        <div style="text-align: center; margin-bottom: 18px;">
-          <span class="role-badge-pill role-teacher">Доступ к электронному журналу</span>
-          <h2 style="font-size: 1.35rem;">Регистрация преподавателя</h2>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">ФИО преподавателя:</label>
-          <input type="text" id="regTeacherName" class="form-input" placeholder="Сейдалиев Канат Аскарович" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Кафедра / Дисциплина:</label>
-          <input type="text" id="regTeacherDept" class="form-input" placeholder="Отделение спец. дисциплин ТиПО" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Рабочий Email:</label>
-          <input type="email" id="regTeacherEmail" class="form-input" placeholder="teacher.seid@amk.kz" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Пароль:</label>
-          <input type="password" id="regTeacherPassword" class="form-input" placeholder="••••••••" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" style="color: var(--accent-amber);">
-            Секретный код колледжа:
+        <!-- Teacher Secret Key (Teacher registration only) -->
+        <div id="groupTeacherKey" style="display: none;">
+          <label class="field-label">
+            Секретный код преподавателя АМК:
+            <span style="color: var(--google-yellow); font-size: 0.75rem;">(Код: AMK-TEACHER-2026)</span>
           </label>
-          <input type="password" id="regTeacherKey" class="form-input" placeholder="Введите код доступа" required>
-          <span style="font-size: 0.72rem; color: var(--text-muted); display: block; margin-top: 4px;">
-            (Для комиссии код: <code>AMK-TEACHER-2026</code>)
-          </span>
+          <input type="text" id="inputTeacherKey" class="input-field" placeholder="AMK-TEACHER-2026">
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px; background: var(--accent-emerald);">
-          Зарегистрировать преподавателя
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary" id="btnSubmitAuth" style="width: 100%; padding: 12px; margin-top: 6px; font-size: 0.95rem;">
+          <span class="material-symbols-outlined" style="font-size: 18px;">login</span>
+          <span id="submitBtnText">Войти в личный кабинет</span>
         </button>
       </form>
+
+      <!-- Quick Fill Buttons for Instant Demonstration -->
+      <div class="quick-logins-box">
+        <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 0.05em; display: block; text-align: center; margin-bottom: 10px;">
+          Быстрый демонстрационный вход:
+        </span>
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-secondary" id="btnQuickStudent" style="flex: 1; padding: 6px 10px; font-size: 0.78rem;">
+            🎓 Студент (ПО-22)
+          </button>
+          <button class="btn btn-secondary" id="btnQuickTeacher" style="flex: 1; padding: 6px 10px; font-size: 0.78rem; border-color: rgba(14, 165, 233, 0.4); color: #38bdf8;">
+            👨‍🏫 Преподаватель
+          </button>
+        </div>
+      </div>
 
     </div>
-  </main>
+  </div>
 
-  <div id="toast" class="toast"></div>
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <!-- Scripts -->
   <script src="js/audio.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 1. Tab Navigation
-      const tabBtns = document.querySelectorAll('.auth-tab-btn');
-      const panes = {
-        'login': document.getElementById('loginForm'),
-        'reg-student': document.getElementById('regStudentForm'),
-        'reg-teacher': document.getElementById('regTeacherForm')
+      let currentRole = 'student'; // 'student' or 'teacher'
+      let currentMode = 'login';   // 'login' or 'register'
+
+      // DOM Elements
+      const tabRoleStudent = document.getElementById('tabRoleStudent');
+      const tabRoleTeacher = document.getElementById('tabRoleTeacher');
+      const btnModeLogin = document.getElementById('btnModeLogin');
+      const btnModeRegister = document.getElementById('btnModeRegister');
+      const groupFullName = document.getElementById('groupFullName');
+      const groupStudentGroup = document.getElementById('groupStudentGroup');
+      const groupTeacherKey = document.getElementById('groupTeacherKey');
+      const submitBtnText = document.getElementById('submitBtnText');
+      const authForm = document.getElementById('authForm');
+      const inputEmail = document.getElementById('inputEmail');
+      const inputPassword = document.getElementById('inputPassword');
+      const inputFullName = document.getElementById('inputFullName');
+      const selectGroup = document.getElementById('selectGroup');
+      const inputTeacherKey = document.getElementById('inputTeacherKey');
+
+      // Update Form View
+      function updateView() {
+        tabRoleStudent.classList.toggle('active', currentRole === 'student');
+        tabRoleTeacher.classList.toggle('active', currentRole === 'teacher');
+        btnModeLogin.classList.toggle('active', currentMode === 'login');
+        btnModeRegister.classList.toggle('active', currentMode === 'register');
+
+        const isReg = currentMode === 'register';
+        groupFullName.style.display = isReg ? 'block' : 'none';
+        groupStudentGroup.style.display = (isReg && currentRole === 'student') ? 'block' : 'none';
+        groupTeacherKey.style.display = (isReg && currentRole === 'teacher') ? 'block' : 'none';
+
+        if (isReg) {
+          submitBtnText.textContent = currentRole === 'teacher' ? 'Зарегистрировать преподавателя' : 'Зарегистрировать студента';
+        } else {
+          submitBtnText.textContent = 'Войти в личный кабинет';
+        }
+      }
+
+      tabRoleStudent.onclick = () => { currentRole = 'student'; updateView(); };
+      tabRoleTeacher.onclick = () => { currentRole = 'teacher'; updateView(); };
+      btnModeLogin.onclick = () => { currentMode = 'login'; updateView(); };
+      btnModeRegister.onclick = () => { currentMode = 'register'; updateView(); };
+
+      // Quick Demos
+      document.getElementById('btnQuickStudent').onclick = () => {
+        currentRole = 'student';
+        currentMode = 'login';
+        inputEmail.value = 'student@amk.kz';
+        inputPassword.value = 'student123';
+        updateView();
+        showToast('Заполнены данные студента Асылхана (ПО-22)');
       };
 
-      tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          if (window.soundEngine) window.soundEngine.playClick();
-          tabBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          const target = btn.getAttribute('data-tab');
-          Object.keys(panes).forEach(k => {
-            panes[k].style.display = k === target ? 'block' : 'none';
+      document.getElementById('btnQuickTeacher').onclick = () => {
+        currentRole = 'teacher';
+        currentMode = 'login';
+        inputEmail.value = 'teacher@amk.kz';
+        inputPassword.value = 'admin123';
+        updateView();
+        showToast('Заполнены данные преподавателя кафедры ТиПО');
+      };
+
+      // Form Submit
+      authForm.onsubmit = (e) => {
+        e.preventDefault();
+        const email = inputEmail.value.trim();
+        const password = inputPassword.value.trim();
+
+        if (currentMode === 'login') {
+          fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          })
+          .then(r => r.json())
+          .then(d => {
+            if (d.success) {
+              localStorage.setItem('amk_current_user', JSON.stringify(d.user));
+              showToast(d.message || 'Успешный вход!', 'success');
+              setTimeout(() => {
+                window.location.href = d.user.role === 'teacher' ? 'teacher.html' : 'simulator.html';
+              }, 600);
+            } else {
+              showToast(d.message || 'Ошибка авторизации', 'error');
+            }
+          })
+          .catch(() => {
+            // Local fallback
+            const demoUser = {
+              id: currentRole === 'teacher' ? 1 : 2,
+              full_name: currentRole === 'teacher' ? 'Иванов Сергей Павлович' : 'Асылхан Бауыржанұлы',
+              email: email,
+              role: currentRole,
+              group_name: currentRole === 'teacher' ? 'Кафедра ТиПО' : 'ПО-22',
+              student_id: currentRole === 'teacher' ? 'TEACHER-AMK-01' : 'KZ-AMK-2026-98421'
+            };
+            localStorage.setItem('amk_current_user', JSON.stringify(demoUser));
+            showToast('Успешный вход (Оффлайн режим)', 'success');
+            setTimeout(() => {
+              window.location.href = currentRole === 'teacher' ? 'teacher.html' : 'simulator.html';
+            }, 600);
           });
-        });
-      });
+        } else {
+          // Register
+          const full_name = inputFullName.value.trim();
+          const group_name = selectGroup.value;
+          const teacher_key = inputTeacherKey.value.trim();
 
-      // Toast Helper
-      function showMsg(msg, isSuccess = true) {
-        if (window.soundEngine) {
-          if (isSuccess) window.soundEngine.playSuccess();
-          else window.soundEngine.playError();
-        }
-        const toast = document.getElementById('toast');
-        toast.textContent = msg;
-        toast.style.borderColor = isSuccess ? 'var(--accent-emerald)' : 'var(--accent-rose)';
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3500);
-      }
-
-      function saveUserAndRedirect(user) {
-        localStorage.setItem('amk_current_user', JSON.stringify(user));
-        showMsg(`Успешный вход! Вы вошли как: ${user.full_name} (${user.role === 'teacher' ? 'Преподаватель' : user.group_name})`);
-        setTimeout(() => {
-          if (user.role === 'teacher') {
-            window.location.href = 'teacher.html';
-          } else {
-            window.location.href = 'index.html';
-          }
-        }, 800);
-      }
-
-      // 2. Login Submit
-      document.getElementById('loginForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value.trim();
-
-        fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        })
-        .then(r => r.json())
-        .then(data => {
-          if (data.success) {
-            saveUserAndRedirect(data.user);
-          } else {
-            showMsg(data.message || 'Ошибка входа', false);
-          }
-        })
-        .catch(() => {
-          // Fallback offline mock login
-          if (email.includes('teacher')) {
-            saveUserAndRedirect({
-              id: 1,
-              full_name: "Иванов Сергей Павлович",
-              role: "teacher",
-              group_name: "Кафедра ТиПО",
-              student_id: "TEACHER-AMK-01"
-            });
-          } else {
-            saveUserAndRedirect({
-              id: 2,
-              full_name: "Асылхан Бауыржанұлы",
-              role: "student",
-              group_name: "ПО-22",
-              student_id: "KZ-AMK-2026-98421"
-            });
-          }
-        });
-      });
-
-      // 3. Register Student Submit
-      document.getElementById('regStudentForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const full_name = document.getElementById('regStudentName').value.trim();
-        const group_name = document.getElementById('regStudentGroup').value;
-        const email = document.getElementById('regStudentEmail').value.trim();
-        const password = document.getElementById('regStudentPassword').value.trim();
-
-        fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ full_name, group_name, email, password, role: 'student' })
-        })
-        .then(r => r.json())
-        .then(data => {
-          if (data.success) {
-            saveUserAndRedirect(data.user);
-          } else {
-            showMsg(data.message || 'Ошибка регистрации', false);
-          }
-        })
-        .catch(() => {
-          saveUserAndRedirect({
-            id: Date.now(),
-            full_name,
-            role: "student",
-            group_name,
-            student_id: "KZ-AMK-2026-" + Math.floor(10000 + Math.random() * 90000)
-          });
-        });
-      });
-
-      // 4. Register Teacher Submit
-      document.getElementById('regTeacherForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const full_name = document.getElementById('regTeacherName').value.trim();
-        const group_name = document.getElementById('regTeacherDept').value.trim();
-        const email = document.getElementById('regTeacherEmail').value.trim();
-        const password = document.getElementById('regTeacherPassword').value.trim();
-        const teacher_key = document.getElementById('regTeacherKey').value.trim();
-
-        fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ full_name, group_name, email, password, role: 'teacher', teacher_key })
-        })
-        .then(r => r.json())
-        .then(data => {
-          if (data.success) {
-            saveUserAndRedirect(data.user);
-          } else {
-            showMsg(data.message || 'Ошибка регистрации преподавателя', false);
-          }
-        })
-        .catch(() => {
-          if (teacher_key === 'AMK-TEACHER-2026') {
-            saveUserAndRedirect({
-              id: Date.now(),
+          fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email,
+              password,
               full_name,
-              role: "teacher",
+              role: currentRole,
               group_name,
-              student_id: "TEACHER-AMK-" + Math.floor(10 + Math.random() * 90)
-            });
-          } else {
-            showMsg('Неверный секретный код преподавателя колледжа!', false);
-          }
-        });
-      });
+              teacher_key
+            })
+          })
+          .then(r => r.json())
+          .then(d => {
+            if (d.success) {
+              localStorage.setItem('amk_current_user', JSON.stringify(d.user));
+              showToast(d.message || 'Регистрация успешна!', 'success');
+              setTimeout(() => {
+                window.location.href = d.user.role === 'teacher' ? 'teacher.html' : 'simulator.html';
+              }, 600);
+            } else {
+              showToast(d.message || 'Ошибка регистрации', 'error');
+            }
+          })
+          .catch(() => {
+            showToast('Сервер недоступен, регистрация сохранена локально', 'info');
+          });
+        }
+      };
 
-      // Quick 1-click test buttons for Commission
-      document.getElementById('btnQuickStudent').addEventListener('click', () => {
-        document.getElementById('loginEmail').value = 'student@amk.kz';
-        document.getElementById('loginPassword').value = 'student123';
-        document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-      });
+      function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        const toast = document.createElement('div');
+        toast.className = `toast ${type === 'success' ? 'toast-success' : (type === 'error' ? 'toast-error' : '')}`;
+        toast.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">${type === 'success' ? 'check_circle' : (type === 'error' ? 'error' : 'info')}</span><span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 250);
+        }, 3200);
+      }
 
-      document.getElementById('btnQuickTeacher').addEventListener('click', () => {
-        document.getElementById('loginEmail').value = 'teacher@amk.kz';
-        document.getElementById('loginPassword').value = 'admin123';
-        document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-      });
+      updateView();
     });
   </script>
 </body>

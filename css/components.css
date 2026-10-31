@@ -1,553 +1,800 @@
 /* ========================================================
-   AMK SKILLHUB: STRIKING & INTUITIVE COMPONENTS (components.css)
-   High-Contrast, Vivid Colors, 3-Step Guide, 50 Tasks Cards
+   AMK SKILLHUB: GOOGLE STITCH COMPONENTS (components.css)
+   Google Sans, Material Symbols & Obsidian Dark Canvas
    ======================================================== */
 
-/* ================= 1. HERO SECTION ================= */
+/* 1. STITCH NAVBAR */
+.navbar {
+  position: sticky;
+  top: 3px;
+  left: 0;
+  width: 100%;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-color);
+  z-index: 1000;
+  transition: var(--transition);
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  gap: 20px;
+}
+
+/* Brand */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.brand-badge {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--google-blue-subtle);
+  border: 1px solid rgba(66, 133, 244, 0.4);
+  color: var(--google-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: -0.5px;
+  box-shadow: 0 0 16px rgba(66, 133, 244, 0.2);
+}
+
+.brand-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.2;
+}
+
+.brand-stitch-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, rgba(66, 133, 244, 0.2), rgba(161, 66, 244, 0.2));
+  color: #93c5fd;
+  border: 1px solid rgba(66, 133, 244, 0.3);
+  text-transform: uppercase;
+}
+
+.brand-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Navigation Links */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-link {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  transition: var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.nav-link.accent-blue {
+  color: #60a5fa;
+}
+
+.nav-link.accent-cyan {
+  color: var(--accent-cyan);
+}
+
+/* Navigation Actions */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Toggle Buttons (Theme, Lang, Audio) */
+.btn-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+.btn-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Live Backend Status Badge in Header */
+.api-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(52, 168, 83, 0.1);
+  border: 1px solid rgba(52, 168, 83, 0.3);
+  color: #4ade80;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.api-status-pill.offline {
+  background: rgba(234, 67, 53, 0.1);
+  border-color: rgba(234, 67, 53, 0.3);
+  color: #f87171;
+}
+
+/* User Profile Chip */
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 6px;
+  border-radius: var(--radius-full);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.user-chip:hover {
+  border-color: var(--border-active);
+  box-shadow: 0 0 12px rgba(66, 133, 244, 0.2);
+}
+
+.user-chip-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--google-blue-subtle);
+  border: 1px solid rgba(66, 133, 244, 0.4);
+  color: #60a5fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+/* 2. HERO SECTION */
 .hero-clean {
-  padding: 60px 0 80px;
   position: relative;
+  padding: 64px 0 48px;
+  overflow: hidden;
 }
 
 .hero-grid-clean {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 48px;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 40px;
   align-items: center;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  background: var(--google-blue-subtle);
+  border: 1px solid rgba(66, 133, 244, 0.3);
+  color: #93c5fd;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 20px;
 }
 
 .hero-title-clean {
-  font-size: 3.4rem;
-  letter-spacing: -0.035em;
-  margin-bottom: 20px;
+  font-size: 2.85rem;
+  font-weight: 800;
+  letter-spacing: -1px;
   line-height: 1.15;
+  margin-bottom: 20px;
+  background: var(--gradient-hero-title);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .hero-desc-clean {
-  font-size: 1.15rem;
-  line-height: 1.75;
-  color: #94a3b8;
-  margin-bottom: 36px;
-  max-width: 620px;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 32px;
+  max-width: 600px;
 }
 
-.hero-btns-clean {
-  display: flex;
-  gap: 14px;
-  margin-bottom: 36px;
-  flex-wrap: wrap;
-}
-
-/* ================= 2. THREE-STEP ROADMAP (Super Clear Workflow) ================= */
-.roadmap-section {
-  padding: 20px 0 60px;
-}
-
-.roadmap-header {
-  text-align: center;
-  max-width: 640px;
-  margin: 0 auto 36px;
-}
-
-.roadmap-header h2 {
-  font-size: 2.1rem;
-  margin-bottom: 8px;
-}
-
-.roadmap-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-.roadmap-card {
-  background: linear-gradient(135deg, #0e1628 0%, #0a101d 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-md);
-  padding: 28px;
-  position: relative;
-  transition: var(--transition);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-}
-
-.roadmap-card:hover {
-  border-color: rgba(99, 102, 241, 0.5);
-  transform: translateY(-3px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
-}
-
-.roadmap-step-badge {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: var(--gradient-btn);
-  color: #fff;
-  font-size: 1.3rem;
-  font-weight: 900;
+.hero-actions-clean {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 18px;
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45);
-}
-
-.roadmap-card h3 {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-  color: #fff;
-}
-
-.roadmap-card p {
-  font-size: 0.88rem;
-  line-height: 1.6;
-  color: #94a3b8;
-  margin: 0;
-}
-
-/* ================= 3. SPECIALTIES CATALOG (Vivid & Striking) ================= */
-.specialties-section {
-  padding: 70px 0;
-}
-
-.section-head-clean {
-  text-align: center;
-  max-width: 720px;
-  margin: 0 auto 40px;
-}
-
-.section-head-clean h2 {
-  font-size: 2.3rem;
-  margin-bottom: 12px;
-}
-
-.category-tabs-clean {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 36px;
+  gap: 14px;
   flex-wrap: wrap;
+  margin-bottom: 36px;
 }
 
-.tab-filter {
-  background: #141e33;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #94a3b8;
-  padding: 9px 20px;
-  border-radius: var(--radius-full);
-  font-size: 0.88rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.tab-filter:hover {
-  color: #fff;
-  border-color: rgba(99, 102, 241, 0.4);
-}
-
-.tab-filter.active {
-  background: var(--gradient-btn);
-  color: #ffffff;
-  border-color: transparent;
-  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.45);
-}
-
-.specs-grid-clean {
+/* Hero Stats Row */
+.hero-stats-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-  gap: 26px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-color);
 }
 
-.spec-clean-card {
-  background: #0d1424;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-md);
-  padding: 28px;
+.hero-stat-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-  transition: var(--transition);
+}
+
+.hero-stat-val {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.hero-stat-lbl {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* Hero Right: Live Interactive Card */
+.hero-preview-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
 }
 
-.spec-clean-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--border-active);
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.7);
-}
-
-.spec-top-bar-color {
+.hero-preview-card::before {
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 2px;
+  background: var(--stitch-gradient-rainbow);
 }
 
-.spec-card-head {
+.preview-header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 14px;
-}
-
-.spec-icon-clean {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.7rem;
-  flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.spec-code-clean {
-  font-size: 0.78rem;
-  font-family: var(--font-mono);
-  font-weight: 800;
-  display: block;
-  margin-bottom: 2px;
-}
-
-.spec-tasks-count-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(16, 185, 129, 0.14);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  font-size: 0.74rem;
-  font-weight: 800;
-  margin-bottom: 12px;
-}
-
-.spec-clean-card h3 {
-  font-size: 1.25rem;
-  line-height: 1.3;
-}
-
-.spec-clean-card p {
-  font-size: 0.88rem;
-  line-height: 1.6;
+  justify-content: space-between;
   margin-bottom: 18px;
-  color: #94a3b8;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.spec-task-preview-box {
-  background: #070a12;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 20px;
-}
-
-.spec-task-preview-label {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  color: #64748b;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  margin-bottom: 6px;
-  display: block;
-}
-
-.spec-task-preview-item {
-  font-size: 0.82rem;
-  color: #cbd5e1;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 4px;
-}
-
-.btn-open-track {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #141e33;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  text-decoration: none;
-  padding: 13px 20px;
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  font-weight: 700;
-  transition: var(--transition);
-}
-
-.btn-open-track:hover {
-  background: var(--gradient-btn);
-  border-color: transparent;
-  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.45);
-}
-
-/* ================= 4. SALARY CALCULATOR ================= */
-.calc-card {
-  background: #0d1424;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-lg);
-  padding: 40px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-}
-
-.calc-header {
-  text-align: center;
-  max-width: 680px;
-  margin: 0 auto 32px;
-}
-
-.calc-header h2 {
-  font-size: 2.2rem;
-  margin-bottom: 10px;
-}
-
-.calc-slider-box {
-  background: #141e33;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-md);
-  padding: 26px 30px;
-  margin-bottom: 32px;
-}
-
-.slider-top-labels {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 14px;
-}
-
-.target-salary-display {
-  font-size: 2.4rem;
-  font-weight: 900;
-  font-family: var(--font-mono);
-  color: #38bdf8;
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.target-salary-display small {
+.preview-title {
   font-size: 0.95rem;
-  color: #94a3b8;
-  font-family: var(--font-main);
-  font-weight: 600;
-}
-
-.custom-range-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 10px;
-  border-radius: 6px;
-  background: #090e1a;
-  outline: none;
-  margin: 14px 0 8px;
-  cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.custom-range-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: var(--gradient-btn);
-  cursor: pointer;
-  box-shadow: 0 0 14px rgba(79, 70, 229, 0.6);
-  border: 3px solid #ffffff;
-  transition: transform 0.15s ease;
-}
-
-.custom-range-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
-}
-
-.slider-ticks {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.78rem;
-  font-family: var(--font-mono);
-  color: #94a3b8;
   font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.careers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 20px;
-}
-
-.career-match-card {
-  background: #141e33;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-md);
-  padding: 22px;
+.preview-ticket-list {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+.ticket-item {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  transition: var(--transition-fast);
+}
+
+.ticket-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-active);
+  transform: translateX(3px);
+}
+
+.ticket-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ticket-badge {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.78rem;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  background: var(--google-blue-subtle);
+  color: #60a5fa;
+  border: 1px solid rgba(66, 133, 244, 0.3);
+}
+
+.ticket-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ticket-spec {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* 3. 3-STEP ROADMAP BANNER */
+.roadmap-section {
+  padding: 40px 0;
+}
+
+.roadmap-card {
+  background: linear-gradient(135deg, rgba(19, 27, 46, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+}
+
+.roadmap-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.roadmap-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  position: relative;
+}
+
+.roadmap-step {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   transition: var(--transition);
 }
 
-.career-match-card:hover {
-  border-color: rgba(99, 102, 241, 0.4);
+.roadmap-step:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-active);
   transform: translateY(-2px);
 }
 
-.career-role-title {
-  font-size: 1.15rem;
+.step-num-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 800;
-  margin-bottom: 6px;
-  color: #fff;
+  font-size: 0.85rem;
+  background: var(--google-blue);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(66, 133, 244, 0.4);
 }
 
-.career-spec-code {
-  font-size: 0.76rem;
-  font-family: var(--font-mono);
-  color: #38bdf8;
-  font-weight: 700;
-  display: block;
-}
-
-.career-salary-box {
-  background: #090e1a;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 12px 16px;
-  border-radius: var(--radius-sm);
-  margin: 14px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.career-salary-num {
-  font-size: 1.25rem;
-  font-weight: 900;
-  font-family: var(--font-mono);
-  color: #10b981;
-}
-
-/* ================= 5. DIPLOMA / PASSPORT MODAL ================= */
-.diploma-card-inner {
-  background: #080c14;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-md);
-  padding: 28px;
-  margin-bottom: 24px;
-}
-
-.diploma-official-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: 16px;
-  margin-bottom: 20px;
-}
-
-.diploma-rep-title {
-  font-size: 0.72rem;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 700;
-}
-
-.diploma-college-name {
+.step-title {
   font-size: 1.05rem;
-  font-weight: 800;
-  color: #fff;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
-.diploma-stamp {
-  border: 2px dashed rgba(16, 185, 129, 0.5);
-  color: #10b981;
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  font-weight: 800;
-  padding: 4px 8px;
-  border-radius: 4px;
-  text-transform: uppercase;
-  transform: rotate(-3deg);
+.step-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
 }
 
-.diploma-user-row {
-  display: flex;
+/* 4. SPECIALTIES GRID */
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-tag {
+  display: inline-flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #93c5fd;
+  margin-bottom: 12px;
 }
 
-.diploma-avatar {
-  width: 58px;
-  height: 58px;
-  border-radius: 12px;
-  background: var(--gradient-btn);
+.section-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+}
+
+.section-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.specialties-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
+  margin-bottom: 60px;
+}
+
+.spec-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.spec-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-active);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-glow);
+}
+
+.spec-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.spec-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  color: #fff;
-  font-weight: 900;
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+  border: 1px solid var(--border-color);
 }
 
-.skills-progress-list {
+.spec-code-chip {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+}
+
+.spec-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.spec-desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.spec-tags {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 18px;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
-.skill-prog-row {
+.spec-tag {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+}
+
+.spec-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color);
 }
 
-.skill-prog-name {
-  font-size: 0.85rem;
-  font-weight: 700;
-  width: 200px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.spec-tasks-badge {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #60a5fa;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.skill-prog-bar-wrap {
-  flex-grow: 1;
+/* 5. SALARY CALCULATOR */
+.calc-section {
+  padding: 50px 0;
+  background: radial-gradient(circle at 50% 50%, rgba(66, 133, 244, 0.05) 0%, transparent 70%);
+}
+
+.calc-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  box-shadow: var(--shadow-card);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: center;
+}
+
+.calc-left h3 {
+  font-size: 1.75rem;
+  margin-bottom: 12px;
+}
+
+.calc-slider-box {
+  margin: 28px 0;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* Range input styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
   height: 8px;
-  background: #141e33;
   border-radius: 4px;
-  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  outline: none;
+  transition: var(--transition-fast);
 }
 
-.skill-prog-bar-fill {
-  height: 100%;
-  background: var(--gradient-btn);
-  border-radius: 4px;
-  transition: width 0.6s ease;
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--google-blue);
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 10px rgba(66, 133, 244, 0.5);
+  transition: transform 0.1s ease;
 }
 
-.skill-prog-val {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.calc-display-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 30px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.calc-amount {
+  font-family: var(--font-display);
+  font-size: 3rem;
   font-weight: 800;
-  color: #38bdf8;
-  width: 60px;
-  text-align: right;
+  color: #4ade80;
+  line-height: 1.1;
+  margin: 10px 0;
+  letter-spacing: -1px;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
-  .hero-grid-clean { grid-template-columns: 1fr; }
-  .hero-title-clean { font-size: 2.3rem; }
-  .roadmap-grid { grid-template-columns: 1fr; }
+.calc-level-tag {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #93c5fd;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 6. MODAL & TOAST NOTIFICATIONS */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-content {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 580px;
+  padding: 32px;
+  box-shadow: var(--shadow-modal);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+}
+
+.modal-close-btn:hover {
+  background: rgba(234, 67, 53, 0.2);
+  color: var(--google-red);
+}
+
+/* Toast */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transform: translateY(10px);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-success {
+  border-color: rgba(52, 168, 83, 0.4);
+}
+
+.toast-error {
+  border-color: rgba(234, 67, 53, 0.4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .hero-grid-clean, .calc-card {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .roadmap-steps-grid {
+    grid-template-columns: 1fr;
+  }
+  .hero-title-clean {
+    font-size: 2.3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+  }
+  .hero-stats-row {
+    grid-template-columns: 1fr 1fr;
+  }
+  .specialties-grid {
+    grid-template-columns: 1fr;
+  }
 }

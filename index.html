@@ -2,73 +2,101 @@
 <html lang="ru" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>АМК Практикум — Цифровая образовательная платформа колледжа (amk.edu.kz)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>АМК SkillHub — Цифровая образовательная платформа колледжа (Google Stitch Edition)</title>
+  
+  <!-- Preconnect to Google Fonts & CDNs -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Google+Sans+Display:wght@400;500;700&family=Google+Sans+Text:wght@400;500;700&family=Google+Sans+Mono:wght@400;500;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet">
+
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-  <!-- Unified Top Navbar -->
+  <!-- Google Stitch Rainbow Accent Strip -->
+  <div class="stitch-rainbow-strip"></div>
+
+  <!-- Unified Stitch Top Navbar -->
   <header class="navbar">
     <div class="container nav-content">
       <a href="index.html" class="brand">
         <div class="brand-badge">АМК</div>
         <div class="brand-info">
-          <span class="brand-name">Практикум</span>
-          <span class="brand-sub" data-i18n="college_sub">Алматинский многопрофильный колледж</span>
+          <span class="brand-name">
+            SkillHub
+            <span class="brand-stitch-tag">Stitch</span>
+          </span>
+          <span class="brand-sub">Алматинский многопрофильный колледж</span>
         </div>
       </a>
 
       <nav class="nav-links">
-        <a href="#specialties" class="nav-link" data-i18n="nav_specialties">Специальности (50)</a>
-        <a href="#howitworks" class="nav-link">Как это работает</a>
-        <a href="#calculator" class="nav-link" data-i18n="nav_career">Калькулятор дохода</a>
-        <a href="simulator.html" class="nav-link" data-i18n="nav_simulator">Тренажеры</a>
-        <a href="teacher.html" class="nav-link" style="color: var(--accent-cyan);">Журнал преподавателя</a>
+        <a href="#specialties" class="nav-link">
+          <span class="material-symbols-outlined">school</span>
+          <span>Специальности (50)</span>
+        </a>
+        <a href="#howitworks" class="nav-link">
+          <span class="material-symbols-outlined">route</span>
+          <span>Регламент практики</span>
+        </a>
+        <a href="#calculator" class="nav-link">
+          <span class="material-symbols-outlined">payments</span>
+          <span>Калькулятор дохода</span>
+        </a>
+        <a href="simulator.html" class="nav-link accent-blue">
+          <span class="material-symbols-outlined">terminal</span>
+          <span>Тренажеры (50 кейсов)</span>
+        </a>
+        <a href="teacher.html" class="nav-link accent-cyan">
+          <span class="material-symbols-outlined">assignment</span>
+          <span>Журнал преподавателя</span>
+        </a>
       </nav>
 
       <div class="nav-actions">
-        <!-- Языковой переключатель -->
-        <button id="langToggle" class="btn-toggle" title="Сменить язык интерфейса">
-          <span id="langLabel">ҚАЗ</span>
+        <!-- Live Backend Status Pill -->
+        <div id="backendStatusPill" class="api-status-pill" title="Статус сервера SQLite3">
+          <span class="pulse-dot"></span>
+          <span>SQLite3 Онлайн</span>
+        </div>
+
+        <!-- Sound FX Toggle -->
+        <button id="soundToggleBtn" class="btn-toggle" title="Переключить звуковые эффекты">
+          <span class="material-symbols-outlined" id="soundIcon">volume_up</span>
         </button>
 
-        <!-- Тема оформления -->
-        <button id="themeToggle" class="btn-toggle" title="Переключить тему (темная/светлая)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="5"/>
-            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-          </svg>
+        <!-- Theme Toggle -->
+        <button id="themeToggle" class="btn-toggle" title="Переключить тему оформления">
+          <span class="material-symbols-outlined">dark_mode</span>
         </button>
 
-        <!-- Динамический блок авторизации: Войти или Профиль -->
+        <!-- Dynamic Auth Section -->
         <div id="navAuthSection">
-          <a href="auth.html" id="btnNavLogin" class="btn-toggle" style="background: rgba(79, 70, 229, 0.15); border-color: rgba(79, 70, 229, 0.4); color: #818cf8;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Войти / Регистрация</span>
+          <a href="auth.html" id="btnNavLogin" class="btn btn-secondary" style="padding: 7px 16px; font-size: 0.82rem;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">login</span>
+            <span>Вход / Регистрация</span>
           </a>
 
           <div id="navUserBadge" style="display: none; align-items: center; gap: 8px;">
-            <div id="userProfileChip" class="user-chip" title="Нажмите для открытия цифрового паспорта">
+            <div id="userProfileChip" class="user-chip" title="Нажмите для открытия цифрового паспорта компетенций">
               <div class="user-chip-avatar">👤</div>
               <span id="navUserName">Асылхан Б.</span>
-              <span id="navUserGroup" style="color: var(--accent-cyan); font-weight: 800; margin-left: 2px;">ПО-22</span>
+              <span id="navUserGroup" style="color: #60a5fa; font-weight: 700; margin-left: 2px;">ПО-22</span>
             </div>
-            <button id="btnNavLogout" class="btn-toggle" style="color: var(--accent-rose); padding: 6px 10px;" title="Выйти из аккаунта">
-              Выйти
+            <button id="btnNavLogout" class="btn-toggle" style="color: var(--google-red); padding: 0 10px;" title="Выйти из аккаунта">
+              <span class="material-symbols-outlined">logout</span>
             </button>
           </div>
         </div>
 
-        <!-- Кнопка перехода к симуляторам -->
-        <a href="simulator.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.85rem;">
-          <span>Тренажеры (50 кейсов)</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <!-- Direct CTA to Simulators -->
+        <a href="simulator.html" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.88rem;">
+          <span>Тренажеры</span>
+          <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
         </a>
       </div>
     </div>
@@ -78,62 +106,107 @@
   <section class="hero-clean">
     <div class="container hero-grid-clean">
       <div class="hero-left">
-        <div class="badge-tag">
+        <div class="hero-tag">
           <span class="pulse-dot"></span>
-          <span data-i18n="hero_badge">Стандарты WorldSkills Kazakhstan 2026 • 50 практических кейсов</span>
+          <span>WorldSkills 2026 • 50 практических кейсов • 2 режима симуляции</span>
         </div>
 
         <h1 class="hero-title-clean">
-          <span data-i18n="hero_title_1">Профессиональная платформа</span> <br>
-          <span class="text-gradient" data-i18n="hero_title_2">практического обучения АМК</span>
+          Интерактивная станция практического обучения АМК
         </h1>
 
-        <p class="hero-desc-clean" data-i18n="hero_desc">
-          Интерактивная среда подготовки студентов колледжа АМК к производственной практике, демонстрационным экзаменам и успешному трудоустройству в ведущих компаниях Алматы.
+        <p class="hero-desc-clean">
+          Подготовка студентов Алматинского многопрофильного колледжа к производственной практике, демонстрационным экзаменам и успешному трудоустройству по стандарту WorldSkills.
         </p>
 
-        <div class="hero-btns-clean">
-          <a href="simulator.html" class="btn btn-primary" data-i18n="btn_start">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Открыть 50 заданий симулятора
+        <div class="hero-actions-clean">
+          <a href="simulator.html" class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem;">
+            <span class="material-symbols-outlined">play_arrow</span>
+            <span>Открыть 50 заданий симулятора</span>
           </a>
-          <button id="openDiplomaBtn" class="btn btn-secondary" data-i18n="btn_diploma">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Паспорт компетенций (А4)
+          <button id="openDiplomaBtn" class="btn btn-secondary" style="padding: 12px 22px; font-size: 1rem;">
+            <span class="material-symbols-outlined">verified</span>
+            <span>Паспорт компетенций (А4)</span>
           </button>
         </div>
 
-        <div class="hero-stats-clean">
-          <div class="stat-item">
-            <span class="stat-num">50</span>
-            <span class="stat-txt">Практических заданий (по 10 на спец.)</span>
+        <!-- Hero Stats Row -->
+        <div class="hero-stats-row">
+          <div class="hero-stat-card">
+            <span class="hero-stat-val">50</span>
+            <span class="hero-stat-lbl">Практических заданий (по 10 на спец.)</span>
           </div>
-          <div class="stat-item">
-            <span class="stat-num">2 Режима</span>
-            <span class="stat-txt">Свободный выбор или Билеты учителя</span>
+          <div class="hero-stat-card">
+            <span class="hero-stat-val">2 Режима</span>
+            <span class="hero-stat-lbl">Свободный выбор / Билеты учителя</span>
           </div>
-          <div class="stat-item">
-            <span class="stat-num">SQLite3</span>
-            <span class="stat-txt">Синхронизация с журналом</span>
+          <div class="hero-stat-card">
+            <span class="hero-stat-val">5</span>
+            <span class="hero-stat-lbl">Специальностей колледжа</span>
+          </div>
+          <div class="hero-stat-card">
+            <span class="hero-stat-val">SQLite3</span>
+            <span class="hero-stat-lbl">Синхронизация с журналом</span>
           </div>
         </div>
       </div>
 
-      <!-- Hero Skill Radar Chart -->
+      <!-- Hero Right: Live Interactive Card -->
       <div class="hero-right">
-        <div class="hero-chart-card">
-          <div class="chart-header">
-            <div>
-              <h3 style="font-size: 1.15rem; margin-bottom: 2px;">Радар квалификаций</h3>
-              <p style="font-size: 0.82rem; margin: 0; color: var(--text-muted);">Текущие компетенции по стандартам колледжа</p>
+        <div class="hero-preview-card">
+          <div class="preview-header">
+            <div class="preview-title">
+              <span class="material-symbols-outlined" style="color: var(--google-yellow);">star</span>
+              <span>Экзаменационные билеты учителя</span>
             </div>
-            <span class="chart-badge">
-              <span class="pulse-dot"></span>
-              Аттестация АМК
-            </span>
+            <span class="badge badge-amber">Сессия 2026</span>
           </div>
-          <div class="radar-canvas-wrap">
-            <canvas id="heroRadarCanvas"></canvas>
+
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">
+            Преподаватели назначили обязательные билеты для сдачи зачета. Выберите билет для перехода в экзаменационный тренажер:
+          </p>
+
+          <div class="preview-ticket-list">
+            <a href="simulator.html?mode=exam&ticket=1" class="ticket-item">
+              <div class="ticket-info">
+                <span class="ticket-badge">Билет №1</span>
+                <div>
+                  <div class="ticket-name">QuickSort V8 & Датчик MAF OBD-II</div>
+                  <div class="ticket-spec">06130100 ПО • 07161300 Авто • 5 заданий</div>
+                </div>
+              </div>
+              <span class="material-symbols-outlined" style="color: var(--google-blue);">arrow_forward_ios</span>
+            </a>
+
+            <a href="simulator.html?mode=exam&ticket=4" class="ticket-item">
+              <div class="ticket-info">
+                <span class="ticket-badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3);">Билет №4</span>
+                <div>
+                  <div class="ticket-name">Глубокая вакуумация & Сетка 12 колонок</div>
+                  <div class="ticket-spec">07150900 Холод • 02110300 Дизайн • 5 заданий</div>
+                </div>
+              </div>
+              <span class="material-symbols-outlined" style="color: var(--google-green);">arrow_forward_ios</span>
+            </a>
+
+            <a href="simulator.html?mode=exam&ticket=8" class="ticket-item">
+              <div class="ticket-info">
+                <span class="ticket-badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);">Билет №8</span>
+                <div>
+                  <div class="ticket-name">Индексы SQLite & Карта присадки Minifix</div>
+                  <div class="ticket-spec">06130100 ПО • 07221400 ЧПУ Мебель • 5 заданий</div>
+                </div>
+              </div>
+              <span class="material-symbols-outlined" style="color: var(--google-yellow);">arrow_forward_ios</span>
+            </a>
+          </div>
+
+          <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.78rem; color: var(--text-muted);">Результаты автоматически заносятся в ведомость</span>
+            <a href="teacher.html" style="font-size: 0.82rem; font-weight: 700; color: #60a5fa; display: inline-flex; align-items: center; gap: 4px;">
+              <span>Открыть журнал</span>
+              <span class="material-symbols-outlined" style="font-size: 16px;">open_in_new</span>
+            </a>
           </div>
         </div>
       </div>
@@ -143,190 +216,208 @@
   <!-- 3-Step Clear Interactive Workflow Guide -->
   <section class="roadmap-section" id="howitworks">
     <div class="container">
-      <div class="roadmap-header">
-        <span class="badge-tag">Понятный регламент практики колледжа</span>
-        <h2>Как работать на платформе — за 3 простых шага</h2>
-        <p>Информационная система обеспечивает сквозной цикл от выбора дисциплины до получения официального диплома с занесением в ведомость.</p>
-      </div>
-
-      <div class="roadmap-grid">
-        <div class="roadmap-card">
-          <div class="roadmap-step-badge">1</div>
-          <h3>1. Выберите специальность</h3>
-          <p>Доступно 5 официальных отделений АМК (IT, Авто, Холод, Дизайн, ЧПУ Мебель) и <strong>50 детально проработанных заданий</strong> (по 10 на каждое направление).</p>
+      <div class="roadmap-card">
+        <div class="roadmap-title-row">
+          <div>
+            <div class="badge badge-blue" style="margin-bottom: 8px;">
+              <span class="material-symbols-outlined" style="font-size: 16px;">verified</span>
+              <span>Регламент практики колледжа АМК</span>
+            </div>
+            <h2 style="font-size: 1.85rem; margin-bottom: 6px;">Как работать на платформе — 3 простых шага</h2>
+            <p style="font-size: 0.95rem; color: var(--text-secondary);">Сквозной цикл: от выбора направления до получения официального диплома с фиксацией в ведомости.</p>
+          </div>
+          <a href="simulator.html" class="btn btn-primary">
+            <span>Перейти к практике</span>
+            <span class="material-symbols-outlined">arrow_forward</span>
+          </a>
         </div>
 
-        <div class="roadmap-card">
-          <div class="roadmap-step-badge">2</div>
-          <h3>2. Выберите режим сдачи</h3>
-          <p><strong>«Свободный выбор»</strong> для самостоятельной тренировки или <strong>«По заданию учителя»</strong> со сдачей конкретного экзаменационного билета (№1, №4, №8).</p>
-        </div>
+        <div class="roadmap-steps-grid">
+          <div class="roadmap-step">
+            <div class="step-num-badge">1</div>
+            <h3 class="step-title">Выбор дисциплины</h3>
+            <p class="step-desc">
+              Доступно 5 отделений колледжа и <strong>50 детальных заданий</strong> (по 10 на каждое направление). Выбирайте задачи свободно или по фильтру сложности.
+            </p>
+          </div>
 
-        <div class="roadmap-card">
-          <div class="roadmap-step-badge">3</div>
-          <h3>3. Получите балл в журнал</h3>
-          <p>Система автоматически оценит решение, сохранит оценку в базу данных SQLite3 и сгенерирует <strong>цифровой паспорт компетенций (А4)</strong>.</p>
+          <div class="roadmap-step">
+            <div class="step-num-badge" style="background: var(--google-yellow); color: #000;">2</div>
+            <h3 class="step-title">Режим выполнения</h3>
+            <p class="step-desc">
+              Используйте <strong>«Свободный выбор»</strong> для личной подготовки или <strong>«По заданию учителя»</strong> для сдачи назначенных экзаменационных билетов (#1, #4, #8).
+            </p>
+          </div>
+
+          <div class="roadmap-step">
+            <div class="step-num-badge" style="background: var(--google-green);">3</div>
+            <h3 class="step-title">Оценка и зачет в журнал</h3>
+            <p class="step-desc">
+              Система автоматически проверяет решение, выставляет балл, сохраняет результат в базу SQLite3 и генерирует <strong>официальный паспорт компетенций (А4)</strong>.
+            </p>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Specialties Section -->
-  <section class="specialties-section" id="specialties">
+  <!-- Specialties Section with 50 Tasks (10 per specialty) -->
+  <section class="specialties-section" id="specialties" style="padding: 60px 0;">
     <div class="container">
-      <div class="section-head-clean">
-        <span class="badge-tag">Официальные профили колледжа (amk.edu.kz)</span>
-        <h2>Специальности и список заданий (50 кейсов)</h2>
-        <p>Выберите профессиональное направление. Каждое отделение включает 10 интерактивных заданий с автопроверкой.</p>
+      <div class="section-header">
+        <div class="section-tag">
+          <span class="material-symbols-outlined" style="font-size: 16px;">domain</span>
+          <span>Официальные специальности amk.edu.kz</span>
+        </div>
+        <h2 class="section-title">Каталог специальностей и практических кейсов (50 заданий)</h2>
+        <p class="section-subtitle">
+          Каждая специальность включает 10 интерактивных заданий, соответствующих требованиям работодателей г. Алматы и чемпионатам WorldSkills.
+        </p>
       </div>
 
-      <!-- Filter Pills -->
-      <div class="category-tabs-clean">
-        <button class="tab-filter active" data-cat="all">Все специальности</button>
-        <button class="tab-filter" data-cat="tech">💻 IT & Программирование</button>
-        <button class="tab-filter" data-cat="auto">🚗 Автодиагностика</button>
-        <button class="tab-filter" data-cat="eng">❄️ Холодильные машины</button>
-        <button class="tab-filter" data-cat="design">🎨 Графический дизайн</button>
-        <button class="tab-filter" data-cat="prod">🪑 ЧПУ Производство мебели</button>
+      <!-- Filter Tabs -->
+      <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 36px;">
+        <button class="btn btn-secondary tab-filter active" data-cat="all">Все специальности (50)</button>
+        <button class="btn btn-secondary tab-filter" data-cat="tech">💻 IT & Программирование</button>
+        <button class="btn btn-secondary tab-filter" data-cat="auto">🚗 Автодиагностика</button>
+        <button class="btn btn-secondary tab-filter" data-cat="eng">❄️ Холодильные машины</button>
+        <button class="btn btn-secondary tab-filter" data-cat="design">🎨 Графический дизайн</button>
+        <button class="btn btn-secondary tab-filter" data-cat="prod">🪑 ЧПУ Производство мебели</button>
       </div>
 
-      <!-- Dynamic Specialties Grid (Rendered by app.js with 10 tasks preview) -->
-      <div class="specs-grid-clean" id="specialtiesGrid">
+      <!-- Dynamic Specialties Grid (Rendered by app.js) -->
+      <div class="specialties-grid" id="specialtiesGrid">
         <!-- Rendered by app.js -->
       </div>
     </div>
   </section>
 
   <!-- Real-time Reactive Income Calculator -->
-  <section class="specialties-section" id="calculator" style="background: var(--bg-card); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
+  <section class="calc-section" id="calculator">
     <div class="container">
       <div class="calc-card">
-        <div class="calc-header">
-          <span class="badge-tag badge-tag-emerald">Рынок труда г. Алматы • Зарплатные предложения</span>
-          <h2 data-i18n="calc_title">Калькулятор дохода выпускников в Алматы</h2>
-          <p data-i18n="calc_desc">Двигайте ползунок, чтобы увидеть рост дохода и карьерные перспективы по специальностям колледжа.</p>
-        </div>
-
-        <div class="calc-slider-box">
-          <div class="slider-top-labels">
-            <div>
-              <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); display: block;">Целевой уровень дохода:</span>
-              <span style="font-size: 0.78rem; color: var(--text-muted);">Регулируйте ползунок для сопоставления с позициями работодателей</span>
-            </div>
-            <div class="target-salary-display" id="salaryDisplay">
-              450 000 ₸ <small>/ ай (мес)</small>
-            </div>
+        <div class="calc-left">
+          <div class="badge badge-green" style="margin-bottom: 12px;">
+            <span class="material-symbols-outlined" style="font-size: 16px;">trending_up</span>
+            <span>Рынок труда г. Алматы • Зарплатные предложения</span>
           </div>
+          <h3>Калькулятор дохода выпускников в Алматы</h3>
+          <p style="font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6;">
+            Двигайте ползунок дохода для сопоставления с реальными вакансиями работодателей-партнеров АМК. Доход рассчитывается на основе освоенных практических навыков.
+          </p>
 
-          <input type="range" id="salarySlider" class="custom-range-slider" min="250000" max="950000" step="25000" value="450000">
-
-          <div class="slider-ticks">
-            <span>250 000 ₸ (Стажер)</span>
-            <span>450 000 ₸ (Специалист)</span>
-            <span>700 000 ₸ (Мастер)</span>
-            <span>950 000+ ₸ (Руководитель)</span>
+          <div class="calc-slider-box">
+            <div class="slider-labels">
+              <span>Целевой доход:</span>
+              <span id="sliderRangeLabel">от 250 000 до 950 000+ ₸</span>
+            </div>
+            <input type="range" id="salarySlider" min="250000" max="950000" step="25000" value="450000">
+            <div class="slider-labels" style="margin-top: 8px; font-size: 0.75rem;">
+              <span>Стажер (250k)</span>
+              <span>Специалист (450k)</span>
+              <span>Мастер (700k)</span>
+              <span>Тимлид (950k+)</span>
+            </div>
           </div>
         </div>
 
-        <div style="font-size: 0.85rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 20px;">
-          Квалификации и компании-партнеры в Алматы при таком доходе:
+        <div class="calc-right">
+          <div class="calc-display-box">
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Прогнозный средний доход:</span>
+            <div class="calc-amount" id="salaryDisplay">450 000 ₸</div>
+            <div class="calc-level-tag" id="salaryLevelTag">Квалифицированный специалист</div>
+            <span style="font-size: 0.78rem; color: var(--text-muted); margin-top: 8px;">Данные мониторинга вакансий Алматы за 2026 год</span>
+          </div>
         </div>
+      </div>
 
-        <div class="careers-grid" id="careerGrid">
+      <!-- Careers Breakdown Grid (Populated by app.js based on slider) -->
+      <div style="margin-top: 32px;">
+        <h4 style="font-size: 1rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 16px;">
+          Соответствующие вакансии партнеров в Алматы при таком доходе:
+        </h4>
+        <div class="specialties-grid" id="careerGrid">
           <!-- Dynamically populated by app.js -->
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Digital Competency Passport Modal -->
-  <div class="modal-backdrop" id="diplomaModal">
-    <div class="modal-card">
+  <!-- Student Digital Passport Modal (A4) -->
+  <div class="modal-overlay" id="diplomaModal">
+    <div class="modal-content">
       <div class="modal-header">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="badge-tag-emerald badge-tag" style="margin: 0;">Официальный документ</span>
-          <span style="font-size: 0.82rem; color: var(--text-muted); font-family: var(--font-mono);" id="certStudentId">KZ-AMK-2026-98421</span>
+          <span class="badge badge-green">Официальный документ</span>
+          <span style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--text-muted);" id="certStudentId">KZ-AMK-2026-98421</span>
         </div>
-        <button class="modal-close-btn" id="closeDiplomaBtn">&times;</button>
+        <button class="modal-close-btn" id="closeDiplomaBtn">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
 
-      <div class="modal-body">
-        <div class="diploma-card-inner">
-          <div class="diploma-official-banner">
-            <div>
-              <div class="diploma-rep-title">Министерство просвещения Республики Казахстан</div>
-              <div class="diploma-college-name">Алматинский многопрофильный колледж</div>
-            </div>
-            <div class="diploma-stamp">✓ Верифицировано АМК</div>
+      <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; margin-bottom: 24px;">
+        <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 16px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Министерство просвещения РК</div>
+            <div style="font-size: 1.05rem; font-weight: 800; color: #fff;">Алматинский многопрофильный колледж</div>
           </div>
+          <span class="badge badge-blue">✓ Верифицировано</span>
+        </div>
 
-          <div class="diploma-user-row">
-            <div class="diploma-avatar" id="certStudentAvatar">АБ</div>
-            <div class="diploma-meta">
-              <h3 id="certStudentName">Асылхан Бауыржанұлы</h3>
-              <p id="certStudentGroup">Алматинский многопрофильный колледж • Группа ПО-22</p>
-            </div>
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--google-blue-subtle); border: 1px solid rgba(66, 133, 244, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #60a5fa;" id="certStudentAvatar">
+            АБ
           </div>
-
-          <div style="font-size: 0.82rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 20px;">
-            Оценки практических компетенций:
-          </div>
-
-          <div class="skills-progress-list">
-            <!-- 1. IT -->
-            <div class="skill-prog-row">
-              <span class="skill-prog-name">06130100 Разработка ПО</span>
-              <div class="skill-prog-bar-wrap"><div class="skill-prog-bar-fill" id="progIt" style="width: 94%;"></div></div>
-              <span class="skill-prog-val" id="valIt">94 / 100</span>
-            </div>
-            <!-- 2. Auto -->
-            <div class="skill-prog-row">
-              <span class="skill-prog-name">07161300 Автодиагностика</span>
-              <div class="skill-prog-bar-wrap"><div class="skill-prog-bar-fill" id="progAuto" style="width: 88%;"></div></div>
-              <span class="skill-prog-val" id="valAuto">88 / 100</span>
-            </div>
-            <!-- 3. Cryo -->
-            <div class="skill-prog-row">
-              <span class="skill-prog-name">07150900 Холодильные машины</span>
-              <div class="skill-prog-bar-wrap"><div class="skill-prog-bar-fill" id="progCryo" style="width: 91%;"></div></div>
-              <span class="skill-prog-val" id="valCryo">91 / 100</span>
-            </div>
-            <!-- 4. Design -->
-            <div class="skill-prog-row">
-              <span class="skill-prog-name">02110300 Графический дизайн</span>
-              <div class="skill-prog-bar-wrap"><div class="skill-prog-bar-fill" id="progDesign" style="width: 85%;"></div></div>
-              <span class="skill-prog-val" id="valDesign">85 / 100</span>
-            </div>
-            <!-- 5. Furniture -->
-            <div class="skill-prog-row">
-              <span class="skill-prog-name">07221400 Раскрой мебели ЧПУ</span>
-              <div class="skill-prog-bar-wrap"><div class="skill-prog-bar-fill" id="progFurn" style="width: 80%;"></div></div>
-              <span class="skill-prog-val" id="valFurn">80 / 100</span>
-            </div>
+          <div>
+            <h3 style="font-size: 1.2rem; color: #fff;" id="certStudentName">Асылхан Бауыржанұлы</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);" id="certStudentGroup">Группа ПО-22 • 06130100 Программное обеспечение</p>
           </div>
         </div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-          <a href="simulator.html" class="btn btn-primary" id="btnGoToSims">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Улучшить баллы в тренажере
-          </a>
-          <div style="display: flex; gap: 10px;">
-            <button class="btn btn-secondary" onclick="window.print()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-              Печать (А4)
-            </button>
-            <button class="btn btn-secondary" id="btnDismissDiploma" onclick="document.getElementById('diplomaModal').classList.remove('active');">
-              Закрыть
-            </button>
+        <h4 style="font-size: 0.82rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 12px;">
+          Оценки практических модулей в SQLite3:
+        </h4>
+
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+            <span>06130100 Программное обеспечение (IT)</span>
+            <strong style="color: #4ade80;">98 / 100 (A)</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+            <span>07161300 Автодиагностика ДВС</span>
+            <strong style="color: #4ade80;">94 / 100 (A)</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+            <span>07150900 Холодильные установки</span>
+            <strong style="color: #4ade80;">92 / 100 (A)</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+            <span>02110300 Графический дизайн</span>
+            <strong style="color: #4ade80;">90 / 100 (A)</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+            <span>07221400 ЧПУ Раскрой мебели</span>
+            <strong style="color: #60a5fa;">88 / 100 (B+)</strong>
           </div>
         </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+        <a href="simulator.html" class="btn btn-primary">
+          <span class="material-symbols-outlined">terminal</span>
+          <span>Улучшить баллы в тренажере</span>
+        </a>
+        <button class="btn btn-secondary" onclick="window.print()">
+          <span class="material-symbols-outlined">print</span>
+          <span>Печать (А4)</span>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Message -->
-  <div id="toast" class="toast"></div>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
   <!-- Footer -->
   <footer style="background: #060911; border-top: 1px solid var(--border-color); padding: 50px 0 30px;">
@@ -334,10 +425,11 @@
       <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 30px; margin-bottom: 40px;">
         <div>
           <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-            <span class="brand-badge">АМК</span>
-            <span style="font-size: 1.2rem; font-weight: 800; color: #fff;">Практикум</span>
+            <div class="brand-badge">АМК</div>
+            <span style="font-size: 1.25rem; font-weight: 800; color: #fff;">SkillHub</span>
+            <span class="brand-stitch-tag">Google Stitch</span>
           </div>
-          <p style="font-size: 0.88rem; max-width: 440px; line-height: 1.6; margin-bottom: 12px;">
+          <p style="font-size: 0.88rem; max-width: 440px; line-height: 1.6; margin-bottom: 12px; color: var(--text-secondary);">
             Алматинский многопрофильный колледж (основан в 1940 г.). Подготовка специалистов среднего звена и прикладного бакалавриата по передовым стандартам WorldSkills.
           </p>
           <p style="font-size: 0.82rem; color: var(--text-muted);">
@@ -349,16 +441,16 @@
           <div>
             <h4 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 14px;">Разделы</h4>
             <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.88rem;">
-              <a href="simulator.html" style="color: var(--text-secondary); text-decoration: none;">50 заданий симулятора</a>
-              <a href="teacher.html" style="color: var(--text-secondary); text-decoration: none;">Журнал преподавателя</a>
-              <a href="auth.html" style="color: var(--text-secondary); text-decoration: none;">Личный кабинет</a>
-              <a href="#calculator" style="color: var(--text-secondary); text-decoration: none;">Калькулятор дохода</a>
+              <a href="simulator.html" style="color: var(--text-secondary);">50 заданий симулятора</a>
+              <a href="teacher.html" style="color: var(--text-secondary);">Журнал преподавателя</a>
+              <a href="auth.html" style="color: var(--text-secondary);">Личный кабинет</a>
+              <a href="#calculator" style="color: var(--text-secondary);">Калькулятор дохода</a>
             </div>
           </div>
           <div>
             <h4 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 14px;">Колледж</h4>
             <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.88rem;">
-              <a href="https://amk.edu.kz" target="_blank" style="color: var(--text-secondary); text-decoration: none;">Официальный сайт amk.edu.kz ↗</a>
+              <a href="https://amk.edu.kz" target="_blank" style="color: var(--text-secondary);">Официальный сайт amk.edu.kz ↗</a>
               <span style="color: var(--text-muted);">Лицензия № KZ24LAA00005124</span>
               <span style="color: var(--text-muted);">Аккредитация НААР / IAAR</span>
             </div>
@@ -367,7 +459,7 @@
       </div>
 
       <div style="border-top: 1px solid rgba(255, 255, 255, 0.06); padding-top: 24px; text-align: center; font-size: 0.8rem; color: var(--text-muted);">
-        © 2026 Алматинский многопрофильный колледж (АМК). Все права защищены. Информационная система практического обучения и демонстрационных экзаменов.
+        © 2026 Алматинский многопрофильный колледж (АМК). Дизайн-система Google Stitch. Все 50 практических кейсов и электронный журнал синхронизированы с SQLite3.
       </div>
     </div>
   </footer>
