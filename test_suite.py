@@ -21,7 +21,7 @@ r = app.get('/api/courses')
 assert r.status_code == 200
 courses = r.get_json()['courses']
 assert len(courses) == 5
-for slug in ('it', 'design', 'accounting', 'auto', 'marketing'):
+for slug in ('it', 'graphic_design', 'autoelectric', 'hvac', 'automechanic'):
     rt = app.get(f'/api/tasks?specialty={slug}')
     assert rt.status_code == 200
     assert rt.get_json()['count'] == 10, f"Course {slug} must have 10 lessons"
@@ -243,6 +243,13 @@ for js_file in ('js/courses-catalog.js', 'js/app-logistics.js'):
         assert '\ufffd' not in txt, f"Mojibake found in {js_file}"
 
 print("Test 15: All 11 HTML pages & JS bundles return HTTP 200 with zero encoding errors OK")
+
+# 16. Verify Local Logo Asset & Favicon
+r_logo = app.get('/assets/eduspace-logo.svg')
+assert r_logo.status_code == 200, "Local SVG logo must return HTTP 200"
+assert '<svg' in r_logo.get_data(as_text=True), "Logo must be a valid SVG"
+print("Test 16: Local crisp SVG logo & favicon (assets/eduspace-logo.svg) returns HTTP 200 OK")
+
 
 # Clean up test-only records so DB starts super clean for real users
 conn = sqlite3.connect(server.DB_PATH)

@@ -7,7 +7,7 @@
   'use strict';
 
   const SESSION_KEY = 'eduspace_active_session_v3';
-  const LOCAL_DB_KEY = 'eduspace_lms_db_v3';
+  const LOCAL_DB_KEY = 'eduspace_lms_db_v4';
   const TEACHER_CODES = ['AMK2026', 'TEACHER2026', 'EDU2026'];
 
   const NAME_WORD_RE = /^[А-Яа-яЁёӘәІіҢңҒғҮүҰұҚқӨөҺһA-Za-z\-]{2,40}$/;
@@ -142,19 +142,27 @@
     return 'СТ';
   }
 
+  const LEGACY_SLUG_MAP = {
+    'design': 'graphic_design',
+    'accounting': 'hvac',
+    'auto': 'autoelectric',
+    'marketing': 'automechanic'
+  };
+
   function getCoursesList() {
     return window.EDU_COURSES || [
-      { slug: 'it', code: '06130100', title: 'Программное обеспечение и Веб-разработка', short_title: 'Программное обеспечение', curator: 'Власов Михаил Григорьевич', skills: [] },
-      { slug: 'design', code: '02110100', title: 'UX/UI и Продуктовый цифровой дизайн', short_title: 'UX/UI Дизайн', curator: 'Сейдахметова Алия Кайратовна', skills: [] },
-      { slug: 'accounting', code: '04110100', title: 'Бухгалтерский учёт, налоги и финансовый аудит', short_title: 'Учёт и аудит', curator: 'Нурпеисова Гульнара Сериковна', skills: [] },
-      { slug: 'auto', code: '07161300', title: 'Электронные системы и компьютерная автодиагностика', short_title: 'Автодиагностика', curator: 'Жумабаев Руслан Маратович', skills: [] },
-      { slug: 'marketing', code: '04140100', title: 'Цифровой маркетинг, аналитика и интернет-коммерция', short_title: 'Цифровой маркетинг', curator: 'Ким Елена Александровна', skills: [] }
+      { slug: 'it', code: '06130100', title: 'Программное обеспечение (Web Design)', short_title: 'Программное обеспечение (Web Design)', curator: 'Власов Михаил Григорьевич', skills: [] },
+      { slug: 'graphic_design', code: '02130100', title: 'Графический Дизайн', short_title: 'Графический Дизайн', curator: 'Сейдахметова Алия Кайратовна', skills: [] },
+      { slug: 'autoelectric', code: '07161301', title: 'Автоэлектрики', short_title: 'Автоэлектрики', curator: 'Жумабаев Руслан Маратович', skills: [] },
+      { slug: 'hvac', code: '07130700', title: 'Ремонт Холодильного Оборудования', short_title: 'Ремонт Холодильного Оборудования', curator: 'Ахметов Тимур Болатович', skills: [] },
+      { slug: 'automechanic', code: '07161300', title: 'Автомеханики', short_title: 'Автомеханики', curator: 'Садыков Ерлан Касымович', skills: [] }
     ];
   }
 
   function getCourseBySlug(slug) {
+    const normalized = LEGACY_SLUG_MAP[slug] || slug;
     const list = getCoursesList();
-    return list.find(c => c.slug === slug) || list[0];
+    return list.find(c => c.slug === normalized) || list[0];
   }
 
   function getLessonFromCatalog(specSlug, num) {
@@ -180,7 +188,8 @@
     if (!u) return null;
     const copy = Object.assign({}, u);
     delete copy.password_hash;
-    const spec = copy.specialty_slug || 'it';
+    const rawSpec = copy.specialty_slug || 'it';
+    const spec = (typeof LEGACY_SLUG_MAP !== 'undefined' && LEGACY_SLUG_MAP[rawSpec]) || rawSpec;
     const course = getCourseBySlug(spec);
     copy.specialty_slug = spec;
     copy.specialty_name = `${course.code} — ${course.short_title}`;

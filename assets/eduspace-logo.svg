@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+  <defs>
+    <linearGradient id="eduspace_bg" x1="2" y1="2" x2="38" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="50%" stop-color="#4F46E5"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="eduspace_shine" x1="20" y1="2" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="36" height="36" rx="10" fill="url(#eduspace_bg)"/>
+  <rect x="2.75" y="2.75" width="34.5" height="34.5" rx="9.25" stroke="url(#eduspace_shine)" stroke-width="1.5"/>
+  <!-- Academic Graduation Cap (Mortarboard) -->
+  <path d="M20 10.5L8.5 16.25L20 22L31.5 16.25L20 10.5Z" fill="#FFFFFF"/>
+  <path d="M13 19.6V25.1C13 26.9 16.13 28.8 20 28.8C23.87 28.8 27 26.9 27 25.1V19.6L20 23.1L13 19.6Z" fill="#E0E7FF"/>
+  <path d="M30.2 17V24.2" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="30.2" cy="25.2" r="1.5" fill="#FDE68A"/>
+</svg>

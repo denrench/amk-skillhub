@@ -31,62 +31,62 @@ COURSES_META = [
     {
         "slug": "it",
         "code": "06130100",
-        "title": "Программное обеспечение и Веб-разработка",
-        "short_title": "Программное обеспечение",
+        "title": "Программное обеспечение (Web Design)",
+        "short_title": "Программное обеспечение (Web Design)",
         "curator": "Власов Михаил Григорьевич",
         "skills": [
-            {"key": "js", "name": "JavaScript V8 & Алгоритмы", "tasks": [1, 3, 7]},
-            {"key": "frontend", "name": "HTML5, CSS Grid & Адаптивная вёрстка", "tasks": [2]},
-            {"key": "sql", "name": "PostgreSQL & Проектирование БД", "tasks": [4, 6]},
-            {"key": "backend", "name": "REST API, JWT, Тесты & Docker", "tasks": [5, 8, 9, 10]}
+            {"key": "web_ui", "name": "Web Design, HTML5, CSS Grid & Дизайн-системы", "tasks": [2, 9]},
+            {"key": "js", "name": "JavaScript V8, Алгоритмы & Логика интерфейсов", "tasks": [1, 3, 7, 8]},
+            {"key": "sql", "name": "PostgreSQL, Нормализация & Аналитические запросы", "tasks": [4, 6]},
+            {"key": "fullstack", "name": "REST API, JWT-авторизация & Архитектура веб-систем", "tasks": [5, 10]}
         ]
     },
     {
-        "slug": "design",
-        "code": "02110100",
-        "title": "UX/UI и Продуктовый цифровой дизайн",
-        "short_title": "UX/UI Дизайн",
+        "slug": "graphic_design",
+        "code": "02130100",
+        "title": "Графический Дизайн",
+        "short_title": "Графический Дизайн",
         "curator": "Сейдахметова Алия Кайратовна",
         "skills": [
-            {"key": "ui", "name": "Композиция, сетки 8pt и типографика", "tasks": [1, 2, 3]},
-            {"key": "figma", "name": "Auto Layout, компоненты и прототипы", "tasks": [4, 5, 7]},
-            {"key": "ux", "name": "UX-исследования, CJM и доступность WCAG", "tasks": [6, 8, 9, 10]}
+            {"key": "composition", "name": "Композиция, колористика RGB/CMYK и типографика", "tasks": [1, 2, 3]},
+            {"key": "branding", "name": "Векторная графика, логотипы и разработка Brandbook", "tasks": [4, 5, 7]},
+            {"key": "prepress", "name": "Вёрстка InDesign, упаковка и допечатная подготовка Prepress", "tasks": [6, 8, 9, 10]}
         ]
     },
     {
-        "slug": "accounting",
-        "code": "04110100",
-        "title": "Бухгалтерский учёт, налоги и финансовый аудит",
-        "short_title": "Учёт и аудит",
-        "curator": "Нурпеисова Гульнара Сериковна",
-        "skills": [
-            {"key": "ledger", "name": "План счетов РК и бухгалтерские проводки", "tasks": [1, 2, 5]},
-            {"key": "tax", "name": "Налоги, зарплата и форма 200.00", "tasks": [3, 6, 8]},
-            {"key": "audit", "name": "Основные средства, отчётность и баланс", "tasks": [4, 7, 9, 10]}
-        ]
-    },
-    {
-        "slug": "auto",
-        "code": "07161300",
-        "title": "Электронные системы и компьютерная автодиагностика",
-        "short_title": "Автодиагностика",
+        "slug": "autoelectric",
+        "code": "07161301",
+        "title": "Автоэлектрики",
+        "short_title": "Автоэлектрики",
         "curator": "Жумабаев Руслан Маратович",
         "skills": [
-            {"key": "obd", "name": "Протоколы OBD-II и анализ параметров ЭБУ", "tasks": [1, 2, 3]},
-            {"key": "sensors", "name": "Осциллография датчиков, топливо и зажигание", "tasks": [4, 5, 6]},
-            {"key": "can", "name": "Шина CAN, ABS/ESP и гибридные установки", "tasks": [7, 8, 9, 10]}
+            {"key": "power_net", "name": "Бортовая сеть 12/24В, АКБ, стартеры и генераторы", "tasks": [1, 2, 3, 4]},
+            {"key": "wiring_obd", "name": "Электросхемы DIN 72552 и диагностика ЭБУ OBD-II", "tasks": [5, 6, 9]},
+            {"key": "can_osc", "name": "Осциллография датчиков и мультиплексные шины CAN/LIN", "tasks": [7, 8, 10]}
         ]
     },
     {
-        "slug": "marketing",
-        "code": "04140100",
-        "title": "Цифровой маркетинг, аналитика и интернет-коммерция",
-        "short_title": "Цифровой маркетинг",
-        "curator": "Ким Елена Александровна",
+        "slug": "hvac",
+        "code": "07130700",
+        "title": "Ремонт Холодильного Оборудования",
+        "short_title": "Ремонт Холодильного Оборудования",
+        "curator": "Ахметов Тимур Болатович",
         "skills": [
-            {"key": "strategy", "name": "Исследование рынка, ЦА, SWOT и УТП", "tasks": [1, 2, 3]},
-            {"key": "traffic", "name": "Контент, таргетинг, SEO и Email-воронки", "tasks": [4, 5, 8, 9]},
-            {"key": "analytics", "name": "Юнит-экономика (LTV, CAC, ROMI) и конверсия", "tasks": [6, 7, 10]}
+            {"key": "thermo", "name": "Термодинамика цикла, фреоны, перегрев и переохлаждение", "tasks": [1, 2, 3, 4]},
+            {"key": "brazing", "name": "Пайка меди, опрессовка азотом, вакуумирование и заправка", "tasks": [6, 7, 8]},
+            {"key": "electro_cold", "name": "Диагностика компрессоров, No Frost и контроллеров Eliwell", "tasks": [5, 9, 10]}
+        ]
+    },
+    {
+        "slug": "automechanic",
+        "code": "07161300",
+        "title": "Автомеханики",
+        "short_title": "Автомеханики",
+        "curator": "Садыков Ерлан Касымович",
+        "skills": [
+            {"key": "engine", "name": "Дефектовка и ремонт ДВС, ГРМ, смазки и охлаждения", "tasks": [1, 2, 3, 4]},
+            {"key": "chassis", "name": "Трансмиссия, подвеска и 3D развал-схождение колёс", "tasks": [5, 6, 7]},
+            {"key": "brakes_to", "name": "Тормозные системы, шиномонтаж и регламентное ТО", "tasks": [8, 9, 10]}
         ]
     }
 ]
@@ -314,6 +314,18 @@ def init_db():
     );
     """)
     cursor.execute("INSERT OR IGNORE INTO platform_settings (key, value) VALUES ('current_study_day', '1');")
+    # Clean out obsolete tasks & migrate legacy slugs
+    cursor.execute("DELETE FROM tasks WHERE specialty_slug NOT IN ('it', 'graphic_design', 'autoelectric', 'hvac', 'automechanic');")
+    cursor.execute("UPDATE users SET specialty_slug = 'graphic_design' WHERE specialty_slug = 'design';")
+    cursor.execute("UPDATE users SET specialty_slug = 'hvac' WHERE specialty_slug = 'accounting';")
+    cursor.execute("UPDATE users SET specialty_slug = 'autoelectric' WHERE specialty_slug = 'auto';")
+    cursor.execute("UPDATE users SET specialty_slug = 'automechanic' WHERE specialty_slug = 'marketing';")
+    cursor.execute("UPDATE enrollments SET specialty_slug = 'graphic_design' WHERE specialty_slug = 'design';")
+    cursor.execute("UPDATE enrollments SET specialty_slug = 'hvac' WHERE specialty_slug = 'accounting';")
+    cursor.execute("UPDATE enrollments SET specialty_slug = 'autoelectric' WHERE specialty_slug = 'auto';")
+    cursor.execute("UPDATE enrollments SET specialty_slug = 'automechanic' WHERE specialty_slug = 'marketing';")
+    cursor.execute("DELETE FROM enrollments WHERE specialty_slug NOT IN ('it', 'graphic_design', 'autoelectric', 'hvac', 'automechanic');")
+
 
     # Seed or sync 50 catalog tasks
     lessons_map = _load_catalog_lessons()
