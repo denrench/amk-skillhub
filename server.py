@@ -35,10 +35,10 @@ COURSES_META = [
         "short_title": "Программное обеспечение (Web Design)",
         "curator": "Власов Михаил Григорьевич",
         "skills": [
-            {"key": "web_ui", "name": "Web Design, HTML5, CSS Grid & Дизайн-системы", "tasks": [2, 9]},
-            {"key": "js", "name": "JavaScript V8, Алгоритмы & Логика интерфейсов", "tasks": [1, 3, 7, 8]},
-            {"key": "sql", "name": "PostgreSQL, Нормализация & Аналитические запросы", "tasks": [4, 6]},
-            {"key": "fullstack", "name": "REST API, JWT-авторизация & Архитектура веб-систем", "tasks": [5, 10]}
+            {"key": "ps_ai", "name": "Photoshop & Illustrator для веба (баннеры, SVG-иконки)", "tasks": [1, 2]},
+            {"key": "figma_ui", "name": "Figma: Сетки 8px, Auto Layout, Компоненты и Прототипы", "tasks": [3, 4, 5]},
+            {"key": "html_css", "name": "Основы верстки: теги HTML, стили CSS и Flexbox", "tasks": [6, 7, 8]},
+            {"key": "basic_js", "name": "Простой интерактив (клик JS) и дипломная карточка", "tasks": [9, 10]}
         ]
     },
     {

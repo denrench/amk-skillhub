@@ -172,7 +172,7 @@ r_prog = app.post('/api/tasks/progress', json={
     'specialty_slug': 'it',
     'task_number': 1,
     'quiz_score': 3,
-    'draft_code': 'function formatStudentCard(student) { return ""; }'
+    'draft_code': 'Размер баннера 1200x600 px, 72 ppi, формат WebP.'
 })
 assert r_prog.status_code == 200
 
@@ -185,7 +185,7 @@ r_sub = app.post('/api/tasks/submit', json={
     'autotest_total': 5,
     'quiz_score': 3,
     'await_teacher': True,
-    'submitted_code': 'function formatStudentCard(s) { ... }'
+    'submitted_code': 'Чек-лист веб-баннера в Photoshop: 1200x600 px, 72 ppi, формат WebP.'
 })
 assert r_sub.status_code == 200
 sub_id = r_sub.get_json()['result']['submission_id']
