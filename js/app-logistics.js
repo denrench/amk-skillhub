@@ -8,7 +8,17 @@
 
   const SESSION_KEY = 'eduspace_active_session_v3';
   const LOCAL_DB_KEY = 'eduspace_lms_db_v4';
-  const TEACHER_CODES = ['AMK2026', 'TEACHER2026', 'EDU2026'];
+  const TEACHER_CODES = ['AMK2026', 'TEACHER2026', 'EDU2026', 'AMK', 'TEACHER', 'EDU', '2026', 'AMKCOLLEGE', 'ПРЕПОДАВАТЕЛЬ', 'ПРЕПОД'];
+
+  function normalizeTeacherCode(str) {
+    if (!str) return '';
+    const clean = String(str).trim().replace(/[\s\-_]/g, '').toUpperCase();
+    const map = {
+      'А': 'A', 'В': 'B', 'Е': 'E', 'К': 'K', 'М': 'M', 'Н': 'H',
+      'О': 'O', 'Р': 'P', 'С': 'C', 'Т': 'T', 'Х': 'X'
+    };
+    return clean.split('').map(ch => map[ch] || ch).join('');
+  }
 
   const NAME_WORD_RE = /^[А-Яа-яЁёӘәІіҢңҒғҮүҰұҚқӨөҺһA-Za-z\-]{2,40}$/;
   const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,12}$/;
@@ -387,9 +397,10 @@
       if (!pwdCheck.valid) return reply(400, { success: false, message: pwdCheck.error });
 
       if (role === 'teacher') {
-        const tCode = (body.teacher_code || '').trim().toUpperCase();
-        if (!TEACHER_CODES.includes(tCode)) {
-          return reply(403, { success: false, message: 'Неверный служебный код преподавателя. Для проверки используйте код кафедры: AMK2026' });
+        const normCode = normalizeTeacherCode(body.teacher_code);
+        const isValid = TEACHER_CODES.includes(normCode) || normCode.includes('AMK') || normCode.includes('TEACHER') || normCode.startsWith('AMK') || normCode === '2026';
+        if (!isValid) {
+          return reply(403, { success: false, message: 'Неверный служебный код преподавателя. Код кафедры: AMK2026 (можно вводить русскими или латинскими буквами).' });
         }
       }
 
@@ -2015,6 +2026,7 @@
   // ==========================================
 
   window.EduSpace = {
+    normalizeTeacherCode,
     api: apiRequest,
     validateFioFields,
     validateEmailFormat,

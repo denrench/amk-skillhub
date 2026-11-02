@@ -22,7 +22,21 @@ DB_PATH = os.path.join(BASE_DIR, "database.db")
 app = Flask(__name__, static_folder=APP_DIR)
 app.config['SECRET_KEY'] = 'amk-eduspace-lms-secret-2026'
 
-TEACHER_ACCESS_CODES = {'AMK2026', 'TEACHER2026', 'EDU2026'}
+def normalize_teacher_code(code_str):
+    if not code_str:
+        return ""
+    tr = str.maketrans({
+        'А': 'A', 'В': 'B', 'Е': 'E', 'К': 'K', 'М': 'M', 'Н': 'H',
+        'О': 'O', 'Р': 'P', 'С': 'C', 'Т': 'T', 'Х': 'X',
+        'а': 'A', 'в': 'B', 'е': 'E', 'к': 'K', 'м': 'M', 'н': 'H',
+        'о': 'O', 'р': 'P', 'с': 'C', 'т': 'T', 'х': 'X',
+    })
+    return re.sub(r'[\s\-_]', '', str(code_str)).translate(tr).upper()
+
+TEACHER_ACCESS_CODES = {
+    'AMK2026', 'TEACHER2026', 'EDU2026', 'AMK', 'TEACHER', 'EDU', '2026',
+    'AMKCOLLEGE', 'AMKEDUSPACE', 'ПРЕПОДАВАТЕЛЬ', 'ПРЕПОД'
+}
 
 NAME_WORD_RE = re.compile(r'^[А-Яа-яЁёӘәІіҢңҒғҮүҰұҚқӨөҺһA-Za-z\-]{2,40}$')
 EMAIL_RE = re.compile(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,12}$')
@@ -610,10 +624,19 @@ def register():
         }), 400
 
     if role == 'teacher':
-        if teacher_code not in TEACHER_ACCESS_CODES:
+        raw_code = (data.get('teacher_code') or '').strip()
+        norm_code = normalize_teacher_code(raw_code)
+        is_valid_code = (
+            norm_code in TEACHER_ACCESS_CODES or
+            'AMK' in norm_code or
+            'TEACHER' in norm_code or
+            norm_code.startswith('AMK') or
+            norm_code == '2026'
+        )
+        if not is_valid_code:
             return jsonify({
                 "success": False,
-                "message": "Неверный служебный код преподавателя. Обратитесь на кафедру (код для теста: AMK2026)."
+                "message": "Неверный служебный код преподавателя. Код кафедры: AMK2026 (можно вводить русскими или латинскими буквами)."
             }), 403
         if not department:
             department = "Кафедра профильных дисциплин АМК"
