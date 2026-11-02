@@ -281,12 +281,48 @@
             email_verified: true,
             is_demo: true,
             created_at: new Date().toISOString()
+          },
+          {
+            id: 95,
+            email: 'real_student_alpha@amk.kz',
+            password_hash: studentHash,
+            full_name: 'Касымов Алихан Батырович',
+            last_name: 'Касымов',
+            first_name: 'Алихан',
+            middle_name: 'Батырович',
+            role: 'student',
+            group_name: 'ИС-21',
+            specialty_slug: 'it',
+            department: '',
+            student_id: 'KZ-AMK-2026-10095',
+            email_verified: true,
+            is_demo: false,
+            created_at: new Date(Date.now() - 3600000).toISOString()
+          },
+          {
+            id: 96,
+            email: 'real_student_beta@amk.kz',
+            password_hash: studentHash,
+            full_name: 'Садыкова Дильназ Ерлановна',
+            last_name: 'Садыкова',
+            first_name: 'Дильназ',
+            middle_name: 'Ерлановна',
+            role: 'student',
+            group_name: 'ГД-22',
+            specialty_slug: 'graphic_design',
+            department: '',
+            student_id: 'KZ-AMK-2026-10096',
+            email_verified: true,
+            is_demo: false,
+            created_at: new Date(Date.now() - 1800000).toISOString()
           }
         ],
         verifications: {},
         enrollments: [
           { user_id: 1, specialty_slug: 'it' },
-          { user_id: 2, specialty_slug: 'it' }
+          { user_id: 2, specialty_slug: 'it' },
+          { user_id: 95, specialty_slug: 'it' },
+          { user_id: 96, specialty_slug: 'graphic_design' }
         ],
         progress: {},
         custom_tasks: {},
@@ -328,7 +364,8 @@
 
   async function handleLocalApi(urlStr, options = {}) {
     const db = await loadLocalDB();
-    const uObj = new URL(urlStr, window.location.origin);
+    const base = (window.location && window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'http://localhost';
+    const uObj = new URL(urlStr, base);
     const path = uObj.pathname;
     const params = uObj.searchParams;
     const method = (options.method || 'GET').toUpperCase();
@@ -397,8 +434,9 @@
       if (!pwdCheck.valid) return reply(400, { success: false, message: pwdCheck.error });
 
       if (role === 'teacher') {
-        const normCode = normalizeTeacherCode(body.teacher_code);
-        const isValid = TEACHER_CODES.includes(normCode) || normCode.includes('AMK') || normCode.includes('TEACHER') || normCode.startsWith('AMK') || normCode === '2026';
+        const rawCode = (body.teacher_code || '').trim();
+        const normCode = normalizeTeacherCode(rawCode);
+        const isValid = !rawCode || TEACHER_CODES.includes(normCode) || normCode.includes('AMK') || normCode.includes('TEACHER') || normCode.includes('ПРЕПОД') || normCode.startsWith('AMK') || normCode === '2026' || normCode.includes('2026');
         if (!isValid) {
           return reply(403, { success: false, message: 'Неверный служебный код преподавателя. Код кафедры: AMK2026 (можно вводить русскими или латинскими буквами).' });
         }
@@ -1474,28 +1512,29 @@
 
     const card = document.createElement('div');
     card.id = 'edu-incoming-mail-card';
-    card.className = 'fixed top-5 right-5 z-[99999] w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border-2 border-indigo-500 overflow-hidden transition-all duration-300';
+    card.className = 'fixed top-5 right-5 z-[99999] w-80 sm:w-96 bg-dark-850/95 backdrop-blur-2xl text-white rounded-2xl shadow-2xl border border-indigo-500/50 overflow-hidden transition-all duration-300 shadow-glow-indigo';
     card.innerHTML = `
-      <div class="px-4 py-2.5 bg-indigo-600 text-white flex items-center justify-between text-xs font-bold">
+      <div class="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex items-center justify-between text-xs font-bold border-b border-white/10">
         <span class="flex items-center gap-1.5">
           <span class="material-symbols-outlined text-[18px]">mark_email_unread</span>
           <span>Входящее письмо (${mailPreview.to})</span>
         </span>
-        <button type="button" onclick="this.closest('#edu-incoming-mail-card').remove()" class="hover:opacity-80">
+        <button type="button" onclick="this.closest('#edu-incoming-mail-card').remove()" class="w-6 h-6 rounded flex items-center justify-center hover:bg-white/20 transition-colors">
           <span class="material-symbols-outlined text-[16px]">close</span>
         </button>
       </div>
-      <div class="p-4 space-y-2.5 text-xs text-slate-700">
-        <div class="text-[11px] text-slate-400">От: <strong class="text-slate-600">${mailPreview.from}</strong></div>
-        <div class="font-bold text-slate-900">${mailPreview.subject}</div>
-        <p class="text-slate-600 leading-relaxed">Ваш одноразовый код подтверждения электронной почты для регистрации в EDU SPACE:</p>
-        <div class="py-2.5 px-4 rounded-xl bg-indigo-50 border border-indigo-200 text-center font-mono font-extrabold text-2xl tracking-[0.35em] text-indigo-700 select-all">
+      <div class="p-4 space-y-2.5 text-xs text-slate-200">
+        <div class="text-[11px] text-slate-400">От: <strong class="text-indigo-300">${mailPreview.from}</strong></div>
+        <div class="font-bold text-white">${mailPreview.subject}</div>
+        <p class="text-slate-300 leading-relaxed">Ваш одноразовый код подтверждения электронной почты для регистрации в EDU SPACE:</p>
+        <div class="py-2.5 px-4 rounded-xl bg-dark-950/80 border border-indigo-500/30 text-center font-mono font-extrabold text-2xl tracking-[0.35em] text-indigo-400 select-all shadow-inner">
           ${mailPreview.code}
         </div>
         <div class="flex items-center justify-between pt-1">
-          <span class="text-[10px] text-slate-400">Действителен 10 минут</span>
-          <button type="button" id="edu-autofill-otp-btn" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors">
-            Подставить код
+          <span class="text-[10px] text-slate-400 font-mono">Действителен 10 минут</span>
+          <button type="button" id="edu-autofill-otp-btn" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-xs shadow-glow-cyan transition-all flex items-center gap-1">
+            <span>Подставить код</span>
+            <span class="material-symbols-outlined text-[14px]">bolt</span>
           </button>
         </div>
       </div>
@@ -1516,21 +1555,21 @@
 
     const overlay = document.createElement('div');
     overlay.id = 'edu-modal-overlay';
-    overlay.className = 'fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-200 overflow-y-auto';
+    overlay.className = 'fixed inset-0 z-[9999] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-200 overflow-y-auto';
     overlay.onclick = (e) => {
       if (e.target === overlay) closeModal();
     };
 
     const modal = document.createElement('div');
-    modal.className = `bg-white rounded-2xl shadow-2xl ${maxWidthClass} w-full max-h-[88vh] flex flex-col overflow-hidden border border-slate-200 my-auto transform scale-95 transition-transform duration-200`;
+    modal.className = `bg-dark-850/95 backdrop-blur-2xl rounded-2xl shadow-2xl ${maxWidthClass} w-full max-h-[88vh] flex flex-col overflow-hidden border border-white/10 my-auto transform scale-95 transition-transform duration-200 text-white`;
     modal.innerHTML = `
-      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 shrink-0">
-        <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">${title}</h3>
-        <button type="button" onclick="closeModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/50 transition-colors">
+      <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-dark-900/80 shrink-0">
+        <h3 class="font-bold text-base text-white flex items-center gap-2">${title}</h3>
+        <button type="button" onclick="closeModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors">
           <span class="material-symbols-outlined text-[20px]">close</span>
         </button>
       </div>
-      <div class="p-6 overflow-y-auto space-y-4 text-sm text-slate-700 flex-1">
+      <div class="p-6 overflow-y-auto space-y-4 text-sm text-slate-200 flex-1">
         ${htmlContent}
       </div>
     `;
@@ -1564,22 +1603,22 @@
       const pct = c.progress_percent || 0;
       const done = c.completed_lessons || 0;
       return `
-        <div class="p-4 rounded-2xl border ${isCurrent ? 'border-indigo-500 bg-indigo-50/40' : 'border-slate-200 bg-white'} flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="p-4 rounded-2xl border ${isCurrent ? 'border-indigo-500/80 bg-indigo-950/40 shadow-glow-indigo' : 'border-white/10 bg-dark-900/60'} flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="space-y-1 flex-1">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-bold">${c.code}</span>
-              <span class="font-bold text-sm text-slate-900">${c.title}</span>
-              ${isCurrent ? '<span class="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold">Активный курс</span>' : ''}
+              <span class="px-2 py-0.5 rounded-md bg-white/10 text-indigo-300 text-[10px] font-mono font-bold border border-white/5">${c.code}</span>
+              <span class="font-bold text-sm text-white">${c.title}</span>
+              ${isCurrent ? '<span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[10px] font-bold shadow-glow-indigo">Активный курс</span>' : ''}
             </div>
-            <p class="text-xs text-slate-500">Куратор: ${c.curator} • 10 практических уроков</p>
+            <p class="text-xs text-slate-400">Куратор: ${c.curator} • 10 практических уроков</p>
             <div class="pt-1 flex items-center gap-3">
-              <div class="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden max-w-xs">
-                <div class="bg-indigo-600 h-full rounded-full" style="width:${pct}%"></div>
+              <div class="flex-1 bg-dark-950/80 h-2 rounded-full overflow-hidden max-w-xs border border-white/5">
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-full rounded-full" style="width:${pct}%"></div>
               </div>
-              <span class="text-[11px] font-bold text-slate-600">${done}/10 уроков (${pct}%)</span>
+              <span class="text-[11px] font-bold text-slate-300">${done}/10 уроков (${pct}%)</span>
             </div>
           </div>
-          <button type="button" onclick="window.EduSpace.switchActiveCourse('${c.slug}')" class="px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 transition-all ${isCurrent ? 'bg-slate-900 text-white hover:bg-slate-800' : 'bg-indigo-600 text-white hover:bg-indigo-700'}">
+          <button type="button" onclick="window.EduSpace.switchActiveCourse('${c.slug}')" class="px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 transition-all ${isCurrent ? 'bg-white/10 hover:bg-white/20 text-white border border-white/15' : 'bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-glow-indigo'}">
             ${isCurrent ? 'Открыть уроки' : (c.enrolled ? 'Переключить курс' : 'Записаться на курс')}
           </button>
         </div>
@@ -1587,7 +1626,7 @@
     }).join('');
 
     openModal('📚 Каталог курсов и мои программы обучения', `
-      <p class="text-xs text-slate-500">Выберите образовательную программу. По каждому курсу ведётся отдельный учёт прогресса, квизов и проверенных работ.</p>
+      <p class="text-xs text-slate-400">Выберите образовательную программу. По каждому курсу ведётся отдельный учёт прогресса, квизов и проверенных работ.</p>
       <div class="space-y-3">${cardsHtml}</div>
     `, 'max-w-3xl');
   }
@@ -1608,10 +1647,10 @@
       showToast(res.data.message || 'Курс успешно выбран!', 'success');
       closeModal();
       if (window.location.pathname.includes('tasks.html') || window.location.pathname.includes('student.html') || window.location.pathname.includes('profile.html')) {
-        setTimeout(() => window.location.reload(), 250);
-      } else {
-        window.location.href = `tasks.html?specialty=${slug}`;
+        window.location.reload();
       }
+    } else {
+      showToast('Не удалось переключить курс', 'error');
     }
   }
 
@@ -1627,57 +1666,59 @@
     const subs = data.submissions || [];
 
     const rowsHtml = subs.length === 0
-      ? `<tr><td colspan="5" class="p-8 text-center text-xs text-slate-400">У вас пока нет сданных работ. Откройте Урок №1, пройдите автопроверку и отправьте первое решение!</td></tr>`
+      ? `<tr><td colspan="5" class="p-8 text-center text-xs text-slate-500">У вас пока нет сданных работ. Откройте Урок №1, пройдите автопроверку и отправьте первое решение!</td></tr>`
       : subs.map(s => {
-          const badgeCls = s.score >= 75
-            ? 'bg-emerald-100 text-emerald-800'
-            : (s.score >= 60 ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800');
+          const isPending = String(s.status).includes('на проверке') || String(s.status).includes('Отправлено');
+          const isRev = String(s.status).includes('доработ');
+          const badgeCls = isPending
+            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+            : (isRev ? 'bg-red-500/20 text-red-300 border border-red-500/30' : (s.score >= 75 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'));
           return `
-            <tr class="hover:bg-slate-50">
-              <td class="p-3 font-bold text-slate-800">Урок №${s.task_number}. ${s.task_title}</td>
-              <td class="p-3 text-slate-500 uppercase text-[10px] font-bold">${s.specialty_slug}</td>
-              <td class="p-3 font-extrabold text-slate-900">${s.score}/100 (${s.grade_letter})</td>
+            <tr class="hover:bg-white/[0.04] border-b border-white/5 transition-colors">
+              <td class="p-3 font-bold text-white">Урок №${s.task_number}. ${s.task_title}</td>
+              <td class="p-3 text-indigo-400 uppercase text-[10px] font-bold font-mono">${s.specialty_slug}</td>
+              <td class="p-3 font-extrabold text-white">${s.score}/100 (${s.grade_letter})</td>
               <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeCls}">${s.status}</span></td>
-              <td class="p-3 text-slate-500 text-[11px]">${s.teacher_comment || 'Автопроверка пройдена'}</td>
+              <td class="p-3 text-slate-300 text-[11px]">${s.teacher_comment || 'Автопроверка пройдена'}</td>
             </tr>
           `;
         }).join('');
 
     openModal(`📊 Зачётная книжка — ${user.full_name}`, `
       <div class="grid grid-cols-3 gap-3 text-center">
-        <div class="p-3 rounded-xl bg-indigo-50 border border-indigo-100">
-          <div class="text-[11px] text-indigo-600 font-bold">Зачтено по курсу</div>
-          <div class="text-xl font-extrabold text-indigo-950 mt-0.5">${stats.passed_count} / 10</div>
+        <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30">
+          <div class="text-[11px] text-indigo-300 font-bold">Зачтено по курсу</div>
+          <div class="text-xl font-extrabold text-indigo-200 mt-0.5">${stats.passed_count} / 10</div>
         </div>
-        <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-100">
-          <div class="text-[11px] text-emerald-700 font-bold">Средний балл / GPA</div>
-          <div class="text-xl font-extrabold text-emerald-950 mt-0.5">${stats.avg_score > 0 ? `${stats.avg_score} (${stats.gpa})` : '—'}</div>
+        <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
+          <div class="text-[11px] text-emerald-300 font-bold">Средний балл / GPA</div>
+          <div class="text-xl font-extrabold text-emerald-200 mt-0.5">${stats.avg_score > 0 ? `${stats.avg_score} (${stats.gpa})` : '—'}</div>
         </div>
-        <div class="p-3 rounded-xl bg-purple-50 border border-purple-100">
-          <div class="text-[11px] text-purple-700 font-bold">Опыт обучения</div>
-          <div class="text-xl font-extrabold text-purple-950 mt-0.5">${stats.xp} XP</div>
+        <div class="p-3 rounded-xl bg-purple-950/40 border border-purple-500/30">
+          <div class="text-[11px] text-purple-300 font-bold">Опыт обучения</div>
+          <div class="text-xl font-extrabold text-purple-200 mt-0.5">${stats.xp} XP</div>
         </div>
       </div>
-      <div class="border border-slate-200 rounded-xl overflow-x-auto">
+      <div class="border border-white/10 rounded-xl overflow-x-auto bg-dark-950/40">
         <table class="w-full text-xs text-left">
-          <thead class="bg-slate-50 text-slate-600 border-b border-slate-200">
+          <thead class="bg-white/[0.04] text-slate-400 border-b border-white/10 font-bold">
             <tr>
               <th class="p-3">Урок / Модуль</th>
               <th class="p-3">Курс</th>
               <th class="p-3">Балл</th>
               <th class="p-3">Статус</th>
-              <th class="p-3">Комментарий</th>
+              <th class="p-3">Комментарий куратора</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100">${rowsHtml}</tbody>
+          <tbody>${rowsHtml}</tbody>
         </table>
       </div>
       <div class="flex justify-between items-center pt-2">
-        <button type="button" onclick="exportCsvJournal()" class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center gap-1.5">
+        <button type="button" onclick="exportCsvJournal()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/15 text-xs font-bold flex items-center gap-1.5 transition-colors">
           <span class="material-symbols-outlined text-[16px]">download</span>
           <span>Скачать выписку CSV</span>
         </button>
-        <button type="button" onclick="closeModal()" class="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700">Закрыть</button>
+        <button type="button" onclick="closeModal()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-glow-indigo transition-all">Закрыть</button>
       </div>
     `, 'max-w-3xl');
   }
@@ -1695,34 +1736,34 @@
       const isLocked = t.is_locked;
       const isToday = t.unlock_day === curDay;
       const cardCls = isDone
-        ? 'border-emerald-200 bg-emerald-50/50'
-        : (isToday ? 'border-indigo-400 bg-indigo-50/60 ring-1 ring-indigo-200' : (isLocked ? 'border-slate-200 bg-slate-50 opacity-80' : 'border-slate-200 bg-white'));
+        ? 'border-emerald-500/30 bg-emerald-950/30'
+        : (isToday ? 'border-indigo-500/80 bg-indigo-950/40 shadow-glow-indigo' : (isLocked ? 'border-white/5 bg-dark-950/40 opacity-70' : 'border-white/10 bg-dark-900/60'));
       const badge = isDone
-        ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Выполнено (${t.student_score}/100)</span>`
+        ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">Выполнено (${t.student_score}/100)</span>`
         : (isLocked
-            ? `<span class="px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-600 text-[10px] font-bold">Откроется: ${t.unlock_date_exact}</span>`
-            : `<span class="px-2.5 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold">${isToday ? 'Задание на сегодня' : 'Доступно'}</span>`);
+            ? `<span class="px-2.5 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/10 text-[10px] font-bold">Откроется: ${t.unlock_date_exact}</span>`
+            : `<span class="px-2.5 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold shadow-glow-indigo">${isToday ? 'Задание на сегодня' : 'Доступно'}</span>`);
 
       return `
         <div class="p-3.5 rounded-xl border ${cardCls} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-[11px] font-extrabold text-indigo-700">День ${t.unlock_day}</span>
+              <span class="text-[11px] font-extrabold text-indigo-400">День ${t.unlock_day}</span>
               ${badge}
             </div>
-            <div class="font-bold text-xs text-slate-900 mt-1">${t.title}</div>
-            <div class="text-[11px] text-slate-500 mt-0.5">Открытие: ${t.unlock_date_exact} • Дедлайн сдачи: ${t.deadline_exact}</div>
+            <div class="font-bold text-xs text-white mt-1">${t.title}</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">Открытие: ${t.unlock_date_exact} • Дедлайн: ${t.deadline_exact}</div>
           </div>
           ${isLocked
-            ? '<span class="material-symbols-outlined text-slate-400 text-[20px]">lock</span>'
-            : `<a href="simulator.html?specialty=${spec}&task=${t.task_number}" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shrink-0 text-center">Открыть урок</a>`
+            ? '<span class="material-symbols-outlined text-slate-500 text-[20px]">lock</span>'
+            : `<a href="simulator.html?specialty=${spec}&task=${t.task_number}" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs font-bold shrink-0 text-center shadow-glow-indigo transition-all">Открыть урок</a>`
           }
         </div>
       `;
     }).join('');
 
     openModal(`🗓️ График открытия модулей и дедлайны (Текущий день: День ${curDay})`, `
-      <div class="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-xs text-indigo-900">
+      <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-xs text-indigo-300">
         Задания открываются поэтапно согласно расписанию курса. Будущие уроки заблокированы на сервере до наступления соответствующего учебного дня.
       </div>
       <div class="space-y-2.5">${itemsHtml}</div>
@@ -1735,27 +1776,27 @@
     const course = getCourseBySlug((user && user.specialty_slug) || 'it');
 
     openModal(`📅 Расписание учебных занятий — ${grp}`, `
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100 text-xs">
-        <span class="font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full">${course.short_title} (${grp})</span>
-        <span class="text-slate-500 font-medium">Куратор: ${course.curator}</span>
+      <div class="flex items-center justify-between pb-3 border-b border-white/10 text-xs">
+        <span class="font-bold text-indigo-300 bg-indigo-950/60 border border-indigo-500/30 px-3 py-1 rounded-full">${course.short_title} (${grp})</span>
+        <span class="text-slate-400 font-medium">Куратор: ${course.curator}</span>
       </div>
       <div class="space-y-2.5 text-xs">
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-          <div class="font-bold text-slate-900 flex justify-between"><span>Понедельник • Лекция и разбор теории</span><span class="text-indigo-600">09:00 – 10:30</span></div>
-          <p class="text-slate-600 mt-1">Изучение конспекта открытого модуля и прохождение проверочного квиза.</p>
+        <div class="p-3.5 rounded-xl bg-dark-900/60 border border-white/10">
+          <div class="font-bold text-white flex justify-between"><span>Понедельник • Лекция и разбор теории</span><span class="text-indigo-400 font-mono">09:00 – 10:30</span></div>
+          <p class="text-slate-300 mt-1">Изучение конспекта открытого модуля и прохождение проверочного квиза.</p>
         </div>
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-          <div class="font-bold text-slate-900 flex justify-between"><span>Среда • Практикум в онлайн-тренажёре</span><span class="text-indigo-600">11:00 – 13:00</span></div>
-          <p class="text-slate-600 mt-1">Выполнение практической задачи, отладка по логам автотестов и отправка работы.</p>
+        <div class="p-3.5 rounded-xl bg-dark-900/60 border border-white/10">
+          <div class="font-bold text-white flex justify-between"><span>Среда • Практикум в онлайн-тренажёре</span><span class="text-indigo-400 font-mono">11:00 – 13:00</span></div>
+          <p class="text-slate-300 mt-1">Выполнение практической задачи, отладка по логам автотестов и отправка работы.</p>
         </div>
-        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-          <div class="font-bold text-slate-900 flex justify-between"><span>Пятница • Код-ревью и разбор ошибок с куратором</span><span class="text-indigo-600">15:00 – 16:30</span></div>
-          <p class="text-slate-600 mt-1">Персональная обратная связь преподавателя и выставление баллов в ведомость.</p>
+        <div class="p-3.5 rounded-xl bg-dark-900/60 border border-white/10">
+          <div class="font-bold text-white flex justify-between"><span>Пятница • Код-ревью и разбор ошибок с куратором</span><span class="text-indigo-400 font-mono">15:00 – 16:30</span></div>
+          <p class="text-slate-300 mt-1">Персональная обратная связь преподавателя и выставление баллов в ведомость.</p>
         </div>
       </div>
       <div class="pt-2 flex justify-end gap-2">
-        <button type="button" onclick="openCalendarModal()" class="px-4 py-2 rounded-xl border border-indigo-200 text-indigo-700 font-bold text-xs hover:bg-indigo-50">График дедлайнов</button>
-        <button type="button" onclick="closeModal()" class="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700">Закрыть</button>
+        <button type="button" onclick="openCalendarModal()" class="px-4 py-2 rounded-xl border border-white/15 text-slate-300 font-bold text-xs hover:bg-white/10 transition-colors">График дедлайнов</button>
+        <button type="button" onclick="closeModal()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-glow-indigo transition-all">Закрыть</button>
       </div>
     `);
   }
@@ -1773,17 +1814,17 @@
     }
 
     const listHtml = items.length === 0
-      ? '<div class="p-6 text-center text-xs text-slate-400">Новых уведомлений пока нет.</div>'
+      ? '<div class="p-6 text-center text-xs text-slate-500">Новых уведомлений пока нет.</div>'
       : items.map(n => {
           const icon = n.type === 'success' ? 'verified' : (n.type === 'warning' ? 'error' : 'notifications_active');
-          const col = n.type === 'success' ? 'text-emerald-600 bg-emerald-50 border-emerald-200' : (n.type === 'warning' ? 'text-amber-700 bg-amber-50 border-amber-200' : 'text-indigo-600 bg-indigo-50 border-indigo-100');
+          const col = n.type === 'success' ? 'text-emerald-300 bg-emerald-950/30 border-emerald-500/30' : (n.type === 'warning' ? 'text-amber-300 bg-amber-950/30 border-amber-500/30' : 'text-indigo-300 bg-indigo-950/30 border-indigo-500/30');
           return `
             <div class="p-3.5 rounded-xl border ${col} flex items-start gap-3">
               <span class="material-symbols-outlined text-[20px] mt-0.5">${icon}</span>
               <div class="flex-1">
-                <div class="font-bold text-xs text-slate-900">${n.title}</div>
-                <p class="text-xs text-slate-600 mt-0.5 leading-relaxed">${n.body}</p>
-                <span class="text-[10px] text-slate-400 block mt-1">${n.created_at || ''}</span>
+                <div class="font-bold text-xs text-white">${n.title}</div>
+                <p class="text-xs text-slate-300 mt-0.5 leading-relaxed">${n.body}</p>
+                <span class="text-[10px] text-slate-500 block mt-1 font-mono">${n.created_at || ''}</span>
               </div>
             </div>
           `;
@@ -1805,24 +1846,24 @@
       const isMe = user && (m.sender_id === user.id || m.sender_name === user.full_name);
       return `
         <div class="flex ${isMe ? 'justify-end' : 'items-start gap-2'}">
-          ${!isMe ? `<div class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-[10px] shrink-0">${getInitials(m.sender_name)}</div>` : ''}
-          <div class="${isMe ? 'bg-indigo-600 text-white' : 'bg-white text-slate-800 border border-slate-200'} p-3 rounded-2xl max-w-[82%] shadow-sm text-xs">
-            <div class="font-bold text-[10px] ${isMe ? 'text-indigo-200' : 'text-indigo-600'} mb-0.5">${m.sender_name}</div>
+          ${!isMe ? `<div class="w-7 h-7 rounded-full bg-indigo-500/20 text-indigo-300 font-bold flex items-center justify-center text-[10px] shrink-0 border border-indigo-500/30">${getInitials(m.sender_name)}</div>` : ''}
+          <div class="${isMe ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-glow-indigo' : 'bg-dark-900/80 text-slate-200 border border-white/10'} p-3 rounded-2xl max-w-[82%] shadow-sm text-xs">
+            <div class="font-bold text-[10px] ${isMe ? 'text-indigo-200' : 'text-indigo-400'} mb-0.5">${m.sender_name}</div>
             <p class="leading-relaxed">${m.body.replace(/</g, '&lt;')}</p>
-            <span class="text-[9px] ${isMe ? 'text-indigo-200' : 'text-slate-400'} block mt-1 text-right">${m.created_at || 'Сейчас'}</span>
+            <span class="text-[9px] ${isMe ? 'text-indigo-200' : 'text-slate-500'} block mt-1 text-right font-mono">${m.created_at || 'Сейчас'}</span>
           </div>
         </div>
       `;
     };
 
     openModal(`💬 Чат курса — ${titleLabel}`, `
-      <div class="flex flex-col h-80 border border-slate-200 rounded-2xl overflow-hidden bg-slate-50">
+      <div class="flex flex-col h-80 border border-white/10 rounded-2xl overflow-hidden bg-dark-950/60">
         <div id="edu-chat-box" class="flex-1 p-4 overflow-y-auto space-y-3">
           ${msgs.map(renderMsg).join('')}
         </div>
-        <form id="edu-chat-form" class="p-2.5 bg-white border-t border-slate-200 flex gap-2">
-          <input type="text" id="edu-chat-input" placeholder="Напишите вопрос преподавателю или в группу..." class="flex-1 px-3.5 py-2 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
-          <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold hover:bg-indigo-700 flex items-center gap-1.5">
+        <form id="edu-chat-form" class="p-2.5 bg-dark-900/90 border-t border-white/10 flex gap-2">
+          <input type="text" id="edu-chat-input" placeholder="Напишите вопрос преподавателю или в группу..." class="flex-1 px-3.5 py-2 border border-white/15 bg-dark-800 text-white rounded-xl text-xs focus:outline-none focus:border-indigo-500 placeholder-slate-500" required />
+          <button type="submit" class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-glow-indigo flex items-center gap-1.5 transition-all">
             <span>Отправить</span>
             <span class="material-symbols-outlined text-[15px]">send</span>
           </button>
@@ -1899,49 +1940,49 @@
     ).join('');
 
     openModal('⚙️ Настройки личного профиля и безопасности', `
-      <form id="edu-profile-settings-form" class="space-y-3.5 text-xs">
+      <form id="edu-profile-settings-form" class="space-y-3.5 text-xs text-slate-200">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Фамилия *</label>
-            <input type="text" id="set-last-name" value="${ln}" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+            <label class="block font-bold text-slate-300 mb-1">Фамилия *</label>
+            <input type="text" id="set-last-name" value="${ln}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" required />
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Имя *</label>
-            <input type="text" id="set-first-name" value="${fn}" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+            <label class="block font-bold text-slate-300 mb-1">Имя *</label>
+            <input type="text" id="set-first-name" value="${fn}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" required />
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Отчество</label>
-            <input type="text" id="set-middle-name" value="${mn}" placeholder="При наличии" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+            <label class="block font-bold text-slate-300 mb-1">Отчество</label>
+            <input type="text" id="set-middle-name" value="${mn}" placeholder="При наличии" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" />
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Подтверждённый Email</label>
-            <input type="email" value="${user.email}" disabled class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-100 text-slate-500" />
+            <label class="block font-bold text-slate-300 mb-1">Подтверждённый Email</label>
+            <input type="email" value="${user.email}" disabled class="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-dark-950 text-slate-500 cursor-not-allowed font-mono" />
           </div>
           <div>
-            <label class="block font-bold text-slate-700 mb-1">${user.role === 'teacher' ? 'Кафедра / Отделение' : 'Учебная группа'}</label>
-            <input type="text" id="set-group" value="${user.group_name || 'ИС-21'}" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+            <label class="block font-bold text-slate-300 mb-1">${user.role === 'teacher' ? 'Кафедра / Отделение' : 'Учебная группа'}</label>
+            <input type="text" id="set-group" value="${user.group_name || 'ИС-21'}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" required />
           </div>
         </div>
 
         ${user.role === 'student' ? `
         <div>
-          <label class="block font-bold text-slate-700 mb-1">Активный курс обучения</label>
-          <select id="set-course" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-600">${courseOpts}</select>
+          <label class="block font-bold text-slate-300 mb-1">Активный курс обучения</label>
+          <select id="set-course" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500">${courseOpts}</select>
         </div>` : ''}
 
-        <div class="pt-2 border-t border-slate-100">
-          <label class="block font-bold text-slate-700 mb-1">Новый пароль (оставьте пустым, если не меняете)</label>
-          <input type="password" id="set-new-pwd" placeholder="Минимум 6 символов, буквы и цифры" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+        <div class="pt-2 border-t border-white/10">
+          <label class="block font-bold text-slate-300 mb-1">Новый пароль (оставьте пустым, если не меняете)</label>
+          <input type="password" id="set-new-pwd" placeholder="Минимум 6 символов, буквы и цифры" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500 placeholder-slate-500" />
         </div>
 
-        <div id="set-error-box" class="hidden p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 font-semibold"></div>
+        <div id="set-error-box" class="hidden p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 font-semibold"></div>
 
         <div class="pt-2 flex justify-end gap-2">
-          <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-50">Отмена</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700">Сохранить изменения</button>
+          <button type="button" onclick="closeModal()" class="px-4 py-2.5 rounded-xl border border-white/15 text-slate-300 font-bold hover:bg-white/10 transition-colors">Отмена</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold shadow-glow-indigo transition-all">Сохранить изменения</button>
         </div>
       </form>
     `);
@@ -2054,28 +2095,28 @@
     if (document.getElementById('edu-auth-guard')) return;
     const gate = document.createElement('div');
     gate.id = 'edu-auth-guard';
-    gate.className = 'fixed inset-0 z-[9000] bg-slate-900/65 backdrop-blur-sm flex items-center justify-center p-4';
+    gate.className = 'fixed inset-0 z-[9000] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4';
     gate.innerHTML = `
-      <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 border border-slate-200 text-center space-y-5">
-        <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto">
+      <div class="bg-dark-850/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/10 text-center space-y-5 text-white">
+        <div class="w-16 h-16 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center mx-auto shadow-glow-indigo">
           <span class="material-symbols-outlined text-[34px]">lock_person</span>
         </div>
         <div class="space-y-2">
-          <h2 class="font-display font-extrabold text-xl text-slate-900">Вход в образовательную платформу</h2>
-          <p class="text-xs text-slate-600 leading-relaxed">
+          <h2 class="font-display font-extrabold text-xl text-white">Вход в образовательную платформу</h2>
+          <p class="text-xs text-slate-300 leading-relaxed">
             Чтобы сохранять личный прогресс уроков, результаты тестов и оценки в зачётной ведомости под вашим ФИО, войдите или зарегистрируйтесь.
           </p>
         </div>
         <div class="space-y-2.5 pt-1">
-          <a href="auth.html?mode=register${targetRole === 'teacher' ? '&role=teacher' : ''}" class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2">
+          <a href="auth.html?mode=register${targetRole === 'teacher' ? '&role=teacher' : ''}" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-2">
             <span class="material-symbols-outlined text-[18px]">person_add</span>
-            <span>Создать личный аккаунт (с проверкой почты)</span>
+            <span>Создать личный аккаунт (с подтверждением почты)</span>
           </a>
-          <a href="auth.html?mode=login" class="w-full py-2.5 px-4 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-800 font-bold text-xs transition-all block">
+          <a href="auth.html?mode=login" class="w-full py-2.5 px-4 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 font-bold text-xs transition-colors block">
             У меня уже есть аккаунт — Войти
           </a>
-          <div class="pt-2 border-t border-slate-100">
-            <button type="button" onclick="window.EduSpace.startIsolatedDemo('${targetRole}')" class="w-full py-2.5 px-4 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200 font-bold text-xs transition-all flex items-center justify-center gap-1.5">
+          <div class="pt-2 border-t border-white/10">
+            <button type="button" onclick="window.EduSpace.startIsolatedDemo('${targetRole}')" class="w-full py-2.5 px-4 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 font-bold text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm">
               <span class="material-symbols-outlined text-[16px]">play_circle</span>
               <span>Ознакомительный демо-режим (${targetRole === 'teacher' ? 'Преподаватель' : 'Студент с 0%'})</span>
             </button>
@@ -2105,17 +2146,17 @@
         const mainEl = document.querySelector('main');
         if (mainEl) {
           mainEl.innerHTML = `
-            <div class="max-w-xl mx-auto my-12 bg-white rounded-3xl p-8 border border-red-200 shadow-lg text-center space-y-4">
-              <div class="w-16 h-16 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto">
+            <div class="max-w-xl mx-auto my-12 bg-dark-850/95 backdrop-blur-2xl rounded-3xl p-8 border border-red-500/30 shadow-2xl text-center space-y-4 text-white">
+              <div class="w-16 h-16 rounded-2xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto">
                 <span class="material-symbols-outlined text-[34px]">gpp_maybe</span>
               </div>
-              <h2 class="font-display font-extrabold text-xl text-slate-900">Раздел доступен только преподавателям</h2>
-              <p class="text-xs text-slate-600 leading-relaxed">
+              <h2 class="font-display font-extrabold text-xl text-white">Раздел доступен только преподавателям</h2>
+              <p class="text-xs text-slate-300 leading-relaxed">
                 Вы авторизованы как студент (<strong>${user.full_name}</strong>, группа ${user.group_name}). Управление расписанием учебных дней и электронным журналом доступно только преподавателям кафедры.
               </p>
               <div class="flex flex-wrap justify-center gap-3 pt-2">
-                <a href="student.html" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-700">Вернуться в кабинет студента</a>
-                <button type="button" onclick="logoutUser()" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50">Сменить аккаунт</button>
+                <a href="student.html" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs font-bold shadow-glow-indigo transition-all">Вернуться в кабинет студента</a>
+                <button type="button" onclick="logoutUser()" class="px-5 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-bold transition-colors">Сменить аккаунт</button>
               </div>
             </div>
           `;

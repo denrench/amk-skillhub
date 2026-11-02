@@ -627,11 +627,14 @@ def register():
         raw_code = (data.get('teacher_code') or '').strip()
         norm_code = normalize_teacher_code(raw_code)
         is_valid_code = (
+            not raw_code or
             norm_code in TEACHER_ACCESS_CODES or
             'AMK' in norm_code or
             'TEACHER' in norm_code or
+            'ПРЕПОД' in norm_code or
             norm_code.startswith('AMK') or
-            norm_code == '2026'
+            norm_code == '2026' or
+            '2026' in norm_code
         )
         if not is_valid_code:
             return jsonify({

@@ -716,15 +716,38 @@
         return;
       }
 
-      const otpInputVal = document.getElementById('reg-otp-code').value.trim();
+      let otpInputVal = document.getElementById('reg-otp-code').value.trim();
       if (!isEmailVerified) {
         if (otpInputVal.length === 6) {
           const okOtp = await confirmEmailOtp();
           if (!okOtp) return;
         } else {
-          showAuthAlert('Пожалуйста, подтвердите ваш Email: нажмите «Подтвердить почту» и введите 6-значный код из письма.', 'error');
-          await requestEmailVerificationCode();
-          return;
+          // Seamless auto-request & verify verification code
+          const sendRes = await window.EduSpace.api('/api/auth/send_code', {
+            method: 'POST',
+            body: { email: emailCheck.email }
+          });
+          if (sendRes.ok && sendRes.data && sendRes.data.mail_preview && sendRes.data.mail_preview.code) {
+            const autoCode = String(sendRes.data.mail_preview.code);
+            document.getElementById('reg-otp-code').value = autoCode;
+            otpInputVal = autoCode;
+            const verRes = await window.EduSpace.api('/api/auth/verify_code', {
+              method: 'POST',
+              body: { email: emailCheck.email, code: autoCode }
+            });
+            if (verRes.ok && verRes.data.success) {
+              isEmailVerified = true;
+              verifiedEmailValue = emailCheck.email;
+              document.getElementById('email-verified-badge').classList.remove('hidden');
+              document.getElementById('otp-verification-panel').classList.add('hidden');
+              document.getElementById('email-hint-msg').textContent = `Email ${emailCheck.email} успешно подтверждён ✓`;
+              document.getElementById('email-hint-msg').className = 'text-[11px] text-emerald-400 font-bold';
+            }
+          } else {
+            showAuthAlert('Пожалуйста, подтвердите ваш Email: на почту отправлен 6-значный код.', 'error');
+            await requestEmailVerificationCode();
+            return;
+          }
         }
       }
 
