@@ -1,156 +1,193 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="h-full scroll-smooth">
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Вход и регистрация — EDU SPACE | Образовательная платформа курсов</title>
+  <title>Вход и регистрация — EDU SPACE | Цифровая образовательная платформа АМК</title>
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg"/>
-  <link href="https://fonts.googleapis.com" rel="preconnect"/>
-  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
+
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: "class",
+      darkMode: 'class',
       theme: {
         extend: {
-          colors: {
-            primary: "#4F46E5",
-            "primary-container": "#4338CA",
-            secondary: "#7C3AED",
-            surface: "#F8FAFC",
-            "surface-container": "#F1F5F9",
-            "surface-container-high": "#E2E8F0",
-            "surface-container-lowest": "#FFFFFF",
-            "on-surface": "#0F172A",
-            "on-surface-variant": "#475569"
-          },
           fontFamily: {
-            sans: ["Inter", "sans-serif"],
-            display: ["Manrope", "sans-serif"]
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b'
+            },
+            dark: {
+              950: '#07090e',
+              900: '#0b0f19',
+              850: '#101524',
+              800: '#161c2e',
+              700: '#1e263d',
+              600: '#2a3452'
+            }
+          },
+          boxShadow: {
+            'glow-indigo': '0 0 50px -10px rgba(99, 102, 241, 0.35)',
+            'glow-purple': '0 0 50px -10px rgba(168, 85, 247, 0.35)',
+            'glow-cyan': '0 0 50px -10px rgba(6, 182, 212, 0.35)',
+            'glow-amber': '0 0 50px -10px rgba(245, 158, 11, 0.35)'
           }
         }
       }
     };
   </script>
+
   <style>
-    html {
-      scroll-behavior: smooth;
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-    }
-    body {
-      min-height: 100vh;
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      scrollbar-width: thin;
-      scrollbar-color: #6366f1 #f1f5f9;
+    .bg-grid-white {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+      background-size: 32px 32px;
     }
     ::-webkit-scrollbar {
       width: 8px;
-      height: 8px;
-      display: block !important;
     }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a3452;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6366f1;
+    }
   </style>
+
   <script src="js/courses-catalog.js"></script>
   <script src="js/app-logistics.js"></script>
 </head>
-<body class="bg-surface font-sans text-on-surface antialiased min-h-screen flex flex-col justify-between">
+<body class="font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
+
+  <!-- Ambient background glow orbs -->
+  <div class="fixed -top-40 left-1/4 w-96 h-96 bg-indigo-600/15 rounded-full blur-[130px] pointer-events-none"></div>
+  <div class="fixed -bottom-40 right-1/4 w-96 h-96 bg-purple-600/15 rounded-full blur-[130px] pointer-events-none"></div>
 
   <!-- TOP HEADER -->
-  <header class="w-full h-20 bg-white/90 backdrop-blur-md border-b border-slate-200 z-50 sticky top-0">
-    <div class="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-3">
-        <img alt="EDU SPACE Logo" width="32" height="32" class="h-8 w-8 shrink-0 object-contain" src="assets/eduspace-logo.svg"/>
+  <header class="w-full h-20 bg-dark-900/80 backdrop-blur-xl border-b border-white/10 z-50 sticky top-0 transition-all">
+    <div class="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+      
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-3.5 group">
+        <div class="relative w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-glow-indigo transition-transform group-hover:scale-105">
+          <div class="w-full h-full bg-dark-900 rounded-[14px] flex items-center justify-center">
+            <img alt="EDU SPACE Logo" width="24" height="24" class="h-6 w-6 object-contain" src="assets/eduspace-logo.svg"/>
+          </div>
+        </div>
         <div class="flex flex-col">
-          <span class="font-display font-bold text-lg text-slate-900 leading-none">EDU SPACE</span>
-          <span class="text-[10px] font-semibold text-indigo-600 tracking-wider uppercase mt-1">АМК Колледж</span>
+          <span class="font-extrabold text-lg text-white tracking-tight flex items-center gap-1.5">
+            EDU SPACE <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">АМК</span>
+          </span>
+          <span class="text-[11px] font-medium text-slate-400">Цифровая образовательная платформа</span>
         </div>
       </a>
 
-      <a href="index.html" class="text-xs font-bold text-slate-600 hover:text-indigo-600 flex items-center gap-1.5 transition-colors">
+      <!-- Back Link -->
+      <a href="index.html" class="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 text-xs font-semibold flex items-center gap-2 transition-all">
         <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-        <span>Вернуться на главную</span>
+        <span class="hidden sm:inline">Вернуться на главную</span>
+        <span class="sm:hidden">Главная</span>
       </a>
     </div>
   </header>
 
   <!-- MAIN CONTAINER -->
-  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-10 flex items-center justify-center">
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex items-center justify-center relative z-10">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full max-w-6xl items-start">
 
       <!-- LEFT COLUMN: BRAND & DEMO ACCESS CARD -->
-      <div class="lg:col-span-5 bg-gradient-to-br from-indigo-700 via-indigo-800 to-purple-900 text-white rounded-3xl p-8 sm:p-9 shadow-xl space-y-6 relative overflow-hidden lg:sticky lg:top-28">
-        <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="lg:col-span-5 bg-dark-850/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 sm:p-9 shadow-2xl space-y-6 relative overflow-hidden lg:sticky lg:top-28">
+        <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="space-y-2.5 relative z-10">
-          <span class="inline-block px-3 py-1 rounded-full bg-white/15 text-[11px] font-bold uppercase tracking-wider backdrop-blur-sm">
-            Профессиональная LMS-платформа
+        <div class="space-y-3 relative z-10">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 text-[11px] font-bold uppercase tracking-wider backdrop-blur-sm">
+            <span class="material-symbols-outlined text-[14px]">school</span>
+            <span>Профессиональная LMS АМК</span>
           </span>
-          <h1 class="font-display font-extrabold text-2xl sm:text-3xl leading-tight">
-            Обучение по курсам с реальной проверкой знаний
+          <h1 class="font-extrabold text-2xl sm:text-3xl leading-tight text-white">
+            Обучение по специальностям с <span class="bg-gradient-to-r from-indigo-400 via-purple-300 to-cyan-300 bg-clip-text text-transparent">реальной проверкой</span>
           </h1>
-          <p class="text-indigo-100 text-xs sm:text-sm leading-relaxed">
-            Создайте личный кабинет с подтверждённой почтой и реальным ФИО. Проходите теорию, интерактивные квизы и практические тренажёры с автотестами и рецензией преподавателя.
+          <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+            Создайте личный кабинет с подтверждённым Email и реальным ФИО. Проходите теорию, проверочные тесты и сдавайте тренажёры на рецензию преподавателю кафедры.
           </p>
         </div>
 
-        <div class="space-y-3 pt-1 text-xs relative z-10">
+        <div class="space-y-3 pt-1 text-xs relative z-10 text-slate-300">
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-[18px] text-emerald-300">mark_email_read</span>
+            <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px] text-emerald-400">mark_email_read</span>
             </div>
-            <span>Обязательная проверка ФИО и подтверждение Email по 6-значному коду</span>
+            <span>Обязательная верификация ФИО и подтверждение Email по 6-значному коду</span>
           </div>
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-[18px] text-emerald-300">lock_clock</span>
+            <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px] text-indigo-400">lock_clock</span>
             </div>
-            <span>Поэтапное открытие модулей по учебному графику (без списывания за 1 день)</span>
+            <span>Поэтапное открытие модулей по учебному графику колледжа</span>
           </div>
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-[18px] text-emerald-300">workspace_premium</span>
+            <div class="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px] text-cyan-400">workspace_premium</span>
             </div>
-            <span>Персональная зачётная ведомость, расчёт GPA и именной сертификат</span>
+            <span>Электронная ведомость, расчёт GPA и цифровой сертификат</span>
           </div>
         </div>
 
         <!-- ISOLATED 1-CLICK DEMO PANEL -->
-        <div class="pt-5 border-t border-white/20 space-y-2.5 relative z-10">
-          <div class="text-[11px] font-bold text-indigo-200 uppercase tracking-wider">
-            Ознакомительный демо-вход (изолированный аккаунт с 0%):
+        <div class="pt-5 border-t border-white/10 space-y-3 relative z-10">
+          <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px] text-amber-400">bolt</span>
+            <span>Ознакомительный демо-вход (0% прогресса):</span>
           </div>
-          <button type="button" onclick="window.EduSpace.startIsolatedDemo('student')" class="w-full py-2.5 px-4 bg-white text-indigo-700 hover:bg-indigo-50 font-bold rounded-xl text-xs shadow-md transition-all flex items-center justify-between">
-            <span class="flex items-center gap-2">
+          <button type="button" onclick="window.EduSpace.startIsolatedDemo('student')" class="w-full py-3 px-4 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold rounded-xl text-xs shadow-glow-indigo transition-all flex items-center justify-between group">
+            <span class="flex items-center gap-2.5">
               <span class="material-symbols-outlined text-[18px]">school</span>
               <span>Демо-студент (Старт с нуля — 0%)</span>
             </span>
-            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            <span class="material-symbols-outlined text-[16px] transition-transform group-hover:translate-x-1">arrow_forward</span>
           </button>
-          <button type="button" onclick="window.EduSpace.startIsolatedDemo('teacher')" class="w-full py-2.5 px-4 bg-indigo-900/60 hover:bg-indigo-900 text-white font-bold rounded-xl text-xs border border-white/25 transition-all flex items-center justify-between">
-            <span class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px]">co_present</span>
-              <span>Демо-преподаватель (Журнал и проверка)</span>
+          <button type="button" onclick="window.EduSpace.startIsolatedDemo('teacher')" class="w-full py-3 px-4 bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white font-bold rounded-xl text-xs border border-white/15 transition-all flex items-center justify-between group">
+            <span class="flex items-center gap-2.5">
+              <span class="material-symbols-outlined text-[18px] text-indigo-400">co_present</span>
+              <span>Демо-преподаватель (Ведомость и проверка)</span>
             </span>
-            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            <span class="material-symbols-outlined text-[16px] transition-transform group-hover:translate-x-1">arrow_forward</span>
           </button>
         </div>
       </div>
 
       <!-- RIGHT COLUMN: AUTHENTICATION & REGISTRATION CARD -->
-      <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-9 border border-slate-200/90 shadow-xl space-y-6">
+      <div class="lg:col-span-7 bg-dark-850/90 backdrop-blur-xl rounded-3xl p-6 sm:p-9 border border-white/10 shadow-2xl space-y-6 text-slate-100">
 
         <!-- Tab Switcher -->
-        <div class="flex items-center p-1.5 bg-slate-100 rounded-2xl">
-          <button type="button" id="tab-btn-login" onclick="switchAuthTab('login')" class="flex-1 py-2.5 rounded-xl font-bold text-xs bg-white text-indigo-600 shadow-sm transition-all">
+        <div class="flex items-center p-1 bg-dark-950/80 rounded-2xl border border-white/10">
+          <button type="button" id="tab-btn-login" onclick="switchAuthTab('login')" class="flex-1 py-2.5 rounded-xl font-bold text-xs bg-indigo-600 text-white shadow-glow-indigo transition-all">
             Вход в аккаунт
           </button>
-          <button type="button" id="tab-btn-register" onclick="switchAuthTab('register')" class="flex-1 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:text-slate-900 transition-all">
+          <button type="button" id="tab-btn-register" onclick="switchAuthTab('register')" class="flex-1 py-2.5 rounded-xl font-bold text-xs text-slate-400 hover:text-white transition-all">
             Регистрация на платформе
           </button>
         </div>
@@ -161,35 +198,35 @@
         <!-- ================= 1. LOGIN FORM ================= -->
         <form id="form-login" onsubmit="event.preventDefault(); submitLogin();" class="space-y-4">
           <div>
-            <label for="login-email" class="block text-xs font-bold text-slate-700 mb-1.5">Электронная почта</label>
+            <label for="login-email" class="block text-xs font-bold text-slate-300 mb-1.5">Электронная почта</label>
             <div class="relative">
-              <span class="material-symbols-outlined text-[18px] text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2">mail</span>
-              <input type="email" id="login-email" autocomplete="email" placeholder="Введите ваш email (например: name@mail.kz)" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+              <span class="material-symbols-outlined text-[18px] text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2">mail</span>
+              <input type="email" id="login-email" autocomplete="email" placeholder="Введите ваш email (например: name@mail.kz)" class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-dark-950/80 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors" required />
             </div>
           </div>
 
           <div>
             <div class="flex justify-between items-center mb-1.5">
-              <label for="login-password" class="block text-xs font-bold text-slate-700">Пароль</label>
-              <button type="button" onclick="openPasswordHelp()" class="text-[11px] text-indigo-600 hover:underline font-semibold">Забыли пароль?</button>
+              <label for="login-password" class="block text-xs font-bold text-slate-300">Пароль</label>
+              <button type="button" onclick="openPasswordHelp()" class="text-[11px] text-indigo-400 hover:text-indigo-300 hover:underline font-semibold">Забыли пароль?</button>
             </div>
             <div class="relative">
-              <span class="material-symbols-outlined text-[18px] text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2">lock</span>
-              <input type="password" id="login-password" autocomplete="current-password" placeholder="Введите пароль от аккаунта" class="w-full pl-10 pr-11 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
-              <button type="button" onclick="togglePwdVisibility('login-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+              <span class="material-symbols-outlined text-[18px] text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2">lock</span>
+              <input type="password" id="login-password" autocomplete="current-password" placeholder="Введите пароль от аккаунта" class="w-full pl-10 pr-11 py-2.5 rounded-xl bg-dark-950/80 border border-white/15 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors" required />
+              <button type="button" onclick="togglePwdVisibility('login-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
                 <span class="material-symbols-outlined text-[18px]">visibility</span>
               </button>
             </div>
           </div>
 
-          <button type="submit" id="btn-login-submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+          <button type="submit" id="btn-login-submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/40 text-white font-bold text-sm rounded-xl shadow-glow-indigo transition-all flex items-center justify-center gap-2 hover:scale-[1.01]">
             <span>Войти в личный кабинет</span>
             <span class="material-symbols-outlined text-[18px]">login</span>
           </button>
 
-          <p class="text-center text-xs text-slate-500 pt-1">
+          <p class="text-center text-xs text-slate-400 pt-1">
             Ещё нет личного аккаунта?
-            <button type="button" onclick="switchAuthTab('register')" class="text-indigo-600 font-bold hover:underline">Зарегистрироваться бесплатно</button>
+            <button type="button" onclick="switchAuthTab('register')" class="text-indigo-400 font-bold hover:underline ml-1">Зарегистрироваться бесплатно</button>
           </p>
         </form>
 
@@ -198,53 +235,53 @@
 
           <!-- Step A: Role Selection -->
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-2">1. Выберите тип аккаунта *</label>
+            <label class="block text-xs font-bold text-slate-300 mb-2">1. Выберите тип аккаунта *</label>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <label id="role-card-student" class="cursor-pointer p-3.5 rounded-2xl border-2 border-indigo-600 bg-indigo-50/50 flex items-center gap-3 transition-all">
-                <input type="radio" name="reg-role" value="student" checked onchange="onRoleChange(this.value)" class="text-indigo-600 focus:ring-indigo-600" />
+              <label id="role-card-student" class="cursor-pointer p-3.5 rounded-2xl border-2 border-indigo-500 bg-indigo-500/10 shadow-glow-indigo flex items-center gap-3 transition-all">
+                <input type="radio" name="reg-role" value="student" checked onchange="onRoleChange(this.value)" class="text-indigo-500 focus:ring-indigo-500" />
                 <div>
-                  <div class="font-bold text-xs text-slate-900">Я студент / слушатель курса</div>
-                  <div class="text-[11px] text-slate-500">Прохождение уроков, тестов и тренажёров</div>
+                  <div class="font-bold text-xs text-white">Я студент / слушатель курса</div>
+                  <div class="text-[11px] text-slate-400">Прохождение уроков, тестов и тренажёров</div>
                 </div>
               </label>
 
-              <label id="role-card-teacher" class="cursor-pointer p-3.5 rounded-2xl border border-slate-200 hover:border-slate-300 bg-white flex items-center gap-3 transition-all">
-                <input type="radio" name="reg-role" value="teacher" onchange="onRoleChange(this.value)" class="text-indigo-600 focus:ring-indigo-600" />
+              <label id="role-card-teacher" class="cursor-pointer p-3.5 rounded-2xl border border-white/10 bg-dark-950/40 hover:border-white/20 flex items-center gap-3 transition-all">
+                <input type="radio" name="reg-role" value="teacher" onchange="onRoleChange(this.value)" class="text-indigo-500 focus:ring-indigo-500" />
                 <div>
-                  <div class="font-bold text-xs text-slate-900">Я преподаватель / куратор</div>
-                  <div class="text-[11px] text-slate-500">Управление графиком, проверка и ведомость</div>
+                  <div class="font-bold text-xs text-white">Я преподаватель / куратор</div>
+                  <div class="text-[11px] text-slate-400">Управление графиком, проверка и ведомость</div>
                 </div>
               </label>
             </div>
           </div>
 
           <!-- Step B: Structured Mandatory FIO -->
-          <div class="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-3">
+          <div class="p-4 rounded-2xl bg-dark-950/60 border border-white/10 space-y-3">
             <div class="flex items-center justify-between flex-wrap gap-2">
-              <span class="text-xs font-bold text-slate-800">2. Полное ФИО (для журнала и сертификата) *</span>
-              <span id="fio-live-preview" class="text-[11px] font-semibold text-indigo-600">Заполните Фамилию и Имя</span>
+              <span class="text-xs font-bold text-slate-200">2. Полное ФИО (для ведомости и сертификата) *</span>
+              <span id="fio-live-preview" class="text-[11px] font-semibold text-indigo-400">Заполните Фамилию и Имя</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label for="reg-last-name" class="block text-[11px] font-bold text-slate-700 mb-1">Фамилия <span class="text-red-500">*</span></label>
-                <input type="text" id="reg-last-name" oninput="onFioInput()" placeholder="Оспанов" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+                <label for="reg-last-name" class="block text-[11px] font-bold text-slate-400 mb-1">Фамилия <span class="text-red-400">*</span></label>
+                <input type="text" id="reg-last-name" oninput="onFioInput()" placeholder="Оспанов" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" required />
               </div>
 
               <div>
-                <label for="reg-first-name" class="block text-[11px] font-bold text-slate-700 mb-1">Имя <span class="text-red-500">*</span></label>
-                <input type="text" id="reg-first-name" oninput="onFioInput()" placeholder="Адилет" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+                <label for="reg-first-name" class="block text-[11px] font-bold text-slate-400 mb-1">Имя <span class="text-red-400">*</span></label>
+                <input type="text" id="reg-first-name" oninput="onFioInput()" placeholder="Адилет" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" required />
               </div>
 
               <div>
-                <label for="reg-middle-name" class="block text-[11px] font-bold text-slate-700 mb-1">Отчество</label>
-                <input type="text" id="reg-middle-name" oninput="onFioInput()" placeholder="Серикович" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+                <label for="reg-middle-name" class="block text-[11px] font-bold text-slate-400 mb-1">Отчество</label>
+                <input type="text" id="reg-middle-name" oninput="onFioInput()" placeholder="Серикович" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
               </div>
             </div>
 
             <div class="flex items-center justify-between flex-wrap gap-2 pt-0.5">
-              <label class="inline-flex items-center gap-2 text-[11px] text-slate-600 cursor-pointer select-none">
-                <input type="checkbox" id="reg-no-middle" onchange="toggleNoMiddle(this.checked)" class="rounded text-indigo-600 focus:ring-indigo-600" />
+              <label class="inline-flex items-center gap-2 text-[11px] text-slate-400 cursor-pointer select-none">
+                <input type="checkbox" id="reg-no-middle" onchange="toggleNoMiddle(this.checked)" class="rounded bg-dark-900 border-white/20 text-indigo-500 focus:ring-indigo-500" />
                 <span>Нет отчества по документам</span>
               </label>
               <span id="fio-validation-msg" class="text-[11px] text-slate-500">Только буквы кириллицы или латиницы, без цифр</span>
@@ -254,8 +291,8 @@
           <!-- Step C: Course & Group (Student) OR Department & Code (Teacher) -->
           <div id="student-academic-fields" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div class="sm:col-span-2">
-              <label for="reg-course" class="block text-xs font-bold text-slate-700 mb-1">3. Выберите курс обучения <span class="text-red-500">*</span></label>
-              <select id="reg-course" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-600">
+              <label for="reg-course" class="block text-xs font-bold text-slate-300 mb-1">3. Выберите курс обучения <span class="text-red-400">*</span></label>
+              <select id="reg-course" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white text-xs sm:text-sm font-medium focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
                 <option value="it">06130100 — Программное обеспечение (Web Design)</option>
                 <option value="graphic_design">02130100 — Графический Дизайн</option>
                 <option value="autoelectric">07161301 — Автоэлектрики</option>
@@ -264,8 +301,8 @@
               </select>
             </div>
             <div>
-              <label for="reg-group" class="block text-xs font-bold text-slate-700 mb-1">Учебная группа <span class="text-red-500">*</span></label>
-              <input type="text" id="reg-group" list="groups-datalist" value="ИС-21" placeholder="ИС-21" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+              <label for="reg-group" class="block text-xs font-bold text-slate-300 mb-1">Учебная группа <span class="text-red-400">*</span></label>
+              <input type="text" id="reg-group" list="groups-datalist" value="ИС-21" placeholder="ИС-21" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" required />
               <datalist id="groups-datalist">
                 <option value="ПО-21"></option>
                 <option value="ГД-21"></option>
@@ -276,46 +313,46 @@
             </div>
           </div>
 
-          <div id="teacher-academic-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-indigo-50/50 border border-indigo-200">
+          <div id="teacher-academic-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-dark-950/60 border border-indigo-500/30">
             <div>
-              <label for="reg-department" class="block text-xs font-bold text-slate-700 mb-1">Кафедра / Цикловая комиссия <span class="text-red-500">*</span></label>
-              <input type="text" id="reg-department" value="Кафедра ИТ и спецдисциплин" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+              <label for="reg-department" class="block text-xs font-bold text-slate-300 mb-1">Кафедра / Цикловая комиссия <span class="text-red-400">*</span></label>
+              <input type="text" id="reg-department" value="Кафедра ИТ и спецдисциплин" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
             </div>
             <div>
-              <label for="reg-teacher-code" class="block text-xs font-bold text-slate-700 mb-1">Служебный код преподавателя <span class="text-red-500">*</span></label>
-              <input type="text" id="reg-teacher-code" value="AMK2026" placeholder="Код кафедры: AMK2026" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm uppercase font-mono focus:outline-none focus:ring-2 focus:ring-indigo-600" />
-              <span class="text-[10px] text-indigo-700 font-semibold block mt-1">Служебный код кафедры: <button type="button" onclick="insertTeacherCode('AMK2026')" class="underline font-bold text-indigo-900 bg-indigo-100 hover:bg-indigo-200 px-1.5 py-0.5 rounded cursor-pointer transition-colors" title="Нажмите для автоматической вставки">AMK2026</button> (подходят русские или латинские буквы)</span>
+              <label for="reg-teacher-code" class="block text-xs font-bold text-slate-300 mb-1">Служебный код преподавателя <span class="text-red-400">*</span></label>
+              <input type="text" id="reg-teacher-code" value="AMK2026" placeholder="Код кафедры: AMK2026" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white text-sm uppercase font-mono focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
+              <span class="text-[10px] text-slate-400 block mt-1">Код кафедры: <button type="button" onclick="insertTeacherCode('AMK2026')" class="underline font-bold text-indigo-300 hover:text-white px-1.5 py-0.5 rounded bg-indigo-500/20 cursor-pointer transition-colors" title="Нажмите для автоматической вставки">AMK2026</button> (подходят русские или латинские буквы)</span>
             </div>
           </div>
 
           <!-- Step D: Email Verification with 6-Digit OTP -->
-          <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+          <div class="p-4 rounded-2xl border border-white/10 bg-dark-950/60 space-y-3">
             <div class="flex items-center justify-between flex-wrap gap-2">
-              <label for="reg-email" class="text-xs font-bold text-slate-800">4. Электронная почта и подтверждение <span class="text-red-500">*</span></label>
-              <span id="email-verified-badge" class="hidden px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center gap-1">
+              <label for="reg-email" class="text-xs font-bold text-slate-200">4. Электронная почта и подтверждение <span class="text-red-400">*</span></label>
+              <span id="email-verified-badge" class="hidden px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold flex items-center gap-1">
                 <span class="material-symbols-outlined text-[14px]">verified</span>
                 <span>Почта подтверждена</span>
               </span>
             </div>
 
             <div class="flex flex-col sm:flex-row gap-2.5">
-              <input type="email" id="reg-email" oninput="onEmailChanged()" placeholder="student@gmail.com или name@amk.kz" class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
-              <button type="button" id="btn-send-code" onclick="requestEmailVerificationCode()" class="px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs shrink-0 transition-all flex items-center justify-center gap-1.5">
+              <input type="email" id="reg-email" oninput="onEmailChanged()" placeholder="student@gmail.com или name@amk.kz" class="flex-1 px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" required />
+              <button type="button" id="btn-send-code" onclick="requestEmailVerificationCode()" class="px-4 py-2.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 font-bold text-xs shrink-0 transition-all flex items-center justify-center gap-1.5">
                 <span class="material-symbols-outlined text-[16px]">forward_to_inbox</span>
                 <span id="btn-send-code-label">Подтвердить почту</span>
               </button>
             </div>
-            <div id="email-hint-msg" class="text-[11px] text-slate-500">На указанный адрес будет отправлен одноразовый 6-значный код проверки.</div>
+            <div id="email-hint-msg" class="text-[11px] text-slate-400">На указанный адрес будет отправлен одноразовый 6-значный код проверки.</div>
 
             <!-- Inline 6-digit OTP Panel -->
-            <div id="otp-verification-panel" class="hidden pt-2 border-t border-slate-100 space-y-2.5">
+            <div id="otp-verification-panel" class="hidden pt-2 border-t border-white/10 space-y-2.5">
               <div class="flex items-center justify-between text-xs">
-                <span class="font-bold text-slate-700">Введите 6-значный код из письма:</span>
+                <span class="font-bold text-slate-200">Введите 6-значный код из письма:</span>
                 <span id="otp-timer-label" class="text-[11px] text-slate-400"></span>
               </div>
               <div class="flex flex-wrap items-center gap-2.5">
-                <input type="text" id="reg-otp-code" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="000000" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 6)" class="w-40 px-4 py-2 rounded-xl border-2 border-indigo-300 font-mono font-extrabold text-lg tracking-[0.35em] text-center text-indigo-700 focus:outline-none focus:border-indigo-600" />
-                <button type="button" onclick="confirmEmailOtp()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all">
+                <input type="text" id="reg-otp-code" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="000000" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 6)" class="w-40 px-4 py-2 rounded-xl border-2 border-indigo-500/60 bg-dark-900 font-mono font-extrabold text-lg tracking-[0.35em] text-center text-indigo-300 focus:outline-none focus:border-indigo-400 shadow-glow-indigo" />
+                <button type="button" onclick="confirmEmailOtp()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-md">
                   Проверить код
                 </button>
               </div>
@@ -325,40 +362,40 @@
           <!-- Step E: Password + Strength + Confirmation -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label for="reg-password" class="block text-xs font-bold text-slate-700 mb-1">5. Придумайте пароль <span class="text-red-500">*</span></label>
+              <label for="reg-password" class="block text-xs font-bold text-slate-300 mb-1">5. Придумайте пароль <span class="text-red-400">*</span></label>
               <div class="relative">
-                <input type="password" id="reg-password" oninput="updatePasswordMeter()" placeholder="Мин. 6 симв., буквы + цифры" class="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
-                <button type="button" onclick="togglePwdVisibility('reg-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+                <input type="password" id="reg-password" oninput="updatePasswordMeter()" placeholder="Мин. 6 симв., буквы + цифры" class="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" required />
+                <button type="button" onclick="togglePwdVisibility('reg-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
                   <span class="material-symbols-outlined text-[18px]">visibility</span>
                 </button>
               </div>
               <div class="grid grid-cols-4 gap-1 mt-2" id="pwd-strength-bars">
-                <div class="h-1.5 rounded-full bg-slate-200"></div>
-                <div class="h-1.5 rounded-full bg-slate-200"></div>
-                <div class="h-1.5 rounded-full bg-slate-200"></div>
-                <div class="h-1.5 rounded-full bg-slate-200"></div>
+                <div class="h-1.5 rounded-full bg-dark-950"></div>
+                <div class="h-1.5 rounded-full bg-dark-950"></div>
+                <div class="h-1.5 rounded-full bg-dark-950"></div>
+                <div class="h-1.5 rounded-full bg-dark-950"></div>
               </div>
-              <span id="pwd-strength-label" class="text-[10px] text-slate-500 block mt-1">Минимум 6 символов, латинские/кириллические буквы и цифры</span>
+              <span id="pwd-strength-label" class="text-[10px] text-slate-400 block mt-1">Минимум 6 символов, латинские/кириллические буквы и цифры</span>
             </div>
 
             <div>
-              <label for="reg-password-confirm" class="block text-xs font-bold text-slate-700 mb-1">Повторите пароль <span class="text-red-500">*</span></label>
+              <label for="reg-password-confirm" class="block text-xs font-bold text-slate-300 mb-1">Повторите пароль <span class="text-red-400">*</span></label>
               <div class="relative">
-                <input type="password" id="reg-password-confirm" oninput="updatePasswordMeter()" placeholder="Повторите пароль" class="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
-                <button type="button" onclick="togglePwdVisibility('reg-password-confirm', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+                <input type="password" id="reg-password-confirm" oninput="updatePasswordMeter()" placeholder="Повторите пароль" class="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" required />
+                <button type="button" onclick="togglePwdVisibility('reg-password-confirm', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
                   <span class="material-symbols-outlined text-[18px]">visibility</span>
                 </button>
               </div>
-              <span id="pwd-match-label" class="text-[10px] text-slate-500 block mt-3">Пароли должны совпадать</span>
+              <span id="pwd-match-label" class="text-[10px] text-slate-400 block mt-3">Пароли должны совпадать</span>
             </div>
           </div>
 
-          <label class="flex items-start gap-2.5 text-xs text-slate-600 cursor-pointer select-none pt-1">
-            <input type="checkbox" id="reg-consent" checked class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-600" />
+          <label class="flex items-start gap-2.5 text-xs text-slate-400 cursor-pointer select-none pt-1">
+            <input type="checkbox" id="reg-consent" checked class="mt-0.5 rounded bg-dark-900 border-white/20 text-indigo-500 focus:ring-indigo-500" />
             <span>Подтверждаю корректность своих ФИО и соглашаюсь с правилами прохождения курсов и академической честности EDU SPACE.</span>
           </label>
 
-          <button type="submit" id="btn-register-submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2">
+          <button type="submit" id="btn-register-submit" class="w-full py-3.5 bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/40 text-white font-bold text-sm rounded-xl shadow-glow-indigo transition-all flex items-center justify-center gap-2 hover:scale-[1.01]">
             <span>Завершить регистрацию и начать курс</span>
             <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
           </button>
@@ -370,8 +407,8 @@
   </main>
 
   <!-- FOOTER -->
-  <footer class="w-full py-6 border-t border-slate-200 text-center text-xs text-slate-500 bg-white">
-    Алматинский многопрофильный колледж (АМК) • Образовательная платформа курсов EDU SPACE 2026
+  <footer class="w-full py-6 border-t border-white/10 text-center text-xs text-slate-500 bg-dark-950 relative z-10">
+    Алматинский многопрофильный колледж (АМК) • Цифровая образовательная платформа EDU SPACE 2026
   </footer>
 
   <script>
@@ -384,8 +421,8 @@
       if (!box) return;
       box.className = 'p-3.5 rounded-xl text-xs font-semibold flex items-start gap-2.5 ' + (
         type === 'error'
-          ? 'bg-red-50 border border-red-200 text-red-700'
-          : (type === 'success' ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-indigo-50 border border-indigo-200 text-indigo-800')
+          ? 'bg-red-500/10 border border-red-500/30 text-red-300'
+          : (type === 'success' ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300' : 'bg-indigo-500/10 border border-indigo-500/30 text-indigo-300')
       );
       const icon = type === 'error' ? 'error' : (type === 'success' ? 'check_circle' : 'info');
       box.innerHTML = `<span class="material-symbols-outlined text-[18px] shrink-0">${icon}</span><span>${msg}</span>`;
@@ -405,13 +442,13 @@
       const formReg = document.getElementById('form-register');
 
       if (tab === 'login') {
-        btnLogin.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs bg-white text-indigo-600 shadow-sm transition-all';
-        btnReg.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:text-slate-900 transition-all';
+        btnLogin.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs bg-indigo-600 text-white shadow-glow-indigo transition-all';
+        btnReg.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs text-slate-400 hover:text-white transition-all';
         formLogin.classList.remove('hidden');
         formReg.classList.add('hidden');
       } else {
-        btnReg.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs bg-white text-indigo-600 shadow-sm transition-all';
-        btnLogin.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:text-slate-900 transition-all';
+        btnReg.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs bg-indigo-600 text-white shadow-glow-indigo transition-all';
+        btnLogin.className = 'flex-1 py-2.5 rounded-xl font-bold text-xs text-slate-400 hover:text-white transition-all';
         formReg.classList.remove('hidden');
         formLogin.classList.add('hidden');
       }
@@ -432,15 +469,15 @@
       const teacherFields = document.getElementById('teacher-academic-fields');
 
       if (role === 'teacher') {
-        cardTeacher.className = 'cursor-pointer p-3.5 rounded-2xl border-2 border-indigo-600 bg-indigo-50/50 flex items-center gap-3 transition-all';
-        cardStudent.className = 'cursor-pointer p-3.5 rounded-2xl border border-slate-200 hover:border-slate-300 bg-white flex items-center gap-3 transition-all';
+        cardTeacher.className = 'cursor-pointer p-3.5 rounded-2xl border-2 border-indigo-500 bg-indigo-500/10 shadow-glow-indigo flex items-center gap-3 transition-all';
+        cardStudent.className = 'cursor-pointer p-3.5 rounded-2xl border border-white/10 bg-dark-950/40 hover:border-white/20 flex items-center gap-3 transition-all';
         studentFields.classList.add('hidden');
         teacherFields.classList.remove('hidden');
         const tInp = document.getElementById('reg-teacher-code');
         if (tInp && !tInp.value.trim()) tInp.value = 'AMK2026';
       } else {
-        cardStudent.className = 'cursor-pointer p-3.5 rounded-2xl border-2 border-indigo-600 bg-indigo-50/50 flex items-center gap-3 transition-all';
-        cardTeacher.className = 'cursor-pointer p-3.5 rounded-2xl border border-slate-200 hover:border-slate-300 bg-white flex items-center gap-3 transition-all';
+        cardStudent.className = 'cursor-pointer p-3.5 rounded-2xl border-2 border-indigo-500 bg-indigo-500/10 shadow-glow-indigo flex items-center gap-3 transition-all';
+        cardTeacher.className = 'cursor-pointer p-3.5 rounded-2xl border border-white/10 bg-dark-950/40 hover:border-white/20 flex items-center gap-3 transition-all';
         teacherFields.classList.add('hidden');
         studentFields.classList.remove('hidden');
       }
@@ -451,10 +488,10 @@
       if (checked) {
         mid.value = '';
         mid.disabled = true;
-        mid.classList.add('bg-slate-100', 'text-slate-400');
+        mid.classList.add('bg-dark-950', 'text-slate-500');
       } else {
         mid.disabled = false;
-        mid.classList.remove('bg-slate-100', 'text-slate-400');
+        mid.classList.remove('bg-dark-950', 'text-slate-500');
       }
       onFioInput();
     }
@@ -471,14 +508,14 @@
 
       if (check.valid) {
         preview.textContent = `В документах: ${check.full_name}`;
-        preview.className = 'text-[11px] font-bold text-emerald-700';
+        preview.className = 'text-[11px] font-bold text-emerald-400';
         msg.textContent = 'ФИО заполнено корректно ✓';
-        msg.className = 'text-[11px] text-emerald-600 font-semibold';
+        msg.className = 'text-[11px] text-emerald-400 font-semibold';
       } else {
         preview.textContent = 'Укажите полные Фамилию и Имя';
-        preview.className = 'text-[11px] font-semibold text-indigo-600';
+        preview.className = 'text-[11px] font-semibold text-indigo-400';
         msg.textContent = check.error;
-        msg.className = 'text-[11px] text-amber-700';
+        msg.className = 'text-[11px] text-amber-400';
       }
     }
 
@@ -517,7 +554,7 @@
 
       document.getElementById('otp-verification-panel').classList.remove('hidden');
       document.getElementById('email-hint-msg').textContent = `Письмо с 6-значным кодом отправлено на ${check.email}. Введите код ниже:`;
-      document.getElementById('email-hint-msg').className = 'text-[11px] text-indigo-700 font-semibold';
+      document.getElementById('email-hint-msg').className = 'text-[11px] text-indigo-300 font-semibold';
       document.getElementById('reg-otp-code').focus();
 
       if (res.data.mail_preview) {
@@ -564,7 +601,7 @@
       document.getElementById('email-verified-badge').classList.remove('hidden');
       document.getElementById('otp-verification-panel').classList.add('hidden');
       document.getElementById('email-hint-msg').textContent = `Адрес ${email} успешно проверен и подтверждён ✓`;
-      document.getElementById('email-hint-msg').className = 'text-[11px] text-emerald-700 font-bold';
+      document.getElementById('email-hint-msg').className = 'text-[11px] text-emerald-400 font-bold';
       showToast('Электронная почта успешно подтверждена!', 'success');
       return true;
     }
@@ -581,20 +618,20 @@
       const texts = ['Слишком простой пароль', 'Слабый (добавьте цифры/буквы)', 'Хороший пароль ✓', 'Отличный надёжный пароль ✓'];
 
       bars.forEach((b, idx) => {
-        b.className = 'h-1.5 rounded-full transition-all ' + (idx < res.score ? colors[Math.max(0, res.score - 1)] : 'bg-slate-200');
+        b.className = 'h-1.5 rounded-full transition-all ' + (idx < res.score ? colors[Math.max(0, res.score - 1)] : 'bg-dark-950');
       });
       lbl.textContent = pwd ? texts[Math.max(0, res.score - 1)] : 'Минимум 6 символов, буквы и цифры';
-      lbl.className = 'text-[10px] block mt-1 ' + (res.valid ? 'text-emerald-600 font-semibold' : 'text-slate-500');
+      lbl.className = 'text-[10px] block mt-1 ' + (res.valid ? 'text-emerald-400 font-semibold' : 'text-slate-400');
 
       if (!conf) {
         matchLbl.textContent = 'Повторите пароль для проверки';
         matchLbl.className = 'text-[10px] text-slate-500 block mt-3';
       } else if (pwd === conf) {
         matchLbl.textContent = 'Пароли совпадают ✓';
-        matchLbl.className = 'text-[10px] text-emerald-600 font-semibold block mt-3';
+        matchLbl.className = 'text-[10px] text-emerald-400 font-semibold block mt-3';
       } else {
         matchLbl.textContent = 'Пароли не совпадают';
-        matchLbl.className = 'text-[10px] text-red-600 font-semibold block mt-3';
+        matchLbl.className = 'text-[10px] text-red-400 font-semibold block mt-3';
       }
     }
 
@@ -612,11 +649,11 @@
 
     function openPasswordHelp() {
       openModal('🔑 Восстановление доступа к аккаунту', `
-        <p class="text-xs text-slate-600 leading-relaxed">
+        <p class="text-xs text-slate-300 leading-relaxed">
           Для входа используйте email и пароль, указанные вами при регистрации. Если вы хотите быстро протестировать платформу, воспользуйтесь кнопками ознакомительного демо-входа слева или зарегистрируйте новый личный аккаунт за 1 минуту.
         </p>
-        <div class="pt-2 flex justify-end">
-          <button type="button" onclick="closeModal()" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl">Понятно</button>
+        <div class="pt-3 flex justify-end">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-glow-indigo transition-all">Понятно</button>
         </div>
       `);
     }
