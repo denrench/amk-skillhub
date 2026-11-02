@@ -1,112 +1,260 @@
+# -*- coding: utf-8 -*-
 import os
+import sqlite3
 import server
 
 app = server.app.test_client()
 
-# 1. Health
+print("=== RUNNING FULL EDU SPACE LMS TEST SUITE ===")
+
+# Ensure clean Day 1 demo state before starting
+app.post('/api/demo/reset')
+
+# 1. Health & Catalog Sync
 r = app.get('/api/health')
-assert r.status_code == 200, 'Health check failed'
-print('Test 1: Health OK')
+assert r.status_code == 200
+assert r.get_json()['tasks_total'] == 50
+print("Test 1: Health & 50-lesson catalog OK")
 
-# 2. Get Tasks
-r = app.get('/api/tasks?specialty=it')
-assert r.status_code == 200, 'Tasks query failed'
-assert r.get_json()['count'] == 10, 'Should have 10 IT tasks'
-print('Test 2: Tasks OK (10 IT tasks)')
+# 2. Courses Catalog API
+r = app.get('/api/courses')
+assert r.status_code == 200
+courses = r.get_json()['courses']
+assert len(courses) == 5
+for slug in ('it', 'design', 'accounting', 'auto', 'marketing'):
+    rt = app.get(f'/api/tasks?specialty={slug}')
+    assert rt.status_code == 200
+    assert rt.get_json()['count'] == 10, f"Course {slug} must have 10 lessons"
+print("Test 2: All 5 courses × 10 lessons (50 total) OK")
 
-# 3. Exam Mode Tasks
-r = app.get('/api/tasks?mode=exam&ticket=1')
-assert r.status_code == 200, 'Exam tasks failed'
-assert r.get_json()['count'] == 5, 'Ticket 1 should have 5 tasks'
-print('Test 3: Exam Ticket 1 OK (5 tasks)')
-
-# 4. Auth: Login
-r = app.post('/api/auth/login', json={'email': 'student@amk.kz', 'password': 'student123'})
-assert r.status_code == 200, 'Login failed'
-user = r.get_json()['user']
-print('Test 4: Login OK')
-
-# 5. Submit task
-r = app.post('/api/tasks/submit', json={
-    'user_id': user['id'],
-    'student_id': user['student_id'],
-    'specialty_slug': 'it',
-    'task_number': 1,
-    'task_title': 'QuickSort V8',
-    'score': 100,
-    'time_spent_seconds': 120,
-    'submitted_code': 'function quickSort() { ... }'
+# 3. FIO Validation (Single word & digits must be rejected)
+r_bad_fio1 = app.post('/api/auth/register', json={
+    'full_name': 'Иван',
+    'email': 'singleword@test.kz',
+    'password': 'Password123'
 })
-assert r.status_code == 200, 'Submit task failed'
-print('Test 5: Submit task OK')
+assert r_bad_fio1.status_code == 400, "1-word name must be rejected"
 
-# 6. Teacher Journal & Stats
-r = app.get('/api/teacher/journal')
-assert r.status_code == 200, 'Journal failed'
-print('Test 6: Teacher journal OK')
+r_bad_fio2 = app.post('/api/auth/register', json={
+    'last_name': 'Иванов123',
+    'first_name': 'Иван',
+    'email': 'digits@test.kz',
+    'password': 'Password123'
+})
+assert r_bad_fio2.status_code == 400, "Digits in FIO must be rejected"
+print("Test 3: Strict FIO validation (rejects 1-word and digits) OK")
 
-r = app.get('/api/teacher/stats')
-assert r.status_code == 200, 'Teacher stats failed'
-print('Test 7: Teacher stats OK')
+# 4. Email Format Validation
+r_bad_email = app.post('/api/auth/send_code', json={'email': 'not-an-email@x'})
+assert r_bad_email.status_code == 400, "Invalid email domain must be rejected"
+print("Test 4: Strict Email format validation OK")
 
-# 7. Check static routes
-assert app.get('/').status_code == 200, 'Index route failed'
-assert app.get('/simulator.html').status_code == 200, 'Simulator route failed'
-assert app.get('/teacher.html').status_code == 200, 'Teacher route failed'
-assert app.get('/auth.html').status_code == 200, 'Auth route failed'
-assert app.get('/student.html').status_code == 200, 'Student route failed'
-assert app.get('/profile.html').status_code == 200, 'Profile route failed'
-assert app.get('/tasks.html').status_code == 200, 'Tasks route failed'
-assert app.get('/features.html').status_code == 200, 'Features route failed'
-assert app.get('/about.html').status_code == 200, 'About route failed'
-assert app.get('/pricing.html').status_code == 200, 'Pricing route failed'
-assert app.get('/reviews.html').status_code == 200, 'Reviews route failed'
-print('Test 8: Static HTML pages OK (All 11 Stitch pages return 200)')
+# 5. Unverified Email Registration Must Be Blocked
+test_student_email = 'smagulov.daniyar.lms@amk.kz'
+# Clean previous test user if exists
+conn = sqlite3.connect(server.DB_PATH)
+conn.execute("DELETE FROM task_submissions WHERE user_id IN (SELECT id FROM users WHERE email IN (?, 'kuznetsova.teacher.lms@amk.kz'))", (test_student_email,))
+conn.execute("DELETE FROM enrollments WHERE user_id IN (SELECT id FROM users WHERE email IN (?, 'kuznetsova.teacher.lms@amk.kz'))", (test_student_email,))
+conn.execute("DELETE FROM notifications WHERE user_id IN (SELECT id FROM users WHERE email IN (?, 'kuznetsova.teacher.lms@amk.kz'))", (test_student_email,))
+conn.execute("DELETE FROM lesson_progress WHERE user_id IN (SELECT id FROM users WHERE email IN (?, 'kuznetsova.teacher.lms@amk.kz'))", (test_student_email,))
+conn.execute("DELETE FROM email_verifications WHERE email IN (?, 'kuznetsova.teacher.lms@amk.kz')", (test_student_email,))
+conn.execute("DELETE FROM users WHERE email IN (?, 'kuznetsova.teacher.lms@amk.kz')", (test_student_email,))
+conn.commit()
+conn.close()
 
+r_unverified = app.post('/api/auth/register', json={
+    'last_name': 'Смагулов',
+    'first_name': 'Данияр',
+    'middle_name': 'Маратович',
+    'email': test_student_email,
+    'password': 'Student2026'
+})
+assert r_unverified.status_code == 400 and r_unverified.get_json().get('require_verification') is True
+print("Test 5: Unverified email blocked from registering OK")
 
-# 9. Test Gradual Task Unlocking & Server-side Security
-# On Day 1: Task 1 must be available, Task 2 must be locked
-r = app.get('/api/tasks?specialty=it')
-tasks = r.get_json()['tasks']
-t1 = next(t for t in tasks if t['task_number'] == 1)
-t2 = next(t for t in tasks if t['task_number'] == 2)
-assert t1['is_locked'] == False, 'Task 1 should be unlocked on Day 1'
-assert t2['is_locked'] == True, 'Task 2 should be LOCKED on Day 1'
-print('Test 9: Schedule check OK (Task 1 unlocked, Task 2 locked)')
+# 6. Full 2-Step 6-Digit Email OTP Flow
+r_send = app.post('/api/auth/send_code', json={'email': test_student_email})
+assert r_send.status_code == 200
+otp_code = r_send.get_json()['mail_preview']['code']
+assert len(otp_code) == 6 and otp_code.isdigit()
 
-# 10. Attempting to submit locked Task 2 must return HTTP 403 Forbidden
-r = app.post('/api/tasks/submit', json={
-    'user_id': user['id'],
+r_wrong_otp = app.post('/api/auth/verify_code', json={'email': test_student_email, 'code': '000000' if otp_code != '000000' else '999999'})
+assert r_wrong_otp.status_code == 400, "Wrong OTP must fail"
+
+r_right_otp = app.post('/api/auth/verify_code', json={'email': test_student_email, 'code': otp_code})
+assert r_right_otp.status_code == 200 and r_right_otp.get_json()['verified'] is True
+print("Test 6: 6-digit Email OTP generation & verification OK")
+
+# 7. Weak Password Rejection & Valid Real Student Registration
+r_weak_pwd = app.post('/api/auth/register', json={
+    'last_name': 'смагулов',
+    'first_name': 'данияр',
+    'middle_name': 'маратович',
+    'email': test_student_email,
+    'password': 'abcdef'  # no digits
+})
+assert r_weak_pwd.status_code == 400, "Password without digits must be rejected"
+
+r_reg = app.post('/api/auth/register', json={
+    'last_name': 'смагулов',
+    'first_name': 'данияр',
+    'middle_name': 'маратович',
+    'email': test_student_email,
+    'password': 'Student2026',
+    'specialty_slug': 'it',
+    'group_name': 'ИС-21'
+})
+assert r_reg.status_code == 201, f"Registration failed: {r_reg.get_json()}"
+real_student = r_reg.get_json()['user']
+assert real_student['full_name'] == 'Смагулов Данияр Маратович', "FIO must be auto-capitalized"
+assert real_student['email_verified'] is True
+assert real_student['is_demo'] is False
+print("Test 7: Real Student registration (FIO normalized + verified email) OK")
+
+# 8. Duplicate Email Rejection
+r_dup = app.post('/api/auth/send_code', json={'email': test_student_email})
+assert r_dup.status_code == 409
+print("Test 8: Duplicate email prevention (HTTP 409) OK")
+
+# 9. Teacher Access Code Security
+t_email = 'kuznetsova.teacher.lms@amk.kz'
+t_otp = app.post('/api/auth/send_code', json={'email': t_email}).get_json()['mail_preview']['code']
+app.post('/api/auth/verify_code', json={'email': t_email, 'code': t_otp})
+
+r_bad_tcode = app.post('/api/auth/register', json={
+    'last_name': 'Кузнецова',
+    'first_name': 'Елена',
+    'email': t_email,
+    'password': 'Teacher2026',
+    'role': 'teacher',
+    'teacher_code': 'WRONG123'
+})
+assert r_bad_tcode.status_code == 403, "Invalid teacher access code must return 403"
+
+r_good_teacher = app.post('/api/auth/register', json={
+    'last_name': 'Кузнецова',
+    'first_name': 'Елена',
+    'middle_name': 'Викторовна',
+    'email': t_email,
+    'password': 'Teacher2026',
+    'role': 'teacher',
+    'department': 'Кафедра ИТ',
+    'teacher_code': 'AMK2026'
+})
+assert r_good_teacher.status_code == 201
+print("Test 9: Teacher Access Code security (403 on wrong code, 201 on AMK2026) OK")
+
+# 10. Initial 0% Zero-State Check for New Student
+r_prof0 = app.get(f"/api/user/profile/{real_student['id']}")
+assert r_prof0.status_code == 200
+stats0 = r_prof0.get_json()['statistics']
+assert stats0['passed_count'] == 0 and stats0['progress_percent'] == 0 and stats0['xp'] == 0
+print("Test 10: Fresh student starts at 0% progress, 0 GPA, 0 XP OK")
+
+# 11. Drip-Feed Schedule Security (Day 1: Task 1 open, Task 2 locked with HTTP 403)
+r_tasks = app.get(f"/api/tasks?specialty=it&user_id={real_student['id']}")
+tasks = r_tasks.get_json()['tasks']
+assert tasks[0]['is_locked'] is False and tasks[1]['is_locked'] is True
+
+r_bypass = app.post('/api/tasks/submit', json={
+    'user_id': real_student['id'],
     'specialty_slug': 'it',
     'task_number': 2,
     'score': 100,
-    'submitted_code': 'malicious bypass'
+    'submitted_code': 'attempting to bypass schedule'
 })
-assert r.status_code == 403, 'Submitting locked task must be blocked with HTTP 403'
-assert r.get_json()['is_locked'] == True, 'Response must confirm task is locked'
-print('Test 10: Server-side Security OK (Locked task submission blocked with 403)')
+assert r_bypass.status_code == 403 and r_bypass.get_json()['is_locked'] is True
+print("Test 11: Drip-Feed server lock blocks locked Task 2 with HTTP 403 OK")
 
-# 11. Test Demo Reset to Day 1 (Absolute Zero)
-r = app.post('/api/demo/reset')
-assert r.status_code == 200, 'Demo reset failed'
-r_stat = app.get('/api/demo/status')
-status_data = r_stat.get_json()
-assert status_data['progress_percent'] == 0, 'Progress must be 0% after reset'
-assert status_data['completed_count'] == 0, 'Completed count must be 0'
-assert status_data['current_study_day'] == 1, 'Current study day must be 1'
-print('Test 11: Demo Reset OK (Starts from 0% on Day 1)')
+# 12. Quiz Progress, Submission & Teacher Review Workflow
+r_prog = app.post('/api/tasks/progress', json={
+    'user_id': real_student['id'],
+    'specialty_slug': 'it',
+    'task_number': 1,
+    'quiz_score': 3,
+    'draft_code': 'function formatStudentCard(student) { return ""; }'
+})
+assert r_prog.status_code == 200
 
-# 12. Test Teacher Advance Day (Day 1 -> Day 2)
-r = app.post('/api/teacher/advance_day', json={'day': 2})
-assert r.status_code == 200, 'Advance day failed'
-r = app.get('/api/tasks?specialty=it')
-tasks = r.get_json()['tasks']
-t2 = next(t for t in tasks if t['task_number'] == 2)
-assert t2['is_locked'] == False, 'Task 2 should be UNLOCKED on Day 2'
-print('Test 12: Teacher Advance Day OK (Task 2 now unlocked on Day 2)')
+r_sub = app.post('/api/tasks/submit', json={
+    'user_id': real_student['id'],
+    'specialty_slug': 'it',
+    'task_number': 1,
+    'score': 92,
+    'autotest_passed': 5,
+    'autotest_total': 5,
+    'quiz_score': 3,
+    'await_teacher': True,
+    'submitted_code': 'function formatStudentCard(s) { ... }'
+})
+assert r_sub.status_code == 200
+sub_id = r_sub.get_json()['result']['submission_id']
 
-# Reset back to Day 1 for clean demo start
+# Teacher grades the submission with 98/100
+r_grade = app.post('/api/teacher/grade_submission', json={
+    'submission_id': sub_id,
+    'grade': 98,
+    'feedback': 'Превосходная работа, все граничные случаи учтены!',
+    'action': 'approve'
+})
+assert r_grade.status_code == 200
+
+r_prof1 = app.get(f"/api/user/profile/{real_student['id']}")
+stats1 = r_prof1.get_json()['statistics']
+assert stats1['passed_count'] == 1
+assert stats1['progress_percent'] == 10
+assert stats1['avg_score'] == 98.0
+print("Test 12: Quiz + Submission + Teacher Grading updates student progress to 10% (98/100) OK")
+
+# 13. Gradebook Matrix Verification
+r_mat = app.get('/api/teacher/matrix?specialty=it')
+assert r_mat.status_code == 200
+mat_rows = r_mat.get_json()['rows']
+st_row = next(x for x in mat_rows if x['student']['id'] == real_student['id'])
+assert st_row['cells']['1']['score'] == 98
+print("Test 13: Electronic Gradebook Matrix (Students × Lessons 1..10) OK")
+
+# 14. Isolated Demo Reset MUST NOT Delete Real Registered Student Data!
+r_reset = app.post('/api/demo/reset')
+assert r_reset.status_code == 200
+
+r_demo_st = app.get('/api/demo/status').get_json()
+assert r_demo_st['progress_percent'] == 0 and r_demo_st['completed_count'] == 0
+
+r_prof_after = app.get(f"/api/user/profile/{real_student['id']}").get_json()['statistics']
+assert r_prof_after['passed_count'] == 1 and r_prof_after['avg_score'] == 98.0, "Real user progress MUST survive demo reset!"
+print("Test 14: Isolated Demo Reset preserves real registered users & their grades OK")
+
+# 15. Static HTML Pages & Zero Mojibake Audit
+all_pages = [
+    '/', '/index.html', '/features.html', '/about.html', '/pricing.html',
+    '/reviews.html', '/auth.html', '/student.html', '/tasks.html',
+    '/simulator.html', '/teacher.html', '/profile.html'
+]
+for route in all_pages:
+    resp = app.get(route)
+    assert resp.status_code == 200, f"Route {route} failed"
+    body_txt = resp.get_data(as_text=True)
+    assert '\ufffd' not in body_txt, f"Mojibake found in {route}"
+
+for js_file in ('js/courses-catalog.js', 'js/app-logistics.js'):
+    with open(os.path.join(server.BASE_DIR, js_file), 'r', encoding='utf-8') as f:
+        txt = f.read()
+        assert '\ufffd' not in txt, f"Mojibake found in {js_file}"
+
+print("Test 15: All 11 HTML pages & JS bundles return HTTP 200 with zero encoding errors OK")
+
+# Clean up test-only records so DB starts super clean for real users
+conn = sqlite3.connect(server.DB_PATH)
+conn.execute("DELETE FROM task_submissions WHERE user_id IN (?, ?)", (real_student['id'], r_good_teacher.get_json()['user']['id']))
+conn.execute("DELETE FROM grades WHERE user_id = ?", (real_student['id'],))
+conn.execute("DELETE FROM enrollments WHERE user_id = ?", (real_student['id'],))
+conn.execute("DELETE FROM notifications WHERE user_id = ?", (real_student['id'],))
+conn.execute("DELETE FROM lesson_progress WHERE user_id = ?", (real_student['id'],))
+conn.execute("DELETE FROM email_verifications WHERE email IN (?, ?)", (test_student_email, t_email))
+conn.execute("DELETE FROM users WHERE email IN (?, ?)", (test_student_email, t_email))
+conn.commit()
+conn.close()
 app.post('/api/demo/reset')
-print('Demo reset back to Day 1')
 
-print('SUCCESS: ALL 12 TESTS COMPLETED WITHOUT ERROR!')
+print("\nSUCCESS: ALL 15 COMPREHENSIVE LMS TESTS PASSED 100%!")

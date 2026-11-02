@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Кабинет преподавателя — EDU SPACE | Алматинский многопрофильный колледж</title>
+  <title>Кабинет преподавателя и электронный журнал — EDU SPACE</title>
   <link href="https://fonts.googleapis.com" rel="preconnect"/>
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet"/>
@@ -34,256 +34,350 @@
     };
   </script>
   <style>
-    html {
-      scroll-behavior: smooth;
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-    }
-    body {
-      min-height: 100vh;
-      overflow-y: auto !important;
-      overflow-x: hidden !important;
-      scrollbar-width: thin;
-      scrollbar-color: #6366f1 #f1f5f9;
-    }
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-      display: block !important;
-    }
-    ::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #6366f1;
-    }
+    html { scroll-behavior: smooth; overflow-y: auto !important; overflow-x: hidden !important; }
+    body { min-height: 100vh; overflow-y: auto !important; overflow-x: hidden !important; scrollbar-width: thin; scrollbar-color: #6366f1 #f1f5f9; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; display: block !important; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
   </style>
+  <script src="js/courses-catalog.js"></script>
   <script src="js/app-logistics.js"></script>
 </head>
 <body class="bg-surface font-sans text-on-surface antialiased min-h-screen flex">
 
   <!-- SIDEBAR -->
-  <aside class="fixed left-0 top-0 h-full w-64 bg-white border-r border-slate-200 z-50 flex flex-col justify-between shadow-sm">
+  <aside class="fixed left-0 top-0 h-full w-64 bg-white border-r border-slate-200 z-50 hidden lg:flex flex-col justify-between shadow-sm">
     <div class="flex flex-col flex-1 overflow-y-auto px-4 py-6">
       <a href="index.html" class="flex items-center gap-3 px-3 mb-8">
         <img alt="EDU SPACE Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WREGeQqAUebN0Vc4cADKrdOQDI1DUlZCrJh0oT88_8DCaqAoZs7HMu-JVgMR5lGhHVm274Y49VumVNssdFA_Y7FmYGOrnLejaQDHgU75kMvvVaKjAp3Nxe5j-q8e84BYVeJTxUJE1-Rgeax9HhzF50nDpQdt1qCuKXQIZ2g63a8Ym0JRIUCflZ03oQhm327Wup4RqqomteY5HUmHYRdiwbhzs4RkYD7mas1uUnDYX6"/>
         <div class="flex flex-col">
           <span class="font-display font-bold text-lg text-slate-900 leading-none">EDU SPACE</span>
-          <span class="text-[10px] font-semibold text-indigo-600 tracking-wider uppercase mt-1">АМК Колледж</span>
+          <span class="text-[10px] font-semibold text-indigo-600 tracking-wider uppercase mt-1">Преподаватель</span>
         </div>
       </a>
 
       <nav class="space-y-1.5">
-        <a href="teacher.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-50 text-indigo-700 font-bold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">dashboard</span>
-          <span>Главная</span>
-        </a>
-        <a href="javascript:void(0)" onclick="openGroupsModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">groups</span>
-          <span>Мои группы (3)</span>
-        </a>
-        <a href="javascript:void(0)" onclick="openStudentsModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">person_search</span>
-          <span>Студенты</span>
-        </a>
-        <a href="javascript:void(0)" onclick="openTeacherSubjectsModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">menu_book</span>
-          <span>Предметы</span>
-        </a>
-        <a href="javascript:void(0)" onclick="openCreateTaskModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">add_task</span>
-          <span>Создать задание</span>
-        </a>
-        <a href="#submissions-section" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+        <a href="javascript:void(0)" onclick="switchTeacherTab('queue')" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-indigo-50 text-indigo-700 font-bold text-sm transition-colors">
           <div class="flex items-center gap-3">
             <span class="material-symbols-outlined text-[20px]">fact_check</span>
             <span>Проверка работ</span>
           </div>
-          <span id="teacher-review-badge" class="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-[10px] font-bold">Очередь</span>
+          <span id="sidebar-pending-badge" class="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold">0</span>
+        </a>
+        <a href="javascript:void(0)" onclick="switchTeacherTab('matrix')" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">grid_on</span>
+          <span>Ведомость-матрица</span>
+        </a>
+        <a href="javascript:void(0)" onclick="switchTeacherTab('builder')" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">add_task</span>
+          <span>Редактор заданий</span>
         </a>
         <a href="javascript:void(0)" onclick="exportCsvJournal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
           <span class="material-symbols-outlined text-[20px]">table_chart</span>
-          <span>Журнал оценок (CSV)</span>
+          <span>Экспорт в CSV / Excel</span>
         </a>
-        <a href="javascript:void(0)" onclick="openScheduleModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">schedule</span>
-          <span>Расписание</span>
-        </a>
-        <a href="javascript:void(0)" onclick="openMessengerModal('Группа ИС-21')" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+        <a href="javascript:void(0)" onclick="openMessengerModal('Общий чат потока')" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
           <div class="flex items-center gap-3">
             <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
-            <span>Чат с группой</span>
+            <span>Чат со студентами</span>
           </div>
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
         </a>
+        <a href="javascript:void(0)" onclick="openZoomModal('Онлайн-консультация кафедры')" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">videocam</span>
+          <span>Вебинарная комната</span>
+        </a>
         <a href="profile.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-semibold text-sm transition-colors">
           <span class="material-symbols-outlined text-[20px]">account_circle</span>
-          <span>Профиль преподавателя</span>
+          <span>Мой профиль</span>
         </a>
       </nav>
     </div>
 
     <div class="p-4 border-t border-slate-100 space-y-2">
-      <button onclick="resetDemoMode()" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold transition-all border border-amber-200">
+      <button type="button" onclick="resetDemoMode()" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold transition-all border border-amber-200">
         <span class="material-symbols-outlined text-[16px]">restart_alt</span>
-        <span>Сбросить демо в начало</span>
+        <span>Сбросить демо-график</span>
       </button>
       <div class="flex items-center justify-between pt-2">
-        <a href="javascript:void(0)" onclick="openSettingsModal()" class="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900">
+        <a href="javascript:void(0)" onclick="openSettingsModal()" class="flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900">
           <span class="material-symbols-outlined text-[18px]">settings</span>
           <span>Настройки</span>
         </a>
-        <button onclick="logoutUser()" class="flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700">
+        <button type="button" onclick="logoutUser()" class="flex items-center gap-1 text-xs font-semibold text-red-600 hover:text-red-700">
           <span class="material-symbols-outlined text-[18px]">logout</span>
-          <span>Выход</span>
+          <span>Выйти</span>
         </button>
       </div>
     </div>
   </aside>
 
-  <!-- CONTENT -->
-  <div class="pl-64 flex-1 flex flex-col min-h-screen">
+  <!-- MAIN WORKSPACE -->
+  <div class="lg:pl-64 flex-1 flex flex-col min-h-screen w-full">
 
     <!-- HEADER -->
-    <header class="fixed top-0 left-64 right-0 h-16 bg-white/90 backdrop-blur-md border-b border-slate-200 z-40 flex items-center justify-between px-8 shadow-sm">
+    <header class="fixed top-0 left-0 lg:left-64 right-0 h-16 bg-white/95 backdrop-blur-md border-b border-slate-200 z-40 flex items-center justify-between px-4 sm:px-8 shadow-sm">
       <div class="flex items-center gap-3">
-        <span class="font-bold text-xs text-slate-800">Кафедра ТиПО • АМК Колледж</span>
+        <span class="font-bold text-xs text-slate-800">Кабинет преподавателя</span>
         <span class="text-slate-300">/</span>
         <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-bold border border-indigo-200">
-          Текущий график: <span id="header-teacher-day">День 1</span>
+          Открытый день: <span id="header-teacher-day">День 1</span>
         </span>
       </div>
 
       <div class="flex items-center gap-3">
-        <button onclick="openCreateTaskModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5">
-          <span class="material-symbols-outlined text-[16px]">add</span>
-          <span>Новое задание</span>
+        <button type="button" onclick="switchTeacherTab('builder')" class="hidden sm:flex px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-all items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px]">campaign</span>
+          <span>Задания и объявления</span>
         </button>
-        <button onclick="openMessengerModal('Группа ИС-21')" class="p-2 rounded-xl text-slate-500 hover:bg-slate-100 transition-colors">
-          <span class="material-symbols-outlined text-[22px]">chat</span>
-        </button>
-        <a href="profile.html" class="flex items-center gap-2 pl-2 border-l border-slate-200">
-          <div class="w-9 h-9 rounded-full bg-indigo-700 text-white font-bold flex items-center justify-center text-xs shadow-sm">
-            СП
+        <a href="profile.html" class="flex items-center gap-2.5 pl-2.5 border-l border-slate-200">
+          <div class="w-9 h-9 rounded-full bg-indigo-700 text-white font-bold flex items-center justify-center text-xs shadow-sm" data-user-initials>
+            ПР
           </div>
           <div class="hidden md:flex flex-col text-left">
-            <span class="text-xs font-bold text-slate-900 leading-tight">Иванов Сергей Павлович</span>
-            <span class="text-[10px] text-slate-500 font-medium">Преподаватель высшей категории</span>
+            <span class="text-xs font-bold text-slate-900 leading-tight" data-user-name>Преподаватель</span>
+            <span class="text-[10px] text-slate-500 font-medium" data-user-role>Кафедра</span>
           </div>
         </a>
       </div>
     </header>
 
-    <!-- MAIN BODY -->
-    <main class="w-full pt-20 p-8 bg-surface space-y-8 flex-1">
+    <!-- BODY -->
+    <main class="w-full pt-20 p-4 sm:p-8 bg-surface space-y-7 flex-1">
 
-      <!-- SCHEDULE CONTROLLER (Key Requirement 4) -->
-      <section class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-indigo-200 shadow-md space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div class="space-y-1">
+      <!-- 1. DRIP-FEED SCHEDULE CONTROLLER -->
+      <section class="bg-white rounded-3xl p-6 sm:p-8 border-2 border-indigo-200 shadow-sm space-y-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="space-y-1.5">
             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-200">
               <span class="material-symbols-outlined text-[16px]">tune</span>
-              <span>Панель управления графиком обучения</span>
+              <span>Серверное управление расписанием открытия модулей</span>
             </div>
-            <h2 class="font-display font-extrabold text-xl text-slate-900">
-              Текущий учебный день: <span id="schedule-day-display" class="text-indigo-600">День 1</span>
-            </h2>
-            <p class="text-xs text-slate-600 max-w-2xl">
-              Студенты видят задания строго до текущего открытого дня. Они не могут приступить к будущим заданиям раньше времени. Чтобы разблокировать следующее задание для студентов колледжа, нажмите кнопку управления днем.
+            <h1 class="font-display font-extrabold text-xl sm:text-2xl text-slate-900">
+              Текущий учебный день потока: <span id="schedule-day-display" class="text-indigo-600">День 1</span>
+            </h1>
+            <p class="text-xs text-slate-600 max-w-2xl leading-relaxed">
+              Студентам открыты только модули с 1 по текущий учебный день. Все последующие уроки защищены серверной блокировкой (HTTP 403). Нажмите на нужный день шкалы или кнопку «День +1», чтобы открыть новый модуль для потока.
             </p>
           </div>
 
-          <!-- Advance Day Button -->
-          <div class="flex flex-wrap items-center gap-3 shrink-0">
-            <button onclick="advanceStudyDay()" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+            <button type="button" onclick="setPlatformStudyDay(currentStudyDay + 1)" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2">
               <span class="material-symbols-outlined text-[18px]">forward_media</span>
-              <span>Открыть следующий день (День +1)</span>
+              <span>Открыть следующий день (+1)</span>
             </button>
-            <button onclick="resetScheduleDay()" class="px-4 py-3 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 transition-colors">
-              Сбросить на День 1
+            <button type="button" onclick="setPlatformStudyDay(1)" class="px-4 py-3 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 transition-colors">
+              Вернуть День 1
             </button>
           </div>
         </div>
 
-        <!-- 10-Day Visual Timeline -->
-        <div class="pt-2 border-t border-slate-100">
-          <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Шкала разблокировки 10 заданий:</div>
-          <div class="grid grid-cols-5 sm:grid-cols-10 gap-2 text-center text-xs" id="timeline-days-grid">
-            <!-- Rendered dynamically -->
-          </div>
+        <div class="pt-3 border-t border-slate-100">
+          <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2.5">Интерактивная шкала 10 учебных дней (нажмите для переключения):</div>
+          <div class="grid grid-cols-5 sm:grid-cols-10 gap-2 text-center text-xs" id="timeline-days-grid"></div>
         </div>
       </section>
 
-      <!-- 4 TEACHER METRICS -->
+      <!-- 2. 4 LIVE STATS -->
       <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
-          <span class="text-xs font-bold text-slate-500 uppercase">Студентов на курсе</span>
-          <div class="font-display font-bold text-2xl text-slate-900 mt-2">25 студентов</div>
-          <span class="text-[11px] text-slate-500 mt-1">Группы ИС-21, ИС-22</span>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+          <span class="text-xs font-bold text-slate-500 uppercase">Зарегистрировано студентов</span>
+          <div class="font-display font-bold text-2xl text-slate-900 mt-2" id="stat-students-cnt">0</div>
+          <span class="text-[11px] text-slate-500 block mt-1">Активные профили в базе</span>
         </div>
-
-        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
-          <span class="text-xs font-bold text-slate-500 uppercase">Сдано на проверку</span>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+          <span class="text-xs font-bold text-slate-500 uppercase">Сдано работ всего</span>
           <div class="font-display font-bold text-2xl text-indigo-600 mt-2" id="stat-total-submissions">0 работ</div>
-          <span class="text-[11px] text-slate-500 mt-1">Обновляется автоматически</span>
+          <span class="text-[11px] text-amber-700 font-semibold block mt-1" id="stat-pending-label">Ожидают ревью: 0</span>
         </div>
-
-        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
           <span class="text-xs font-bold text-slate-500 uppercase">Средний балл потока</span>
           <div class="font-display font-bold text-2xl text-emerald-600 mt-2" id="stat-avg-score">—</div>
-          <span class="text-[11px] text-slate-500 mt-1">По проверенным работам</span>
+          <span class="text-[11px] text-slate-500 block mt-1">По всем проверенным модулям</span>
         </div>
-
         <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
-          <span class="text-xs font-bold text-slate-500 uppercase">Электронная ведомость</span>
-          <button onclick="exportCsvJournal()" class="mt-2 py-2 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
+          <span class="text-xs font-bold text-slate-500 uppercase">Сводная ведомость</span>
+          <button type="button" onclick="exportCsvJournal()" class="mt-2 py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5">
             <span class="material-symbols-outlined text-[16px]">file_download</span>
-            <span>Скачать CSV/Excel</span>
+            <span>Выгрузить ведомость CSV</span>
           </button>
         </div>
       </section>
 
-      <!-- SUBMISSIONS TABLE -->
-      <section id="submissions-section" class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden space-y-4">
+      <!-- 3. WORKSPACE TABS -->
+      <div class="flex flex-wrap items-center gap-2 p-1.5 bg-slate-200/70 rounded-2xl w-fit">
+        <button type="button" id="t-tab-queue" onclick="switchTeacherTab('queue')" class="px-5 py-2.5 rounded-xl font-bold text-xs bg-white text-indigo-700 shadow-sm transition-all">
+          1. Очередь проверки работ
+        </button>
+        <button type="button" id="t-tab-matrix" onclick="switchTeacherTab('matrix')" class="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:text-slate-900 transition-all">
+          2. Электронная ведомость (Студенты × Уроки 1–10)
+        </button>
+        <button type="button" id="t-tab-builder" onclick="switchTeacherTab('builder')" class="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:text-slate-900 transition-all">
+          3. Редактор заданий и объявления
+        </button>
+      </div>
+
+      <!-- TAB PANEL 1: SUBMISSIONS REVIEW QUEUE -->
+      <section id="teacher-panel-queue" class="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
         <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h3 class="font-display font-bold text-lg text-slate-900">Журнал сдачи и проверки студенческих работ</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Все отправленные через симулятор работы с оценками и рецензиями</p>
+            <h2 class="font-display font-bold text-lg text-slate-900">Отправленные работы студентов</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Нажмите «Проверить и оценить», чтобы просмотреть код студента, выставить балл или вернуть на доработку.</p>
           </div>
-
-          <div class="flex items-center gap-2">
-            <button onclick="openBroadcastModal()" class="px-4 py-2 border border-slate-300 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-50 transition-colors flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[16px]">campaign</span>
-              <span>Объявление группе</span>
-            </button>
-            <button onclick="openZoomModal('Онлайн-консультация кафедры')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[16px]">videocam</span>
-              <span>Начать вебинар</span>
-            </button>
-          </div>
+          <select id="queue-course-filter" onchange="loadTeacherDashboard()" class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-bold bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600">
+            <option value="">Все курсы (5 программ)</option>
+            <option value="it">Программное обеспечение</option>
+            <option value="design">UX/UI Дизайн</option>
+            <option value="accounting">Учёт и аудит</option>
+            <option value="auto">Автодиагностика</option>
+            <option value="marketing">Цифровой маркетинг</option>
+          </select>
         </div>
 
         <div class="overflow-x-auto">
           <table class="w-full text-xs text-left">
             <thead class="bg-slate-50 text-slate-600 uppercase font-bold text-[10px] border-b border-slate-200">
               <tr>
-                <th class="p-4">Студент</th>
-                <th class="p-4">Группа</th>
-                <th class="p-4">Задание</th>
-                <th class="p-4">Балл</th>
+                <th class="p-4">ФИО Студента</th>
+                <th class="p-4">Группа / Курс</th>
+                <th class="p-4">Модуль</th>
+                <th class="p-4">Автотесты / Балл</th>
                 <th class="p-4">Статус</th>
-                <th class="p-4 text-right">Действие</th>
+                <th class="p-4 text-right">Рецензирование</th>
               </tr>
             </thead>
-            <tbody id="submissions-tbody" class="divide-y divide-slate-100">
-              <!-- Dynamically populated or empty state -->
-            </tbody>
+            <tbody id="submissions-tbody" class="divide-y divide-slate-100"></tbody>
           </table>
         </div>
+      </section>
+
+      <!-- TAB PANEL 2: ELECTRONIC GRADEBOOK MATRIX -->
+      <section id="teacher-panel-matrix" class="hidden bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-display font-bold text-lg text-slate-900">Электронный журнал успеваемости по модулям 1–10</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Отображаются все зарегистрированные студенты и их актуальные баллы по выбранному курсу.</p>
+          </div>
+          <select id="matrix-course-select" onchange="loadGradebookMatrix()" class="px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-bold bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600">
+            <option value="it">06130100 — Программное обеспечение</option>
+            <option value="design">02110100 — UX/UI Дизайн</option>
+            <option value="accounting">04110100 — Учёт и аудит</option>
+            <option value="auto">07161300 — Автодиагностика</option>
+            <option value="marketing">04140100 — Цифровой маркетинг</option>
+          </select>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-slate-50 text-slate-600 font-bold text-[10px] uppercase border-b border-slate-200">
+              <tr>
+                <th class="p-3.5 min-w-[200px]">ФИО Студента</th>
+                <th class="p-3.5">Группа</th>
+                <th class="p-2.5 text-center">Ур.1</th>
+                <th class="p-2.5 text-center">Ур.2</th>
+                <th class="p-2.5 text-center">Ур.3</th>
+                <th class="p-2.5 text-center">Ур.4</th>
+                <th class="p-2.5 text-center">Ур.5</th>
+                <th class="p-2.5 text-center">Ур.6</th>
+                <th class="p-2.5 text-center">Ур.7</th>
+                <th class="p-2.5 text-center">Ур.8</th>
+                <th class="p-2.5 text-center">Ур.9</th>
+                <th class="p-2.5 text-center">Ур.10</th>
+                <th class="p-3.5 text-right">Средний</th>
+              </tr>
+            </thead>
+            <tbody id="matrix-tbody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB PANEL 3: TASK BUILDER & GROUP BROADCAST -->
+      <section id="teacher-panel-builder" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-7">
+
+        <!-- Assignment Customizer -->
+        <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-sm space-y-4">
+          <div>
+            <h3 class="font-display font-bold text-lg text-slate-900">Настройка / обновление практического задания</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Изменения сразу применяются в каталоге курса и плеере студентов.</p>
+          </div>
+          <form onsubmit="event.preventDefault(); saveCustomTask();" class="space-y-3.5 text-xs">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Курс</label>
+                <select id="ct-spec" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white">
+                  <option value="it">Программное обеспечение</option>
+                  <option value="design">UX/UI Дизайн</option>
+                  <option value="accounting">Учёт и аудит</option>
+                  <option value="auto">Автодиагностика</option>
+                  <option value="marketing">Цифровой маркетинг</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Номер модуля (1–10)</label>
+                <input type="number" id="ct-num" min="1" max="10" value="1" class="w-full px-3 py-2 rounded-xl border border-slate-300" required />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">День открытия по графику</label>
+                <input type="number" id="ct-day" min="1" max="10" value="1" class="w-full px-3 py-2 rounded-xl border border-slate-300" required />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Сложность</label>
+                <select id="ct-diff" class="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white">
+                  <option value="Базовый">Базовый</option>
+                  <option value="Средний" selected>Средний</option>
+                  <option value="Сложный">Сложный</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Название урока *</label>
+              <input type="text" id="ct-title" placeholder="Урок 1. Практическая разработка модуля..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300" required />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Формулировка задания *</label>
+              <textarea id="ct-desc" rows="3" placeholder="Опишите требования и ожидаемый результат..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300" required></textarea>
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Шаблон стартового кода</label>
+              <textarea id="ct-starter" rows="3" class="w-full font-mono px-3.5 py-2 rounded-xl border border-slate-300 bg-slate-50" placeholder="// Начальный шаблон для студента"></textarea>
+            </div>
+            <button type="submit" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm">
+              Сохранить задание в программе курса
+            </button>
+          </form>
+        </div>
+
+        <!-- Group Announcement Broadcast -->
+        <div class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-sm space-y-4 flex flex-col justify-between">
+          <div class="space-y-4">
+            <div>
+              <h3 class="font-display font-bold text-lg text-slate-900">Отправить объявление студентам</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Уведомление мгновенно появится с индикатором в личном кабинете студентов.</p>
+            </div>
+            <form onsubmit="event.preventDefault(); sendGroupBroadcast();" class="space-y-3.5 text-xs">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Целевая группа (пусто — для всего потока)</label>
+                <input type="text" id="bc-group" placeholder="Например: ИС-21 (или оставьте пустым для всех)" class="w-full px-3.5 py-2 rounded-xl border border-slate-300" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Заголовок уведомления *</label>
+                <input type="text" id="bc-title" placeholder="Консультация перед защитой модуля" class="w-full px-3.5 py-2 rounded-xl border border-slate-300" required />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Текст сообщения *</label>
+                <textarea id="bc-body" rows="4" placeholder="Уважаемые студенты! Обратите внимание на дедлайн сдачи..." class="w-full px-3.5 py-2 rounded-xl border border-slate-300" required></textarea>
+              </div>
+              <button type="submit" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">send</span>
+                <span>Опубликовать объявление в кабинетах</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
       </section>
 
     </main>
@@ -291,124 +385,262 @@
 
   <script>
     let currentStudyDay = 1;
+    let journalItemsCache = [];
+
+    function switchTeacherTab(tab) {
+      ['queue', 'matrix', 'builder'].forEach(k => {
+        const btn = document.getElementById(`t-tab-${k}`);
+        const panel = document.getElementById(`teacher-panel-${k}`);
+        if (k === tab) {
+          btn.className = 'px-5 py-2.5 rounded-xl font-bold text-xs bg-white text-indigo-700 shadow-sm transition-all';
+          panel.classList.remove('hidden');
+        } else {
+          btn.className = 'px-5 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:text-slate-900 transition-all';
+          panel.classList.add('hidden');
+        }
+      });
+      if (tab === 'matrix') loadGradebookMatrix();
+    }
+
+    function renderDayTimeline(day) {
+      const grid = document.getElementById('timeline-days-grid');
+      if (!grid) return;
+      let html = '';
+      for (let d = 1; d <= 10; d++) {
+        const isOpen = d <= day;
+        const isCurrent = d === day;
+        html += `
+          <button type="button" onclick="setPlatformStudyDay(${d})"
+            class="p-2.5 rounded-xl border transition-all flex flex-col items-center gap-0.5 ${isCurrent ? 'bg-indigo-600 text-white border-indigo-600 shadow-md font-extrabold' : (isOpen ? 'bg-emerald-50 text-emerald-900 border-emerald-200 font-bold hover:bg-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-200 hover:border-indigo-300')}">
+            <span>День ${d}</span>
+            <span class="text-[10px] opacity-85">${isOpen ? 'Открыт' : 'Закрыт'}</span>
+          </button>
+        `;
+      }
+      grid.innerHTML = html;
+    }
+
+    async function setPlatformStudyDay(targetDay) {
+      const clamped = Math.max(1, Math.min(10, targetDay));
+      const res = await window.EduSpace.api('/api/teacher/advance_day', {
+        method: 'POST',
+        body: { day: clamped }
+      });
+      if (res.ok && res.data.success) {
+        currentStudyDay = res.data.current_study_day;
+        showToast(res.data.message, 'success');
+        await loadTeacherDashboard();
+      }
+    }
 
     async function loadTeacherDashboard() {
-      try {
-        const statsRes = await fetch('/api/teacher/stats');
-        const statsData = await statsRes.json();
-        if (statsData.success) {
-          currentStudyDay = statsData.stats.current_study_day || 1;
-          document.getElementById('header-teacher-day').textContent = `День ${currentStudyDay}`;
-          document.getElementById('schedule-day-display').textContent = `День ${currentStudyDay}`;
-          document.getElementById('stat-total-submissions').textContent = `${statsData.stats.total_submissions || 0} работ`;
-          document.getElementById('stat-avg-score').textContent = statsData.stats.average_score > 0 ? `${statsData.stats.average_score} / 100` : '—';
-          renderTimeline();
-        }
+      const user = window.EduSpace.getActiveUser();
+      if (!user || user.role !== 'teacher') return;
 
-        const journalRes = await fetch('/api/teacher/journal');
-        const journalData = await journalRes.json();
-        const tbody = document.getElementById('submissions-tbody');
-        tbody.innerHTML = '';
+      const courseFilter = document.getElementById('queue-course-filter').value;
+      const [statsRes, journalRes] = await Promise.all([
+        window.EduSpace.api('/api/teacher/stats'),
+        window.EduSpace.api(`/api/teacher/journal${courseFilter ? `?specialty=${courseFilter}` : ''}`)
+      ]);
 
-        if (!journalData.journal || journalData.journal.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="6" class="p-8 text-center text-slate-500">
-                <span class="material-symbols-outlined text-[32px] text-slate-300 block mb-1">inbox</span>
-                Работ на проверку пока нет (демоверсия в начальном состоянии Дня 1).<br>
-                Студент может сдать Задание №1 в <a href="simulator.html?task=1" class="text-indigo-600 font-bold hover:underline">онлайн-тренажере</a>.
-              </td>
-            </tr>
-          `;
-        } else {
-          journalData.journal.forEach(sub => {
-            const tr = document.createElement('tr');
-            tr.className = 'hover:bg-slate-50/70 transition-colors';
-            tr.innerHTML = `
-              <td class="p-4 font-bold text-slate-900">${sub.student_name}</td>
-              <td class="p-4 text-slate-600">${sub.group_name}</td>
-              <td class="p-4 font-medium text-slate-800">${sub.task_title}</td>
-              <td class="p-4 font-bold text-indigo-600">${sub.score} / 100 (${sub.grade_letter})</td>
-              <td class="p-4"><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">${sub.status}</span></td>
-              <td class="p-4 text-right">
-                <button onclick="openReviewModal('${sub.student_name}', '${sub.task_title}', ${sub.score})" class="px-3 py-1.5 bg-slate-100 hover:bg-indigo-600 hover:text-white rounded-lg text-xs font-bold transition-all">
-                  Оценить
-                </button>
-              </td>
-            </tr>
-            `;
-            tbody.appendChild(tr);
-          });
-        }
-      } catch (e) {
-        console.warn('Teacher dashboard loaded offline');
-      }
+      const stats = (statsRes.data && statsRes.data.stats) || { total_students: 0, total_submissions: 0, pending_submissions: 0, average_score: 0, current_study_day: 1 };
+      currentStudyDay = stats.current_study_day || 1;
+      journalItemsCache = (journalRes.data && journalRes.data.journal) || [];
+
+      document.getElementById('header-teacher-day').textContent = `День ${currentStudyDay}`;
+      document.getElementById('schedule-day-display').textContent = `День ${currentStudyDay}`;
+      document.getElementById('stat-students-cnt').textContent = `${stats.total_students} чел.`;
+      document.getElementById('stat-total-submissions').textContent = `${stats.total_submissions} работ`;
+      document.getElementById('stat-pending-label').textContent = `Ожидают проверки: ${stats.pending_submissions || 0}`;
+      document.getElementById('sidebar-pending-badge').textContent = String(stats.pending_submissions || journalItemsCache.length || 0);
+      document.getElementById('stat-avg-score').textContent = stats.average_score > 0 ? `${stats.average_score} / 100` : '—';
+
+      renderDayTimeline(currentStudyDay);
+      renderSubmissionsQueue();
     }
 
-    function renderTimeline() {
-      const grid = document.getElementById('timeline-days-grid');
-      grid.innerHTML = '';
-      for (let d = 1; d <= 10; d++) {
-        const item = document.createElement('div');
-        const isCurrent = (d === currentStudyDay);
-        const isPassed = (d < currentStudyDay);
-
-        let bg = 'bg-slate-100 text-slate-400 border-slate-200';
-        let statusText = '🔒 Заблокировано';
-        if (isCurrent) {
-          bg = 'bg-indigo-600 text-white border-indigo-600 font-bold shadow-md';
-          statusText = '⭐ Текущий день';
-        } else if (isPassed) {
-          bg = 'bg-emerald-50 text-emerald-800 border-emerald-300 font-semibold';
-          statusText = '✓ Открыто';
-        }
-
-        item.className = `p-2 rounded-xl border ${bg} transition-all cursor-pointer`;
-        item.title = `День ${d}: ${statusText}`;
-        item.onclick = () => setStudyDay(d);
-        item.innerHTML = `
-          <div class="font-bold text-xs">День ${d}</div>
-          <div class="text-[9px] mt-0.5 opacity-90 truncate">${isCurrent ? 'Активен' : (isPassed ? 'Открыто' : 'Блок')}</div>
+    function renderSubmissionsQueue() {
+      const tbody = document.getElementById('submissions-tbody');
+      if (journalItemsCache.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="p-10 text-center text-slate-400">
+              Отправленных студенческих работ пока нет (при старте с нуля ведомость чистая). Как только студент сдаст урок в тренажёре, работа сразу появится здесь.
+            </td>
+          </tr>
         `;
-        grid.appendChild(item);
+        return;
+      }
+
+      tbody.innerHTML = journalItemsCache.map(item => {
+        const isPending = String(item.status).includes('на проверке');
+        const isRev = String(item.status).includes('доработ');
+        const pillCls = isPending
+          ? 'bg-indigo-100 text-indigo-800'
+          : (isRev ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-800');
+
+        return `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="p-4">
+              <div class="font-bold text-slate-900">${item.student_name}</div>
+              <div class="text-[10px] text-slate-400">${item.student_id || ''}</div>
+            </td>
+            <td class="p-4">
+              <span class="font-bold text-slate-700">${item.group_name}</span>
+              <span class="block text-[10px] uppercase text-indigo-600 font-bold">${item.specialty_slug}</span>
+            </td>
+            <td class="p-4">
+              <div class="font-semibold text-slate-800">Урок №${item.task_number || 1}. ${item.task_title}</div>
+              ${item.repo_url ? `<a href="${item.repo_url}" target="_blank" rel="noopener" class="text-[11px] text-indigo-600 hover:underline">Открыть ссылку студента ↗</a>` : ''}
+            </td>
+            <td class="p-4">
+              <div class="font-extrabold text-slate-900">${item.score}/100 (${item.grade_letter})</div>
+              ${item.autotest_total ? `<div class="text-[10px] text-slate-500">Автотесты: ${item.autotest_passed}/${item.autotest_total}</div>` : ''}
+            </td>
+            <td class="p-4">
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${pillCls}">${item.status}</span>
+            </td>
+            <td class="p-4 text-right">
+              <button type="button" onclick="openSubmissionReviewModal(${item.id})" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-colors">
+                Проверить и оценить
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openSubmissionReviewModal(subId) {
+      const sub = journalItemsCache.find(x => x.id === subId);
+      if (!sub) return;
+
+      const safeCode = (sub.submitted_code || '// Код не прикреплён').replace(/</g, '&lt;');
+      openModal(`📝 Рецензирование работы — ${sub.student_name} (${sub.group_name})`, `
+        <div class="space-y-4 text-xs">
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap justify-between gap-2">
+            <div>
+              <div class="font-bold text-slate-900">${sub.task_title}</div>
+              <div class="text-slate-500 mt-0.5">Курс: ${sub.specialty_slug.toUpperCase()} • Автотесты: ${sub.autotest_passed || 0}/${sub.autotest_total || 0} • Квиз: ${sub.quiz_score || 0}/3</div>
+            </div>
+            <span class="font-extrabold text-indigo-700 text-sm">Автобалл: ${sub.score}/100</span>
+          </div>
+
+          ${sub.student_comment ? `<div class="p-3 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-900"><strong>Комментарий студента:</strong> ${sub.student_comment.replace(/</g, '&lt;')}</div>` : ''}
+
+          <div>
+            <div class="font-bold text-slate-700 mb-1">Отправленное решение студента:</div>
+            <pre class="bg-slate-950 text-emerald-300 p-4 rounded-xl overflow-x-auto max-h-56 font-mono text-[11px] leading-relaxed">${safeCode}</pre>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Итоговый балл (0–100)</label>
+              <input type="number" id="modal-grade-score" min="0" max="100" value="${sub.score || 95}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-bold text-sm" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block font-bold text-slate-700 mb-1">Комментарий / разбор ошибок для студента</label>
+              <input type="text" id="modal-grade-feedback" value="${(sub.teacher_comment || 'Решение проверено: код чистый, критерии модуля выполнены.').replace(/"/g, '&quot;')}" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300" />
+            </div>
+          </div>
+
+          <div class="pt-2 flex flex-wrap justify-end gap-2.5">
+            <button type="button" onclick="saveSubmissionReview(${sub.id}, 'revision')" class="px-4 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold">
+              Вернуть на доработку
+            </button>
+            <button type="button" onclick="saveSubmissionReview(${sub.id}, 'approve')" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-sm">
+              Утвердить оценку в ведомости
+            </button>
+          </div>
+        </div>
+      `, 'max-w-3xl');
+    }
+
+    async function saveSubmissionReview(subId, action) {
+      const grade = Number(document.getElementById('modal-grade-score').value || 0);
+      const feedback = document.getElementById('modal-grade-feedback').value.trim();
+
+      const res = await window.EduSpace.api('/api/teacher/grade_submission', {
+        method: 'POST',
+        body: { submission_id: subId, grade, feedback, action }
+      });
+
+      if (res.ok && res.data.success) {
+        closeModal();
+        showToast(res.data.message, 'success');
+        await loadTeacherDashboard();
       }
     }
 
-    async function advanceStudyDay() {
-      try {
-        const res = await fetch('/api/teacher/advance_day', { method: 'POST', headers: {'Content-Type': 'application/json'} });
-        const data = await res.json();
-        showToast(data.message || 'График переключен!', 'success');
-        loadTeacherDashboard();
-      } catch (e) {
-        showToast('День переключен локально', 'info');
+    async function loadGradebookMatrix() {
+      const spec = document.getElementById('matrix-course-select').value;
+      const res = await window.EduSpace.api(`/api/teacher/matrix?specialty=${spec}`);
+      const rows = (res.data && res.data.rows) || [];
+      const tbody = document.getElementById('matrix-tbody');
+
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="13" class="p-8 text-center text-slate-400">Нет зарегистрированных студентов.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = rows.map(r => {
+        const st = r.student;
+        let cellsHtml = '';
+        for (let n = 1; n <= 10; n++) {
+          const c = r.cells[String(n)];
+          if (!c) {
+            cellsHtml += `<td class="p-2.5 text-center text-slate-300">${n <= currentStudyDay ? '—' : '🔒'}</td>`;
+          } else {
+            const cls = c.score >= 75 ? 'bg-emerald-100 text-emerald-800' : (c.score >= 60 ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700');
+            cellsHtml += `<td class="p-2 text-center"><span class="inline-block px-2 py-0.5 rounded-md font-extrabold text-[11px] ${cls}" title="${c.status}">${c.score}</span></td>`;
+          }
+        }
+
+        return `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3.5">
+              <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                <span>${st.full_name}</span>
+                ${!st.is_demo ? '<span class="px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 text-[9px] font-bold">Личный</span>' : '<span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 text-[9px]">Демо</span>'}
+              </div>
+              <div class="text-[10px] text-slate-400">${st.email}</div>
+            </td>
+            <td class="p-3.5 font-semibold text-slate-700">${st.group_name || 'ИС-21'}</td>
+            ${cellsHtml}
+            <td class="p-3.5 text-right font-extrabold text-slate-900">${r.avg_score > 0 ? r.avg_score : '—'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function saveCustomTask() {
+      const payload = {
+        specialty_slug: document.getElementById('ct-spec').value,
+        task_number: Number(document.getElementById('ct-num').value),
+        unlock_day: Number(document.getElementById('ct-day').value),
+        difficulty: document.getElementById('ct-diff').value,
+        title: document.getElementById('ct-title').value.trim(),
+        description: document.getElementById('ct-desc').value.trim(),
+        starter_code: document.getElementById('ct-starter').value
+      };
+      const res = await window.EduSpace.api('/api/teacher/create_task', { method: 'POST', body: payload });
+      if (res.ok && res.data.success) {
+        showToast(res.data.message, 'success');
+      } else {
+        showToast((res.data && res.data.message) || 'Ошибка сохранения задания', 'error');
       }
     }
 
-    async function setStudyDay(targetDay) {
-      try {
-        const res = await fetch('/api/teacher/advance_day', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ day: targetDay })
-        });
-        const data = await res.json();
-        showToast(`График переключен на День ${targetDay}!`, 'success');
-        loadTeacherDashboard();
-      } catch (e) {
-        showToast(`День ${targetDay} выбран`, 'info');
-      }
-    }
-
-    async function resetScheduleDay() {
-      await setStudyDay(1);
-    }
-
-    async function resetDemoMode() {
-      if (confirm('Сбросить демоверсию ко Дню 1 (0% прогресса, очистить работы студентов)?')) {
-        await fetch('/api/demo/reset', { method: 'POST' });
-        showToast('Демоверсия сброшена ко Дню 1!', 'success');
-        loadTeacherDashboard();
+    async function sendGroupBroadcast() {
+      const payload = {
+        target_group: document.getElementById('bc-group').value.trim(),
+        title: document.getElementById('bc-title').value.trim(),
+        body: document.getElementById('bc-body').value.trim()
+      };
+      const res = await window.EduSpace.api('/api/teacher/broadcast', { method: 'POST', body: payload });
+      if (res.ok && res.data.success) {
+        document.getElementById('bc-title').value = '';
+        document.getElementById('bc-body').value = '';
+        showToast(res.data.message, 'success');
       }
     }
 

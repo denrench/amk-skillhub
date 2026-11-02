@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Вход и регистрация — EDU SPACE | Алматинский многопрофильный колледж</title>
+  <title>Вход и регистрация — EDU SPACE | Образовательная платформа курсов</title>
   <link href="https://fonts.googleapis.com" rel="preconnect"/>
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet"/>
@@ -51,23 +51,17 @@
       height: 8px;
       display: block !important;
     }
-    ::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #6366f1;
-    }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
   </style>
+  <script src="js/courses-catalog.js"></script>
   <script src="js/app-logistics.js"></script>
 </head>
 <body class="bg-surface font-sans text-on-surface antialiased min-h-screen flex flex-col justify-between">
 
   <!-- TOP HEADER -->
-  <header class="w-full h-20 bg-white/90 backdrop-blur-md border-b border-slate-200 z-50">
+  <header class="w-full h-20 bg-white/90 backdrop-blur-md border-b border-slate-200 z-50 sticky top-0">
     <div class="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
       <a href="index.html" class="flex items-center gap-3">
         <img alt="EDU SPACE Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1WREGeQqAUebN0Vc4cADKrdOQDI1DUlZCrJh0oT88_8DCaqAoZs7HMu-JVgMR5lGhHVm274Y49VumVNssdFA_Y7FmYGOrnLejaQDHgU75kMvvVaKjAp3Nxe5j-q8e84BYVeJTxUJE1-Rgeax9HhzF50nDpQdt1qCuKXQIZ2g63a8Ym0JRIUCflZ03oQhm327Wup4RqqomteY5HUmHYRdiwbhzs4RkYD7mas1uUnDYX6"/>
@@ -85,148 +79,288 @@
   </header>
 
   <!-- MAIN CONTAINER -->
-  <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-12 flex items-center justify-center">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 w-full max-w-5xl items-center">
+  <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 py-10 flex items-center justify-center">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 w-full max-w-6xl items-start">
 
-      <!-- LEFT COLUMN: BRAND PROMO CARD -->
-      <div class="lg:col-span-5 bg-gradient-to-br from-indigo-700 via-indigo-800 to-purple-900 text-white rounded-3xl p-8 sm:p-10 shadow-xl space-y-6 relative overflow-hidden">
+      <!-- LEFT COLUMN: BRAND & DEMO ACCESS CARD -->
+      <div class="lg:col-span-5 bg-gradient-to-br from-indigo-700 via-indigo-800 to-purple-900 text-white rounded-3xl p-8 sm:p-9 shadow-xl space-y-6 relative overflow-hidden lg:sticky lg:top-28">
         <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
 
-        <div class="space-y-2">
-          <span class="px-3 py-1 rounded-full bg-white/20 text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
-            Платформа ТиПО РК
+        <div class="space-y-2.5 relative z-10">
+          <span class="inline-block px-3 py-1 rounded-full bg-white/15 text-[11px] font-bold uppercase tracking-wider backdrop-blur-sm">
+            Профессиональная LMS-платформа
           </span>
-          <h2 class="font-display font-extrabold text-2xl sm:text-3xl leading-tight">
-            Единое цифровое пространство
-          </h2>
-          <p class="text-indigo-200 text-xs sm:text-sm leading-relaxed">
-            Интерактивные онлайн-тренажеры, автопроверка решений в изолированной среде V8, электронный табель и постепенный график обучения.
+          <h1 class="font-display font-extrabold text-2xl sm:text-3xl leading-tight">
+            Обучение по курсам с реальной проверкой знаний
+          </h1>
+          <p class="text-indigo-100 text-xs sm:text-sm leading-relaxed">
+            Создайте личный кабинет с подтверждённой почтой и реальным ФИО. Проходите теорию, интерактивные квизы и практические тренажёры с автотестами и рецензией преподавателя.
           </p>
         </div>
 
-        <div class="space-y-3 pt-2 text-xs">
+        <div class="space-y-3 pt-1 text-xs relative z-10">
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-[18px] text-emerald-300">verified</span>
+            <div class="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px] text-emerald-300">mark_email_read</span>
             </div>
-            <span>Постепенное открытие заданий по графику</span>
+            <span>Обязательная проверка ФИО и подтверждение Email по 6-значному коду</span>
           </div>
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-[18px] text-emerald-300">terminal</span>
+            <div class="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px] text-emerald-300">lock_clock</span>
             </div>
-            <span>50 профильных симуляторов и автотесты</span>
+            <span>Поэтапное открытие модулей по учебному графику (без списывания за 1 день)</span>
           </div>
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-[18px] text-emerald-300">fact_check</span>
+            <div class="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[18px] text-emerald-300">workspace_premium</span>
             </div>
-            <span>Электронный журнал и ведомость для преподавателей</span>
+            <span>Персональная зачётная ведомость, расчёт GPA и именной сертификат</span>
           </div>
         </div>
 
-        <!-- FAST 1-CLICK DEMO BUTTONS -->
-        <div class="pt-4 border-t border-white/20 space-y-2.5">
+        <!-- ISOLATED 1-CLICK DEMO PANEL -->
+        <div class="pt-5 border-t border-white/20 space-y-2.5 relative z-10">
           <div class="text-[11px] font-bold text-indigo-200 uppercase tracking-wider">
-            Быстрый вход для проверки (1 клик):
+            Ознакомительный демо-вход (изолированный аккаунт с 0%):
           </div>
-          <button onclick="demoLogin('student')" class="w-full py-2.5 px-4 bg-white text-indigo-700 hover:bg-indigo-50 font-bold rounded-xl text-xs shadow-md transition-all flex items-center justify-between">
+          <button type="button" onclick="window.EduSpace.startIsolatedDemo('student')" class="w-full py-2.5 px-4 bg-white text-indigo-700 hover:bg-indigo-50 font-bold rounded-xl text-xs shadow-md transition-all flex items-center justify-between">
             <span class="flex items-center gap-2">
               <span class="material-symbols-outlined text-[18px]">school</span>
-              <span>Войти как Студент (Константин Воронов)</span>
+              <span>Демо-студент (Старт с нуля — 0%)</span>
             </span>
             <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
           </button>
-          <button onclick="demoLogin('teacher')" class="w-full py-2.5 px-4 bg-indigo-900/60 hover:bg-indigo-900 text-white font-bold rounded-xl text-xs border border-white/30 transition-all flex items-center justify-between">
+          <button type="button" onclick="window.EduSpace.startIsolatedDemo('teacher')" class="w-full py-2.5 px-4 bg-indigo-900/60 hover:bg-indigo-900 text-white font-bold rounded-xl text-xs border border-white/25 transition-all flex items-center justify-between">
             <span class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px]">badge</span>
-              <span>Войти как Преподаватель (Иванов С. П.)</span>
+              <span class="material-symbols-outlined text-[18px]">co_present</span>
+              <span>Демо-преподаватель (Журнал и проверка)</span>
             </span>
             <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
           </button>
         </div>
       </div>
 
-      <!-- RIGHT COLUMN: LOGIN & REGISTER FORMS -->
-      <div class="lg:col-span-7 bg-white rounded-3xl p-8 sm:p-10 border border-slate-200/80 shadow-xl space-y-6">
+      <!-- RIGHT COLUMN: AUTHENTICATION & REGISTRATION CARD -->
+      <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-9 border border-slate-200/90 shadow-xl space-y-6">
 
         <!-- Tab Switcher -->
-        <div class="flex items-center p-1 bg-slate-100 rounded-2xl">
-          <button id="tab-btn-login" onclick="switchAuthTab('login')" class="flex-1 py-2.5 rounded-xl font-bold text-xs bg-white text-indigo-600 shadow-sm transition-all">
-            Вход в систему
+        <div class="flex items-center p-1.5 bg-slate-100 rounded-2xl">
+          <button type="button" id="tab-btn-login" onclick="switchAuthTab('login')" class="flex-1 py-2.5 rounded-xl font-bold text-xs bg-white text-indigo-600 shadow-sm transition-all">
+            Вход в аккаунт
           </button>
-          <button id="tab-btn-register" onclick="switchAuthTab('register')" class="flex-1 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:text-slate-900 transition-all">
-            Регистрация нового аккаунта
+          <button type="button" id="tab-btn-register" onclick="switchAuthTab('register')" class="flex-1 py-2.5 rounded-xl font-bold text-xs text-slate-600 hover:text-slate-900 transition-all">
+            Регистрация на платформе
           </button>
         </div>
 
-        <!-- 1. LOGIN FORM -->
+        <!-- Global Form Alert -->
+        <div id="auth-alert-box" class="hidden p-3.5 rounded-xl text-xs font-semibold flex items-start gap-2.5"></div>
+
+        <!-- ================= 1. LOGIN FORM ================= -->
         <form id="form-login" onsubmit="event.preventDefault(); submitLogin();" class="space-y-4">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Email пользователя</label>
-            <input type="email" id="login-email" value="voronov@student.amk.kz" placeholder="student@amk.kz" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+            <label for="login-email" class="block text-xs font-bold text-slate-700 mb-1.5">Электронная почта</label>
+            <div class="relative">
+              <span class="material-symbols-outlined text-[18px] text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2">mail</span>
+              <input type="email" id="login-email" autocomplete="email" placeholder="Введите ваш email (например: name@mail.kz)" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+            </div>
           </div>
 
           <div>
-            <div class="flex justify-between items-center mb-1">
-              <label class="block text-xs font-bold text-slate-700">Пароль</label>
-              <a href="javascript:void(0)" onclick="showToast('Для демоверсии используйте пароль: student123', 'info')" class="text-[11px] text-indigo-600 hover:underline font-semibold">Забыли пароль?</a>
+            <div class="flex justify-between items-center mb-1.5">
+              <label for="login-password" class="block text-xs font-bold text-slate-700">Пароль</label>
+              <button type="button" onclick="openPasswordHelp()" class="text-[11px] text-indigo-600 hover:underline font-semibold">Забыли пароль?</button>
             </div>
-            <input type="password" id="login-password" value="student123" placeholder="••••••••" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+            <div class="relative">
+              <span class="material-symbols-outlined text-[18px] text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2">lock</span>
+              <input type="password" id="login-password" autocomplete="current-password" placeholder="Введите пароль от аккаунта" class="w-full pl-10 pr-11 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+              <button type="button" onclick="togglePwdVisibility('login-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+                <span class="material-symbols-outlined text-[18px]">visibility</span>
+              </button>
+            </div>
           </div>
 
-          <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-all">
-            Войти в личный кабинет
+          <button type="submit" id="btn-login-submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+            <span>Войти в личный кабинет</span>
+            <span class="material-symbols-outlined text-[18px]">login</span>
           </button>
+
+          <p class="text-center text-xs text-slate-500 pt-1">
+            Ещё нет личного аккаунта?
+            <button type="button" onclick="switchAuthTab('register')" class="text-indigo-600 font-bold hover:underline">Зарегистрироваться бесплатно</button>
+          </p>
         </form>
 
-        <!-- 2. REGISTRATION FORM (Hidden by default) -->
-        <form id="form-register" onsubmit="event.preventDefault(); submitRegister();" class="hidden space-y-4">
-          <!-- Role Selector -->
+        <!-- ================= 2. REGISTRATION FORM ================= -->
+        <form id="form-register" onsubmit="event.preventDefault(); submitRegister();" class="hidden space-y-5" novalidate>
+
+          <!-- Step A: Role Selection -->
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-2">Выберите вашу роль:</label>
-            <div class="grid grid-cols-2 gap-3">
-              <label class="role-card cursor-pointer p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/50 flex items-center gap-3">
-                <input type="radio" name="reg-role" value="student" checked onchange="toggleRoleCard(this)" class="text-indigo-600" />
+            <label class="block text-xs font-bold text-slate-700 mb-2">1. Выберите тип аккаунта *</label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <label id="role-card-student" class="cursor-pointer p-3.5 rounded-2xl border-2 border-indigo-600 bg-indigo-50/50 flex items-center gap-3 transition-all">
+                <input type="radio" name="reg-role" value="student" checked onchange="onRoleChange(this.value)" class="text-indigo-600 focus:ring-indigo-600" />
                 <div>
-                  <div class="font-bold text-xs text-slate-900">Студент</div>
-                  <div class="text-[10px] text-slate-500">Доступ к тренажерам</div>
+                  <div class="font-bold text-xs text-slate-900">Я студент / слушатель курса</div>
+                  <div class="text-[11px] text-slate-500">Прохождение уроков, тестов и тренажёров</div>
                 </div>
               </label>
 
-              <label class="role-card cursor-pointer p-3 rounded-xl border border-slate-300 hover:border-slate-400 bg-white flex items-center gap-3">
-                <input type="radio" name="reg-role" value="teacher" onchange="toggleRoleCard(this)" class="text-indigo-600" />
+              <label id="role-card-teacher" class="cursor-pointer p-3.5 rounded-2xl border border-slate-200 hover:border-slate-300 bg-white flex items-center gap-3 transition-all">
+                <input type="radio" name="reg-role" value="teacher" onchange="onRoleChange(this.value)" class="text-indigo-600 focus:ring-indigo-600" />
                 <div>
-                  <div class="font-bold text-xs text-slate-900">Преподаватель</div>
-                  <div class="text-[10px] text-slate-500">Журнал и проверка</div>
+                  <div class="font-bold text-xs text-slate-900">Я преподаватель / куратор</div>
+                  <div class="text-[11px] text-slate-500">Управление графиком, проверка и ведомость</div>
                 </div>
               </label>
             </div>
           </div>
 
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">ФИО полностью</label>
-            <input type="text" id="reg-name" placeholder="например: Константин Воронов" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+          <!-- Step B: Structured Mandatory FIO -->
+          <div class="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <span class="text-xs font-bold text-slate-800">2. Полное ФИО (для журнала и сертификата) *</span>
+              <span id="fio-live-preview" class="text-[11px] font-semibold text-indigo-600">Заполните Фамилию и Имя</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label for="reg-last-name" class="block text-[11px] font-bold text-slate-700 mb-1">Фамилия <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-last-name" oninput="onFioInput()" placeholder="Оспанов" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+              </div>
+
+              <div>
+                <label for="reg-first-name" class="block text-[11px] font-bold text-slate-700 mb-1">Имя <span class="text-red-500">*</span></label>
+                <input type="text" id="reg-first-name" oninput="onFioInput()" placeholder="Адилет" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+              </div>
+
+              <div>
+                <label for="reg-middle-name" class="block text-[11px] font-bold text-slate-700 mb-1">Отчество</label>
+                <input type="text" id="reg-middle-name" oninput="onFioInput()" placeholder="Серикович" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between flex-wrap gap-2 pt-0.5">
+              <label class="inline-flex items-center gap-2 text-[11px] text-slate-600 cursor-pointer select-none">
+                <input type="checkbox" id="reg-no-middle" onchange="toggleNoMiddle(this.checked)" class="rounded text-indigo-600 focus:ring-indigo-600" />
+                <span>Нет отчества по документам</span>
+              </label>
+              <span id="fio-validation-msg" class="text-[11px] text-slate-500">Только буквы кириллицы или латиницы, без цифр</span>
+            </div>
           </div>
 
+          <!-- Step C: Course & Group (Student) OR Department & Code (Teacher) -->
+          <div id="student-academic-fields" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2">
+              <label for="reg-course" class="block text-xs font-bold text-slate-700 mb-1">3. Выберите курс обучения <span class="text-red-500">*</span></label>
+              <select id="reg-course" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs sm:text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-600">
+                <option value="it">06130100 — Программное обеспечение и Веб-разработка</option>
+                <option value="design">02110100 — UX/UI и Продуктовый цифровой дизайн</option>
+                <option value="accounting">04110100 — Бухгалтерский учёт, налоги и аудит</option>
+                <option value="auto">07161300 — Электронные системы и автодиагностика</option>
+                <option value="marketing">04140100 — Цифровой маркетинг и интернет-коммерция</option>
+              </select>
+            </div>
+            <div>
+              <label for="reg-group" class="block text-xs font-bold text-slate-700 mb-1">Учебная группа <span class="text-red-500">*</span></label>
+              <input type="text" id="reg-group" list="groups-datalist" value="ИС-21" placeholder="ИС-21" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+              <datalist id="groups-datalist">
+                <option value="ИС-21"></option>
+                <option value="ПО-22"></option>
+                <option value="ДИЗ-19"></option>
+                <option value="БУХ-20"></option>
+                <option value="АВТ-21"></option>
+                <option value="МРК-22"></option>
+              </datalist>
+            </div>
+          </div>
+
+          <div id="teacher-academic-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-indigo-50/50 border border-indigo-200">
+            <div>
+              <label for="reg-department" class="block text-xs font-bold text-slate-700 mb-1">Кафедра / Цикловая комиссия <span class="text-red-500">*</span></label>
+              <input type="text" id="reg-department" value="Кафедра ИТ и спецдисциплин" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+            </div>
+            <div>
+              <label for="reg-teacher-code" class="block text-xs font-bold text-slate-700 mb-1">Служебный код преподавателя <span class="text-red-500">*</span></label>
+              <input type="text" id="reg-teacher-code" placeholder="Код кафедры (например: AMK2026)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-sm uppercase font-mono focus:outline-none focus:ring-2 focus:ring-indigo-600" />
+              <span class="text-[10px] text-indigo-700 font-semibold block mt-1">Защита от регистрации студентов: код <code>AMK2026</code></span>
+            </div>
+          </div>
+
+          <!-- Step D: Email Verification with 6-Digit OTP -->
+          <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <label for="reg-email" class="text-xs font-bold text-slate-800">4. Электронная почта и подтверждение <span class="text-red-500">*</span></label>
+              <span id="email-verified-badge" class="hidden px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-bold flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">verified</span>
+                <span>Почта подтверждена</span>
+              </span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2.5">
+              <input type="email" id="reg-email" oninput="onEmailChanged()" placeholder="student@gmail.com или name@amk.kz" class="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+              <button type="button" id="btn-send-code" onclick="requestEmailVerificationCode()" class="px-4 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-bold text-xs shrink-0 transition-all flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">forward_to_inbox</span>
+                <span id="btn-send-code-label">Подтвердить почту</span>
+              </button>
+            </div>
+            <div id="email-hint-msg" class="text-[11px] text-slate-500">На указанный адрес будет отправлен одноразовый 6-значный код проверки.</div>
+
+            <!-- Inline 6-digit OTP Panel -->
+            <div id="otp-verification-panel" class="hidden pt-2 border-t border-slate-100 space-y-2.5">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-slate-700">Введите 6-значный код из письма:</span>
+                <span id="otp-timer-label" class="text-[11px] text-slate-400"></span>
+              </div>
+              <div class="flex flex-wrap items-center gap-2.5">
+                <input type="text" id="reg-otp-code" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="000000" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 6)" class="w-40 px-4 py-2 rounded-xl border-2 border-indigo-300 font-mono font-extrabold text-lg tracking-[0.35em] text-center text-indigo-700 focus:outline-none focus:border-indigo-600" />
+                <button type="button" onclick="confirmEmailOtp()" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all">
+                  Проверить код
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step E: Password + Strength + Confirmation -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Email</label>
-              <input type="email" id="reg-email" placeholder="student@amk.kz" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+              <label for="reg-password" class="block text-xs font-bold text-slate-700 mb-1">5. Придумайте пароль <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <input type="password" id="reg-password" oninput="updatePasswordMeter()" placeholder="Мин. 6 симв., буквы + цифры" class="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+                <button type="button" onclick="togglePwdVisibility('reg-password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+                  <span class="material-symbols-outlined text-[18px]">visibility</span>
+                </button>
+              </div>
+              <div class="grid grid-cols-4 gap-1 mt-2" id="pwd-strength-bars">
+                <div class="h-1.5 rounded-full bg-slate-200"></div>
+                <div class="h-1.5 rounded-full bg-slate-200"></div>
+                <div class="h-1.5 rounded-full bg-slate-200"></div>
+                <div class="h-1.5 rounded-full bg-slate-200"></div>
+              </div>
+              <span id="pwd-strength-label" class="text-[10px] text-slate-500 block mt-1">Минимум 6 символов, латинские/кириллические буквы и цифры</span>
             </div>
+
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Группа / Отделение</label>
-              <input type="text" id="reg-group" value="ИС-21" placeholder="ИС-21" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+              <label for="reg-password-confirm" class="block text-xs font-bold text-slate-700 mb-1">Повторите пароль <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <input type="password" id="reg-password-confirm" oninput="updatePasswordMeter()" placeholder="Повторите пароль" class="w-full pl-3.5 pr-10 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
+                <button type="button" onclick="togglePwdVisibility('reg-password-confirm', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">
+                  <span class="material-symbols-outlined text-[18px]">visibility</span>
+                </button>
+              </div>
+              <span id="pwd-match-label" class="text-[10px] text-slate-500 block mt-3">Пароли должны совпадать</span>
             </div>
           </div>
 
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Придумайте пароль</label>
-            <input type="password" id="reg-password" placeholder="минимум 6 символов" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600" required />
-          </div>
+          <label class="flex items-start gap-2.5 text-xs text-slate-600 cursor-pointer select-none pt-1">
+            <input type="checkbox" id="reg-consent" checked class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-600" />
+            <span>Подтверждаю корректность своих ФИО и соглашаюсь с правилами прохождения курсов и академической честности EDU SPACE.</span>
+          </label>
 
-          <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-all">
-            Зарегистрироваться
+          <button type="submit" id="btn-register-submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition-all flex items-center justify-center gap-2">
+            <span>Завершить регистрацию и начать курс</span>
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
           </button>
         </form>
 
@@ -237,11 +371,34 @@
 
   <!-- FOOTER -->
   <footer class="w-full py-6 border-t border-slate-200 text-center text-xs text-slate-500 bg-white">
-    Алматинский многопрофильный колледж (АМК) • Цифровая образовательная платформа EDU SPACE 2026
+    Алматинский многопрофильный колледж (АМК) • Образовательная платформа курсов EDU SPACE 2026
   </footer>
 
   <script>
+    let isEmailVerified = false;
+    let verifiedEmailValue = '';
+    let resendInterval = null;
+
+    function showAuthAlert(msg, type = 'error') {
+      const box = document.getElementById('auth-alert-box');
+      if (!box) return;
+      box.className = 'p-3.5 rounded-xl text-xs font-semibold flex items-start gap-2.5 ' + (
+        type === 'error'
+          ? 'bg-red-50 border border-red-200 text-red-700'
+          : (type === 'success' ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' : 'bg-indigo-50 border border-indigo-200 text-indigo-800')
+      );
+      const icon = type === 'error' ? 'error' : (type === 'success' ? 'check_circle' : 'info');
+      box.innerHTML = `<span class="material-symbols-outlined text-[18px] shrink-0">${icon}</span><span>${msg}</span>`;
+      box.classList.remove('hidden');
+    }
+
+    function hideAuthAlert() {
+      const box = document.getElementById('auth-alert-box');
+      if (box) box.classList.add('hidden');
+    }
+
     function switchAuthTab(tab) {
+      hideAuthAlert();
       const btnLogin = document.getElementById('tab-btn-login');
       const btnReg = document.getElementById('tab-btn-register');
       const formLogin = document.getElementById('form-login');
@@ -260,119 +417,318 @@
       }
     }
 
-    function toggleRoleCard(radio) {
-      document.querySelectorAll('.role-card').forEach(c => {
-        c.className = 'role-card cursor-pointer p-3 rounded-xl border border-slate-300 hover:border-slate-400 bg-white flex items-center gap-3';
+    function onRoleChange(role) {
+      const cardStudent = document.getElementById('role-card-student');
+      const cardTeacher = document.getElementById('role-card-teacher');
+      const studentFields = document.getElementById('student-academic-fields');
+      const teacherFields = document.getElementById('teacher-academic-fields');
+
+      if (role === 'teacher') {
+        cardTeacher.className = 'cursor-pointer p-3.5 rounded-2xl border-2 border-indigo-600 bg-indigo-50/50 flex items-center gap-3 transition-all';
+        cardStudent.className = 'cursor-pointer p-3.5 rounded-2xl border border-slate-200 hover:border-slate-300 bg-white flex items-center gap-3 transition-all';
+        studentFields.classList.add('hidden');
+        teacherFields.classList.remove('hidden');
+      } else {
+        cardStudent.className = 'cursor-pointer p-3.5 rounded-2xl border-2 border-indigo-600 bg-indigo-50/50 flex items-center gap-3 transition-all';
+        cardTeacher.className = 'cursor-pointer p-3.5 rounded-2xl border border-slate-200 hover:border-slate-300 bg-white flex items-center gap-3 transition-all';
+        teacherFields.classList.add('hidden');
+        studentFields.classList.remove('hidden');
+      }
+    }
+
+    function toggleNoMiddle(checked) {
+      const mid = document.getElementById('reg-middle-name');
+      if (checked) {
+        mid.value = '';
+        mid.disabled = true;
+        mid.classList.add('bg-slate-100', 'text-slate-400');
+      } else {
+        mid.disabled = false;
+        mid.classList.remove('bg-slate-100', 'text-slate-400');
+      }
+      onFioInput();
+    }
+
+    function onFioInput() {
+      const check = window.EduSpace.validateFioFields({
+        last_name: document.getElementById('reg-last-name').value,
+        first_name: document.getElementById('reg-first-name').value,
+        middle_name: document.getElementById('reg-middle-name').value,
+        no_middle_name: document.getElementById('reg-no-middle').checked
       });
-      radio.closest('.role-card').className = 'role-card cursor-pointer p-3 rounded-xl border-2 border-indigo-600 bg-indigo-50/50 flex items-center gap-3';
+      const preview = document.getElementById('fio-live-preview');
+      const msg = document.getElementById('fio-validation-msg');
+
+      if (check.valid) {
+        preview.textContent = `В документах: ${check.full_name}`;
+        preview.className = 'text-[11px] font-bold text-emerald-700';
+        msg.textContent = 'ФИО заполнено корректно ✓';
+        msg.className = 'text-[11px] text-emerald-600 font-semibold';
+      } else {
+        preview.textContent = 'Укажите полные Фамилию и Имя';
+        preview.className = 'text-[11px] font-semibold text-indigo-600';
+        msg.textContent = check.error;
+        msg.className = 'text-[11px] text-amber-700';
+      }
+    }
+
+    function onEmailChanged() {
+      const cur = document.getElementById('reg-email').value.trim().toLowerCase();
+      if (cur !== verifiedEmailValue) {
+        isEmailVerified = false;
+        document.getElementById('email-verified-badge').classList.add('hidden');
+      }
+    }
+
+    async function requestEmailVerificationCode() {
+      hideAuthAlert();
+      const emailInput = document.getElementById('reg-email');
+      const check = window.EduSpace.validateEmailFormat(emailInput.value);
+      if (!check.valid) {
+        showAuthAlert(check.error, 'error');
+        emailInput.focus();
+        return;
+      }
+
+      const btn = document.getElementById('btn-send-code');
+      const lbl = document.getElementById('btn-send-code-label');
+      btn.disabled = true;
+
+      const res = await window.EduSpace.api('/api/auth/send_code', {
+        method: 'POST',
+        body: { email: check.email }
+      });
+
+      if (!res.ok || !res.data.success) {
+        btn.disabled = false;
+        showAuthAlert((res.data && res.data.message) || 'Не удалось отправить код подтверждения', 'error');
+        return;
+      }
+
+      document.getElementById('otp-verification-panel').classList.remove('hidden');
+      document.getElementById('email-hint-msg').textContent = `Письмо с 6-значным кодом отправлено на ${check.email}. Введите код ниже:`;
+      document.getElementById('email-hint-msg').className = 'text-[11px] text-indigo-700 font-semibold';
+      document.getElementById('reg-otp-code').focus();
+
+      if (res.data.mail_preview) {
+        window.EduSpace.showIncomingMailCard(res.data.mail_preview, (code) => {
+          document.getElementById('reg-otp-code').value = code;
+          confirmEmailOtp();
+        });
+      }
+
+      let left = 45;
+      clearInterval(resendInterval);
+      lbl.textContent = `Повторно (${left}с)`;
+      resendInterval = setInterval(() => {
+        left--;
+        if (left <= 0) {
+          clearInterval(resendInterval);
+          btn.disabled = false;
+          lbl.textContent = 'Отправить код ещё раз';
+        } else {
+          lbl.textContent = `Повторно (${left}с)`;
+        }
+      }, 1000);
+    }
+
+    async function confirmEmailOtp() {
+      hideAuthAlert();
+      const email = document.getElementById('reg-email').value.trim().toLowerCase();
+      const code = document.getElementById('reg-otp-code').value.trim();
+      if (code.length !== 6) {
+        showAuthAlert('Введите все 6 цифр кода подтверждения из письма.', 'error');
+        return false;
+      }
+      const res = await window.EduSpace.api('/api/auth/verify_code', {
+        method: 'POST',
+        body: { email, code }
+      });
+      if (!res.ok || !res.data.success) {
+        showAuthAlert((res.data && res.data.message) || 'Неверный код подтверждения почты.', 'error');
+        return false;
+      }
+
+      isEmailVerified = true;
+      verifiedEmailValue = email;
+      document.getElementById('email-verified-badge').classList.remove('hidden');
+      document.getElementById('otp-verification-panel').classList.add('hidden');
+      document.getElementById('email-hint-msg').textContent = `Адрес ${email} успешно проверен и подтверждён ✓`;
+      document.getElementById('email-hint-msg').className = 'text-[11px] text-emerald-700 font-bold';
+      showToast('Электронная почта успешно подтверждена!', 'success');
+      return true;
+    }
+
+    function updatePasswordMeter() {
+      const pwd = document.getElementById('reg-password').value;
+      const conf = document.getElementById('reg-password-confirm').value;
+      const res = window.EduSpace.validatePasswordStrength(pwd);
+      const bars = document.querySelectorAll('#pwd-strength-bars > div');
+      const lbl = document.getElementById('pwd-strength-label');
+      const matchLbl = document.getElementById('pwd-match-label');
+
+      const colors = ['bg-red-500', 'bg-amber-500', 'bg-indigo-500', 'bg-emerald-500'];
+      const texts = ['Слишком простой пароль', 'Слабый (добавьте цифры/буквы)', 'Хороший пароль ✓', 'Отличный надёжный пароль ✓'];
+
+      bars.forEach((b, idx) => {
+        b.className = 'h-1.5 rounded-full transition-all ' + (idx < res.score ? colors[Math.max(0, res.score - 1)] : 'bg-slate-200');
+      });
+      lbl.textContent = pwd ? texts[Math.max(0, res.score - 1)] : 'Минимум 6 символов, буквы и цифры';
+      lbl.className = 'text-[10px] block mt-1 ' + (res.valid ? 'text-emerald-600 font-semibold' : 'text-slate-500');
+
+      if (!conf) {
+        matchLbl.textContent = 'Повторите пароль для проверки';
+        matchLbl.className = 'text-[10px] text-slate-500 block mt-3';
+      } else if (pwd === conf) {
+        matchLbl.textContent = 'Пароли совпадают ✓';
+        matchLbl.className = 'text-[10px] text-emerald-600 font-semibold block mt-3';
+      } else {
+        matchLbl.textContent = 'Пароли не совпадают';
+        matchLbl.className = 'text-[10px] text-red-600 font-semibold block mt-3';
+      }
+    }
+
+    function togglePwdVisibility(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        if (icon) icon.textContent = 'visibility_off';
+      } else {
+        inp.type = 'password';
+        if (icon) icon.textContent = 'visibility';
+      }
+    }
+
+    function openPasswordHelp() {
+      openModal('🔑 Восстановление доступа к аккаунту', `
+        <p class="text-xs text-slate-600 leading-relaxed">
+          Для входа используйте email и пароль, указанные вами при регистрации. Если вы хотите быстро протестировать платформу, воспользуйтесь кнопками ознакомительного демо-входа слева или зарегистрируйте новый личный аккаунт за 1 минуту.
+        </p>
+        <div class="pt-2 flex justify-end">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl">Понятно</button>
+        </div>
+      `);
     }
 
     async function submitLogin() {
-      const email = document.getElementById('login-email').value.trim();
+      hideAuthAlert();
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
       const password = document.getElementById('login-password').value.trim();
 
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ email, password })
-        });
-        const data = await res.json();
-        if (data.success) {
-          setActiveUser(data.user);
-          showToast(data.message || 'Успешный вход!', 'success');
-          setTimeout(() => {
-            window.location.href = data.user.role === 'teacher' ? 'teacher.html' : 'student.html';
-          }, 400);
-        } else {
-          showToast(data.message || 'Ошибка входа', 'error');
-        }
-      } catch (e) {
-        // Local fallback
-        const mockUser = {
-          id: 1,
-          email: email,
-          full_name: 'Константин Воронов',
-          role: email.includes('teacher') ? 'teacher' : 'student',
-          group_name: 'ИС-21'
-        };
-        setActiveUser(mockUser);
-        showToast('Вход выполнен!', 'success');
-        setTimeout(() => {
-          window.location.href = mockUser.role === 'teacher' ? 'teacher.html' : 'student.html';
-        }, 400);
+      const res = await window.EduSpace.api('/api/auth/login', {
+        method: 'POST',
+        body: { email, password }
+      });
+
+      if (!res.ok || !res.data.success) {
+        showAuthAlert((res.data && res.data.message) || 'Неверный email или пароль.', 'error');
+        return;
       }
+
+      const user = window.EduSpace.setActiveUser(res.data.user);
+      showToast(res.data.message || `Добро пожаловать, ${user.full_name}!`, 'success');
+      setTimeout(() => {
+        window.location.href = user.role === 'teacher' ? 'teacher.html' : 'student.html';
+      }, 350);
     }
 
     async function submitRegister() {
+      hideAuthAlert();
       const role = document.querySelector('input[name="reg-role"]:checked').value;
-      const full_name = document.getElementById('reg-name').value.trim();
-      const email = document.getElementById('reg-email').value.trim();
-      const group_name = document.getElementById('reg-group').value.trim();
-      const password = document.getElementById('reg-password').value.trim();
+      const fioCheck = window.EduSpace.validateFioFields({
+        last_name: document.getElementById('reg-last-name').value,
+        first_name: document.getElementById('reg-first-name').value,
+        middle_name: document.getElementById('reg-middle-name').value,
+        no_middle_name: document.getElementById('reg-no-middle').checked
+      });
+      if (!fioCheck.valid) {
+        showAuthAlert(fioCheck.error, 'error');
+        return;
+      }
 
-      try {
-        const res = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ email, password, full_name, role, group_name })
-        });
-        const data = await res.json();
-        if (data.success) {
-          setActiveUser(data.user);
-          showToast(data.message || 'Регистрация успешна!', 'success');
-          setTimeout(() => {
-            window.location.href = role === 'teacher' ? 'teacher.html' : 'student.html';
-          }, 400);
+      const emailCheck = window.EduSpace.validateEmailFormat(document.getElementById('reg-email').value);
+      if (!emailCheck.valid) {
+        showAuthAlert(emailCheck.error, 'error');
+        return;
+      }
+
+      const pwd = document.getElementById('reg-password').value;
+      const pwdConf = document.getElementById('reg-password-confirm').value;
+      const pwdCheck = window.EduSpace.validatePasswordStrength(pwd);
+      if (!pwdCheck.valid) {
+        showAuthAlert(pwdCheck.error, 'error');
+        return;
+      }
+      if (pwd !== pwdConf) {
+        showAuthAlert('Введённые пароли не совпадают. Проверьте поле подтверждения пароля.', 'error');
+        return;
+      }
+      if (!document.getElementById('reg-consent').checked) {
+        showAuthAlert('Необходимо подтвердить достоверность ФИО и согласие с правилами обучения.', 'error');
+        return;
+      }
+
+      const otpInputVal = document.getElementById('reg-otp-code').value.trim();
+      if (!isEmailVerified) {
+        if (otpInputVal.length === 6) {
+          const okOtp = await confirmEmailOtp();
+          if (!okOtp) return;
         } else {
-          showToast(data.message || 'Ошибка регистрации', 'error');
+          showAuthAlert('Пожалуйста, подтвердите ваш Email: нажмите «Подтвердить почту» и введите 6-значный код из письма.', 'error');
+          await requestEmailVerificationCode();
+          return;
         }
-      } catch (e) {
-        showToast('Регистрация завершена!', 'success');
-        setTimeout(() => {
-          window.location.href = role === 'teacher' ? 'teacher.html' : 'student.html';
-        }, 400);
       }
+
+      const payload = {
+        role,
+        last_name: fioCheck.last_name,
+        first_name: fioCheck.first_name,
+        middle_name: fioCheck.middle_name,
+        no_middle_name: document.getElementById('reg-no-middle').checked,
+        email: emailCheck.email,
+        password: pwd,
+        verification_code: otpInputVal,
+        specialty_slug: document.getElementById('reg-course').value,
+        group_name: document.getElementById('reg-group').value.trim() || 'ИС-21',
+        department: document.getElementById('reg-department').value.trim(),
+        teacher_code: document.getElementById('reg-teacher-code').value.trim()
+      };
+
+      const res = await window.EduSpace.api('/api/auth/register', {
+        method: 'POST',
+        body: payload
+      });
+
+      if (!res.ok || !res.data.success) {
+        showAuthAlert((res.data && res.data.message) || 'Ошибка при регистрации аккаунта.', 'error');
+        return;
+      }
+
+      const user = window.EduSpace.setActiveUser(res.data.user);
+      showToast(res.data.message || 'Аккаунт успешно создан!', 'success');
+      setTimeout(() => {
+        window.location.href = user.role === 'teacher' ? 'teacher.html' : 'student.html';
+      }, 450);
     }
 
-    function demoLogin(role) {
-      if (role === 'student') {
-        const user = {
-          id: 1,
-          email: 'voronov@student.amk.kz',
-          full_name: 'Константин Воронов',
-          role: 'student',
-          group_name: 'ИС-21',
-          student_id: 'KZ-AMK-2026-98421'
-        };
-        setActiveUser(user);
-        showToast('Вход как студент Константин Воронов...', 'success');
-        setTimeout(() => window.location.href = 'student.html', 300);
-      } else {
-        const user = {
-          id: 2,
-          email: 'teacher@amk.kz',
-          full_name: 'Иванов Сергей Павлович',
-          role: 'teacher',
-          group_name: 'Кафедра ТиПО'
-        };
-        setActiveUser(user);
-        showToast('Вход как преподаватель Иванов С. П....', 'success');
-        setTimeout(() => window.location.href = 'teacher.html', 300);
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
       if (params.get('mode') === 'register') {
         switchAuthTab('register');
       }
       if (params.get('role') === 'teacher') {
-        const teacherRadio = document.querySelector('input[value="teacher"]');
+        switchAuthTab('register');
+        const teacherRadio = document.querySelector('input[name="reg-role"][value="teacher"]');
         if (teacherRadio) {
           teacherRadio.checked = true;
-          toggleRoleCard(teacherRadio);
+          onRoleChange('teacher');
         }
+      }
+      if (params.get('course')) {
+        const sel = document.getElementById('reg-course');
+        if (sel) sel.value = params.get('course');
       }
     });
   </script>
