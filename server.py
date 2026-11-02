@@ -1337,6 +1337,191 @@ def advance_study_day():
     })
 
 
+@app.route('/api/teacher/students', methods=['GET'])
+def get_teacher_students():
+    specialty = request.args.get('specialty')
+    group_filter = request.args.get('group')
+    conn = get_db()
+    cursor = conn.cursor()
+
+    q = """
+    SELECT id, full_name, last_name, first_name, middle_name, email, role,
+           specialty_slug, group_name, student_id, is_demo, created_at
+    FROM users
+    WHERE role = 'student'
+    """
+    params = []
+    if specialty:
+        q += " AND specialty_slug = ?"
+        params.append(specialty)
+    if group_filter:
+        q += " AND group_name = ?"
+        params.append(group_filter)
+
+    q += " ORDER BY is_demo ASC, created_at DESC, id DESC"
+    cursor.execute(q, params)
+    raw_students = cursor.fetchall()
+
+    students = []
+    for r in raw_students:
+        s_dict = serialize_user(r)
+        uid = s_dict["id"]
+
+        cursor.execute("""
+        SELECT COUNT(DISTINCT task_number) as passed_cnt,
+               COUNT(id) as total_subs,
+               AVG(score) as avg_sc,
+               MAX(updated_at) as last_act
+        FROM task_submissions
+        WHERE user_id = ?
+        """, (uid,))
+        agg = cursor.fetchone()
+
+        s_dict["submitted_count"] = agg["total_subs"] if agg else 0
+        s_dict["passed_count"] = agg["passed_cnt"] if agg else 0
+        s_dict["avg_score"] = round(agg["avg_sc"], 1) if (agg and agg["avg_sc"] is not None) else 0.0
+        s_dict["last_activity"] = agg["last_act"] if (agg and agg["last_act"]) else s_dict.get("created_at")
+
+        course_meta = COURSES_BY_SLUG.get(s_dict.get("specialty_slug", "it"), COURSES_META[0])
+        s_dict["course_name"] = course_meta["short_title"]
+        s_dict["course_code"] = course_meta["code"]
+
+        students.append(s_dict)
+
+    return jsonify({
+        "success": True,
+        "count": len(students),
+        "students": students,
+        "current_study_day": get_current_day()
+    })
+
+
+@app.route('/api/teacher/sync_user', methods=['POST'])
+def sync_user():
+    data = request.get_json() or {}
+    email = (data.get('email') or '').strip().lower()
+    full_name = (data.get('full_name') or '').strip()
+    role = (data.get('role') or 'student').strip().lower()
+    group_name = (data.get('group_name') or 'ИС-21').strip()
+    specialty_slug = (data.get('specialty_slug') or 'it').strip().lower()
+    is_demo = 1 if bool(data.get('is_demo', False)) else 0
+    student_id = data.get('student_id')
+
+    if not email or not full_name:
+        return jsonify({"success": False, "message": "Не указаны обязательные поля"}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+    existing = cursor.fetchone()
+
+    if existing:
+        return jsonify({"success": True, "message": "Пользователь уже существует в БД", "user_id": existing["id"]})
+
+    fio_parts = [p for p in re.split(r'\s+', full_name) if p]
+    last_name = fio_parts[0] if fio_parts else full_name
+    first_name = fio_parts[1] if len(fio_parts) > 1 else ""
+    middle_name = " ".join(fio_parts[2:]) if len(fio_parts) > 2 else ""
+
+    pwd_hash = hashlib.sha256("student123".encode()).hexdigest()
+    if not student_id and role == 'student':
+        student_id = f"KZ-AMK-2026-{random.randint(10000, 99999)}"
+
+    cursor.execute("""
+    INSERT INTO users (
+        email, password_hash, full_name, last_name, first_name, middle_name,
+        role, group_name, specialty_slug, department, student_id, email_verified, is_demo
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '', ?, 1, ?)
+    """, (
+        email, pwd_hash, full_name, last_name, first_name, middle_name,
+        role, group_name, specialty_slug, student_id, is_demo
+    ))
+    new_id = cursor.lastrowid
+    if role == 'student':
+        cursor.execute("INSERT OR IGNORE INTO enrollments (user_id, specialty_slug) VALUES (?, ?)", (new_id, specialty_slug))
+    conn.commit()
+
+    return jsonify({"success": True, "message": "Пользователь синхронизирован с сервером", "user_id": new_id})
+
+
+@app.route('/api/teacher/simulate_submission', methods=['POST'])
+def simulate_submission():
+    data = request.get_json() or {}
+    user_id = data.get('user_id')
+    specialty_slug = (data.get('specialty_slug') or 'it').strip().lower()
+    task_num = int(data.get('task_number') or 1)
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    if not user_id:
+        cursor.execute("SELECT id, full_name, group_name, student_id, specialty_slug FROM users WHERE role = 'student' ORDER BY is_demo ASC, id DESC LIMIT 1")
+        st_row = cursor.fetchone()
+    else:
+        cursor.execute("SELECT id, full_name, group_name, student_id, specialty_slug FROM users WHERE id = ?", (user_id,))
+        st_row = cursor.fetchone()
+
+    if not st_row:
+        return jsonify({"success": False, "message": "В системе нет зарегистрированных студентов для симуляции"}), 404
+
+    target_uid = st_row["id"]
+    st_name = st_row["full_name"]
+    grp = st_row["group_name"] or "ИС-21"
+    st_id = st_row["student_id"] or f"KZ-AMK-2026-{10000 + target_uid}"
+    spec = specialty_slug or st_row["specialty_slug"] or "it"
+
+    cursor.execute("SELECT id, title FROM tasks WHERE specialty_slug = ? AND task_number = ?", (spec, task_num))
+    t_row = cursor.fetchone()
+    task_id = t_row["id"] if t_row else task_num
+    task_title = t_row["title"] if t_row else f"Практический урок №{task_num}"
+
+    code_sample = (
+        "<!DOCTYPE html>\n<html lang=\"ru\">\n<head>\n  <title>Макет карточки студента</title>\n"
+        "  <style>\n    .card { padding: 20px; border-radius: 12px; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }\n"
+        "  </style>\n</head>\n<body>\n  <div class=\"card\">\n    <h2>Выполненное практическое задание</h2>\n"
+        "    <p>Решение сдано на проверку куратору. Все критерии выполнены.</p>\n  </div>\n</body>\n</html>"
+    )
+
+    score = 90
+    grade_letter = "—"
+    status = "Отправлено на проверку"
+    comment = f"Здравствуйте, Сергей Павлович! Выполнил практическое задание №{task_num}. Проверьте, пожалуйста, соответствие критериям и чистоту кода."
+
+    cursor.execute("""
+    SELECT id FROM task_submissions WHERE user_id = ? AND specialty_slug = ? AND task_number = ?
+    """, (target_uid, spec, task_num))
+    existing = cursor.fetchone()
+
+    if existing:
+        sub_id = existing["id"]
+        cursor.execute("""
+        UPDATE task_submissions
+        SET status = ?, score = ?, grade_letter = ?, submitted_code = ?, student_comment = ?,
+            autotest_passed = 3, autotest_total = 3, quiz_score = 3, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+        """, (status, score, grade_letter, code_sample, comment, sub_id))
+    else:
+        cursor.execute("""
+        INSERT INTO task_submissions (
+            user_id, student_id, student_name, group_name, task_id, specialty_slug,
+            task_number, task_title, score, grade_letter, status, time_spent_seconds,
+            submitted_code, repo_url, student_comment, autotest_passed, autotest_total, quiz_score
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1200, ?, 'https://github.com/amk-student/project-demo', ?, 3, 3, 3)
+        """, (
+            target_uid, st_id, st_name, grp, task_id, spec,
+            task_num, task_title, score, grade_letter, status, code_sample, comment
+        ))
+        sub_id = cursor.lastrowid
+
+    conn.commit()
+
+    return jsonify({
+        "success": True,
+        "message": f"Тестовая работа от студента {st_name} (Урок №{task_num}) успешно отправлена в очередь на проверку!",
+        "submission_id": sub_id
+    })
+
+
 @app.route('/api/teacher/journal', methods=['GET'])
 def get_teacher_journal():
     specialty = request.args.get('specialty')

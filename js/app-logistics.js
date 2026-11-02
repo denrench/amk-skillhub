@@ -866,6 +866,120 @@
       });
     }
 
+    // 9.1 Teacher Students List
+    if (path === '/api/teacher/students' && method === 'GET') {
+      const spec = params.get('specialty');
+      const groupFilter = params.get('group');
+      let students = db.users.filter(u => u.role === 'student');
+      if (spec) students = students.filter(u => u.specialty_slug === spec);
+      if (groupFilter) students = students.filter(u => u.group_name === groupFilter);
+
+      students.sort((a, b) => Number(a.is_demo) - Number(b.is_demo) || (new Date(b.created_at || 0) - new Date(a.created_at || 0)));
+
+      const out = students.map(st => {
+        const enriched = enrichUserObject(st);
+        const userSubs = db.submissions.filter(s => s.user_id === st.id);
+        const passedSubs = userSubs.filter(s => s.score >= 60);
+        const scoredSubs = userSubs.filter(s => s.score > 0);
+        const avg = scoredSubs.length ? Number((scoredSubs.reduce((a, b) => a + b.score, 0) / scoredSubs.length).toFixed(1)) : 0;
+        const lastAct = userSubs.length ? (userSubs[userSubs.length - 1].updated_at || userSubs[userSubs.length - 1].created_at) : (st.created_at || 'Недавно');
+
+        enriched.submitted_count = userSubs.length;
+        enriched.passed_count = new Set(passedSubs.map(s => s.task_number)).size;
+        enriched.avg_score = avg;
+        enriched.last_activity = lastAct;
+        return enriched;
+      });
+
+      return reply(200, { success: true, count: out.length, students: out, current_study_day: db.current_study_day });
+    }
+
+    // 9.2 Teacher Sync User from Flask or static
+    if (path === '/api/teacher/sync_user' && method === 'POST') {
+      const email = (body.email || '').trim().toLowerCase();
+      if (!email) return reply(400, { success: false, message: 'Email обязателен' });
+      let existing = db.users.find(u => u.email === email);
+      if (!existing) {
+        const uid = db.next_user_id++;
+        const newUser = {
+          id: uid,
+          email,
+          password_hash: body.password_hash || 'placeholder',
+          full_name: body.full_name || 'Студент',
+          last_name: body.last_name || '',
+          first_name: body.first_name || '',
+          middle_name: body.middle_name || '',
+          role: body.role || 'student',
+          group_name: body.group_name || 'ИС-21',
+          specialty_slug: body.specialty_slug || 'it',
+          department: body.department || '',
+          student_id: body.student_id || `KZ-AMK-2026-${10000 + uid}`,
+          email_verified: true,
+          is_demo: Boolean(body.is_demo),
+          created_at: body.created_at || new Date().toISOString()
+        };
+        db.users.push(newUser);
+        saveLocalDB(db);
+        return reply(200, { success: true, message: 'Пользователь сохранён в localStorage', user: enrichUserObject(newUser) });
+      }
+      return reply(200, { success: true, message: 'Пользователь уже есть в localStorage', user: enrichUserObject(existing) });
+    }
+
+    // 9.3 Simulate Student Submission for Instant Review
+    if (path === '/api/teacher/simulate_submission' && method === 'POST') {
+      const uid = body.user_id ? Number(body.user_id) : null;
+      let targetStudent = null;
+      if (uid) {
+        targetStudent = db.users.find(u => u.id === uid && u.role === 'student');
+      } else {
+        targetStudent = db.users.find(u => u.role === 'student' && !u.is_demo) || db.users.find(u => u.role === 'student');
+      }
+      if (!targetStudent) return reply(404, { success: false, message: 'Студенты не найдены' });
+
+      const spec = body.specialty_slug || targetStudent.specialty_slug || 'it';
+      const taskNum = Number(body.task_number || 1);
+      const lesson = getLessonFromCatalog(spec, taskNum);
+      const taskTitle = lesson ? lesson.title : `Практический урок №${taskNum}`;
+
+      const existingIndex = db.submissions.findIndex(s => s.user_id === targetStudent.id && s.specialty_slug === spec && s.task_number === taskNum);
+      const subObj = {
+        id: existingIndex >= 0 ? db.submissions[existingIndex].id : db.next_sub_id++,
+        user_id: targetStudent.id,
+        student_id: targetStudent.student_id || `KZ-AMK-2026-${10000 + targetStudent.id}`,
+        student_name: targetStudent.full_name,
+        group_name: targetStudent.group_name || 'ИС-21',
+        task_id: taskNum,
+        specialty_slug: spec,
+        task_number: taskNum,
+        task_title: taskTitle,
+        score: 90,
+        grade_letter: '—',
+        status: 'Отправлено на проверку',
+        time_spent_seconds: 1200,
+        submitted_code: '<!DOCTYPE html>\n<html lang="ru">\n<head>\n  <title>Макет карточки студента</title>\n  <style>\n    .card { padding: 20px; border-radius: 12px; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }\n  </style>\n</head>\n<body>\n  <div class="card">\n    <h2>Выполненное практическое задание</h2>\n    <p>Решение сдано на проверку куратору. Все критерии выполнены.</p>\n  </div>\n</body>\n</html>',
+        repo_url: 'https://github.com/amk-student/project-demo',
+        student_comment: `Здравствуйте, Сергей Павлович! Выполнил практическое задание №${taskNum}. Проверьте, пожалуйста, соответствие критериям и чистоту кода.`,
+        autotest_passed: 3,
+        autotest_total: 3,
+        quiz_score: 3,
+        teacher_comment: '',
+        created_at: new Date().toLocaleString('ru-RU'),
+        updated_at: new Date().toLocaleString('ru-RU')
+      };
+
+      if (existingIndex >= 0) {
+        db.submissions[existingIndex] = subObj;
+      } else {
+        db.submissions.unshift(subObj);
+      }
+      saveLocalDB(db);
+      return reply(200, {
+        success: true,
+        message: `Тестовая работа от студента ${targetStudent.full_name} (Урок №${taskNum}) успешно отправлена в очередь на проверку!`,
+        submission_id: subObj.id
+      });
+    }
+
     if ((path === '/api/teacher/journal' || path === '/api/teacher/submissions') && method === 'GET') {
       const spec = params.get('specialty');
       let list = db.submissions.slice().reverse();
@@ -1046,6 +1160,42 @@
         if (contentType.includes('application/json')) {
           backendMode = 'flask';
           const data = await res.json();
+
+          // Bi-directional sync between Flask and localStorage
+          if (url.includes('/api/auth/register') && data.success && data.user) {
+            try {
+              const db = await loadLocalDB();
+              if (!db.users.some(u => u.email === data.user.email)) {
+                db.users.push(data.user);
+                saveLocalDB(db);
+              }
+            } catch (e) {}
+          }
+
+          if (url.includes('/api/teacher/students') && data.success && Array.isArray(data.students)) {
+            try {
+              const db = await loadLocalDB();
+              let updated = false;
+              data.students.forEach(st => {
+                if (!db.users.some(u => u.email === st.email)) {
+                  db.users.push(st);
+                  updated = true;
+                }
+              });
+              // Push any local real students to Flask if Flask is missing them
+              db.users.filter(u => u.role === 'student' && !u.is_demo).forEach(lu => {
+                if (!data.students.some(s => s.email === lu.email)) {
+                  fetch('/api/teacher/sync_user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(lu)
+                  }).catch(() => {});
+                }
+              });
+              if (updated) saveLocalDB(db);
+            } catch (e) {}
+          }
+
           return { ok: res.ok, status: res.status, data };
         }
         // Static server (like GitHub Pages) returned 404/405 HTML

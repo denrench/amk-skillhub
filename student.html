@@ -532,17 +532,39 @@
         `;
       } else {
         gradesBox.innerHTML = subs.slice(0, 5).map(s => {
-          const ok = s.score >= 60 && !String(s.status).includes('доработ');
+          const isPending = String(s.status).includes('проверк');
+          const isRev = String(s.status).includes('доработ');
+          const isApproved = !isPending && !isRev && s.score >= 60;
+
+          let pillCls = 'bg-emerald-100 text-emerald-800 border border-emerald-200';
+          let pillText = `${s.score}/100 (${s.grade_letter})`;
+          let commentHtml = '';
+
+          if (isPending) {
+            pillCls = 'bg-amber-100 text-amber-900 border border-amber-300';
+            pillText = '🟡 На проверке у куратора';
+            commentHtml = `<div class="text-[11px] text-amber-900 bg-amber-50 p-2 rounded-xl border border-amber-200">
+              <strong>Статус куратора:</strong> Решение отправлено преподавателю. Преподаватель проверит код и выставит официальный балл.
+            </div>`;
+          } else if (isRev) {
+            pillCls = 'bg-red-100 text-red-700 border border-red-300';
+            pillText = `🔴 Доработка (${s.score}/100)`;
+            commentHtml = `<div class="text-[11px] text-red-800 bg-red-50 p-2 rounded-xl border border-red-200">
+              <strong>Замечание преподавателя:</strong> ${s.teacher_comment || 'Требуется исправить ошибки в коде и отправить работу повторно.'}
+            </div>`;
+          } else {
+            commentHtml = `<div class="text-[11px] text-indigo-900 bg-white p-2 rounded-xl border border-slate-200">
+              <strong>Рецензия преподавателя:</strong> ${s.teacher_comment || 'Практическое решение успешно зачтено преподавателем.'}
+            </div>`;
+          }
+
           return `
             <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
               <div class="flex items-center justify-between gap-2">
-                <span class="font-bold text-xs text-slate-900">Урок №${s.task_number}</span>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${ok ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">${s.score}/100 (${s.grade_letter})</span>
+                <span class="font-bold text-xs text-slate-900">Урок №${s.task_number}. ${s.task_title}</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${pillCls}">${pillText}</span>
               </div>
-              <div class="text-[11px] text-slate-600 line-clamp-1">${s.task_title}</div>
-              <div class="text-[11px] text-indigo-700 bg-white p-2 rounded-xl border border-slate-100">
-                <strong>Отзыв:</strong> ${s.teacher_comment || s.status}
-              </div>
+              ${commentHtml}
             </div>
           `;
         }).join('');
