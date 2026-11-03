@@ -12,6 +12,9 @@ import json
 import random
 import sqlite3
 import hashlib
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, send_from_directory, g
 
@@ -550,6 +553,66 @@ def compute_dates_for_day(unlock_day):
 # AUTH & EMAIL VERIFICATION API
 # ==========================================
 
+
+# ==========================================
+# OFFICIAL EMAIL SMTP DISPATCHER
+# ==========================================
+SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
+SMTP_PORT = int(os.environ.get('SMTP_PORT', 587))
+SMTP_USER = os.environ.get('SMTP_USER', 'd03509181@gmail.com')
+SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
+
+def send_smtp_email(to_email, code):
+    if not SMTP_PASSWORD:
+        print(f"[OTP DEV PREVIEW] To: {to_email} | Code: {code} | SMTP_PASSWORD not set (Gmail App Password needed for live sending)")
+        return False, "SMTP_PASSWORD_NOT_SET"
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = f"{code} — Ваш проверочный код EDU SPACE (АМК)"
+        msg['From'] = f"EDU SPACE АМК <{SMTP_USER}>"
+        msg['To'] = to_email
+
+        html = f"""<!DOCTYPE html>
+        <html>
+        <head><meta charset="utf-8"></head>
+        <body style="margin: 0; padding: 24px; background-color: #07090e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+          <div style="max-width: 520px; margin: 0 auto; background: #0c1017; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.6);">
+            <div style="background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 32px 24px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px;">EDU SPACE</h1>
+              <p style="color: rgba(255,255,255,0.85); margin: 6px 0 0 0; font-size: 13px; font-weight: 600;">Алматинский многопрофильный колледж (АМК)</p>
+            </div>
+            <div style="padding: 32px 28px; text-align: center;">
+              <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6; margin: 0 0 22px 0;">
+                Здравствуйте! Вы запросили подтверждение регистрации на образовательной платформе <strong>EDU SPACE</strong>. Ваш 6-значный проверочный код:
+              </p>
+              <div style="display: inline-block; padding: 14px 28px; background: rgba(16, 185, 129, 0.12); border: 2px solid #10b981; border-radius: 14px; font-size: 34px; font-weight: 900; letter-spacing: 8px; color: #10b981; font-family: monospace;">
+                {code}
+              </div>
+              <p style="color: #64748b; font-size: 12px; margin: 22px 0 0 0;">
+                Код действителен в течение 10 минут. Никому не сообщайте данный код.
+              </p>
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.08); padding: 20px 24px; background: #07090e; text-align: center; color: #64748b; font-size: 11px; line-height: 1.6;">
+              КГКП «Алматинский многопрофильный колледж» • БИН: 990440001809<br/>
+              г. Алматы, ул. Жандосова, 63 • Тел. приемной: +7 (727) 309-59-44<br/>
+              Поддержка: +7 707 907 97 64 (WhatsApp) • danidanilov333@gmail.com
+            </div>
+          </div>
+        </body>
+        </html>"""
+        msg.attach(MIMEText(html, 'html', 'utf-8'))
+
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=10) as s:
+            s.starttls()
+            s.login(SMTP_USER, SMTP_PASSWORD)
+            s.sendmail(SMTP_USER, [to_email], msg.as_string())
+
+        print(f"[OTP SUCCESS] Real email delivered to {to_email} via {SMTP_USER}")
+        return True, "SUCCESS"
+    except Exception as e:
+        print(f"[OTP ERROR] SMTP Dispatch failed: {e}")
+        return False, str(e)
+
 @app.route('/api/auth/send_code', methods=['POST'])
 def send_verification_code():
     data = request.get_json() or {}
@@ -582,14 +645,18 @@ def send_verification_code():
     """, (email, code, expires_at))
     conn.commit()
 
+    sent_real, status_smtp = send_smtp_email(email, code)
+
+    msg_text = f"6-значный проверочный код отправлен на {email}" if sent_real else f"Код сформирован для {email} (демо-режим активен)"
     return jsonify({
         "success": True,
-        "message": f"6-значный код подтверждения отправлен на {email}",
+        "message": msg_text,
+        "sent_via_smtp": sent_real,
         "expires_in_seconds": 600,
         "mail_preview": {
             "to": email,
-            "from": "noreply@eduspace.amk.kz",
-            "subject": "Подтверждение электронной почты EDU SPACE",
+            "from": "d03509181@gmail.com",
+            "subject": f"{code} — Код подтверждения EDU SPACE (АМК)",
             "code": code
         }
     })
@@ -2276,6 +2343,7 @@ def verify_certificate():
             "specialty_title": course['title'],
             "qualification": course['short_title'],
             "curator": course['curator'],
+            "director": "Бейсетбаев Асылхан Косылханович",
             "passed_modules": passed_count,
             "total_modules": 10,
             "average_score": avg_score,
@@ -2283,7 +2351,13 @@ def verify_certificate():
             "is_pro": (u.get('subscription_tier') == 'pro'),
             "status": "VALID / ДЕЙСТВИТЕЛЕН",
             "issue_date": issue_date,
-            "institution": "Алматинский многопрофильный колледж (АМК)",
+            "institution": "КГКП «Алматинский многопрофильный колледж»",
+            "bin": "990440001809",
+            "address": "Республика Казахстан, г. Алматы, Ауэзовский р-н, ул. Жандосова, 63",
+            "reception_phone": "+7 (727) 309-59-44",
+            "support_phone": "+7 707 907 97 64",
+            "support_email": "danidanilov333@gmail.com",
+            "license_info": "Государственная лицензия МОН/МП РК (eLicense.kz, БИН 990440001809)",
             "accreditation_standard": "ГОСО РК ТиПО (Приказ МОН РК №130)",
             "digital_signature_hash": digital_signature,
             "qr_verify_url": f"/verify.html?cert={cert_number}"

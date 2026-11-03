@@ -210,7 +210,10 @@
             <div class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Цифровая подпись сертификата (SHA-256)</div>
             <div class="font-mono text-xs text-indigo-300 font-bold tracking-wider select-all" id="cert-hash-val"></div>
             <div class="text-[10px] text-slate-400 pt-0.5">
-              Стандарт: <span id="cert-standard-label">ГОСО РК ТиПО (Приказ МОН РК №130)</span>
+              Директор: <strong class="text-white" id="cert-director-label">Бейсетбаев Асылхан Косылханович</strong>
+            </div>
+            <div class="text-[10px] text-slate-500">
+              КГКП «АМК» • БИН: 990440001809 • г. Алматы, ул. Жандосова, 63
             </div>
           </div>
 
@@ -242,9 +245,15 @@
   </main>
 
   <!-- Footer -->
-  <footer class="relative z-10 border-t border-white/10 bg-dark-900/60 py-6 text-center text-xs text-slate-500">
-    <div class="max-w-7xl mx-auto px-4">
-      © 2026 EDU SPACE — Алматинский многопрофильный колледж. Государственный реестр верификации образовательных сертификатов.
+    <footer class="relative z-10 border-t border-white/10 bg-dark-900/60 py-8 text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+      <div>
+        <strong class="text-white">КГКП «Алматинский многопрофильный колледж»</strong> • БИН: 990440001809 • ул. Жандосова, 63<br/>
+        Единый реестр аккредитации образовательных сертификатов ТиПО РК
+      </div>
+      <div class="text-slate-300">
+        Поддержка: <a href="https://wa.me/77079079764" class="text-emerald-400 font-bold hover:underline">+7 707 907 97 64 (WhatsApp)</a> • <a href="mailto:danidanilov333@gmail.com" class="text-indigo-400 hover:underline">danidanilov333@gmail.com</a>
+      </div>
     </div>
   </footer>
 
@@ -316,6 +325,7 @@
           document.getElementById('cert-gpa-label').textContent = cert.gpa;
           document.getElementById('cert-date-label').textContent = cert.issue_date;
           document.getElementById('cert-hash-val').textContent = cert.digital_signature_hash;
+          if (cert.director) document.getElementById('cert-director-label').textContent = cert.director;
           document.getElementById('cert-standard-label').textContent = cert.accreditation_standard;
 
           document.getElementById('cert-qr-svg').innerHTML = generateQrSvg(window.location.href);

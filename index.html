@@ -607,28 +607,101 @@
   </section>
 
   <!-- ================= FOOTER ================= -->
-  <footer class="bg-dark-950 border-t border-white/10 py-12 text-slate-400 text-xs">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-      
-      <div class="flex items-center gap-3">
-        <img alt="EDU SPACE Logo" width="24" height="24" class="h-6 w-6 object-contain" src="assets/eduspace-logo.svg"/>
-        <span class="font-bold text-white text-sm">EDU SPACE</span>
-        <span class="text-slate-600">|</span>
-        <span>Алматинский многопрофильный колледж (АМК)</span>
+    <footer class="bg-dark-950 border-t border-white/10 pt-16 pb-12 relative overflow-hidden text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
+        <!-- Col 1: Brand & College -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white font-extrabold text-lg shadow-glow-indigo">
+              E
+            </div>
+            <div>
+              <span class="text-base font-extrabold text-white tracking-tight">EDU <span class="text-indigo-400">SPACE</span></span>
+              <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-400">Алматинский многопрофильный колледж</span>
+            </div>
+          </div>
+          <p class="text-slate-400 text-xs leading-relaxed max-w-sm">
+            КГКП «Алматинский многопрофильный колледж» Управления образования г. Алматы (БИН: 990440001809). Инновационная цифровая образовательная среда подготовки специалистов ТиПО по 5 ключевым отраслям.
+          </p>
+          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 text-[11px] text-slate-300 space-y-1">
+            <div class="font-bold text-white flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-indigo-400 text-[16px]">verified</span>
+              <span>Директор колледжа: Бейсетбаев Асылхан Косылханович</span>
+            </div>
+            <div>Гос. лицензия ТиПО (eLicense.kz) • Аккредитация ГОСО РК 2026</div>
+          </div>
+        </div>
+
+        <!-- Col 2: Специальности -->
+        <div>
+          <div class="text-xs font-bold text-white uppercase tracking-wider mb-4">Специальности</div>
+          <ul class="space-y-2 text-slate-400">
+            <li><a href="tasks.html?specialty=it" class="hover:text-indigo-400 transition-colors">06130100 — Web Design (ПО)</a></li>
+            <li><a href="tasks.html?specialty=graphic_design" class="hover:text-indigo-400 transition-colors">02130100 — Графический дизайн</a></li>
+            <li><a href="tasks.html?specialty=autoelectric" class="hover:text-indigo-400 transition-colors">07161301 — Автоэлектрики</a></li>
+            <li><a href="tasks.html?specialty=hvac" class="hover:text-indigo-400 transition-colors">07130700 — Холодильные системы</a></li>
+            <li><a href="tasks.html?specialty=automechanic" class="hover:text-indigo-400 transition-colors">07161300 — Автомеханики</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Навигация -->
+        <div>
+          <div class="text-xs font-bold text-white uppercase tracking-wider mb-4">Навигация</div>
+          <ul class="space-y-2 text-slate-400">
+            <li><a href="features.html" class="hover:text-indigo-400 transition-colors">Возможности LMS</a></li>
+            <li><a href="tasks.html" class="hover:text-indigo-400 transition-colors">Каталог 50 модулей</a></li>
+            <li><a href="pricing.html" class="hover:text-indigo-400 transition-colors">Тарифы и подписка</a></li>
+            <li><a href="gradebook.html" class="hover:text-indigo-400 transition-colors">Ведомость оценок</a></li>
+            <li><a href="verify.html" class="hover:text-indigo-400 transition-colors">Реестр сертификатов</a></li>
+            <li><a href="reviews.html" class="hover:text-indigo-400 transition-colors">Отзывы студентов</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Контакты -->
+        <div>
+          <div class="text-xs font-bold text-white uppercase tracking-wider mb-4">Контакты и поддержка</div>
+          <ul class="space-y-2.5 text-slate-300">
+            <li class="flex items-start gap-2">
+              <span class="material-symbols-outlined text-indigo-400 text-[16px] shrink-0 mt-0.5">location_on</span>
+              <span>г. Алматы, Ауэзовский р-н, ул. Жандосова, 63 (угол ул. Алтынсарина)</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-emerald-400 text-[16px] shrink-0">chat</span>
+              <a href="https://wa.me/77079079764" target="_blank" class="text-emerald-400 hover:text-emerald-300 font-bold hover:underline">
+                WhatsApp: +7 707 907 97 64
+              </a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-indigo-400 text-[16px] shrink-0">call</span>
+              <a href="tel:+77079079764" class="hover:text-white transition-colors">
+                +7 707 907 97 64
+              </a>
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-indigo-400 text-[16px] shrink-0">mail</span>
+              <a href="mailto:danidanilov333@gmail.com" class="hover:text-white transition-colors">
+                danidanilov333@gmail.com
+              </a>
+            </li>
+            <li class="flex items-center gap-2 text-slate-400 text-[11px] pt-1">
+              <span>Приемная колледжа: +7 (727) 309-59-44</span>
+            </li>
+          </ul>
+        </div>
       </div>
 
-      <div class="flex items-center gap-6">
-        <a href="features.html" class="hover:text-white transition-colors">Возможности</a>
-        <a href="tasks.html" class="hover:text-white transition-colors">5 Профессий</a>
-        <a href="pricing.html" class="hover:text-white transition-colors">Тарифы</a>
-        <a href="reviews.html" class="hover:text-white transition-colors">Отзывы</a>
-        <a href="auth.html?mode=login" class="hover:text-white transition-colors">Вход</a>
+      <!-- Bottom Bar -->
+      <div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+        <span>&copy; 2026 КГКП «Алматинский многопрофильный колледж» (АМК). БИН: 990440001809. Все права защищены.</span>
+        <div class="flex items-center gap-4">
+          <a href="verify.html" class="hover:text-indigo-400 transition-colors">Реестр аккредитации</a>
+          <span class="text-slate-700">•</span>
+          <a href="pricing.html" class="hover:text-indigo-400 transition-colors">Тарифы</a>
+          <span class="text-slate-700">•</span>
+          <span class="text-slate-400">Версия 2.0 Cyber-Glass</span>
+        </div>
       </div>
-
-      <div>
-        © 2026 EDU SPACE LMS. Все права защищены.
-      </div>
-
     </div>
   </footer>
 
