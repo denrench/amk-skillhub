@@ -2374,8 +2374,15 @@ def verify_certificate():
     })
 
 
+
+@app.route('/healthz')
+@app.route('/health')
+def healthz():
+    return jsonify({"status": "healthy", "service": "EDU SPACE LMS", "version": "2.0"}), 200
+
+
 if __name__ == '__main__':
     init_db()
     port = int(os.environ.get('PORT', 5000))
-    print(f"EDU SPACE LMS Server started at http://127.0.0.1:{port}")
+    print(f"EDU SPACE LMS Server running on http://0.0.0.0:{port}")
     app.run(host='0.0.0.0', port=port, debug=False)

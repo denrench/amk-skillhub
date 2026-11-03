@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: eduspace-amk
-    runtime: python
+    name: amk-skillhub
+    env: python
+    plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: python server.py
-    envVars:
-      - key: PORT
-        value: 5000
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 2 server:app
+    healthCheckPath: /healthz
+    autoDeploy: true
