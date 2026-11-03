@@ -1018,6 +1018,8 @@
         return;
       }
 
+      window.lastMatrixRows = rows;
+      window.lastMatrixSpec = spec;
       tbody.innerHTML = rows.map(r => {
         const st = r.student;
         let cellsHtml = '';
@@ -1081,6 +1083,158 @@
     }
 
     document.addEventListener('DOMContentLoaded', loadTeacherDashboard);
+  
+    // ==========================================
+    // OFFICIAL GRADEBOOK EXCEL & PRINT DISPATCHER
+    // ==========================================
+
+    function exportCsvJournal() {
+      const rows = window.lastMatrixRows || [];
+      const spec = window.lastMatrixSpec || (document.getElementById('matrix-course-select') ? document.getElementById('matrix-course-select').value : 'it');
+      const course = window.EduSpace.getCourseBySlug ? window.EduSpace.getCourseBySlug(spec) : { title: spec, code: '06130100' };
+
+      if (rows.length === 0) {
+        showToast('Пожалуйста, выберите направление и дождитесь загрузки таблицы', 'warning');
+        return;
+      }
+
+      let csv = '\uFEFF';
+      csv += `«ОФИЦИАЛЬНАЯ ЭКЗАМЕНАЦИОННАЯ СВОДНАЯ ВЕДОМОСТЬ ОЦЕНОК»\n`;
+      csv += `«КГКП \"Алматинский многопрофильный колледж\" (АМК) • БИН 990440001809»\n`;
+      csv += `«Директор: Бейсетбаев Асылхан Косылханович • г. Алматы, ул. Жандосова, 63»\n`;
+      csv += `«Специальность: ${course.code || ''} — ${course.title || spec}»\n`;
+      csv += `«Дата формирования: ${new Date().toLocaleDateString('ru-RU')}»\n\n`;
+
+      csv += `№;ФИО Студента;Студенческий билет / ИИН;Группа;М1;М2;М3;М4;М5;М6;М7;М8;М9;М10;Средний балл;GPA;Итоговый статус\n`;
+
+      rows.forEach((r, idx) => {
+        const st = r.student || {};
+        let scores = [];
+        let total = 0;
+        let count = 0;
+        for (let n = 1; n <= 10; n++) {
+          const c = r.cells[String(n)];
+          const sc = (c && c.score != null) ? c.score : '';
+          scores.push(sc);
+          if (sc !== '') {
+            total += Number(sc);
+            count++;
+          }
+        }
+        const avg = count > 0 ? (total / count).toFixed(1) : '0';
+        const gpa = (avg >= 90) ? '4.0 (A)' : (avg >= 75 ? '3.33 (B)' : (avg >= 60 ? '2.67 (C)' : '0 (F)'));
+        const status = count >= 8 && avg >= 60 ? 'ЗАЧТЕНО (ДОПУЩЕН)' : (count > 0 ? 'В ПРОЦЕССЕ' : 'НЕ ПРИСТУПАЛ');
+
+        const name = (st.full_name || 'Студент').replace(/;/g, ' ');
+        const sId = (st.student_id || '').replace(/;/g, ' ');
+        const grp = (st.group_name || 'ИС-21').replace(/;/g, ' ');
+
+        csv += `${idx + 1};${name};${sId};${grp};${scores.join(';')};${avg};${gpa};${status}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', `Vedomost_AMK_${spec}_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast('Сводная ведомость успешно выгружена в формате Excel (.csv)!', 'success');
+    }
+
+    function printOfficialGradebook() {
+      const rows = window.lastMatrixRows || [];
+      const spec = window.lastMatrixSpec || (document.getElementById('matrix-course-select') ? document.getElementById('matrix-course-select').value : 'it');
+      const course = window.EduSpace.getCourseBySlug ? window.EduSpace.getCourseBySlug(spec) : { title: spec, code: '06130100' };
+
+      if (rows.length === 0) {
+        showToast('Нет данных для печати ведомости', 'warning');
+        return;
+      }
+
+      const rowsHtml = rows.map((r, idx) => {
+        const st = r.student || {};
+        let cells = '';
+        let total = 0, count = 0;
+        for (let n = 1; n <= 10; n++) {
+          const c = r.cells[String(n)];
+          const sc = c && c.score != null ? c.score : '—';
+          if (c && c.score != null) { total += c.score; count++; }
+          cells += `<td style="border: 1px solid #000; padding: 4px; text-align: center; font-size: 11px;">${sc}</td>`;
+        }
+        const avg = count > 0 ? (total / count).toFixed(1) : '—';
+        const result = count >= 8 && avg >= 60 ? 'Зачтено' : 'Не зачтено';
+        return `
+          <tr>
+            <td style="border: 1px solid #000; padding: 4px; text-align: center;">${idx + 1}</td>
+            <td style="border: 1px solid #000; padding: 4px; font-weight: bold; font-size: 11px;">${st.full_name || 'Студент'}</td>
+            <td style="border: 1px solid #000; padding: 4px; text-align: center; font-size: 10px;">${st.group_name || 'ИС-21'}</td>
+            ${cells}
+            <td style="border: 1px solid #000; padding: 4px; text-align: center; font-weight: bold;">${avg}</td>
+            <td style="border: 1px solid #000; padding: 4px; text-align: center; font-weight: bold;">${result}</td>
+          </tr>
+        `;
+      }).join('');
+
+      const printWin = window.open('', '_blank');
+      printWin.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Экзаменационная ведомость — АМК</title>
+          <meta charset="utf-8"/>
+          <style>
+            body { font-family: 'Times New Roman', serif; margin: 15mm 15mm; color: #000; font-size: 12px; line-height: 1.3; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th { border: 1px solid #000; padding: 5px; font-size: 10px; background: #f0f0f0; }
+            .header { text-align: center; margin-bottom: 20px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h4 style="margin: 0; text-transform: uppercase;">Министерство просвещения Республики Казахстан</h4>
+            <h3 style="margin: 4px 0;">КГКП «Алматинский многопрофильный колледж»</h3>
+            <p style="margin: 2px 0; font-size: 11px;">БИН: 990440001809 • г. Алматы, ул. Жандосова, 63 • Тел.: +7 (727) 309-59-44</p>
+            <h2 style="margin: 15px 0 5px 0; text-transform: uppercase;">ЭКЗАМЕНАЦИОННАЯ СВОДНАЯ ВЕДОМОСТЬ ОЦЕНОК</h2>
+            <p style="margin: 0;"><strong>Специальность:</strong> ${course.code || ''} — ${course.title || spec} &nbsp;|&nbsp; <strong>Учебный год:</strong> 2026/2027</p>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th rowspan="2" style="width: 25px;">№</th>
+                <th rowspan="2">ФИО Студента</th>
+                <th rowspan="2" style="width: 50px;">Группа</th>
+                <th colspan="10">Практические модули (1..10)</th>
+                <th rowspan="2" style="width: 55px;">Ср. балл</th>
+                <th rowspan="2" style="width: 70px;">Итог</th>
+              </tr>
+              <tr>
+                <th>М1</th><th>М2</th><th>М3</th><th>М4</th><th>М5</th><th>М6</th><th>М7</th><th>М8</th><th>М9</th><th>М10</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+          <div style="margin-top: 35px; display: flex; justify-content: space-between;">
+            <div>
+              <p>Директор колледжа: __________________ <strong>Бейсетбаев А. К.</strong></p>
+              <p>Куратор специальности: __________________ <strong>${course.curator || ''}</strong></p>
+            </div>
+            <div style="text-align: right;">
+              <p>Председатель экзаменационной комиссии: __________________</p>
+              <p>Дата утверждения: «___» ____________ 2026 г.</p>
+            </div>
+          </div>
+          <script>window.onload = function() { window.print(); };<\/script>
+        </body>
+        </html>
+      `);
+      printWin.document.close();
+    }
+
   </script>
 </body>
 </html>

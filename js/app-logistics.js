@@ -2228,3 +2228,105 @@
   window.exportPdfStatement = exportPdfStatement;
   window.sharePortfolio = sharePortfolio;
 })();
+
+
+  // ==========================================
+  // GLOBAL COMMAND PALETTE (Ctrl + K)
+  // ==========================================
+
+  function initCommandPalette() {
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        openCommandPaletteModal();
+      }
+      if (e.key === 'Escape') {
+        closeCommandPaletteModal();
+      }
+    });
+  }
+
+  function openCommandPaletteModal() {
+    const existing = document.getElementById('edu-command-palette-modal');
+    if (existing) {
+      existing.classList.remove('hidden');
+      document.getElementById('cmd-palette-input').focus();
+      return;
+    }
+
+    const modal = document.createElement('div');
+    modal.id = 'edu-command-palette-modal';
+    modal.className = 'fixed inset-0 z-[999999] flex items-start justify-center pt-20 px-4 bg-dark-950/80 backdrop-blur-xl transition-all';
+    modal.innerHTML = `
+      <div class="w-full max-w-2xl bg-dark-900 border border-white/20 rounded-3xl shadow-2xl overflow-hidden shadow-glow-indigo text-slate-200">
+        <div class="p-4 border-b border-white/10 flex items-center gap-3">
+          <span class="material-symbols-outlined text-indigo-400 text-[24px]">search</span>
+          <input type="text" id="cmd-palette-input" oninput="filterCommandPalette(this.value)" placeholder="Быстрый поиск урока, специальности, ведомости или калькулятора..." class="w-full bg-transparent border-0 text-white placeholder-slate-500 text-sm focus:outline-none font-medium" />
+          <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400">ESC</span>
+        </div>
+        <div id="cmd-palette-results" class="max-h-96 overflow-y-auto p-3 space-y-1 text-xs"></div>
+        <div class="px-4 py-2.5 bg-dark-950/60 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-500">
+          <span>Навигация: <strong>↑ ↓</strong> • Выбор: <strong>Enter</strong></span>
+          <span>EDU SPACE Quick Search</span>
+        </div>
+      </div>
+    `;
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeCommandPaletteModal();
+    });
+
+    document.body.appendChild(modal);
+    document.getElementById('cmd-palette-input').focus();
+    renderCommandPaletteItems('');
+  }
+
+  function closeCommandPaletteModal() {
+    const m = document.getElementById('edu-command-palette-modal');
+    if (m) m.classList.add('hidden');
+  }
+
+  const PALETTE_ITEMS = [
+    { title: 'Веб-дизайн и разработка ПО (10 модулей)', desc: 'HTML, CSS, JS, SQL, Docker', url: 'tasks.html?specialty=it', icon: 'code', category: 'Специальность' },
+    { title: 'Графический дизайн (10 модулей)', desc: 'Figma, брендинг, типографика, растровая графика', url: 'tasks.html?specialty=graphic_design', icon: 'palette', category: 'Специальность' },
+    { title: 'Автоэлектрика и диагностика (10 модулей)', desc: 'Мультиметр, осциллограф, CAN-шина, OBD-II', url: 'tasks.html?specialty=autoelectric', icon: 'electric_meter', category: 'Специальность' },
+    { title: 'Холодильное оборудование и HVAC (10 модулей)', desc: 'Фреоны R134a/R404a, вакуумирование, перегрев', url: 'tasks.html?specialty=hvac', icon: 'ac_unit', category: 'Специальность' },
+    { title: 'Автомеханика и ТО (10 модулей)', desc: 'ДВС, моменты затяжки ГБЦ, зазоры клапанов', url: 'tasks.html?specialty=automechanic', icon: 'build', category: 'Специальность' },
+    { title: 'Электронная ведомость оценок', desc: 'Сводный академический журнал всех студентов', url: 'gradebook.html', icon: 'grid_on', category: 'Учебная часть' },
+    { title: 'Реестр проверки сертификатов', desc: 'Государственная проверка подлинности с QR-кодом', url: 'verify.html', icon: 'verified_user', category: 'Сертификация' },
+    { title: 'Тарифные планы и подписка Pro', desc: 'Kaspi QR, оплата картой, доступ к модулям 4–10', url: 'pricing.html', icon: 'diamond', category: 'Финансы' },
+    { title: 'Личный кабинет слушателя', desc: 'Профиль, статистика, зачётная книжка', url: 'profile.html', icon: 'person', category: 'Профиль' }
+  ];
+
+  function renderCommandPaletteItems(query) {
+    const cont = document.getElementById('cmd-palette-results');
+    if (!cont) return;
+    const q = (query || '').toLowerCase().trim();
+    const filtered = PALETTE_ITEMS.filter(it => !q || it.title.toLowerCase().includes(q) || it.desc.toLowerCase().includes(q) || it.category.toLowerCase().includes(q));
+
+    if (filtered.length === 0) {
+      cont.innerHTML = '<div class="p-6 text-center text-slate-500">По запросу ничего не найдено. Попробуйте другой термин.</div>';
+      return;
+    }
+
+    cont.innerHTML = filtered.map(it => `
+      <a href="${it.url}" onclick="closeCommandPaletteModal()" class="flex items-center justify-between p-3 rounded-2xl hover:bg-white/5 transition-colors group">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-indigo-400 group-hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-[20px]">${it.icon}</span>
+          </div>
+          <div>
+            <div class="font-bold text-white group-hover:text-indigo-300 transition-colors">${it.title}</div>
+            <div class="text-[11px] text-slate-400">${it.desc}</div>
+          </div>
+        </div>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-400">${it.category}</span>
+      </a>
+    `).join('');
+  }
+
+  function filterCommandPalette(val) {
+    renderCommandPaletteItems(val);
+  }
+
+  document.addEventListener('DOMContentLoaded', initCommandPalette);

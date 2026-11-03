@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  eduspace:
+    build: .
+    container_name: eduspace-amk
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+    restart: always
+    volumes:
+      - ./database.db:/app/database.db
+      - ./static/uploads:/app/static/uploads

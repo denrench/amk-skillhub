@@ -247,18 +247,72 @@
           </div>
         </section>
 
-        <!-- ================= STAGE 1: THEORY ================= -->
+        <!-- ================= STAGE 1: THEORY & VIDEO ================= -->
         <section id="stage-panel-theory" class="bg-dark-850/80 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-white/10 shadow-xl space-y-6">
-          <div class="flex items-center justify-between border-b border-white/10 pb-4 flex-wrap gap-2">
-            <div class="flex items-center gap-2 text-indigo-400 font-bold text-xs uppercase tracking-wider">
-              <span class="material-symbols-outlined text-[18px]">auto_stories</span>
-              <span>Учебный конспект модуля</span>
+          
+          <!-- Sub-tab switcher: Video vs Lecture -->
+          <div class="flex flex-wrap items-center justify-between border-b border-white/10 pb-4 gap-3">
+            <div class="flex items-center gap-2">
+              <button type="button" id="tab-sub-video" onclick="switchTheoryView('video')" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">play_circle</span>
+                <span>Видео-разбор урока</span>
+              </button>
+              <button type="button" id="tab-sub-text" onclick="switchTheoryView('text')" class="px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">menu_book</span>
+                <span>Учебный конспект</span>
+              </button>
             </div>
-            <span class="text-xs text-slate-400" id="theory-tools-badge">Стек инструментов</span>
+            <span class="text-xs text-slate-400 font-mono" id="theory-tools-badge">Стек инструментов</span>
           </div>
 
-          <div id="theory-content-body" class="theory-prose">
-            <!-- Populated from lesson.theory -->
+          <!-- Video View -->
+          <div id="theory-video-container" class="space-y-4">
+            <div class="rounded-2xl border border-white/15 bg-dark-950 overflow-hidden shadow-2xl relative">
+              <div class="aspect-video w-full bg-dark-900 flex flex-col items-center justify-center relative group p-6 text-center">
+                <div class="w-16 h-16 rounded-2xl bg-indigo-600/30 text-indigo-400 flex items-center justify-center border border-indigo-500/40 shadow-glow-indigo mb-3 group-hover:scale-110 transition-transform cursor-pointer" onclick="togglePlayLectureVideo()">
+                  <span class="material-symbols-outlined text-[36px]">play_arrow</span>
+                </div>
+                <div class="font-bold text-white text-base sm:text-lg" id="lecture-video-title">Видео-разбор практического задания</div>
+                <p class="text-xs text-slate-400 max-w-md mt-1" id="lecture-video-desc">Пошаговое объяснение архитектуры решения, предотвращение частых ошибок и демонстрация критериев автопроверки.</p>
+                <div class="mt-4 flex items-center gap-3">
+                  <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono text-slate-300">Длительность: 14:30</span>
+                  <span class="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300 font-bold">1080p HD • АМК</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Video Timecodes & Key Steps -->
+            <div class="p-4 rounded-2xl bg-dark-950/60 border border-white/10 space-y-2.5">
+              <div class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-indigo-400 text-[16px]">schedule</span>
+                <span>Ключевые таймкоды практического занятия:</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div onclick="seekLectureTime(0)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
+                  <span><strong>00:45</strong> — Постановка технической задачи</span>
+                  <span class="material-symbols-outlined text-[16px] text-indigo-400">arrow_forward</span>
+                </div>
+                <div onclick="seekLectureTime(180)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
+                  <span><strong>03:00</strong> — Анализ частых ошибок студентов</span>
+                  <span class="material-symbols-outlined text-[16px] text-indigo-400">arrow_forward</span>
+                </div>
+                <div onclick="seekLectureTime(450)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
+                  <span><strong>07:30</strong> — Пошаговое выполнение задания</span>
+                  <span class="material-symbols-outlined text-[16px] text-indigo-400">arrow_forward</span>
+                </div>
+                <div onclick="seekLectureTime(720)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
+                  <span><strong>12:00</strong> — Проверка чек-листа перед сдачей</span>
+                  <span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Text View -->
+          <div id="theory-text-container" class="hidden">
+            <div id="theory-content-body" class="theory-prose">
+              <!-- Populated from lesson.theory -->
+            </div>
           </div>
 
           <div class="pt-4 border-t border-white/10 flex items-center justify-between flex-wrap gap-3">
@@ -1111,6 +1165,37 @@
       document.getElementById('hvac-high-p').textContent = `${high} bar`;
       document.getElementById('hvac-sh').textContent = `${sh} °C`;
       showToast(`Манометрическая станция: Всасывание ${low} bar, Нагнетание ${high} bar (Перегрев: ${sh} °C)`, 'success');
+    }
+
+  
+    function switchTheoryView(view) {
+      const vBtn = document.getElementById('tab-sub-video');
+      const tBtn = document.getElementById('tab-sub-text');
+      const vBox = document.getElementById('theory-video-container');
+      const tBox = document.getElementById('theory-text-container');
+
+      if (view === 'video') {
+        vBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2';
+        tBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2';
+        vBox.classList.remove('hidden');
+        tBox.classList.add('hidden');
+      } else {
+        tBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2';
+        vBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2';
+        tBox.classList.remove('hidden');
+        vBox.classList.add('hidden');
+      }
+    }
+
+    function togglePlayLectureVideo() {
+      showToast('Видео-разбор открыт в интерактивном плеере EDU SPACE. Изучите материал и выполните практические шаги.', 'success');
+    }
+
+    function seekLectureTime(sec) {
+      const mins = Math.floor(sec / 60);
+      const s = sec % 60;
+      const str = `${mins < 10 ? '0' : ''}${mins}:${s < 10 ? '0' : ''}${s}`;
+      showToast(`Переход к разделу занятия [${str}]`, 'info');
     }
 
   </script>
