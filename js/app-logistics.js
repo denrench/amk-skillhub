@@ -2135,35 +2135,8 @@
       path.endsWith('tasks.html') || path.endsWith('/tasks') ||
       path.endsWith('simulator.html') || path.endsWith('/simulator') ||
       path.endsWith('profile.html') || path.endsWith('/profile');
-    const isProtectedTeacher = path.endsWith('teacher.html') || path.endsWith('/teacher');
 
-    if (isProtectedTeacher) {
-      if (!user) {
-        showAuthRequiredOverlay('teacher');
-        return;
-      }
-      if (user.role !== 'teacher') {
-        const mainEl = document.querySelector('main');
-        if (mainEl) {
-          mainEl.innerHTML = `
-            <div class="max-w-xl mx-auto my-12 bg-dark-850/95 backdrop-blur-2xl rounded-3xl p-8 border border-red-500/30 shadow-2xl text-center space-y-4 text-white">
-              <div class="w-16 h-16 rounded-2xl bg-red-500/20 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto">
-                <span class="material-symbols-outlined text-[34px]">gpp_maybe</span>
-              </div>
-              <h2 class="font-display font-extrabold text-xl text-white">Раздел доступен только преподавателям</h2>
-              <p class="text-xs text-slate-300 leading-relaxed">
-                Вы авторизованы как студент (<strong>${user.full_name}</strong>, группа ${user.group_name}). Управление расписанием учебных дней и электронным журналом доступно только преподавателям кафедры.
-              </p>
-              <div class="flex flex-wrap justify-center gap-3 pt-2">
-                <a href="student.html" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs font-bold shadow-glow-indigo transition-all">Вернуться в кабинет студента</a>
-                <button type="button" onclick="logoutUser()" class="px-5 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-bold transition-colors">Сменить аккаунт</button>
-              </div>
-            </div>
-          `;
-        }
-        return;
-      }
-    } else if (isProtectedStudent && !user) {
+    if (isProtectedStudent && !user) {
       showAuthRequiredOverlay('student');
       return;
     }
@@ -2176,9 +2149,7 @@
       });
       document.querySelectorAll('[data-user-initials]').forEach(el => { el.textContent = user.initials; });
       document.querySelectorAll('[data-user-role]').forEach(el => {
-        el.textContent = user.role === 'teacher'
-          ? `Преподаватель (${user.group_name || 'Кафедра'})`
-          : `Студент (${user.group_name || 'ИС-21'})`;
+        el.textContent = `Студент (${user.group_name || 'ИС-21'})`;
       });
       document.querySelectorAll('[data-user-course]').forEach(el => {
         el.textContent = `Курс: ${user.specialty_name}`;

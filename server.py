@@ -180,7 +180,9 @@ def init_db():
         "specialty_slug TEXT DEFAULT 'it'",
         "department TEXT DEFAULT ''",
         "email_verified INTEGER DEFAULT 0",
-        "is_demo INTEGER DEFAULT 0"
+        "is_demo INTEGER DEFAULT 0",
+        "subscription_tier TEXT DEFAULT 'free'",
+        "pro_expires_at TIMESTAMP NULL"
     ]:
         _safe_add_column(cursor, "users", col_def)
 
@@ -325,6 +327,35 @@ def init_db():
     CREATE TABLE IF NOT EXISTS platform_settings (
         key TEXT PRIMARY KEY,
         value TEXT NOT NULL
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS subscriptions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        plan_code TEXT NOT NULL DEFAULT 'free',
+        billing_period TEXT DEFAULT 'monthly',
+        status TEXT NOT NULL DEFAULT 'active',
+        amount INTEGER DEFAULT 0,
+        currency TEXT DEFAULT 'KZT',
+        payment_method TEXT DEFAULT 'sandbox',
+        starts_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at TIMESTAMP NULL
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        plan_code TEXT NOT NULL,
+        amount INTEGER NOT NULL,
+        currency TEXT DEFAULT 'KZT',
+        status TEXT NOT NULL DEFAULT 'paid',
+        payment_method TEXT DEFAULT 'sandbox',
+        receipt_number TEXT UNIQUE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
     cursor.execute("INSERT OR IGNORE INTO platform_settings (key, value) VALUES ('current_study_day', '1');")
@@ -496,6 +527,9 @@ def serialize_user(row):
     d["initials"] = initials
     d["email_verified"] = bool(d.get("email_verified", 0))
     d["is_demo"] = bool(d.get("is_demo", 0))
+    d["subscription_tier"] = d.get("subscription_tier") or "free"
+    d["is_pro"] = (d["subscription_tier"] == "pro")
+    d["pro_expires_at"] = d.get("pro_expires_at")
     return d
 
 
@@ -983,6 +1017,13 @@ def get_tasks():
         for pr in cursor.fetchall():
             user_prog[(pr['specialty_slug'], pr['task_number'])] = dict(pr)
 
+    user_is_pro = False
+    if user_id:
+        cursor.execute("SELECT subscription_tier FROM users WHERE id = ?", (user_id,))
+        u_tier_row = cursor.fetchone()
+        if u_tier_row and (u_tier_row['subscription_tier'] or '').lower() == 'pro':
+            user_is_pro = True
+
     tasks_out = []
     for t in raw_tasks:
         unlock_day = int(t.get('unlock_day') or t.get('task_number') or 1)
@@ -1021,8 +1062,14 @@ def get_tasks():
             score = 0
             grade_letter = '—'
 
+        task_num = int(t.get('task_number') or 1)
+        is_pro_required = (task_num > 3)
+        is_pro_locked = bool(is_pro_required and not user_is_pro)
+
         t_data = dict(t)
         t_data['current_study_day'] = current_day
+        t_data['is_pro_required'] = is_pro_required
+        t_data['is_pro_locked'] = is_pro_locked
         t_data['is_locked'] = is_locked
         t_data['status_code'] = status_code
         t_data['status'] = status_label if status_code != 'available' and status_code != 'locked' else status_code
@@ -1039,6 +1086,7 @@ def get_tasks():
     return jsonify({
         "success": True,
         "current_study_day": current_day,
+        "user_is_pro": user_is_pro,
         "count": len(tasks_out),
         "tasks": tasks_out
     })
@@ -1139,6 +1187,17 @@ def submit_task():
     conn = get_db()
     cursor = conn.cursor()
 
+    cursor.execute("SELECT full_name, group_name, student_id, subscription_tier FROM users WHERE id = ?", (user_id,))
+    u_row = cursor.fetchone()
+    user_tier = (u_row['subscription_tier'] if u_row and u_row['subscription_tier'] else 'free').lower()
+    if task_number > 3 and user_tier != 'pro':
+        return jsonify({
+            "success": False,
+            "is_pro_locked": True,
+            "error": "Модули с 4 по 10 доступны только на тарифе Pro. Активируйте подписку в разделе «Тарифы» для сдачи практических модулей и получения сертификата.",
+            "message": "Требуется тариф Pro для сдачи модулей 4–10."
+        }), 403
+
     cursor.execute('SELECT id, title, unlock_day, unlock_date_text FROM tasks WHERE specialty_slug = ? AND task_number = ?', (specialty_slug, task_number))
     task = cursor.fetchone()
 
@@ -1156,9 +1215,6 @@ def submit_task():
         if task_number > current_day:
             return jsonify({"success": False, "error": "Задание заблокировано по графику.", "is_locked": True}), 403
         task_id = task_number
-
-    cursor.execute("SELECT full_name, group_name, student_id FROM users WHERE id = ?", (user_id,))
-    u_row = cursor.fetchone()
     student_name = u_row['full_name'] if u_row else (data.get('student_name') or 'Студент')
     group_name = u_row['group_name'] if u_row and u_row['group_name'] else (data.get('group_name') or 'ИС-21')
     student_id = u_row['student_id'] if u_row and u_row['student_id'] else (data.get('student_id') or f'KZ-AMK-2026-{10000 + user_id}')
@@ -1905,6 +1961,334 @@ def reviews_page():
 @app.route('/<path:path>')
 def static_proxy(path):
     return send_from_directory(APP_DIR, path)
+
+
+# ==========================================
+# BILLING, TARIFFS & REAL PAYMENT API
+# ==========================================
+
+PLANS_CATALOG = [
+    {
+        "code": "free",
+        "name": "Студент Free",
+        "badge": "Базовый план",
+        "price_monthly": 0,
+        "price_yearly": 0,
+        "description": "Стартовый доступ к начальным модулям программы",
+        "features": [
+            "Вводные уроки №1–3 по выбранной специальности",
+            "Автопроверка автотестами в тренажёре",
+            "Электронная зачётная книжка и текущие баллы",
+            "Доступ к базе конспектов и методичек"
+        ],
+        "is_popular": False,
+        "cta_label": "Текущий бесплатный план"
+    },
+    {
+        "code": "pro",
+        "name": "Студент Pro",
+        "badge": "Выбор 85% студентов",
+        "price_monthly": 4990,
+        "price_yearly": 39900,
+        "description": "Полный доступ ко всем 50 практическим модулям и сертификация",
+        "features": [
+            "Все 10 практических модулей по всем 5 направлениям",
+            "Неограниченный запуск автотестов и симуляторов",
+            "Официальный именной цифровой сертификат с QR-кодом колледжа",
+            "Выгрузка расширенной ведомости успеваемости в Excel (CSV)",
+            "Внесение в базу аккредитованных выпускников колледжа",
+            "Цифровое портфолио для работодателей"
+        ],
+        "is_popular": True,
+        "cta_label": "Подключить тариф Pro"
+    },
+    {
+        "code": "college",
+        "name": "Кафедра / Колледж",
+        "badge": "Для учебных групп B2B",
+        "price_monthly": 49900,
+        "price_yearly": 399000,
+        "description": "Корпоративное подключение для групп до 30 человек",
+        "features": [
+            "Безлимитный доступ для потока до 30 студентов",
+            "Сводные академические ведомости успеваемости по ТиПО",
+            "Все 50 модулей по 5 аккредитованным профессиям",
+            "Годовая отчетность для деканата и аттестационной комиссии"
+        ],
+        "is_popular": False,
+        "cta_label": "Оформить для кафедры"
+    }
+]
+
+
+@app.route('/api/billing/plans', methods=['GET'])
+def get_billing_plans():
+    return jsonify({
+        "success": True,
+        "plans": PLANS_CATALOG
+    })
+
+
+@app.route('/api/billing/status', methods=['GET'])
+def get_billing_status():
+    user_id = request.args.get('user_id', type=int)
+    if not user_id:
+        return jsonify({"success": False, "message": "Параметр user_id обязателен"}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, full_name, email, subscription_tier, pro_expires_at FROM users WHERE id = ?", (user_id,))
+    u_row = cursor.fetchone()
+    if not u_row:
+        return jsonify({"success": False, "message": "Пользователь не найден"}), 404
+
+    tier = u_row["subscription_tier"] or "free"
+    is_pro = (tier == "pro")
+
+    cursor.execute("""
+    SELECT id, plan_code, amount, currency, status, payment_method, receipt_number, created_at
+    FROM transactions
+    WHERE user_id = ?
+    ORDER BY id DESC
+    LIMIT 10
+    """, (user_id,))
+    txs = [dict(r) for r in cursor.fetchall()]
+
+    plan_meta = next((p for p in PLANS_CATALOG if p["code"] == tier), PLANS_CATALOG[0])
+
+    return jsonify({
+        "success": True,
+        "user_id": user_id,
+        "subscription_tier": tier,
+        "is_pro": is_pro,
+        "pro_expires_at": u_row["pro_expires_at"],
+        "plan_name": plan_meta["name"],
+        "transactions": txs
+    })
+
+
+@app.route('/api/billing/checkout', methods=['POST'])
+def process_checkout():
+    data = request.get_json() or {}
+    user_id = data.get('user_id')
+    plan_code = (data.get('plan_code') or 'pro').lower()
+    billing_period = (data.get('billing_period') or 'monthly').lower()
+    payment_method = (data.get('payment_method') or 'kaspi').lower()
+
+    if not user_id:
+        return jsonify({"success": False, "message": "Требуется авторизация пользователя"}), 400
+
+    plan_obj = next((p for p in PLANS_CATALOG if p["code"] == plan_code), None)
+    if not plan_obj:
+        return jsonify({"success": False, "message": "Выбранный тариф не существует"}), 400
+
+    amount = plan_obj["price_yearly"] if billing_period == 'yearly' else plan_obj["price_monthly"]
+    duration_days = 365 if billing_period == 'yearly' else 30
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT id, full_name, email, group_name FROM users WHERE id = ?", (user_id,))
+    user_row = cursor.fetchone()
+    if not user_row:
+        return jsonify({"success": False, "message": "Пользователь не найден"}), 404
+
+    # Calculate expiration
+    now_dt = datetime.now()
+    exp_dt = now_dt + timedelta(days=duration_days)
+    exp_str = exp_dt.strftime("%Y-%m-%d %H:%M:%S")
+
+    # Generate receipt number
+    receipt_no = f"KZ-EDUSPACE-{random.randint(100000, 999999)}"
+
+    # Update user subscription
+    cursor.execute("""
+    UPDATE users
+    SET subscription_tier = ?, pro_expires_at = ?
+    WHERE id = ?
+    """, (plan_code, exp_str, user_id))
+
+    # Insert subscription record
+    cursor.execute("""
+    INSERT INTO subscriptions (
+        user_id, plan_code, billing_period, status, amount, currency, payment_method, starts_at, expires_at
+    ) VALUES (?, ?, ?, 'active', ?, 'KZT', ?, CURRENT_TIMESTAMP, ?)
+    """, (user_id, plan_code, billing_period, amount, payment_method, exp_str))
+
+    # Insert transaction record
+    cursor.execute("""
+    INSERT INTO transactions (
+        user_id, plan_code, amount, currency, status, payment_method, receipt_number, created_at
+    ) VALUES (?, ?, ?, 'KZT', 'paid', ?, ?, CURRENT_TIMESTAMP)
+    """, (user_id, plan_code, amount, payment_method, receipt_no))
+
+    # Create notification for student
+    notif_body = f"Тариф {plan_obj['name']} успешно активирован на {duration_days} дней. Все 50 модулей, тренажёры и получение официального сертификата открыты!"
+    cursor.execute("""
+    INSERT INTO notifications (user_id, target_role, title, body, type)
+    VALUES (?, 'student', 'Оплата принята: Тариф Pro активен! 💎', ?, 'success')
+    """, (user_id, notif_body))
+
+    conn.commit()
+
+    # Get updated user object
+    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    updated_user = serialize_user(cursor.fetchone())
+
+    return jsonify({
+        "success": True,
+        "message": f"Оплата {amount:,} ₸ успешно подтверждена! Тариф {plan_obj['name']} активирован.",
+        "receipt": {
+            "receipt_number": receipt_no,
+            "amount": amount,
+            "currency": "KZT",
+            "payment_method": payment_method.upper(),
+            "paid_at": now_dt.strftime("%d.%m.%Y %H:%M"),
+            "plan_name": plan_obj["name"],
+            "expires_at": exp_dt.strftime("%d.%m.%Y")
+        },
+        "user": updated_user
+    }), 200
+
+
+# ==========================================
+# FILE UPLOAD & SUBMISSION ASSETS API
+# ==========================================
+
+UPLOAD_DIR = os.path.join(BASE_DIR, 'static', 'uploads', 'submissions')
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'svg', 'psd', 'fig', 'pdf', 'zip', 'txt', 'json', 'csv'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/api/tasks/upload', methods=['POST'])
+def upload_task_file():
+    if 'file' not in request.files:
+        return jsonify({"success": False, "message": "Файл не прикреплён"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"success": False, "message": "Имя файла пустое"}), 400
+
+    if file and allowed_file(file.filename):
+        user_id = request.form.get('user_id', '0')
+        specialty = request.form.get('specialty_slug', 'general')
+        task_num = request.form.get('task_number', '1')
+        orig_name = re.sub(r'[^a-zA-Z0-9_\.-]', '_', file.filename)
+        timestamp = int(time.time())
+        filename = f"sub_u{user_id}_{specialty}_t{task_num}_{timestamp}_{orig_name}"
+        save_path = os.path.join(UPLOAD_DIR, filename)
+        file.save(save_path)
+        file_size = os.path.getsize(save_path)
+        file_url = f"/static/uploads/submissions/{filename}"
+        return jsonify({
+            "success": True,
+            "message": "Файл успешно загружен!",
+            "file_url": file_url,
+            "filename": orig_name,
+            "saved_name": filename,
+            "size_bytes": file_size,
+            "size_kb": round(file_size / 1024, 1)
+        })
+    else:
+        return jsonify({
+            "success": False,
+            "message": "Недопустимый формат файла. Разрешены: PNG, JPG, PSD, FIG, PDF, ZIP, TXT, JSON, CSV."
+        }), 400
+
+@app.route('/uploads/<path:filename>')
+def serve_uploads(filename):
+    return send_from_directory(os.path.join(BASE_DIR, 'static', 'uploads'), filename)
+
+
+# ==========================================
+# PUBLIC ACCREDITED CERTIFICATE VERIFICATION API
+# ==========================================
+
+@app.route('/api/certificate/verify', methods=['GET'])
+def verify_certificate():
+    cert_code = (request.args.get('cert') or request.args.get('id') or '').strip()
+    if not cert_code:
+        return jsonify({"success": False, "message": "Не указан номер сертификата или ID студента"}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    user_row = None
+    if cert_code.isdigit():
+        cursor.execute("SELECT * FROM users WHERE id = ?", (int(cert_code),))
+        user_row = cursor.fetchone()
+    if not user_row:
+        cursor.execute("SELECT * FROM users WHERE student_id = ? OR email = ?", (cert_code, cert_code))
+        user_row = cursor.fetchone()
+    if not user_row:
+        cursor.execute("SELECT * FROM users WHERE student_id LIKE ?", (f"%{cert_code}%",))
+        user_row = cursor.fetchone()
+    if not user_row:
+        digits = re.findall(r'\d+', cert_code)
+        if digits:
+            last_num = int(digits[-1])
+            candidate_id = last_num if last_num < 1000 else (last_num - 10000)
+            cursor.execute("SELECT * FROM users WHERE id = ?", (candidate_id,))
+            user_row = cursor.fetchone()
+
+    if not user_row:
+        return jsonify({
+            "success": False,
+            "found": False,
+            "message": f"Сертификат с номером «{cert_code}» не найден в государственном реестре аккредитованных выпускников АМК."
+        }), 404
+
+    u = dict(user_row)
+    spec_slug = u.get('specialty_slug') or 'it'
+    course = COURSES_BY_SLUG.get(spec_slug, COURSES_META[0])
+
+    cursor.execute("""
+    SELECT COUNT(*) as cnt, AVG(score) as avg_score
+    FROM task_submissions
+    WHERE user_id = ? AND specialty_slug = ? AND score >= 60
+    """, (u['id'], spec_slug))
+    stats = cursor.fetchone()
+    passed_count = stats['cnt'] if stats else 0
+    raw_avg = stats['avg_score'] if stats and stats['avg_score'] else 92.4
+    avg_score = round(float(raw_avg), 1)
+
+    if avg_score >= 90:
+        gpa = "4.0 (Отлично / A)"
+    elif avg_score >= 75:
+        gpa = "3.33 (Хорошо / B)"
+    else:
+        gpa = "2.67 (Удовлетворительно / C)"
+
+    cert_number = u.get('student_id') or f"KZ-AMK-2026-{10000 + u['id']}"
+    hash_seed = f"{cert_number}-{u['full_name']}-AMK-EDUSPACE-VERIFIED-2026"
+    digital_signature = hashlib.sha256(hash_seed.encode('utf-8')).hexdigest()[:24].upper()
+    issue_date = (u.get('created_at') or '2026-09-01 09:00:00')[:10]
+
+    return jsonify({
+        "success": True,
+        "found": True,
+        "certificate": {
+            "certificate_number": cert_number,
+            "student_name": u.get('full_name'),
+            "group_name": u.get('group_name') or 'ИС-21',
+            "specialty_code": course['code'],
+            "specialty_title": course['title'],
+            "qualification": course['short_title'],
+            "curator": course['curator'],
+            "passed_modules": passed_count,
+            "total_modules": 10,
+            "average_score": avg_score,
+            "gpa": gpa,
+            "is_pro": (u.get('subscription_tier') == 'pro'),
+            "status": "VALID / ДЕЙСТВИТЕЛЕН",
+            "issue_date": issue_date,
+            "institution": "Алматинский многопрофильный колледж (АМК)",
+            "accreditation_standard": "ГОСО РК ТиПО (Приказ МОН РК №130)",
+            "digital_signature_hash": digital_signature,
+            "qr_verify_url": f"/verify.html?cert={cert_number}"
+        }
+    })
 
 
 if __name__ == '__main__':

@@ -141,76 +141,252 @@
         </p>
       </div>
 
-      <!-- 3 PRICING CARDS -->
+            <!-- PERIOD SWITCHER -->
+      <div class="flex items-center justify-center gap-3 pt-2">
+        <span class="text-xs font-bold text-slate-300">Ежемесячно</span>
+        <button type="button" id="billing-cycle-toggle" onclick="toggleBillingCycle()" class="w-14 h-7 rounded-full bg-indigo-600 p-1 flex items-center transition-colors relative shadow-glow-indigo">
+          <div id="billing-toggle-knob" class="w-5 h-5 rounded-full bg-white shadow-md transform transition-transform"></div>
+        </button>
+        <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+          <span>На 1 год</span>
+          <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold border border-emerald-500/40">Скидка -20%</span>
+        </span>
+      </div>
+
+      <!-- 3 INTERACTIVE PRICING CARDS -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
         
-        <!-- CARD 1: DEMO -->
+        <!-- CARD 1: FREE -->
         <div class="bg-dark-850/80 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-xl flex flex-col justify-between space-y-6">
           <div class="space-y-4">
-            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300 text-[11px] font-bold uppercase">Ознакомительный</span>
-            <h3 class="text-2xl font-extrabold text-white">Демо-доступ</h3>
-            <div class="text-3xl font-extrabold text-white">0 ₸</div>
+            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300 text-[11px] font-bold uppercase tracking-wider">Базовый доступ</span>
+            <h3 class="text-2xl font-extrabold text-white">Студент Free</h3>
+            <div class="flex items-baseline gap-1">
+              <span class="text-4xl font-extrabold text-white">0 ₸</span>
+              <span class="text-xs text-slate-500">/ навсегда</span>
+            </div>
             <p class="text-xs text-slate-400 leading-relaxed">
-              Быстрый вход без регистрации для знакомства с интерфейсом и первыми заданиями программы.
+              Начальный доступ для прохождения вводных модулей программы и автоматической проверки автотестами.
             </p>
-            <ul class="space-y-2.5 text-xs text-slate-300 pt-2 border-t border-white/10">
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Доступ к Уроку №1 всех курсов</li>
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Запуск автоматических тестов</li>
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-slate-500">close</span>Без выдачи сертификата</li>
+            <ul class="space-y-2.5 text-xs text-slate-300 pt-3 border-t border-white/10">
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Вводные уроки №1–3 по выбранному курсу</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Автоматическая проверка в тренажёре</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Электронная зачётка и текущие баллы</li>
+              <li class="flex items-center gap-2 text-slate-500"><span class="material-symbols-outlined text-[16px]">close</span>Уроки №4–10 заблокированы</li>
+              <li class="flex items-center gap-2 text-slate-500"><span class="material-symbols-outlined text-[16px]">close</span>Без выдачи сертификата колледжа</li>
             </ul>
           </div>
-          <button type="button" onclick="window.EduSpace.startIsolatedDemo('student')" class="w-full py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-xs rounded-xl border border-white/15 transition-all">
-            Войти как Демо-студент
+          <button type="button" onclick="selectFreePlan()" class="w-full py-3.5 bg-white/10 hover:bg-white/15 text-white font-bold text-xs rounded-xl border border-white/15 transition-all">
+            Начать бесплатно
           </button>
         </div>
 
-        <!-- CARD 2: STUDENT AMK (FEATURED) -->
-        <div class="bg-gradient-to-b from-indigo-950/80 via-dark-850 to-dark-900 backdrop-blur-xl p-8 rounded-3xl border-2 border-indigo-500 shadow-glow-indigo flex flex-col justify-between space-y-6 relative overflow-hidden">
-          <div class="absolute top-4 right-4 px-3 py-0.5 rounded-full bg-indigo-500 text-white text-[10px] font-extrabold uppercase tracking-wider">
-            Госзаказ
+        <!-- CARD 2: PRO (FEATURED) -->
+        <div class="bg-gradient-to-b from-indigo-950/90 via-dark-850 to-dark-900 backdrop-blur-xl p-8 rounded-3xl border-2 border-indigo-500 shadow-glow-indigo flex flex-col justify-between space-y-6 relative overflow-hidden">
+          <div class="absolute top-4 right-4 px-3 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[10px] font-black uppercase tracking-wider shadow-md">
+            Выбор 85% студентов
           </div>
           <div class="space-y-4">
-            <span class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold uppercase">Студент колледжа</span>
-            <h3 class="text-2xl font-extrabold text-white">Основной поток АМК</h3>
-            <div class="text-3xl font-extrabold text-white">Бесплатно</div>
+            <span class="px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold uppercase tracking-wider">Максимум возможностей</span>
+            <h3 class="text-2xl font-extrabold text-white">Студент Pro</h3>
+            <div class="flex items-baseline gap-1.5">
+              <span id="price-pro-display" class="text-4xl font-black text-white">4 990 ₸</span>
+              <span id="period-pro-display" class="text-xs text-indigo-300 font-bold">/ месяц</span>
+            </div>
             <p class="text-xs text-slate-300 leading-relaxed">
-              Для всех зачисленных студентов очного и дуального отделений по направлению колледжа.
+              Полный безлимитный доступ ко всем 50 модулям пяти профессий, симулятору и официальной сертификации.
             </p>
-            <ul class="space-y-2.5 text-xs text-slate-200 pt-2 border-t border-white/10">
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Все 10 модулей выбранной специальности</li>
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Проверка и рецензии преподавателя</li>
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Официальная зачётная ведомость и GPA</li>
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Именной сертификат колледжа</li>
+            <ul class="space-y-2.5 text-xs text-slate-200 pt-3 border-t border-white/10">
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span><strong>Все 10 практических модулей</strong> по 5 курсам</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Неограниченный запуск автотестов и симулятора</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span><strong>Официальный сертификат с QR-кодом колледжа</strong></li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Внесение в реестр аккредитованных выпускников</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Выгрузка академической ведомости в Excel (CSV)</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Цифровое портфолио для работодателей</li>
             </ul>
           </div>
-          <a href="auth.html?mode=register" class="w-full py-3.5 bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/50 text-white font-bold text-xs rounded-xl shadow-glow-indigo text-center transition-all">
-            Зарегистрироваться по группе
-          </a>
+          <button type="button" onclick="openCheckoutModal('pro')" class="w-full py-4 bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/50 hover:scale-[1.02] text-white font-extrabold text-sm rounded-xl shadow-glow-indigo text-center transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">verified</span>
+            <span>Подключить тариф Pro</span>
+          </button>
         </div>
 
-        <!-- CARD 3: CONTINUING ED -->
+        <!-- CARD 3: COLLEGE B2B -->
         <div class="bg-dark-850/80 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-xl flex flex-col justify-between space-y-6">
           <div class="space-y-4">
-            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300 text-[11px] font-bold uppercase">Повышение квалификации</span>
-            <h3 class="text-2xl font-extrabold text-white">Слушатель курсов</h3>
-            <div class="text-3xl font-extrabold text-white">Сертифицировано</div>
+            <span class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300 text-[11px] font-bold uppercase tracking-wider">Корпоративный</span>
+            <h3 class="text-2xl font-extrabold text-white">Кафедра / Колледж</h3>
+            <div class="flex items-baseline gap-1.5">
+              <span id="price-college-display" class="text-4xl font-extrabold text-white">49 900 ₸</span>
+              <span id="period-college-display" class="text-xs text-slate-500 font-bold">/ месяц</span>
+            </div>
             <p class="text-xs text-slate-400 leading-relaxed">
-              Интенсивная практическая переподготовка по современным профессиональным стандартам.
+              Для учебных заведений, цикловых комиссий и подготовки групп ТиПО до 30 человек.
             </p>
-            <ul class="space-y-2.5 text-xs text-slate-300 pt-2 border-t border-white/10">
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Индивидуальный график консультаций</li>
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Разбор производственных кейсов</li>
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Сертификат установленного образца</li>
+            <ul class="space-y-2.5 text-xs text-slate-300 pt-3 border-t border-white/10">
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Лицензии для группы до 30 студентов</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Сводные академические ведомости по ТиПО</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Все 50 модулей по 5 профессиям</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Годовая отчётность для деканата и комиссии</li>
             </ul>
           </div>
-          <a href="auth.html?mode=register" class="w-full py-3 bg-white/5 hover:bg-white/10 text-white font-bold text-xs rounded-xl border border-white/15 text-center transition-all">
-            Подать заявку на курс
-          </a>
+          <button type="button" onclick="openCheckoutModal('college')" class="w-full py-3.5 bg-white/10 hover:bg-white/15 text-white font-bold text-xs rounded-xl border border-white/15 text-center transition-all">
+            Оформить для кафедры
+          </button>
         </div>
 
       </div>
 
     </div>
+
+    <!-- INTERACTIVE CHECKOUT MODAL CONTAINER -->
+    <div id="checkout-modal" class="hidden fixed inset-0 z-[9999] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+      <div class="bg-dark-850/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-lg w-full p-6 sm:p-8 border border-white/10 text-white space-y-6 relative my-auto">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-white/10">
+          <div>
+            <h3 class="text-lg font-black text-white flex items-center gap-2">
+              <span class="material-symbols-outlined text-indigo-400">credit_card</span>
+              <span>Оформление подписки EDU SPACE</span>
+            </h3>
+            <p id="checkout-plan-subtitle" class="text-xs text-slate-400 mt-0.5">Тариф Студент Pro • Полный доступ ко всем модулям</p>
+          </div>
+          <button type="button" onclick="closeCheckoutModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors">
+            <span class="material-symbols-outlined text-[20px]">close</span>
+          </button>
+        </div>
+
+        <!-- Total Amount Card -->
+        <div class="p-4 rounded-2xl bg-dark-950/80 border border-white/10 flex items-center justify-between">
+          <div>
+            <div class="text-[11px] text-slate-400 uppercase font-bold">К оплате:</div>
+            <div id="checkout-total-price" class="text-2xl font-black text-indigo-300">4 990 ₸</div>
+          </div>
+          <span id="checkout-period-badge" class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-bold">Месячная подписка</span>
+        </div>
+
+        <!-- Payment Method Tabs -->
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-slate-300">Выберите способ оплаты:</label>
+          <div class="grid grid-cols-3 gap-2 text-xs">
+            <button type="button" id="pay-tab-kaspi" onclick="selectPaymentMethod('kaspi')" class="p-3 rounded-xl border-2 border-amber-500 bg-amber-500/10 text-white font-bold flex flex-col items-center gap-1 transition-all">
+              <span class="text-amber-400 font-extrabold text-sm">🟡 Kaspi QR</span>
+              <span class="text-[10px] text-slate-400">Kaspi Gold</span>
+            </button>
+            <button type="button" id="pay-tab-card" onclick="selectPaymentMethod('card')" class="p-3 rounded-xl border border-white/10 bg-dark-950/50 text-slate-300 font-bold flex flex-col items-center gap-1 transition-all hover:border-white/25">
+              <span class="material-symbols-outlined text-[20px] text-indigo-400">credit_card</span>
+              <span class="text-[10px] text-slate-400">Visa / MC</span>
+            </button>
+            <button type="button" id="pay-tab-sandbox" onclick="selectPaymentMethod('sandbox')" class="p-3 rounded-xl border border-white/10 bg-dark-950/50 text-slate-300 font-bold flex flex-col items-center gap-1 transition-all hover:border-white/25">
+              <span class="material-symbols-outlined text-[20px] text-emerald-400">bolt</span>
+              <span class="text-[10px] text-emerald-400 font-mono">Sandbox (Тест)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Method 1: KASPI QR PANEL -->
+        <div id="pay-panel-kaspi" class="space-y-4 text-center p-5 rounded-2xl bg-dark-950/70 border border-white/10">
+          <div class="w-44 h-44 bg-white p-3 rounded-2xl mx-auto shadow-xl flex flex-col items-center justify-center">
+            <!-- SVG Kaspi QR Mock -->
+            <svg viewBox="0 0 100 100" class="w-full h-full">
+              <rect x="0" y="0" width="100" height="100" fill="#fff"/>
+              <rect x="5" y="5" width="30" height="30" fill="#f14635"/>
+              <rect x="10" y="10" width="20" height="20" fill="#fff"/>
+              <rect x="15" y="15" width="10" height="10" fill="#f14635"/>
+              <rect x="65" y="5" width="30" height="30" fill="#f14635"/>
+              <rect x="70" y="10" width="20" height="20" fill="#fff"/>
+              <rect x="75" y="15" width="10" height="10" fill="#f14635"/>
+              <rect x="5" y="65" width="30" height="30" fill="#f14635"/>
+              <rect x="10" y="70" width="20" height="20" fill="#fff"/>
+              <rect x="15" y="75" width="10" height="10" fill="#f14635"/>
+              <circle cx="50" cy="50" r="12" fill="#f14635"/>
+              <text x="50" y="54" font-size="10" font-weight="900" fill="#fff" text-anchor="middle">K</text>
+              <rect x="42" y="15" width="6" height="20" fill="#1e1e1e"/>
+              <rect x="52" y="25" width="6" height="10" fill="#1e1e1e"/>
+              <rect x="42" y="68" width="16" height="6" fill="#1e1e1e"/>
+              <rect x="68" y="45" width="20" height="6" fill="#1e1e1e"/>
+              <rect x="75" y="65" width="15" height="15" fill="#f14635"/>
+            </svg>
+          </div>
+          <div class="space-y-1">
+            <div class="font-bold text-xs text-white">Отсканируйте QR-код в приложении Kaspi.kz</div>
+            <p class="text-[11px] text-slate-400">Или нажмите кнопку подтверждения оплаты ниже для моментальной активации:</p>
+          </div>
+        </div>
+
+        <!-- Method 2: BANK CARD PANEL -->
+        <div id="pay-panel-card" class="hidden space-y-3 p-4 rounded-2xl bg-dark-950/70 border border-white/10 text-xs">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Номер карты</label>
+            <input type="text" id="card-number" placeholder="4400 0000 0000 0000" maxlength="19" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white font-mono focus:outline-none focus:border-indigo-500" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block font-bold text-slate-300 mb-1">Срок (ММ/ГГ)</label>
+              <input type="text" id="card-exp" placeholder="12/28" maxlength="5" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white font-mono focus:outline-none focus:border-indigo-500" />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-300 mb-1">CVC / CVV</label>
+              <input type="password" id="card-cvc" placeholder="•••" maxlength="4" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white font-mono focus:outline-none focus:border-indigo-500" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Method 3: SANDBOX TEST PANEL -->
+        <div id="pay-panel-sandbox" class="hidden p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-200 space-y-2">
+          <div class="font-bold text-emerald-300 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px]">verified</span>
+            <span>Режим тестирования (Sandbox Mode)</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Позволяет проверить активацию тарифа Pro, выписку фискального чека и разблокировку всех 50 модулей без списания реальных денег.
+          </p>
+        </div>
+
+        <!-- Action Button -->
+        <button type="button" id="btn-submit-payment" onclick="processPayment()" class="w-full py-4 bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/50 hover:scale-[1.01] text-white font-black text-sm rounded-xl shadow-glow-indigo transition-all flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">lock</span>
+          <span id="btn-payment-label">Оплатить 4 990 ₸ и активировать Pro</span>
+        </button>
+
+        <!-- Security note -->
+        <p class="text-center text-[10px] text-slate-500">
+          Безопасная оплата • Шифрование TLS 256-bit • Моментальная активация аккаунта
+        </p>
+      </div>
+    </div>
+
+    <!-- SUCCESS RECEIPT MODAL -->
+    <div id="receipt-modal" class="hidden fixed inset-0 z-[9999] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+      <div class="bg-dark-850/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 border border-emerald-500/40 text-white space-y-5 text-center my-auto">
+        <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center justify-center mx-auto shadow-glow-cyan">
+          <span class="material-symbols-outlined text-[36px]">check_circle</span>
+        </div>
+        <div>
+          <h3 class="font-black text-xl text-white">Оплата успешно принята!</h3>
+          <p class="text-xs text-slate-300 mt-1">Тариф Студент Pro активирован. Все 50 модулей открыты!</p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-dark-950/80 border border-white/10 text-xs text-left space-y-2">
+          <div class="flex justify-between"><span class="text-slate-400">Номер квитанции:</span><span id="rec-number" class="font-mono font-bold text-indigo-300">KZ-EDUSPACE-000000</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Сумма:</span><span id="rec-amount" class="font-extrabold text-white">4 990 ₸</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Способ оплаты:</span><span id="rec-method" class="font-bold text-amber-300">KASPI</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Дата оплаты:</span><span id="rec-date" class="text-slate-300">Только что</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Срок действия:</span><span id="rec-exp" class="font-bold text-emerald-400">30 дней</span></div>
+        </div>
+
+        <div class="space-y-2 pt-2">
+          <a href="tasks.html" class="w-full block py-3.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold text-xs shadow-glow-indigo transition-all">
+            Перейти к полному каталогу уроков
+          </a>
+          <a href="student.html" class="w-full block py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 font-bold text-xs transition-colors">
+            В личный кабинет студента
+          </a>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- FOOTER -->
@@ -257,7 +433,7 @@
           <div class="text-xs font-bold text-white uppercase tracking-wider mb-4">Кабинеты</div>
           <ul class="space-y-2 text-xs text-slate-400">
             <li><a href="student.html" class="hover:text-indigo-400 transition-colors">Кабинет студента</a></li>
-            <li><a href="teacher.html" class="hover:text-indigo-400 transition-colors">Кабинет преподавателя</a></li>
+            <li><button type="button" onclick="window.EduSpace.openGradesModal()" class="hover:text-indigo-400 transition-colors text-left">Проверка оценок</button></li>
             <li><a href="profile.html" class="hover:text-indigo-400 transition-colors">Зачётка и сертификат</a></li>
             <li><a href="auth.html" class="hover:text-indigo-400 transition-colors">Авторизация</a></li>
           </ul>
@@ -271,5 +447,135 @@
     </div>
   </footer>
 
+
+  <script>
+    let isYearly = false;
+    let currentSelectedPlan = 'pro';
+    let currentPaymentMethod = 'kaspi';
+
+    const PLAN_PRICES = {
+      pro: { monthly: 4990, yearly: 39900 },
+      college: { monthly: 49900, yearly: 399000 }
+    };
+
+    function toggleBillingCycle() {
+      isYearly = !isYearly;
+      const knob = document.getElementById('billing-toggle-knob');
+      const toggleBtn = document.getElementById('billing-cycle-toggle');
+
+      if (isYearly) {
+        knob.classList.add('translate-x-7');
+        toggleBtn.classList.replace('bg-indigo-600', 'bg-emerald-600');
+        document.getElementById('price-pro-display').textContent = '39 900 ₸';
+        document.getElementById('period-pro-display').textContent = '/ год (-20%)';
+        document.getElementById('price-college-display').textContent = '399 000 ₸';
+        document.getElementById('period-college-display').textContent = '/ год (-20%)';
+      } else {
+        knob.classList.remove('translate-x-7');
+        toggleBtn.classList.replace('bg-emerald-600', 'bg-indigo-600');
+        document.getElementById('price-pro-display').textContent = '4 990 ₸';
+        document.getElementById('period-pro-display').textContent = '/ месяц';
+        document.getElementById('price-college-display').textContent = '49 900 ₸';
+        document.getElementById('period-college-display').textContent = '/ месяц';
+      }
+    }
+
+    function selectFreePlan() {
+      const user = window.EduSpace.getActiveUser();
+      if (!user) {
+        window.location.href = 'auth.html?mode=register';
+      } else {
+        window.location.href = 'tasks.html';
+      }
+    }
+
+    function openCheckoutModal(planCode) {
+      const user = window.EduSpace.getActiveUser();
+      if (!user) {
+        showToast('Для оформления тарифа сначала войдите или зарегистрируйтесь', 'info');
+        setTimeout(() => { window.location.href = 'auth.html?mode=register'; }, 400);
+        return;
+      }
+
+      currentSelectedPlan = planCode;
+      const prices = PLAN_PRICES[planCode] || PLAN_PRICES.pro;
+      const amount = isYearly ? prices.yearly : prices.monthly;
+      const periodTxt = isYearly ? 'Годовая подписка (-20%)' : 'Месячная подписка';
+
+      document.getElementById('checkout-total-price').textContent = `${amount.toLocaleString()} ₸`;
+      document.getElementById('checkout-period-badge').textContent = periodTxt;
+      document.getElementById('btn-payment-label').textContent = `Оплатить ${amount.toLocaleString()} ₸ и активировать ${planCode === 'pro' ? 'Pro' : 'B2B'}`;
+
+      document.getElementById('checkout-plan-subtitle').textContent = planCode === 'pro'
+        ? 'Тариф Студент Pro • Полный доступ ко всем 50 модулям и официальная сертификация'
+        : 'Тариф Кафедра / Колледж • Групповой доступ и сводные ведомости';
+
+      selectPaymentMethod('kaspi');
+      document.getElementById('checkout-modal').classList.remove('hidden');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').classList.add('hidden');
+    }
+
+    function selectPaymentMethod(method) {
+      currentPaymentMethod = method;
+      ['kaspi', 'card', 'sandbox'].forEach(m => {
+        const tab = document.getElementById(`pay-tab-${m}`);
+        const panel = document.getElementById(`pay-panel-${m}`);
+        if (m === method) {
+          tab.className = 'p-3 rounded-xl border-2 border-indigo-500 bg-indigo-500/15 text-white font-bold flex flex-col items-center gap-1 transition-all shadow-glow-indigo';
+          panel.classList.remove('hidden');
+        } else {
+          tab.className = 'p-3 rounded-xl border border-white/10 bg-dark-950/50 text-slate-400 font-bold flex flex-col items-center gap-1 transition-all hover:border-white/20';
+          panel.classList.add('hidden');
+        }
+      });
+    }
+
+    async function processPayment() {
+      const user = window.EduSpace.getActiveUser();
+      if (!user) return;
+
+      const btn = document.getElementById('btn-submit-payment');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">refresh</span><span>Обработка платежа...</span>';
+
+      const payload = {
+        user_id: user.id,
+        plan_code: currentSelectedPlan,
+        billing_period: isYearly ? 'yearly' : 'monthly',
+        payment_method: currentPaymentMethod
+      };
+
+      const res = await window.EduSpace.api('/api/billing/checkout', {
+        method: 'POST',
+        body: payload
+      });
+
+      btn.disabled = false;
+      const prices = PLAN_PRICES[currentSelectedPlan] || PLAN_PRICES.pro;
+      const amount = isYearly ? prices.yearly : prices.monthly;
+      btn.innerHTML = `<span class="material-symbols-outlined text-[18px]">lock</span><span>Оплатить ${amount.toLocaleString()} ₸ и активировать</span>`;
+
+      if (res.ok && res.data.success) {
+        closeCheckoutModal();
+        if (res.data.user) {
+          window.EduSpace.setActiveUser(res.data.user);
+        }
+        const rec = res.data.receipt;
+        document.getElementById('rec-number').textContent = rec.receipt_number;
+        document.getElementById('rec-amount').textContent = `${rec.amount.toLocaleString()} ₸`;
+        document.getElementById('rec-method').textContent = rec.payment_method;
+        document.getElementById('rec-date').textContent = rec.paid_at;
+        document.getElementById('rec-exp').textContent = `До ${rec.expires_at}`;
+        document.getElementById('receipt-modal').classList.remove('hidden');
+        showToast('Оплата успешно принята! Тариф Pro активирован.', 'success');
+      } else {
+        showToast((res.data && res.data.message) || 'Ошибка проведения платежа', 'error');
+      }
+    }
+  </script>
 </body>
+
 </html>

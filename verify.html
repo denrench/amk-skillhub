@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark scroll-smooth">
+<head>
+  <title>Реестр верификации сертификатов — EDU SPACE | АМК</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg"/>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            dark: {
+              950: '#07090e',
+              900: '#0c1017',
+              850: '#111722',
+              800: '#172033',
+            }
+          },
+          boxShadow: {
+            'glow-indigo': '0 0 35px -5px rgba(99, 102, 241, 0.35)',
+            'glow-emerald': '0 0 35px -5px rgba(16, 185, 129, 0.35)',
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="css/cyber-glass.css"/>
+</head>
+<body class="bg-dark-950 text-slate-100 font-sans min-h-screen antialiased flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+  <!-- Background decorative glows -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute -top-40 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-indigo-600/15 rounded-full blur-[140px]"></div>
+    <div class="absolute top-1/3 -right-40 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[140px]"></div>
+    <div class="absolute -bottom-40 -left-40 w-[600px] h-[500px] bg-purple-600/10 rounded-full blur-[150px]"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="relative z-20 border-b border-white/10 bg-dark-900/80 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white font-extrabold text-xl shadow-glow-indigo">
+          E
+        </div>
+        <div>
+          <span class="text-lg font-extrabold tracking-tight text-white">EDU <span class="text-indigo-400">SPACE</span></span>
+          <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-400">Алматинский многопрофильный колледж</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-4">
+        <a href="tasks.html" class="hidden sm:inline-flex text-xs font-bold text-slate-300 hover:text-white transition-colors">Каталог курсов</a>
+        <a href="pricing.html" class="hidden sm:inline-flex text-xs font-bold text-slate-300 hover:text-white transition-colors">Тарифы</a>
+        <a href="gradebook.html" class="hidden md:inline-flex text-xs font-bold text-slate-300 hover:text-white transition-colors">Ведомость оценок</a>
+        <a href="profile.html" class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold text-white transition-colors flex items-center gap-2">
+          <span class="material-symbols-outlined text-[16px] text-indigo-400">person</span>
+          <span>Личный кабинет</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-12 flex-1 w-full">
+
+    <!-- Search / Verify Bar -->
+    <div class="bg-dark-850/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-white/10 shadow-xl mb-8">
+      <form onsubmit="handleSearchCert(event)" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div class="relative flex-1">
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+          <input type="text" id="cert-search-input" placeholder="Введите номер сертификата (например, KZ-AMK-2026-98421 или ID студента)..." class="w-full pl-11 pr-4 py-3 bg-dark-950/80 border border-white/15 rounded-xl text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono" />
+        </div>
+        <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-glow-indigo transition-all flex items-center justify-center gap-2 shrink-0">
+          <span class="material-symbols-outlined text-[18px]">verified_user</span>
+          <span>Проверить в реестре</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Loading State -->
+    <div id="verify-loading" class="text-center py-16 space-y-4">
+      <div class="inline-block w-10 h-10 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
+      <p class="text-xs text-slate-400">Запрос в Единый реестр аккредитованных сертификатов АМК...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="verify-error" class="hidden bg-dark-850/90 backdrop-blur-xl rounded-3xl p-8 sm:p-12 border border-red-500/30 text-center space-y-4">
+      <div class="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-[36px]">gpp_bad</span>
+      </div>
+      <h2 class="text-xl font-extrabold text-white">Сертификат не найден</h2>
+      <p id="verify-error-msg" class="text-sm text-slate-300 max-w-md mx-auto leading-relaxed"></p>
+      <div class="pt-4">
+        <a href="verify.html?cert=KZ-AMK-2026-98421" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 underline">
+          Посмотреть образец верифицированного сертификата (KZ-AMK-2026-98421)
+        </a>
+      </div>
+    </div>
+
+    <!-- Verified Certificate Card (Official Accreditation Style) -->
+    <div id="verify-card" class="hidden space-y-6">
+
+      <!-- Official Credential Paper Wrapper -->
+      <article class="bg-gradient-to-b from-dark-850/95 via-dark-900/95 to-dark-950/95 backdrop-blur-2xl rounded-3xl border-2 border-indigo-500/30 shadow-2xl p-6 sm:p-10 relative overflow-hidden print:p-0 print:border-none print:shadow-none print:bg-white print:text-black">
+
+        <!-- Watermark / Background Crest Pattern -->
+        <div class="absolute right-0 top-0 translate-x-12 -translate-y-12 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Top Header Ribbon -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-white/10">
+          <div class="flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shrink-0">
+              <span class="material-symbols-outlined text-[32px]">workspace_premium</span>
+            </div>
+            <div>
+              <div class="text-[11px] uppercase font-bold tracking-widest text-indigo-400">Министерство просвещения РК • ТиПО</div>
+              <h1 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">Электронный сертификат квалификации</h1>
+              <div class="text-xs text-slate-400">ГККП «Алматинский многопрофильный колледж»</div>
+            </div>
+          </div>
+
+          <div class="shrink-0 flex sm:flex-col sm:items-end justify-between items-center">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-extrabold shadow-glow-emerald">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>ВЕРИФИЦИРОВАНО</span>
+            </span>
+            <span class="text-[11px] font-mono text-slate-400 mt-1" id="cert-num-badge">KZ-AMK-2026-XXXXX</span>
+          </div>
+        </div>
+
+        <!-- Certificate Body -->
+        <div class="py-8 space-y-6">
+
+          <div class="text-center sm:text-left space-y-1">
+            <div class="text-xs uppercase font-bold text-slate-400 tracking-wider">Настоящим подтверждается, что</div>
+            <div class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight" id="cert-student-name"></div>
+            <div class="text-xs text-indigo-300 font-semibold" id="cert-group-label">Учебная группа: ИС-21</div>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-dark-950/70 border border-white/10 space-y-3">
+            <div class="text-xs uppercase font-bold text-slate-400">Успешно освоил(а) образовательную программу курса:</div>
+            <div class="text-base sm:text-lg font-bold text-white flex items-center gap-2" id="cert-course-title"></div>
+            <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300 pt-1">
+              <span>Шифр специальности: <strong class="text-indigo-300 font-mono" id="cert-spec-code"></strong></span>
+              <span>Присвоенная квалификация: <strong class="text-indigo-300" id="cert-qual-label"></strong></span>
+              <span>Куратор курса: <strong class="text-slate-200" id="cert-curator-label"></strong></span>
+            </div>
+          </div>
+
+          <!-- Academic Metrics Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div class="text-[11px] font-bold text-slate-400">Модули</div>
+              <div class="text-xl font-extrabold text-white mt-1" id="cert-modules-cnt">10 / 10</div>
+              <div class="text-[10px] text-emerald-400 font-semibold">100% выполнено</div>
+            </div>
+            <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div class="text-[11px] font-bold text-slate-400">Средний балл</div>
+              <div class="text-xl font-extrabold text-emerald-400 mt-1" id="cert-avg-score">92.4</div>
+              <div class="text-[10px] text-slate-400">из 100 баллов</div>
+            </div>
+            <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div class="text-[11px] font-bold text-slate-400">Итоговый GPA</div>
+              <div class="text-xl font-extrabold text-indigo-400 mt-1" id="cert-gpa-label">4.0 (A)</div>
+              <div class="text-[10px] text-slate-400">Отлично</div>
+            </div>
+            <div class="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div class="text-[11px] font-bold text-slate-400">Дата выдачи</div>
+              <div class="text-sm font-extrabold text-slate-200 mt-2 font-mono" id="cert-date-label"></div>
+              <div class="text-[10px] text-slate-400">Бессрочно</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Security Stamp & Digital Cryptographic Seal -->
+        <div class="pt-6 border-t border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+
+          <!-- QR Code Container -->
+          <div class="flex items-center gap-4">
+            <div class="w-24 h-24 p-2 rounded-xl bg-white flex items-center justify-center shrink-0 shadow-lg" id="cert-qr-svg"></div>
+            <div class="space-y-1">
+              <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-indigo-400">qr_code_scanner</span>
+                <span>Быстрая проверка подлинности</span>
+              </div>
+              <p class="text-[11px] text-slate-400 leading-relaxed max-w-xs">
+                QR-код ведёт в официальную цифровую систему колледжа для подтверждения подлинности диплома работодателем.
+              </p>
+            </div>
+          </div>
+
+          <!-- Digital Hash and Standard Info -->
+          <div class="text-left md:text-right space-y-1">
+            <div class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Цифровая подпись сертификата (SHA-256)</div>
+            <div class="font-mono text-xs text-indigo-300 font-bold tracking-wider select-all" id="cert-hash-val"></div>
+            <div class="text-[10px] text-slate-400 pt-0.5">
+              Стандарт: <span id="cert-standard-label">ГОСО РК ТиПО (Приказ МОН РК №130)</span>
+            </div>
+          </div>
+
+        </div>
+
+      </article>
+
+      <!-- Action Buttons Bar -->
+      <div class="flex flex-wrap items-center justify-center sm:justify-between gap-3 pt-2">
+        <a href="index.html" class="px-5 py-3 rounded-xl border border-white/10 hover:bg-white/5 text-xs font-bold text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+          <span>На главную</span>
+        </a>
+
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="button" onclick="copyCertLink()" class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-bold text-white transition-colors flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-indigo-400">link</span>
+            <span>Скопировать ссылку</span>
+          </button>
+          <button type="button" onclick="window.print()" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-glow-indigo transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">print</span>
+            <span>Печать / Сохранить в PDF</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-white/10 bg-dark-900/60 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4">
+      © 2026 EDU SPACE — Алматинский многопрофильный колледж. Государственный реестр верификации образовательных сертификатов.
+    </div>
+  </footer>
+
+  <script src="js/app-logistics.js"></script>
+  <script>
+    function generateQrSvg(text) {
+      // Clean styled SVG QR representation with dynamic matrix pattern
+      return `
+        <svg viewBox="0 0 100 100" class="w-full h-full" shape-rendering="crispEdges">
+          <rect width="100" height="100" fill="#ffffff"/>
+          <!-- Position Markers -->
+          <rect x="6" y="6" width="28" height="28" fill="#000000"/>
+          <rect x="10" y="10" width="20" height="20" fill="#ffffff"/>
+          <rect x="14" y="14" width="12" height="12" fill="#000000"/>
+
+          <rect x="66" y="6" width="28" height="28" fill="#000000"/>
+          <rect x="70" y="10" width="20" height="20" fill="#ffffff"/>
+          <rect x="74" y="14" width="12" height="12" fill="#000000"/>
+
+          <rect x="6" y="66" width="28" height="28" fill="#000000"/>
+          <rect x="10" y="70" width="20" height="20" fill="#ffffff"/>
+          <rect x="14" y="74" width="12" height="12" fill="#000000"/>
+
+          <!-- Decorative Hash Matrix Dots -->
+          <rect x="38" y="10" width="6" height="6" fill="#000000"/>
+          <rect x="48" y="14" width="6" height="6" fill="#000000"/>
+          <rect x="38" y="24" width="6" height="6" fill="#000000"/>
+          <rect x="52" y="24" width="6" height="6" fill="#000000"/>
+          <rect x="10" y="44" width="6" height="6" fill="#000000"/>
+          <rect x="22" y="48" width="6" height="6" fill="#000000"/>
+          <rect x="38" y="42" width="8" height="8" fill="#4f46e5"/>
+          <rect x="50" y="42" width="8" height="8" fill="#000000"/>
+          <rect x="44" y="54" width="8" height="8" fill="#4f46e5"/>
+          <rect x="62" y="48" width="6" height="6" fill="#000000"/>
+          <rect x="74" y="42" width="6" height="6" fill="#000000"/>
+          <rect x="84" y="52" width="6" height="6" fill="#000000"/>
+          <rect x="42" y="70" width="6" height="6" fill="#000000"/>
+          <rect x="54" y="78" width="6" height="6" fill="#000000"/>
+          <rect x="68" y="72" width="6" height="6" fill="#000000"/>
+          <rect x="80" y="80" width="8" height="8" fill="#000000"/>
+        </svg>
+      `;
+    }
+
+    async function loadCertificate(certCode) {
+      const loadingEl = document.getElementById('verify-loading');
+      const errorEl = document.getElementById('verify-error');
+      const cardEl = document.getElementById('verify-card');
+
+      loadingEl.classList.remove('hidden');
+      errorEl.classList.add('hidden');
+      cardEl.classList.add('hidden');
+
+      try {
+        const res = await window.EduSpace.api(`/api/certificate/verify?cert=${encodeURIComponent(certCode)}`);
+        loadingEl.classList.add('hidden');
+
+        if (res.ok && res.data && res.data.found) {
+          const cert = res.data.certificate;
+          document.getElementById('cert-student-name').textContent = cert.student_name;
+          document.getElementById('cert-group-label').textContent = `Учебная группа: ${cert.group_name} • ИИН / Студбилет: ${cert.certificate_number}`;
+          document.getElementById('cert-course-title').textContent = cert.specialty_title;
+          document.getElementById('cert-spec-code').textContent = cert.specialty_code;
+          document.getElementById('cert-qual-label').textContent = cert.qualification;
+          document.getElementById('cert-curator-label').textContent = cert.curator;
+          document.getElementById('cert-num-badge').textContent = cert.certificate_number;
+          document.getElementById('cert-modules-cnt').textContent = `${cert.passed_modules} / ${cert.total_modules}`;
+          document.getElementById('cert-avg-score').textContent = cert.average_score;
+          document.getElementById('cert-gpa-label').textContent = cert.gpa;
+          document.getElementById('cert-date-label').textContent = cert.issue_date;
+          document.getElementById('cert-hash-val').textContent = cert.digital_signature_hash;
+          document.getElementById('cert-standard-label').textContent = cert.accreditation_standard;
+
+          document.getElementById('cert-qr-svg').innerHTML = generateQrSvg(window.location.href);
+
+          cardEl.classList.remove('hidden');
+        } else {
+          document.getElementById('verify-error-msg').textContent =
+            (res.data && res.data.message) || `Сертификат с кодом «${certCode}» не найден в государственном реестре выпускников. Проверьте правильность введённого номера.`;
+          errorEl.classList.remove('hidden');
+        }
+      } catch (err) {
+        loadingEl.classList.add('hidden');
+        document.getElementById('verify-error-msg').textContent = 'Ошибка при соединении с сервером реестра.';
+        errorEl.classList.remove('hidden');
+      }
+    }
+
+    function handleSearchCert(e) {
+      e.preventDefault();
+      const code = document.getElementById('cert-search-input').value.trim();
+      if (!code) return;
+      window.history.pushState({}, '', `verify.html?cert=${encodeURIComponent(code)}`);
+      loadCertificate(code);
+    }
+
+    function copyCertLink() {
+      navigator.clipboard.writeText(window.location.href);
+      showToast('Постоянная ссылка на верификацию скопирована в буфер обмена!', 'success');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const certParam = params.get('cert') || params.get('id') || 'KZ-AMK-2026-98421';
+      document.getElementById('cert-search-input').value = certParam;
+      loadCertificate(certParam);
+    });
+  </script>
+</body>
+</html>

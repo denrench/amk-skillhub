@@ -194,6 +194,10 @@
               <div class="flex flex-wrap items-center gap-2">
                 <h1 class="font-extrabold text-xl sm:text-2xl text-white" data-user-name>Загрузка профиля...</h1>
                 <span id="prof-role-badge" class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">Студент</span>
+                <span id="prof-plan-badge" class="px-2.5 py-0.5 rounded-full bg-white/10 text-slate-300 text-xs font-bold border border-white/15 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px] text-amber-400">diamond</span>
+                  <span id="prof-plan-badge-text">Free план</span>
+                </span>
                 <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-bold border border-emerald-500/30 inline-flex items-center gap-1">
                   <span class="material-symbols-outlined text-[14px]">verified</span>
                   <span>Email подтверждён</span>
@@ -392,35 +396,55 @@
       if (!user) return;
       const stats = (profilePayload && profilePayload.statistics) || { passed_count: 0, progress_percent: 0, avg_score: 0, gpa: 0 };
       const course = (profilePayload && profilePayload.active_course) || window.EduSpace.getCourseBySlug(user.specialty_slug);
-      const certNum = `CERT-AMK-2026-${10000 + Number(user.id || 1)}`;
+      const certNum = user.student_id || `KZ-AMK-2026-${10000 + Number(user.id || 1)}`;
 
-      openModal('🎓 Официальная академическая выписка и сертификат курса', `
+      openModal('🎓 Официальный сертификат и реестр квалификации', `
         <div class="p-6 sm:p-8 rounded-2xl border-2 border-indigo-500/40 bg-dark-950 text-center space-y-4 shadow-2xl relative overflow-hidden">
           <div class="absolute -top-12 -right-12 w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
-          <div class="text-[11px] font-extrabold uppercase tracking-[0.2em] text-indigo-400">Алматинский многопрофильный колледж • EDU SPACE</div>
+          <div class="text-[11px] font-extrabold uppercase tracking-[0.2em] text-indigo-400">Министерство просвещения РК • АМК</div>
           <h3 class="font-extrabold text-2xl text-white">
-            ${stats.passed_count >= 8 ? 'СЕРТИФИКАТ О ПРОХОЖДЕНИИ КУРСА' : 'АКАДЕМИЧЕСКАЯ СПРАВКА СЛУШАТЕЛЯ'}
+            ${stats.passed_count >= 8 ? 'СЕРТИФИКАТ КВАЛИФИКАЦИИ' : 'АКАДЕМИЧЕСКАЯ СПРАВКА СЛУШАТЕЛЯ'}
           </h3>
-          <p class="text-xs text-slate-400">Настоящим подтверждается, что слушатель платформы</p>
+          <p class="text-xs text-slate-400">Настоящим удостоверяется, что слушатель</p>
           <div class="font-extrabold text-xl sm:text-2xl text-indigo-300 py-1 border-b border-white/10 max-w-md mx-auto">
             ${user.full_name}
           </div>
           <p class="text-xs text-slate-300 max-w-lg mx-auto leading-relaxed">
-            обучается по образовательной программе <strong class="text-white">«${course.code} — ${course.title}»</strong>.<br/>
-            Освоено практических модулей: <strong class="text-emerald-400">${stats.passed_count} из 10 (${stats.progress_percent}%)</strong> • Средний балл: <strong class="text-indigo-400">${stats.avg_score > 0 ? `${stats.avg_score}/100 (GPA ${stats.gpa})` : 'В процессе'}</strong>.
+            осваивает образовательную программу <strong class="text-white">«${course.code} — ${course.title}»</strong>.<br/>
+            Зачтено модулей: <strong class="text-emerald-400">${stats.passed_count} из 10 (${stats.progress_percent}%)</strong> • Средний балл: <strong class="text-indigo-400">${stats.avg_score > 0 ? `${stats.avg_score}/100 (GPA ${stats.gpa})` : 'В процессе'}</strong>.
           </p>
-          <div class="pt-4 flex items-center justify-between text-[11px] text-slate-400 border-t border-white/10">
-            <span>Рег. номер: <strong class="text-white">${certNum}</strong></span>
+
+          <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-left text-xs">
+            <div>
+              <div class="text-[10px] uppercase font-bold text-slate-400">Номер в государственном реестре</div>
+              <div class="font-mono font-extrabold text-white text-sm mt-0.5">${certNum}</div>
+            </div>
+            <div class="text-right">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                ВЕРИФИЦИРОВАНО
+              </span>
+            </div>
+          </div>
+
+          <div class="pt-3 flex items-center justify-between text-[11px] text-slate-400 border-t border-white/10">
+            <span>Стандарт: <strong class="text-white">ГОСО РК ТиПО</strong></span>
             <span>Куратор: <strong class="text-white">${course.curator}</strong></span>
           </div>
         </div>
-        <div class="pt-3 flex justify-end gap-2">
-          <button type="button" onclick="closeModal()" class="px-4 py-2 rounded-xl border border-white/15 bg-white/5 text-slate-300 hover:text-white text-xs font-bold">Закрыть</button>
-          <button type="button" onclick="exportPdfStatement()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs font-bold shadow-glow-indigo flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[16px]">print</span>
-            <span>Распечатать / Сохранить PDF</span>
-          </button>
+        <div class="pt-3 flex flex-wrap items-center justify-between gap-2">
+          <a href="verify.html?cert=${encodeURIComponent(certNum)}" target="_blank" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-glow-emerald flex items-center gap-1.5 transition-all">
+            <span class="material-symbols-outlined text-[16px]">verified</span>
+            <span>Открыть страницу верификации с QR →</span>
+          </a>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="closeModal()" class="px-4 py-2.5 rounded-xl border border-white/15 bg-white/5 text-slate-300 hover:text-white text-xs font-bold">Закрыть</button>
+            <button type="button" onclick="exportPdfStatement()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-glow-indigo flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">print</span>
+              <span>Печать / PDF</span>
+            </button>
+          </div>
         </div>
       `, 'max-w-2xl');
     }

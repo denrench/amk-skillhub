@@ -404,11 +404,16 @@
 
       container.innerHTML = filtered.map(t => {
         const isLocked = t.is_locked;
+        const isProLocked = Boolean(t.is_pro_locked);
+        const isProRequired = Boolean(t.is_pro_required);
         const sc = t.status_code;
         let statusPill = '';
         let borderCls = 'border-white/10 bg-dark-850/80 hover:border-indigo-500/50 hover:shadow-glow-indigo';
 
-        if (isLocked) {
+        if (isProLocked) {
+          borderCls = 'border-amber-500/30 bg-dark-850/90 hover:border-amber-400/60 shadow-lg';
+          statusPill = `<span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-extrabold inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">diamond</span>Тариф Pro (Модули 4–10)</span>`;
+        } else if (isLocked) {
           borderCls = 'border-white/5 bg-dark-950/40 opacity-75';
           statusPill = `<span class="px-2.5 py-1 rounded-full bg-white/5 text-slate-400 border border-white/10 text-[11px] font-bold inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">lock</span>Заблокировано (День ${t.unlock_day})</span>`;
         } else if (sc === 'graded') {
@@ -425,6 +430,10 @@
           statusPill = `<span class="px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold">Доступно к изучению</span>`;
         }
 
+        const tierBadge = isProRequired
+          ? (isProLocked ? '' : `<span class="px-2.5 py-0.5 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold inline-flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">verified</span>Pro активен</span>`)
+          : `<span class="px-2.5 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[11px] font-bold">Бесплатный модуль</span>`;
+
         const feedbackRow = t.teacher_comment
           ? `<div class="mt-2 p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300"><strong>Комментарий преподавателя:</strong> ${t.teacher_comment}</div>`
           : '';
@@ -435,6 +444,7 @@
               <div class="space-y-2 flex-1">
                 <div class="flex flex-wrap items-center gap-2">
                   <span class="px-2.5 py-0.5 rounded-lg bg-white/5 border border-white/10 text-slate-300 text-[11px] font-extrabold">Модуль №${t.task_number}</span>
+                  ${tierBadge}
                   ${statusPill}
                   <span class="px-2.5 py-0.5 rounded-lg bg-white/5 text-slate-400 text-[11px] font-semibold">${t.difficulty} • ${t.time_limit}</span>
                   ${!isLocked && t.quiz_score > 0 ? `<span class="px-2.5 py-0.5 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-[11px] font-bold">Квиз: ${t.quiz_score}/3</span>` : ''}
@@ -452,15 +462,21 @@
               </div>
 
               <div class="shrink-0 flex flex-col items-stretch sm:items-end gap-2">
-                ${isLocked
-                  ? `<button type="button" onclick="showToast('Задание закрыто до наступления Дня ${t.unlock_day} (${t.unlock_date_exact})', 'info')" class="px-5 py-3 rounded-xl bg-dark-950/60 text-slate-500 border border-white/5 font-bold text-xs flex items-center justify-center gap-2 cursor-not-allowed">
-                       <span class="material-symbols-outlined text-[16px]">lock_clock</span>
-                       <span>Откроется ${t.unlock_date_exact}</span>
-                     </button>`
-                  : `<a href="simulator.html?specialty=${currentSpec}&task=${t.task_number}" class="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/40 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-2 hover:scale-[1.02]">
-                       <span>${sc === 'graded' ? 'Повторить / Просмотреть' : (sc === 'in_progress' || sc === 'revision' ? 'Продолжить урок' : 'Открыть урок и практику')}</span>
-                       <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                ${isProLocked
+                  ? `<a href="pricing.html?plan=pro" class="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-purple-600 to-indigo-600 hover:shadow-amber-500/40 text-white font-extrabold text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-2 hover:scale-[1.02]">
+                       <span class="material-symbols-outlined text-[16px]">diamond</span>
+                       <span>Разблокировать в Pro (4 990 ₸)</span>
                      </a>`
+                  : (isLocked
+                    ? `<button type="button" onclick="showToast('Задание закрыто до наступления Дня ${t.unlock_day} (${t.unlock_date_exact})', 'info')" class="px-5 py-3 rounded-xl bg-dark-950/60 text-slate-500 border border-white/5 font-bold text-xs flex items-center justify-center gap-2 cursor-not-allowed">
+                         <span class="material-symbols-outlined text-[16px]">lock_clock</span>
+                         <span>Откроется ${t.unlock_date_exact}</span>
+                       </button>`
+                    : `<a href="simulator.html?specialty=${currentSpec}&task=${t.task_number}" class="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/40 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-2 hover:scale-[1.02]">
+                         <span>${sc === 'graded' ? 'Повторить / Просмотреть' : (sc === 'in_progress' || sc === 'revision' ? 'Продолжить урок' : 'Открыть урок и практику')}</span>
+                         <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                       </a>`
+                  )
                 }
               </div>
             </div>

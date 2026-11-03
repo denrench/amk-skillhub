@@ -332,6 +332,79 @@
             </div>
           </div>
 
+          <!-- Pro Gating Banner (shown if module > 3 and user is on Free tier) -->
+          <div id="sim-pro-gating-banner" class="hidden rounded-3xl p-6 border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-indigo-500/10 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-5">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                <span class="material-symbols-outlined text-[28px]">diamond</span>
+              </div>
+              <div class="space-y-1">
+                <div class="text-sm font-extrabold text-white flex items-center gap-2">
+                  <span>Модуль №<span id="pro-banner-mod-num"></span> доступен по тарифу Pro</span>
+                  <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-extrabold border border-amber-500/30">ПРО-ДОСТУП</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  В бесплатном плане доступны модули 1–3. Чтобы отправить на проверку решение этого модуля, сдать нормативы и получить официальный сертификат аккредитации АМК — подключите подписку Pro.
+                </p>
+              </div>
+            </div>
+            <a href="pricing.html?plan=pro" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-indigo-600 hover:shadow-amber-500/30 text-white font-extrabold text-xs shadow-glow-indigo transition-all flex items-center gap-2 shrink-0 hover:scale-105">
+              <span class="material-symbols-outlined text-[18px]">lock_open</span>
+              <span>Активировать Pro (4 990 ₸)</span>
+            </a>
+          </div>
+
+          <!-- Specialty-Specific Interactive Workbench -->
+          <div id="specialty-workbench-container" class="bg-dark-850/80 backdrop-blur-xl rounded-3xl border border-white/10 p-6 shadow-2xl space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-indigo-400 text-[20px]" id="workbench-icon">tune</span>
+                <span class="font-extrabold text-sm text-white" id="workbench-title">Интерактивный специализированный симулятор</span>
+              </div>
+              <span class="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-300 font-bold" id="workbench-spec-pill">Спецификация</span>
+            </div>
+
+            <!-- Dynamic toolkit inner body -->
+            <div id="workbench-dynamic-body"></div>
+          </div>
+
+          <!-- Interactive File Upload Zone -->
+          <div class="bg-dark-850/80 backdrop-blur-xl rounded-3xl border border-white/10 p-6 shadow-2xl space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">upload_file</span>
+                <span>Прикрепить файл решения / макет / схему / скриншот</span>
+              </div>
+              <span class="text-[11px] text-slate-400">PNG, JPG, PSD, FIG, PDF, ZIP, TXT (до 25 МБ)</span>
+            </div>
+
+            <div id="upload-dropzone" onclick="document.getElementById('task-file-input').click()" ondragover="onFileDragOver(event)" ondragleave="onFileDragLeave(event)" ondrop="onFileDrop(event)" class="border-2 border-dashed border-white/20 hover:border-indigo-500/60 rounded-2xl p-6 text-center cursor-pointer transition-all bg-dark-950/40 hover:bg-white/5 group">
+              <input type="file" id="task-file-input" onchange="handleFileInputChange(event)" class="hidden" accept=".png,.jpg,.jpeg,.webp,.svg,.psd,.fig,.pdf,.zip,.txt,.json,.csv" />
+              <div class="w-12 h-12 rounded-2xl bg-indigo-600/10 text-indigo-400 group-hover:scale-110 flex items-center justify-center mx-auto mb-3 transition-transform">
+                <span class="material-symbols-outlined text-[28px]">cloud_upload</span>
+              </div>
+              <p class="text-xs font-bold text-white">Перетащите файл сюда или <span class="text-indigo-400 underline">выберите на диске</span></p>
+              <p class="text-[11px] text-slate-400 mt-1">Файл будет сохранён в цифровом архиве вашей практической работы</p>
+            </div>
+
+            <!-- Uploaded file pill preview -->
+            <div id="uploaded-file-status" class="hidden p-3.5 rounded-2xl bg-dark-950 border border-emerald-500/30 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                </div>
+                <div>
+                  <a id="uploaded-file-link" href="#" target="_blank" class="text-xs font-bold text-emerald-300 hover:underline"></a>
+                  <div class="text-[10px] text-slate-400" id="uploaded-file-size"></div>
+                </div>
+              </div>
+              <button type="button" onclick="clearUploadedFile()" class="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-red-400 transition-colors">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+              </button>
+            </div>
+            <input type="hidden" id="uploaded-file-url" value="" />
+          </div>
+
           <!-- Code / Solution Editor + Console + Submission -->
           <div class="bg-dark-850/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
             <div class="px-6 py-3.5 bg-dark-950 border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
@@ -371,13 +444,13 @@
                 </button>
 
                 <div class="flex flex-wrap items-center gap-2.5">
-                  <button type="button" onclick="submitLessonWork(true)" class="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/40 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center gap-2 hover:scale-[1.02]">
-                    <span class="material-symbols-outlined text-[18px]">send</span>
-                    <span>Сдать работу преподавателю на проверку</span>
+                  <button type="button" id="btn-submit-work" onclick="submitLessonWork()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/40 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center gap-2 hover:scale-[1.02]">
+                    <span class="material-symbols-outlined text-[18px]">verified</span>
+                    <span>Сдать решение и зафиксировать оценку</span>
                   </button>
-                  <button type="button" id="btn-submit-final" onclick="submitLessonWork(false)" class="px-4 py-3 rounded-xl border border-white/15 hover:bg-white/10 text-slate-300 hover:text-white font-bold text-xs transition-all flex items-center gap-1.5" title="Автоматический зачёт по критериям автотестов">
-                    <span class="material-symbols-outlined text-[17px] text-indigo-400">verified</span>
-                    <span>Автопроверка автотестами</span>
+                  <button type="button" onclick="window.EduSpace.openGradesModal()" class="px-4 py-3 rounded-xl border border-white/15 hover:bg-white/10 text-slate-300 hover:text-white font-bold text-xs transition-all flex items-center gap-1.5" title="Открыть зачётную книжку">
+                    <span class="material-symbols-outlined text-[17px] text-indigo-400">format_list_bulleted</span>
+                    <span>Зачётная книжка</span>
                   </button>
                 </div>
               </div>
@@ -523,6 +596,28 @@
 
       const savedDraft = activeTaskServer.draft_code || localStorage.getItem(`eduspace_draft_${user.id}_${activeSpecialty}_${activeTaskNumber}`);
       document.getElementById('solution-code').value = savedDraft || activeTaskServer.starter_code || (activeLessonCatalog && activeLessonCatalog.starter_code) || '';
+
+      // Check Pro Feature Gating
+      const isProLocked = Boolean(activeTaskServer && activeTaskServer.is_pro_locked);
+      const proBanner = document.getElementById('sim-pro-gating-banner');
+      const submitBtn = document.getElementById('btn-submit-work');
+      if (isProLocked) {
+        proBanner.classList.remove('hidden');
+        document.getElementById('pro-banner-mod-num').textContent = activeTaskNumber;
+        if (submitBtn) {
+          submitBtn.innerHTML = `<span class="material-symbols-outlined text-[18px] text-amber-400">diamond</span><span>Разблокировать Pro для сдачи (4 990 ₸)</span>`;
+          submitBtn.className = 'px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-purple-600 to-indigo-600 hover:shadow-amber-500/40 text-white font-extrabold text-xs shadow-glow-indigo transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer';
+        }
+      } else {
+        proBanner.classList.add('hidden');
+        if (submitBtn) {
+          submitBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">verified</span><span>Сдать решение и зафиксировать оценку</span>`;
+          submitBtn.className = 'px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/40 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center gap-2 hover:scale-[1.02]';
+        }
+      }
+
+      // Render Specialty-Specific Interactive Workbench
+      renderSpecialtyWorkbench(activeSpecialty, activeTaskNumber);
     }
 
     function renderQuizQuestions() {
@@ -694,6 +789,12 @@
       const user = window.EduSpace.getActiveUser();
       if (!user) return;
 
+      if (activeTaskServer && activeTaskServer.is_pro_locked) {
+        showToast(`Модуль №${activeTaskNumber} доступен по подписке Pro. Активируйте подписку в разделе «Тарифы»!`, 'warning');
+        setTimeout(() => { window.location.href = 'pricing.html?plan=pro'; }, 800);
+        return;
+      }
+
       const code = document.getElementById('solution-code').value.trim();
       if (!code || code.length < 15) {
         showToast('Пожалуйста, напишите решение в редакторе перед отправкой!', 'error');
@@ -710,7 +811,7 @@
       }
 
       if (!awaitTeacher && finalScore < 60) {
-        showToast(`Набрано ${finalScore}/100 баллов (порог зачёта — 60). Доработайте решение по логам консоли или отправьте куратору на ревью.`, 'error');
+        showToast(`Набрано ${finalScore}/100 баллов (порог зачёта — 60). Доработайте решение по логам автотестов, чтобы набрать от 60 баллов.`, 'error');
         return;
       }
 
@@ -751,6 +852,267 @@
     }
 
     document.addEventListener('DOMContentLoaded', initLessonPlayer);
+  
+    // ==========================================
+    // INTERACTIVE FILE UPLOADER LOGIC
+    // ==========================================
+
+    function onFileDragOver(e) {
+      e.preventDefault();
+      document.getElementById('upload-dropzone').classList.add('border-indigo-500', 'bg-white/10');
+    }
+
+    function onFileDragLeave(e) {
+      e.preventDefault();
+      document.getElementById('upload-dropzone').classList.remove('border-indigo-500', 'bg-white/10');
+    }
+
+    function onFileDrop(e) {
+      e.preventDefault();
+      document.getElementById('upload-dropzone').classList.remove('border-indigo-500', 'bg-white/10');
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        uploadTaskFile(e.dataTransfer.files[0]);
+      }
+    }
+
+    function handleFileInputChange(e) {
+      if (e.target.files && e.target.files.length > 0) {
+        uploadTaskFile(e.target.files[0]);
+      }
+    }
+
+    async function uploadTaskFile(file) {
+      const user = window.EduSpace.getActiveUser();
+      if (!user) {
+        showToast('Пожалуйста, войдите в аккаунт для загрузки файлов', 'error');
+        return;
+      }
+
+      showToast(`Загрузка файла ${file.name}...`, 'info');
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('user_id', user.id);
+      formData.append('specialty_slug', activeSpecialty);
+      formData.append('task_number', activeTaskNumber);
+
+      try {
+        const response = await fetch('/api/tasks/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const res = await response.json();
+        if (response.ok && res.success) {
+          document.getElementById('uploaded-file-url').value = res.file_url;
+          const statusEl = document.getElementById('uploaded-file-status');
+          const linkEl = document.getElementById('uploaded-file-link');
+          const sizeEl = document.getElementById('uploaded-file-size');
+
+          linkEl.textContent = res.filename;
+          linkEl.href = res.file_url;
+          sizeEl.textContent = `Размер: ${res.size_kb} КБ • Загружен в архив практики ✓`;
+          statusEl.classList.remove('hidden');
+
+          showToast(`Файл «${res.filename}» успешно прикреплён к решению!`, 'success');
+        } else {
+          showToast(res.message || 'Ошибка загрузки файла', 'error');
+        }
+      } catch (err) {
+        showToast('Сбой соединения при загрузке файла', 'error');
+      }
+    }
+
+    function clearUploadedFile() {
+      document.getElementById('uploaded-file-url').value = '';
+      document.getElementById('uploaded-file-status').classList.add('hidden');
+      document.getElementById('task-file-input').value = '';
+      showToast('Прикреплённый файл удалён', 'info');
+    }
+
+    // ==========================================
+    // SPECIALTY-SPECIFIC INTERACTIVE WORKBENCHES
+    // ==========================================
+
+    function renderSpecialtyWorkbench(spec, taskNum) {
+      const container = document.getElementById('workbench-dynamic-body');
+      const titleEl = document.getElementById('workbench-title');
+      const iconEl = document.getElementById('workbench-icon');
+      const pillEl = document.getElementById('workbench-spec-pill');
+
+      if (spec === 'it') {
+        iconEl.textContent = 'terminal';
+        titleEl.textContent = 'Веб-разработка: Live Preview & DOM Inspector';
+        pillEl.textContent = 'HTML5 / CSS3 / ES6';
+        container.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between text-xs text-slate-300">
+              <span class="font-bold flex items-center gap-1.5"><span class="material-symbols-outlined text-indigo-400 text-[18px]">visibility</span>Интерактивное превью в реальном времени:</span>
+              <button type="button" onclick="refreshWebPreview()" class="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-indigo-300 font-bold border border-white/10 text-[11px] flex items-center gap-1">
+                <span class="material-symbols-outlined text-[14px]">refresh</span>Обновить превью
+              </button>
+            </div>
+            <div class="rounded-2xl border border-white/15 bg-white p-3 shadow-inner h-60 overflow-hidden relative">
+              <iframe id="live-web-iframe" class="w-full h-full border-0 rounded-xl bg-white" sandbox="allow-scripts"></iframe>
+            </div>
+          </div>
+        `;
+        setTimeout(refreshWebPreview, 200);
+      } else if (spec === 'graphic_design') {
+        iconEl.textContent = 'palette';
+        titleEl.textContent = 'Дизайн-студия: Цветовая палитра & Спецификация Figma';
+        pillEl.textContent = '02130100 • Дизайн';
+        container.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 space-y-2">
+              <div class="font-bold text-slate-300">Основной цвет (Primary)</div>
+              <div class="flex items-center gap-3">
+                <input type="color" id="palette-primary" value="#4f46e5" onchange="updatePalettePreview()" class="w-10 h-10 rounded-xl cursor-pointer bg-transparent border-0" />
+                <span id="palette-primary-hex" class="font-mono text-white font-bold text-sm">#4F46E5</span>
+              </div>
+            </div>
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 space-y-2">
+              <div class="font-bold text-slate-300">Акцентный цвет (Accent)</div>
+              <div class="flex items-center gap-3">
+                <input type="color" id="palette-accent" value="#10b981" onchange="updatePalettePreview()" class="w-10 h-10 rounded-xl cursor-pointer bg-transparent border-0" />
+                <span id="palette-accent-hex" class="font-mono text-white font-bold text-sm">#10B981</span>
+              </div>
+            </div>
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 space-y-2">
+              <div class="font-bold text-slate-300">Контраст WCAG 2.1</div>
+              <div class="text-emerald-400 font-extrabold text-lg flex items-center gap-1">
+                <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                <span>7.4:1 (AAA)</span>
+              </div>
+              <div class="text-[10px] text-slate-400">Соответствует стандартам доступности интерфейсов</div>
+            </div>
+          </div>
+        `;
+      } else if (spec === 'autoelectric') {
+        iconEl.textContent = 'electric_meter';
+        titleEl.textContent = 'Виртуальный цифровой мультиметр & OBD-II диагностика';
+        pillEl.textContent = '07161301 • Автоэлектрика';
+        container.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 text-center space-y-1">
+              <div class="text-[10px] uppercase font-bold text-slate-400">Напряжение АКБ</div>
+              <div class="text-2xl font-mono font-extrabold text-amber-400" id="meter-volt">12.65 V</div>
+              <div class="text-[10px] text-emerald-400 font-semibold">Норма покоя</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 text-center space-y-1">
+              <div class="text-[10px] uppercase font-bold text-slate-400">Сопротивление CAN</div>
+              <div class="text-2xl font-mono font-extrabold text-indigo-400" id="meter-ohm">60.2 Ω</div>
+              <div class="text-[10px] text-emerald-400 font-semibold">Терминаторы целы</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 text-center space-y-1">
+              <div class="text-[10px] uppercase font-bold text-slate-400">Ток утечки</div>
+              <div class="text-2xl font-mono font-extrabold text-emerald-400" id="meter-amp">0.03 A</div>
+              <div class="text-[10px] text-slate-400">&lt; 0.05 А допуск</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 flex flex-col justify-center gap-2">
+              <button type="button" onclick="simulateMultimeterRead()" class="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">sensors</span>Замерить щупами
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (spec === 'hvac') {
+        iconEl.textContent = 'ac_unit';
+        titleEl.textContent = 'Манометрическая станция & Расчёт перегрева (Superheat)';
+        pillEl.textContent = '07130700 • Холодильные системы';
+        container.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 text-center space-y-1">
+              <div class="text-[10px] uppercase font-bold text-blue-400">Низкая сторона (Всас)</div>
+              <div class="text-2xl font-mono font-extrabold text-blue-400" id="hvac-low-p">2.2 bar</div>
+              <div class="text-[10px] text-slate-400">T кипения: -6 °C</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 text-center space-y-1">
+              <div class="text-[10px] uppercase font-bold text-red-400">Высокая сторона (Нагнетание)</div>
+              <div class="text-2xl font-mono font-extrabold text-red-400" id="hvac-high-p">14.6 bar</div>
+              <div class="text-[10px] text-slate-400">T конд.: +42 °C</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 text-center space-y-1">
+              <div class="text-[10px] uppercase font-bold text-emerald-400">Перегрев испарителя</div>
+              <div class="text-2xl font-mono font-extrabold text-emerald-400" id="hvac-sh">6.5 °C</div>
+              <div class="text-[10px] text-emerald-300 font-semibold">Идеальная заправка R134a</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 flex flex-col justify-center gap-2">
+              <button type="button" onclick="simulateHvacGauges()" class="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">speed</span>Снять показания
+              </button>
+            </div>
+          </div>
+        `;
+      } else if (spec === 'automechanic') {
+        iconEl.textContent = 'build';
+        titleEl.textContent = 'Верстак моториста: Моменты затяжки & Зазоры клапанов';
+        pillEl.textContent = '07161300 • Автомеханика';
+        container.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 text-center space-y-1">
+              <div class="text-[10px] uppercase font-bold text-slate-400">Болты ГБЦ (3 этап)</div>
+              <div class="text-xl font-mono font-extrabold text-indigo-400">75 Н·м + 90°</div>
+              <div class="text-[10px] text-emerald-400 font-semibold">По спирали от центра</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 text-center space-y-1">
+              <div class="text-[10px] uppercase font-bold text-slate-400">Впускные клапаны</div>
+              <div class="text-xl font-mono font-extrabold text-emerald-400">0.25 мм</div>
+              <div class="text-[10px] text-slate-400">Щуп 0.25 скользит с усилием</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 text-center space-y-1">
+              <div class="text-[10px] uppercase font-bold text-slate-400">Выпускные клапаны</div>
+              <div class="text-xl font-mono font-extrabold text-amber-400">0.30 мм</div>
+              <div class="text-[10px] text-slate-400">Тепловой компенсационный зазор</div>
+            </div>
+            <div class="p-4 rounded-2xl bg-dark-950 border border-white/10 flex flex-col justify-center gap-2">
+              <button type="button" onclick="showToast('Динамометрический ключ откалиброван: норматив затяжки зафиксирован в отчёте!', 'success')" class="w-full py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">check</span>Проверить момент
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function refreshWebPreview() {
+      const code = document.getElementById('solution-code').value;
+      const iframe = document.getElementById('live-web-iframe');
+      if (!iframe) return;
+
+      let htmlDoc = code;
+      if (!code.includes('<html') && !code.includes('<body') && !code.includes('<!DOCTYPE')) {
+        htmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;padding:16px;color:#1e293b;}</style></head><body>${code}</body></html>`;
+      }
+      iframe.srcdoc = htmlDoc;
+    }
+
+    function updatePalettePreview() {
+      const p = document.getElementById('palette-primary').value.toUpperCase();
+      const a = document.getElementById('palette-accent').value.toUpperCase();
+      document.getElementById('palette-primary-hex').textContent = p;
+      document.getElementById('palette-accent-hex').textContent = a;
+      showToast(`Цветовая схема обновлена: ${p} + ${a}`, 'info');
+    }
+
+    function simulateMultimeterRead() {
+      const v = (12.4 + Math.random() * 0.4).toFixed(2);
+      const o = (59.8 + Math.random() * 0.8).toFixed(1);
+      const a = (0.02 + Math.random() * 0.02).toFixed(2);
+      document.getElementById('meter-volt').textContent = `${v} V`;
+      document.getElementById('meter-ohm').textContent = `${o} Ω`;
+      document.getElementById('meter-amp').textContent = `${a} A`;
+      showToast(`Показания мультиметра обновлены: Напряжение ${v}В, Сопротивление ${o}Ом`, 'success');
+    }
+
+    function simulateHvacGauges() {
+      const low = (2.0 + Math.random() * 0.3).toFixed(1);
+      const high = (14.2 + Math.random() * 0.8).toFixed(1);
+      const sh = (6.0 + Math.random() * 0.8).toFixed(1);
+      document.getElementById('hvac-low-p').textContent = `${low} bar`;
+      document.getElementById('hvac-high-p').textContent = `${high} bar`;
+      document.getElementById('hvac-sh').textContent = `${sh} °C`;
+      showToast(`Манометрическая станция: Всасывание ${low} bar, Нагнетание ${high} bar (Перегрев: ${sh} °C)`, 'success');
+    }
+
   </script>
 </body>
 </html>
