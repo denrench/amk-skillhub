@@ -459,6 +459,38 @@
     }
 
     document.addEventListener('DOMContentLoaded', initProfilePage);
+  
+    function renderProfileBadges() {
+      const user = window.EduSpace.getActiveUser();
+      if (!user) return;
+      const stats = (profilePayload && profilePayload.statistics) || { passed_count: 0, avg_score: 0 };
+      const isPro = (user.subscription_tier === 'pro');
+      const badges = computeStudentBadges(user, stats.passed_count, stats.avg_score, isPro);
+
+      const cont = document.getElementById('badges-grid-container');
+      const counterEl = document.getElementById('badges-unlocked-count');
+      if (!cont) return;
+
+      const unlockedCnt = badges.filter(b => b.unlocked).length;
+      if (counterEl) counterEl.textContent = `${unlockedCnt} из ${badges.length} открыто`;
+
+      cont.innerHTML = badges.map(b => `
+        <div class="p-4 rounded-2xl border transition-all flex items-start gap-3.5 ${b.unlocked ? 'bg-dark-900/90 border-indigo-500/30 hover:border-indigo-400/60 shadow-md' : 'bg-dark-950/40 border-white/5 opacity-50'}">
+          <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${b.unlocked ? 'bg-white/5 border border-white/10 shadow-inner' : 'bg-white/5'}">
+            <span class="material-symbols-outlined text-[24px] ${b.unlocked ? b.color : 'text-slate-600'}">${b.icon}</span>
+          </div>
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-xs sm:text-sm text-white">${b.title}</span>
+              ${b.unlocked ? '<span class="text-[10px] text-emerald-400 font-bold">✓</span>' : '<span class="text-[10px] text-slate-500">🔒</span>'}
+            </div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">${b.desc}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
   </script>
 </body>
-</html>
+</html>  renderProfileBadges();
+    

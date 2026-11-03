@@ -478,11 +478,23 @@
                 <span class="ml-2 text-xs font-bold text-slate-300">Рабочая область решения</span>
                 <span id="editor-file-label" class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[11px] font-mono border border-indigo-500/30 font-bold">solution.js</span>
               </div>
-              <span id="draft-autosave-status" class="text-[11px] text-slate-400 font-medium">Черновик синхронизирован</span>
+              <div class="flex items-center gap-3">
+                <button type="button" onclick="formatEditorCode()" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[11px] font-bold border border-white/10 flex items-center gap-1 transition-colors">
+                  <span class="material-symbols-outlined text-[13px]">code_blocks</span>
+                  <span>Форматировать</span>
+                </button>
+                <span id="draft-autosave-status" class="text-[11px] text-slate-400 font-medium">Черновик синхронизирован</span>
+              </div>
             </div>
 
             <div class="p-6 space-y-5">
-              <textarea id="solution-code" rows="13" spellcheck="false" oninput="onCodeEdited()" class="w-full font-mono text-xs sm:text-sm p-4 bg-dark-950 text-emerald-300 rounded-2xl border border-white/15 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 leading-relaxed shadow-inner" placeholder="Введите ваш код или подробное решение практического кейса..."></textarea>
+              <div class="space-y-1.5">
+                <textarea id="solution-code" rows="13" spellcheck="false" oninput="onCodeEdited(); updateEditorCursorStats();" onclick="updateEditorCursorStats()" onkeyup="updateEditorCursorStats()" class="w-full font-mono text-xs sm:text-sm p-4 bg-dark-950 text-emerald-300 rounded-2xl border border-white/15 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 leading-relaxed shadow-inner" placeholder="Введите ваш код или подробное решение практического кейса..."></textarea>
+                <div class="flex items-center justify-between text-[11px] text-slate-500 px-1 font-mono">
+                  <span id="editor-cursor-pos">Строка 1, Символ 1</span>
+                  <span>Клавиша Tab вставляет 2 пробела • UTF-8</span>
+                </div>
+              </div>
 
               <!-- Optional Repo/Figma Link & Comment -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1206,6 +1218,51 @@
       const str = `${mins < 10 ? '0' : ''}${mins}:${s < 10 ? '0' : ''}${s}`;
       showToast(`Переход к разделу занятия [${str}]`, 'info');
     }
+
+  
+    function updateEditorCursorStats() {
+      const el = document.getElementById('solution-code');
+      if (!el) return;
+      const pos = el.selectionStart;
+      const text = el.value.substring(0, pos);
+      const lines = text.split('\n');
+      const curLine = lines.length;
+      const curCol = lines[lines.length - 1].length + 1;
+      const statsEl = document.getElementById('editor-cursor-pos');
+      if (statsEl) statsEl.textContent = `Строка ${curLine}, Символ ${curCol}`;
+    }
+
+    function formatEditorCode() {
+      const el = document.getElementById('solution-code');
+      if (!el) return;
+      let val = el.value;
+      // Basic clean indent formatting
+      const lines = val.split('\n');
+      let indentLevel = 0;
+      const formatted = lines.map(line => {
+        let trimmed = line.trim();
+        if (trimmed.startsWith('}') || trimmed.startsWith(']') || trimmed.startsWith('</')) {
+          indentLevel = Math.max(0, indentLevel - 1);
+        }
+        const indented = '  '.repeat(indentLevel) + trimmed;
+        if (trimmed.endsWith('{') || trimmed.endsWith('[') || (trimmed.startsWith('<') && !trimmed.endsWith('/>') && !trimmed.includes('</') && !trimmed.startsWith('<!--'))) {
+          indentLevel++;
+        }
+        return indented;
+      }).join('\n');
+
+      el.value = formatted;
+      onCodeEdited();
+      if (typeof playUiTone === 'function') playUiTone('click');
+      showToast('Код аккуратно выровнен по стандарту (2 пробела)', 'info');
+    }
+
+    // Initialize Tab key on document load
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof setupCodeEditorTabs === 'function') {
+        setupCodeEditorTabs('solution-code');
+      }
+    });
 
   </script>
 </body>

@@ -2330,3 +2330,123 @@
   }
 
   document.addEventListener('DOMContentLoaded', initCommandPalette);
+
+
+  // ==========================================
+  // SLEEK AUDIO SYNTHESIZER (WEB AUDIO API)
+  // ==========================================
+  let audioCtx = null;
+  let audioEnabled = localStorage.getItem('eduspace_audio_mute') !== 'true';
+
+  function playUiTone(type) {
+    if (!audioEnabled) return;
+    try {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'success' || type === 'grade') {
+        // High soft chime: E5 (659Hz) -> B5 (987Hz)
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(659.25, now);
+        osc.frequency.exponentialRampToValueAtTime(987.77, now + 0.12);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      } else if (type === 'click') {
+        // Subtle haptic pop
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        gain.gain.setValueAtTime(0.03, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      }
+    } catch (e) {
+      // Audio not permitted or unsupported, fail silently
+    }
+  }
+
+  // ==========================================
+  // TAB KEY INDENTATION IN CODE EDITORS
+  // ==========================================
+  function setupCodeEditorTabs(textareaId) {
+    const el = document.getElementById(textareaId);
+    if (!el) return;
+    el.addEventListener('keydown', function(e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = this.selectionStart;
+        const end = this.selectionEnd;
+        this.value = this.value.substring(0, start) + "  " + this.value.substring(end);
+        this.selectionStart = this.selectionEnd = start + 2;
+        if (typeof onCodeEdited === 'function') onCodeEdited();
+      }
+    });
+  }
+
+  // ==========================================
+  // STUDENT ACHIEVEMENTS SYSTEM
+  // ==========================================
+  function computeStudentBadges(user, passedCount, avgScore, isPro) {
+    return [
+      {
+        id: 'start',
+        title: 'Успешный старт',
+        desc: 'Зарегистрирован и подтвердил контакты в колледже',
+        icon: 'rocket_launch',
+        color: 'text-indigo-400',
+        unlocked: true
+      },
+      {
+        id: 'first_lesson',
+        title: 'Первый рубеж',
+        desc: 'Сдан и успешно зачтён Модуль №1',
+        icon: 'verified',
+        color: 'text-emerald-400',
+        unlocked: passedCount >= 1
+      },
+      {
+        id: 'quiz_master',
+        title: 'Мастер теории',
+        desc: 'Сдано не менее 3 практических модулей',
+        icon: 'psychology',
+        color: 'text-purple-400',
+        unlocked: passedCount >= 3
+      },
+      {
+        id: 'pro_tier',
+        title: 'Тариф Pro 💎',
+        desc: 'Открыт полный доступ ко всем 10 модулям специальности',
+        icon: 'diamond',
+        color: 'text-amber-400',
+        unlocked: Boolean(isPro)
+      },
+      {
+        id: 'high_gpa',
+        title: 'Отличник курса',
+        desc: 'Средний балл успеваемости 85+ баллов',
+        icon: 'stars',
+        color: 'text-yellow-400',
+        unlocked: passedCount >= 2 && avgScore >= 85
+      },
+      {
+        id: 'graduate',
+        title: 'Аккредитованный специалист',
+        desc: 'Освоены все 10 модулей, выдан гос. сертификат',
+        icon: 'school',
+        color: 'text-cyan-400',
+        unlocked: passedCount >= 10
+      }
+    ];
+  }

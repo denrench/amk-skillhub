@@ -327,3 +327,58 @@ button {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(66, 133, 244, 0.4);
 }
+
+
+/* ========================================================
+   CYBER-GLASS 2.0 ADVANCED VISUAL ENHANCEMENTS
+   ======================================================== */
+
+.glow-gradient-border {
+  position: relative;
+  border-radius: 1.5rem;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.15), rgba(16, 185, 129, 0.1));
+  padding: 1px;
+}
+
+.glow-gradient-inner {
+  border-radius: calc(1.5rem - 1px);
+  background: rgba(12, 16, 23, 0.95);
+  backdrop-filter: blur(24px);
+}
+
+.text-gradient-neon {
+  background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #34d399 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.card-hover-tilt {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card-hover-tilt:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px -10px rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.5);
+}
+
+.badge-pulse {
+  animation: cyberPulse 2.5s infinite;
+}
+
+@keyframes cyberPulse {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.achievement-unlocked {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(16, 185, 129, 0.15));
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.achievement-locked {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  opacity: 0.6;
+}
