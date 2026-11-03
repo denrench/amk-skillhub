@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ru" class="h-full scroll-smooth">
+<head>
+  <title>Центр карьеры & Резюме выпускника | EDU SPACE PRO</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <!-- Open Graph / Social Preview -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://amk-skillhub.onrender.com/career.html"/>
+  <meta property="og:title" content="Центр карьеры & Резюме выпускника АМК — EDU SPACE PRO"/>
+  <meta property="og:description" content="Готовые проверенные цифровые резюме выпускников Алматинского многопрофильного колледжа с подтверждёнными навыками и вакансиями в г. Алматы."/>
+  <meta property="og:image" content="https://amk-skillhub.onrender.com/assets/eduspace-logo.svg"/>
+  <meta name="theme-color" content="#4f46e5"/>
+
+  <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            dark: {
+              800: '#1e2330',
+              850: '#161922',
+              900: '#0f1117',
+              950: '#090a0f',
+            }
+          },
+          boxShadow: {
+            'glow-indigo': '0 0 30px -5px rgba(99, 102, 241, 0.4)',
+            'glow-cyan': '0 0 30px -5px rgba(6, 182, 212, 0.4)',
+            'glow-emerald': '0 0 30px -5px rgba(16, 185, 129, 0.4)',
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="css/style.css"/>
+
+  <style>
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      header, footer, #action-toolbar, #vacancies-section, #career-selector, .no-print {
+        display: none !important;
+      }
+      #cv-sheet {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 24px !important;
+        max-width: 100% !important;
+        page-break-inside: avoid;
+      }
+      .cv-text-muted {
+        color: #475569 !important;
+      }
+      .cv-card {
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #0f172a !important;
+      }
+      .cv-badge {
+        background: #e0e7ff !important;
+        color: #3730a3 !important;
+        border: 1px solid #c7d2fe !important;
+      }
+      a {
+        text-decoration: none !important;
+        color: inherit !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-dark-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- Main Navigation Header -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-dark-900/80 backdrop-blur-xl border-b border-white/10 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="index.html" class="flex items-center gap-3.5 group">
+        <div class="relative w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-glow-indigo transition-transform group-hover:scale-105">
+          <div class="w-full h-full bg-dark-900 rounded-[14px] flex items-center justify-center">
+            <img alt="EDU SPACE Logo" width="24" height="24" class="h-6 w-6 object-contain" src="assets/eduspace-logo.svg"/>
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5 leading-none">
+            EDU SPACE
+            <span class="px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-[10px] font-bold border border-indigo-400/30">PRO</span>
+          </span>
+          <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase mt-1">Алматинский колледж</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center gap-1 bg-white/5 border border-white/10 p-1.5 rounded-2xl backdrop-blur-md">
+        <a href="index.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Главная</a>
+        <a href="student.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Каталог</a>
+        <a href="tasks.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Задания</a>
+        <a href="gradebook.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Журнал</a>
+        <a href="tools.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px] text-cyan-400">construction</span>Инструменты
+        </a>
+        <a href="career.html" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-1">
+          <span class="material-symbols-outlined text-[16px] text-amber-300">work</span>Карьера & Резюме
+        </a>
+        <a href="pricing.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-amber-300 hover:bg-white/5 transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-[15px]">diamond</span>Тарифы
+        </a>
+      </nav>
+
+      <!-- User Auth CTA -->
+      <div class="flex items-center gap-3">
+        <a href="profile.html" id="nav-profile-btn" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold transition-all">
+          <span class="material-symbols-outlined text-[18px] text-indigo-400">account_circle</span>
+          <span id="nav-profile-name">Личный кабинет</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+
+    <!-- Top Hero Banner (Hidden in print) -->
+    <div class="mb-8 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-indigo-900/40 via-purple-900/30 to-dark-900 border border-indigo-500/20 backdrop-blur-xl relative overflow-hidden">
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div>
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-bold mb-3">
+            <span class="material-symbols-outlined text-[16px] text-amber-400 animate-pulse">verified</span>
+            Официальный центр содействия трудоустройству АМК
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            Цифровое резюме & Карьерный хаб выпускника
+          </h1>
+          <p class="text-sm text-slate-400 mt-2 max-w-2xl leading-relaxed">
+            Автоматически сформированное резюме по стандартам <strong class="text-slate-200">HeadHunter Kazakhstan</strong> и <strong class="text-slate-200">Enbek.kz</strong> с верификацией практических модулей и электронной подписью колледжа.
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div id="action-toolbar" class="flex flex-wrap items-center gap-3 no-print">
+          <button type="button" onclick="window.print()" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">print</span>
+            Печать / PDF резюме
+          </button>
+          <button type="button" onclick="shareResumeWhatsApp()" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-glow-emerald transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">share</span>
+            Отправить в WhatsApp HR
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Specialty Selector Tabs -->
+    <div id="career-selector" class="mb-8 flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar no-print">
+      <button type="button" onclick="switchResumeSpecialty('it')" id="tab-it" class="resume-tab px-4 py-2.5 rounded-2xl bg-indigo-600 text-white font-bold text-xs whitespace-nowrap shadow-glow-indigo transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">code</span>Web-разработчик (06130100)
+      </button>
+      <button type="button" onclick="switchResumeSpecialty('design')" id="tab-design" class="resume-tab px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10 transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">palette</span>Графический дизайнер (02130100)
+      </button>
+      <button type="button" onclick="switchResumeSpecialty('autoelectric')" id="tab-autoelectric" class="resume-tab px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10 transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">bolt</span>Автоэлектрик-диагност (07161301)
+      </button>
+      <button type="button" onclick="switchResumeSpecialty('hvac')" id="tab-hvac" class="resume-tab px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10 transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">ac_unit</span>Мастер холодильных установок (07130700)
+      </button>
+      <button type="button" onclick="switchResumeSpecialty('automechanic')" id="tab-automechanic" class="resume-tab px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10 transition-all flex items-center gap-2">
+        <span class="material-symbols-outlined text-[16px]">car_repair</span>Автомеханик-моторист (07161300)
+      </button>
+    </div>
+
+    <!-- THE RESUME DOCUMENT SHEET (Print-Optimized) -->
+    <div id="cv-sheet" class="bg-dark-900 border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl relative">
+      
+      <!-- College Official Header / Stamp -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-white/10 gap-4">
+        <div class="flex items-center gap-3">
+          <img src="assets/eduspace-logo.svg" alt="АМК Колледж" class="w-12 h-12 object-contain rounded-xl bg-white/5 p-1 border border-white/10"/>
+          <div>
+            <div class="text-xs uppercase tracking-wider font-extrabold text-indigo-400">КГКП «Алматинский многопрофильный колледж»</div>
+            <div class="text-[11px] text-slate-400 cv-text-muted">Государственная образовательная лицензия • БИН: 990440001809</div>
+            <div class="text-[10px] text-slate-500 cv-text-muted">г. Алматы, ул. Жандосова, 63 • Тел: +7 (727) 309-59-44</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold text-xs">
+          <span class="material-symbols-outlined text-[18px]">verified</span>
+          <span>AMK-VERIFIED CREDENTIALS</span>
+        </div>
+      </div>
+
+      <!-- Candidate Main Info Block -->
+      <div class="mt-8 flex flex-col md:flex-row items-start justify-between gap-6">
+        <div class="flex items-start gap-5">
+          <div class="relative">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 p-0.5 shadow-glow-indigo">
+              <div class="w-full h-full bg-dark-850 rounded-[14px] flex items-center justify-center text-white text-3xl font-extrabold" id="cv-avatar-initials">
+                ДС
+              </div>
+            </div>
+            <div class="absolute -bottom-2 -right-2 px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold border border-dark-900">
+              В поиске
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white" id="cv-candidate-name">Смагулов Данияр Маратович</h2>
+            <div class="text-base font-bold text-indigo-400" id="cv-candidate-role">Junior+ Web / Frontend Разработчик</div>
+            <div class="text-xs text-slate-400 cv-text-muted flex items-center gap-3 pt-1">
+              <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-slate-500">location_on</span>Алматы, Казахстан</span>
+              <span>•</span>
+              <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-slate-500">schedule</span>Полная занятость / Стажировка</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Links -->
+        <div class="w-full md:w-auto p-4 rounded-2xl bg-white/5 cv-card border border-white/10 space-y-2 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] text-emerald-400">call</span>
+            <a href="https://wa.me/77079079764" target="_blank" class="text-slate-200 hover:text-emerald-400 font-semibold" id="cv-candidate-phone">+7 707 907 97 64 (WhatsApp)</a>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] text-indigo-400">mail</span>
+            <a href="mailto:danidanilov333@gmail.com" class="text-slate-200 hover:text-indigo-400 font-semibold" id="cv-candidate-email">danidanilov333@gmail.com</a>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px] text-purple-400">link</span>
+            <a href="https://amk-skillhub.onrender.com/verify.html" target="_blank" class="text-slate-200 hover:text-purple-400 font-semibold">Проверить сертификат онлайн</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="p-4 rounded-2xl bg-dark-850 cv-card border border-white/10">
+          <div class="text-[11px] text-slate-400 cv-text-muted">Академический GPA</div>
+          <div class="text-2xl font-black text-amber-400 mt-1">3.92 <span class="text-xs text-slate-500">/ 4.0</span></div>
+          <div class="text-[10px] text-emerald-400 mt-1 font-semibold">Отличный результат (A-)</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-dark-850 cv-card border border-white/10">
+          <div class="text-[11px] text-slate-400 cv-text-muted">Практических модулей</div>
+          <div class="text-2xl font-black text-indigo-400 mt-1">10 <span class="text-xs text-slate-500">/ 10</span></div>
+          <div class="text-[10px] text-indigo-300 mt-1 font-semibold">100% программа закрыта</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-dark-850 cv-card border border-white/10">
+          <div class="text-[11px] text-slate-400 cv-text-muted">Стандарт подготовки</div>
+          <div class="text-xl font-bold text-white mt-1">WorldSkills</div>
+          <div class="text-[10px] text-slate-400 cv-text-muted mt-1 font-semibold">Казахстан 2026</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-dark-850 cv-card border border-white/10">
+          <div class="text-[11px] text-slate-400 cv-text-muted">Электронный диплом</div>
+          <div class="text-xl font-bold text-emerald-400 mt-1">Подтверждён</div>
+          <div class="text-[10px] text-slate-400 cv-text-muted mt-1 font-semibold">Директор Бейсетбаев А.К.</div>
+        </div>
+      </div>
+
+      <!-- Competency Matrix & Hard Skills -->
+      <div class="mt-8">
+        <h3 class="text-sm font-extrabold uppercase tracking-wider text-slate-300 cv-text-muted flex items-center gap-2 mb-4">
+          <span class="material-symbols-outlined text-[18px] text-indigo-400">psychology</span>
+          Подтверждённые ключевые навыки (Hard Skills)
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="cv-skills-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Completed Practical Projects & Portfolio -->
+      <div class="mt-8">
+        <h3 class="text-sm font-extrabold uppercase tracking-wider text-slate-300 cv-text-muted flex items-center gap-2 mb-4">
+          <span class="material-symbols-outlined text-[18px] text-cyan-400">task_alt</span>
+          Выполненные квалификационные работы & Проекты
+        </h3>
+        <div class="space-y-3" id="cv-projects-list">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Education & Official College Statement -->
+      <div class="mt-8 pt-6 border-t border-white/10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <div class="text-xs font-bold text-white">КГКП «Алматинский многопрофильный колледж»</div>
+          <div class="text-[11px] text-slate-400 cv-text-muted" id="cv-specialty-degree">Специальность: 06130100 — Разработка программного обеспечения (2022–2026)</div>
+        </div>
+        <div class="text-right text-[11px] text-slate-400 cv-text-muted">
+          <div>Протокол государственной аттестации №AMK-2026/81</div>
+          <div class="text-indigo-400 font-semibold">Рекомендован к приёму на работу</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- REAL ALMATY VACANCIES SECTION (Hidden in print) -->
+    <div id="vacancies-section" class="mt-16 no-print">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <div class="text-xs uppercase font-extrabold text-indigo-400 tracking-wider">Прямой найм в Алматы</div>
+          <h2 class="text-2xl font-black text-white mt-1">Актуальные вакансии для выпускников этой специальности</h2>
+        </div>
+        <div class="text-xs text-slate-400 font-medium">Партнёры колледжа АМК</div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="vacancies-grid">
+        <!-- Dynamically populated based on active specialty -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="bg-dark-900 border-t border-white/10 py-10 mt-auto no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500 space-y-2">
+      <div>КГКП «Алматинский многопрофильный колледж» • БИН 990440001809</div>
+      <div>г. Алматы, ул. Жандосова, 63 • Директор Бейсетбаев Асылхан Косылханович</div>
+      <div>Единый контакт техподдержки и трудоустройства: WhatsApp +7 707 907 97 64 • Email: danidanilov333@gmail.com</div>
+    </div>
+  </footer>
+
+  <script src="js/courses-catalog.js"></script>
+  <script src="js/app-logistics.js"></script>
+  <script>
+    const RESUME_DATA = {
+      it: {
+        role: 'Junior+ Web / Frontend Разработчик',
+        degree: '06130100 — «Разработка программного обеспечения (Web и мобильные системы)»',
+        skills: [
+          { name: 'HTML5, Semantic UI & Tailwind CSS', level: '95%', tag: 'Продвинутый' },
+          { name: 'JavaScript (ES6+), DOM, Async/Await', level: '88%', tag: 'Уверенный' },
+          { name: 'REST API, JSON, Fetch / AJAX', level: '90%', tag: 'Уверенный' },
+          { name: 'Git, GitHub, CI/CD, Deployment (Render)', level: '85%', tag: 'Практический' }
+        ],
+        projects: [
+          { title: 'Модуль №1: Адаптивный веб-интерфейс образовательного портала', score: '98/100', desc: 'Разработан многостраничный Cyber-Glass интерфейс с Tailwind CSS, flexbox/grid версткой и поддержкой мобильных экранов.' },
+          { title: 'Модуль №4: Авторизация с WhatsApp OTP & Session Tokens', score: '95/100', desc: 'Спроектирован и протестирован модуль генерации 6-значных кодов и верификации через WhatsApp Business API.' },
+          { title: 'Модуль №7: Интерактивный тренажёр-симулятор кода', score: '96/100', desc: 'Внедрён редактор кода в браузере с подсветкой синтаксиса, автозапуском тестов и AI-куратором.' }
+        ],
+        vacancies: [
+          { company: 'Kaspi.kz', title: 'Junior Frontend Developer', salary: '380 000 – 480 000 ₸', city: 'Алматы, БЦ Нурлы-Тау', phone: '77079079764' },
+          { company: 'Chocofamily Holding', title: 'Web Developer (Intern/Junior)', salary: '300 000 – 420 000 ₸', city: 'Алматы, пр. Аль-Фараби', phone: '77079079764' },
+          { company: 'ТОО «KazInterSoft»', title: 'Младший разработчик веб-сервисов', salary: '320 000 – 450 000 ₸', city: 'Алматы, ул. Жандосова', phone: '77079079764' }
+        ]
+      },
+      design: {
+        role: 'UI/UX & Графический дизайнер',
+        degree: '02130100 — «Графический и мультимедийный дизайн»',
+        skills: [
+          { name: 'Figma: компоненты, Auto-Layout, Tokens', level: '96%', tag: 'Продвинутый' },
+          { name: 'Adobe Photoshop & Illustrator', level: '90%', tag: 'Уверенный' },
+          { name: 'Брендинг, Айдентика, Гайдлайны', level: '88%', tag: 'Уверенный' },
+          { name: 'UI-системы, WCAG доступность, Мобильный UX', level: '92%', tag: 'Продвинутый' }
+        ],
+        projects: [
+          { title: 'Модуль №2: Дизайн-система цифрового колледжа в Figma', score: '97/100', desc: 'Создана комплексная компонентная библиотека: цветовые стили, шрифтовые шкалы, 40+ интерактивных элементов UI.' },
+          { title: 'Модуль №5: Редизайн мобильного кабинета студента', score: '94/100', desc: 'Проведены юзабилити-тесты, составлен CJM, проработаны микроанимации и тёмная неоновая тема оформления.' }
+        ],
+        vacancies: [
+          { company: 'ТОО «Kolesa Group»', title: 'Junior UI/UX Designer', salary: '350 000 – 450 000 ₸', city: 'Алматы, ул. Шевченко', phone: '77079079764' },
+          { company: 'Рекламное агентство «GForce / Grey»', title: 'Графический дизайнер', salary: '280 000 – 400 000 ₸', city: 'Алматы, Медеуский р-н', phone: '77079079764' },
+          { company: 'ТОО «Magnum E-Commerce»', title: 'Digital Designer', salary: '320 000 – 430 000 ₸', city: 'Алматы, пр. Абая', phone: '77079079764' }
+        ]
+      },
+      autoelectric: {
+        role: 'Автоэлектрик-диагност компьютерных систем',
+        degree: '07161301 — «Техническое обслуживание и диагностика автоэлектроники»',
+        skills: [
+          { name: 'Компьютерная диагностика OBD-II (Launch, Autel)', level: '94%', tag: 'Продвинутый' },
+          { name: 'Анализ осциллограмм датчиков (ДПКВ, ДПРВ, CAN)', level: '90%', tag: 'Уверенный' },
+          { name: 'Чтение и поиск обрывов в электрических схемах', level: '96%', tag: 'Продвинутый' },
+          { name: 'Диагностика систем впрыска, зажигания, ABS/ESP', level: '88%', tag: 'Уверенный' }
+        ],
+        projects: [
+          { title: 'Модуль №3: Расшифровка кодов ошибок DTC и локализация сбоя CAN', score: '99/100', desc: 'Успешно выявлен обрыв согласующего резистора 120 Ом на шине данных CAN-High/CAN-Low с помощью осциллографа.' },
+          { title: 'Модуль №6: Диагностика топливной коррекции LTFT/STFT', score: '95/100', desc: 'Локализован нештатный подсос воздуха на впускном коллекторе при ошибке бедной смеси P0171.' }
+        ],
+        vacancies: [
+          { company: 'ТОО «Astana Motors» (Hyundai/BMW Center)', title: 'Автоэлектрик-диагност', salary: '450 000 – 650 000 ₸', city: 'Алматы, пр. Суюнбая', phone: '77079079764' },
+          { company: 'ТОО «Allur Auto» (Kia / Chevrolet)', title: 'Диагност электронных систем', salary: '400 000 – 600 000 ₸', city: 'Алматы, ул. Майлина', phone: '77079079764' },
+          { company: 'Автоцентр «Bavaria Almaty»', title: 'Младший автоэлектрик', salary: '350 000 – 500 000 ₸', city: 'Алматы, пр. Аль-Фараби', phone: '77079079764' }
+        ]
+      },
+      hvac: {
+        role: 'Техник-механик систем кондиционирования & холода',
+        degree: '07130700 — «Монтаж и эксплуатация холодильно-компрессорных установок»',
+        skills: [
+          { name: 'Вакуумирование и заправка фреоном R134a, R404a, R600a', level: '95%', tag: 'Продвинутый' },
+          { name: 'Пайка медных трубопроводов твёрдым припоем (медно-фосфор)', level: '92%', tag: 'Уверенный' },
+          { name: 'Расчёт и замер перегрева (Superheat) и переохлаждения', level: '90%', tag: 'Уверенный' },
+          { name: 'Диагностика компрессоров, ТРВ и реле давления', level: '88%', tag: 'Уверенный' }
+        ],
+        projects: [
+          { title: 'Модуль №2: Расчёт давления кипения и заправка контура R134a', score: '98/100', desc: 'Выполнена опрессовка азотом 15 bar, глубокий вакуум до 500 микрон и точная весовая заправка с контролем перегрева 6 K.' },
+          { title: 'Модуль №5: Замена фильтра-осушителя и настройка ТРВ', score: '96/100', desc: 'Отрегулирован терморегулирующий вентиль для стабильного охлаждения камеры при переменной тепловой нагрузке.' }
+        ],
+        vacancies: [
+          { company: 'ТОО «Air Astana» (Наземный сервис)', title: 'Техник по климатическим установкам', salary: '420 000 – 580 000 ₸', city: 'Алматы, Аэропорт', phone: '77079079764' },
+          { company: 'ТОО «Technodom Service»', title: 'Мастер по ремонту климатического оборудования', salary: '350 000 – 550 000 ₸', city: 'Алматы, ул. Толе би', phone: '77079079764' },
+          { company: 'Хладокомбинат №1 г. Алматы', title: 'Холодильщик промышленных камер', salary: '400 000 – 600 000 ₸', city: 'Алматы, Райымбека', phone: '77079079764' }
+        ]
+      },
+      automechanic: {
+        role: 'Автомеханик-моторист легковых автомобилей',
+        degree: '07161300 — «Техническое обслуживание и ремонт автотранспорта»',
+        skills: [
+          { name: 'Дефектовка и ремонт двигателей (ГБЦ, ШПГ, КШМ)', level: '93%', tag: 'Продвинутый' },
+          { name: 'Динамометрическая затяжка и соблюдение технологических карт', level: '96%', tag: 'Продвинутый' },
+          { name: 'Замена ремней и цепей ГРМ по меткам и фиксаторам', level: '91%', tag: 'Уверенный' },
+          { name: 'Диагностика подвески, рулевого управления и тормозов', level: '94%', tag: 'Продвинутый' }
+        ],
+        projects: [
+          { title: 'Модуль №3: Капитальная сборка блока цилиндров и ГБЦ 16V', score: '97/100', desc: 'Замерены зазоры в замках колец, постелях распредвала, произведена пошаговая обтяжка болтов ГБЦ по спирали.' },
+          { title: 'Модуль №7: Регулировка тепловых зазоров клапанов', score: '95/100', desc: 'Произведён подбор толкателей и шайб по щупу с точностью до 0.02 мм на остывшем моторе 20 °C.' }
+        ],
+        vacancies: [
+          { company: 'ТОО «Astana Motors»', title: 'Слесарь по ремонту ДВС', salary: '400 000 – 620 000 ₸', city: 'Алматы, Кульджинский тракт', phone: '77079079764' },
+          { company: 'Сеть автосервисов «SCT Service»', title: 'Автомеханик-универсал', salary: '380 000 – 520 000 ₸', city: 'Алматы, ул. Жандосова', phone: '77079079764' },
+          { company: 'ТОО «Вираж Сервис Казахстан»', title: 'Моторист', salary: '360 000 – 500 000 ₸', city: 'Алматы, пр. Райымбека', phone: '77079079764' }
+        ]
+      }
+    };
+
+    let currentSpec = 'it';
+
+    function initCareerHub() {
+      const user = window.EduSpace.getActiveUser();
+      if (user) {
+        const nameEl = document.getElementById('cv-candidate-name');
+        const phoneEl = document.getElementById('cv-candidate-phone');
+        const emailEl = document.getElementById('cv-candidate-email');
+        const initialsEl = document.getElementById('cv-avatar-initials');
+        const navName = document.getElementById('nav-profile-name');
+
+        if (nameEl && user.full_name) nameEl.textContent = user.full_name;
+        if (phoneEl && user.phone) {
+          phoneEl.textContent = user.phone + ' (WhatsApp)';
+          phoneEl.href = 'https://wa.me/' + user.phone.replace(/[^0-9]/g, '');
+        }
+        if (emailEl && user.email) {
+          emailEl.textContent = user.email;
+          emailEl.href = 'mailto:' + user.email;
+        }
+        if (initialsEl && user.full_name) {
+          const parts = user.full_name.split(' ');
+          initialsEl.textContent = (parts[0][0] || '') + (parts[1] ? parts[1][0] : '');
+        }
+        if (navName && user.full_name) {
+          navName.textContent = user.first_name || user.full_name.split(' ')[0];
+        }
+
+        if (user.active_specialty && RESUME_DATA[user.active_specialty]) {
+          currentSpec = user.active_specialty;
+        }
+      }
+
+      renderResumeFor(currentSpec);
+    }
+
+    function switchResumeSpecialty(slug) {
+      if (!RESUME_DATA[slug]) return;
+      currentSpec = slug;
+
+      document.querySelectorAll('.resume-tab').forEach(b => {
+        b.className = 'resume-tab px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10 transition-all flex items-center gap-2';
+      });
+
+      const activeBtn = document.getElementById('tab-' + slug);
+      if (activeBtn) {
+        activeBtn.className = 'resume-tab px-4 py-2.5 rounded-2xl bg-indigo-600 text-white font-bold text-xs whitespace-nowrap shadow-glow-indigo transition-all flex items-center gap-2';
+      }
+
+      renderResumeFor(slug);
+    }
+
+    function renderResumeFor(slug) {
+      const data = RESUME_DATA[slug];
+      if (!data) return;
+
+      document.getElementById('cv-candidate-role').textContent = data.role;
+      document.getElementById('cv-specialty-degree').textContent = 'Специальность: ' + data.degree;
+
+      // Render Skills
+      const skillsCont = document.getElementById('cv-skills-grid');
+      skillsCont.innerHTML = data.skills.map(s => `
+        <div class="p-3.5 rounded-2xl bg-dark-850 cv-card border border-white/10 space-y-1.5">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-white">${s.name}</span>
+            <span class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-bold cv-badge">${s.tag}</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 rounded-full" style="width: ${s.level}"></div>
+          </div>
+        </div>
+      `).join('');
+
+      // Render Projects
+      const projCont = document.getElementById('cv-projects-list');
+      projCont.innerHTML = data.projects.map(p => `
+        <div class="p-4 rounded-2xl bg-dark-850 cv-card border border-white/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div class="space-y-1">
+            <div class="text-xs font-bold text-white flex items-center gap-2">
+              <span>${p.title}</span>
+              <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/30">Сдано: ${p.score}</span>
+            </div>
+            <div class="text-[11px] text-slate-400 cv-text-muted leading-relaxed">${p.desc}</div>
+          </div>
+        </div>
+      `).join('');
+
+      // Render Vacancies
+      const vacCont = document.getElementById('vacancies-grid');
+      vacCont.innerHTML = data.vacancies.map(v => `
+        <div class="p-5 rounded-3xl bg-dark-900 border border-white/10 hover:border-indigo-500/40 transition-all flex flex-col justify-between group">
+          <div>
+            <div class="flex items-center justify-between text-xs mb-2">
+              <span class="font-extrabold text-indigo-400 uppercase tracking-wider">${v.company}</span>
+              <span class="px-2 py-0.5 rounded-md bg-white/5 text-[10px] text-slate-400">${v.city}</span>
+            </div>
+            <h4 class="text-base font-bold text-white group-hover:text-indigo-300 transition-colors">${v.title}</h4>
+            <div class="text-lg font-black text-emerald-400 mt-2">${v.salary}</div>
+          </div>
+          <div class="mt-5 pt-4 border-t border-white/10 flex items-center justify-between gap-3">
+            <a href="https://wa.me/${v.phone}?text=${encodeURIComponent('Здравствуйте! Я выпускник колледжа АМК по специальности ' + data.role + '. Направляю своё резюме с платформы EDU SPACE: https://amk-skillhub.onrender.com/career.html')}" target="_blank" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors">
+              <span class="material-symbols-outlined text-[16px]">send</span>Откликнуться резюме
+            </a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function shareResumeWhatsApp() {
+      const text = encodeURIComponent('Здравствуйте! Направляю верифицированное цифровое резюме выпускника Алматинского многопрофильного колледжа (АМК): https://amk-skillhub.onrender.com/career.html');
+      window.open('https://wa.me/77079079764?text=' + text, '_blank');
+    }
+
+    document.addEventListener('DOMContentLoaded', initCareerHub);
+  </script>
+</body>
+</html>

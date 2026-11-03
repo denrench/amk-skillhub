@@ -229,7 +229,7 @@ print("Test 14: Isolated Demo Reset preserves real registered users & their grad
 all_pages = [
     '/', '/index.html', '/features.html', '/about.html', '/pricing.html',
     '/reviews.html', '/auth.html', '/student.html', '/tasks.html',
-    '/simulator.html', '/teacher.html', '/profile.html'
+    '/simulator.html', '/teacher.html', '/profile.html', '/career.html', '/tools.html'
 ]
 for route in all_pages:
     resp = app.get(route)

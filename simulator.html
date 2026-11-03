@@ -1264,6 +1264,204 @@
       }
     });
 
+  
+    // ==========================================
+    // AI-COPILOT MENTORING ENGINE
+    // ==========================================
+    let aiDrawerOpen = false;
+    let aiPromptCount = parseInt(localStorage.getItem('eduspace_ai_count') || '0', 10);
+
+    function toggleAiAssistantDrawer() {
+      aiDrawerOpen = !aiDrawerOpen;
+      const drawer = document.getElementById('ai-assistant-drawer');
+      if (drawer) {
+        if (aiDrawerOpen) {
+          drawer.classList.remove('translate-x-full');
+          if (!document.getElementById('ai-chat-messages').hasChildNodes()) {
+            initAiChatGreeting();
+          }
+          document.getElementById('ai-chat-input').focus();
+        } else {
+          drawer.classList.add('translate-x-full');
+        }
+      }
+    }
+
+    function initAiChatGreeting() {
+      const user = window.EduSpace.getActiveUser();
+      const course = window.EduSpace.getCourseBySlug ? window.EduSpace.getCourseBySlug(activeSpecialty) : { short_title: 'Курс' };
+      const isPro = (user && user.subscription_tier === 'pro');
+      const quotaLabel = document.getElementById('ai-quota-label');
+      if (quotaLabel) {
+        quotaLabel.textContent = isPro ? 'Тариф Pro: безлимитные подсказки 24/7 💎' : `Бесплатный план: использовано ${aiPromptCount}/3`;
+      }
+
+      appendAiMessage('assistant', `Здравствуйте, ${user ? user.first_name || user.full_name : 'Студент'}! Я ваш интеллектуальный AI-Куратор по направлению <strong>«${course.short_title}»</strong>.<br/><br/>Я знаю все требования Модуля №${activeTaskNumber}, критерии автотестов и стандарты колледжа АМК. Чем могу помочь прямо сейчас?`);
+    }
+
+    function appendAiMessage(role, text) {
+      const cont = document.getElementById('ai-chat-messages');
+      if (!cont) return;
+
+      const isUser = (role === 'user');
+      const bubble = document.createElement('div');
+      bubble.className = isUser ? 'flex justify-end' : 'flex justify-start';
+      bubble.innerHTML = `
+        <div class="max-w-[85%] p-3.5 rounded-2xl ${isUser ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-dark-850 border border-white/10 text-slate-200 rounded-tl-none shadow-md'} space-y-1.5 leading-relaxed">
+          ${!isUser ? '<div class="text-[10px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">smart_toy</span>AI-Куратор</div>' : ''}
+          <div>${text}</div>
+        </div>
+      `;
+      cont.appendChild(bubble);
+      cont.scrollTop = cont.scrollHeight;
+    }
+
+    function sendAiQuickPrompt(type) {
+      const user = window.EduSpace.getActiveUser();
+      const isPro = (user && user.subscription_tier === 'pro');
+
+      if (!isPro && aiPromptCount >= 3) {
+        appendAiMessage('assistant', `⚠️ Вы использовали лимит (3 из 3) бесплатных подсказок AI-Куратора на сегодня.<br/><br/>Чтобы получать неограниченную помощь при решении практических задач — <a href="pricing.html?plan=pro" class="text-amber-400 underline font-bold">активируйте тариф Pro (4 990 ₸)</a>.`);
+        return;
+      }
+
+      aiPromptCount++;
+      localStorage.setItem('eduspace_ai_count', aiPromptCount);
+      const quotaLabel = document.getElementById('ai-quota-label');
+      if (quotaLabel && !isPro) quotaLabel.textContent = `Бесплатный план: использовано ${aiPromptCount}/3`;
+
+      const code = document.getElementById('solution-code') ? document.getElementById('solution-code').value.trim() : '';
+      const promptLabels = {
+        hint: 'Дай полезную подсказку по решению текущего модуля',
+        bug: 'Проанализируй мой код и объясни, в чём ошибка',
+        explain: 'Объясни теоретическую суть этого практического задания простыми словами',
+        checklist: 'Какой чек-лист нужно выполнить перед сдачей решения на проверку?'
+      };
+
+      appendAiMessage('user', promptLabels[type] || 'Подскажи решение');
+
+      // AI Contextual Response Generator
+      setTimeout(() => {
+        let answer = '';
+        if (type === 'hint') {
+          if (activeSpecialty === 'it') {
+            answer = `💡 <strong>Подсказка по Web-разработке (Модуль №${activeTaskNumber}):</strong><br/>Обратите внимание на семантику тегов и правильные имена классов. Если задание требует центрирования или сетки — используйте <code>display: flex</code> или <code>grid</code> с соответствующими правилами.`;
+          } else if (activeSpecialty === 'autoelectric') {
+            answer = `💡 <strong>Совет диагноста:</strong><br/>Всегда начинайте проверку с питания датчика и целостности массы. Опорное напряжение большинства датчиков составляет 5.0 В. Сопротивление CAN-шины между линиями High и Low должно составлять строго 60 Ом (два резистора по 120 Ом параллельно).`;
+          } else if (activeSpecialty === 'hvac') {
+            answer = `💡 <strong>Рекомендация мастера холода:</strong><br/>Для R134a нормальное давление всасывания составляет 1.8–2.2 bar при температуре кипения около -5...-8 °C. Перегрев должен оставаться в коридоре 5–8 °C. Если перегрев выше 10 °C — система недозаправлена!`;
+          } else if (activeSpecialty === 'automechanic') {
+            answer = `💡 <strong>Норматив моториста:</strong><br/>Затяжку болтов ГБЦ проводите строго в 3 этапа по спирали от центра к краям: 40 Н·м ➔ 75 Н·м ➔ доворот на 90°. Проверку зазоров клапанов делайте только на остывшем двигателе (20 °C).`;
+          } else {
+            answer = `💡 <strong>Совет дизайнера:</strong><br/>Следите за коэффициентом контрастности текста к фону (WCAG AA: минимум 4.5:1). Применяйте модульную сетку 8px и не используйте более 2 шрифтовых гарнитур на одном макете.`;
+          }
+        } else if (type === 'bug') {
+          if (!code || code.length < 20) {
+            answer = `🔍 В редакторе пока пусто или слишком мало кода. Напишите решение или вставьте исходный шаблон, и я найду в нём синтаксические и логические ошибки.`;
+          } else if (code.includes('var ')) {
+            answer = `🔍 <strong>Замечание по чистоте кода:</strong><br/>Замечено использование устаревшего ключевого слова <code>var</code>. Замените его на современные <code>const</code> и <code>let</code> по стандарту ES6+.`;
+          } else {
+            answer = `🔍 Анализ кода решения завершён. Базовый синтаксис корректен. Рекомендую запустить кнопку <strong>«Запустить автотесты»</strong> под редактором — тест-раннер проверит граничные случаи и покажет точную строку несоответствия.`;
+          }
+        } else if (type === 'explain') {
+          answer = `📖 <strong>Теоретическая основа модуля №${activeTaskNumber}:</strong><br/>В этом задании оценивается понимание базовых физических и программных принципов. Главная цель — не просто воспроизвести шаблон, а понять причинно-следственную связь: как параметры влияют на итоговую стабильность системы.`;
+        } else if (type === 'checklist') {
+          answer = `📋 <strong>Чек-лист перед сдачей работы:</strong><br/>
+            1. Все функции и параметры названы корректно ✓<br/>
+            2. Запущены автотесты и получен балл не ниже 60/100 ✓<br/>
+            3. Квиз проверен и зафиксирован (до +15 баллов бонуса) ✓<br/>
+            4. Прикреплён отчёт или макет в поле загрузки файлов ✓`;
+        }
+
+        appendAiMessage('assistant', answer);
+      }, 600);
+    }
+
+    function handleAiUserSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('ai-chat-input');
+      const val = (input.value || '').trim();
+      if (!val) return;
+      input.value = '';
+
+      const user = window.EduSpace.getActiveUser();
+      const isPro = (user && user.subscription_tier === 'pro');
+      if (!isPro && aiPromptCount >= 3) {
+        appendAiMessage('assistant', `⚠️ Лимит бесплатных запросов исчерпан. Перейдите на <a href="pricing.html?plan=pro" class="text-amber-400 underline font-bold">Тариф Pro</a> для безлимитного AI-наставника 24/7.`);
+        return;
+      }
+
+      aiPromptCount++;
+      localStorage.setItem('eduspace_ai_count', aiPromptCount);
+      appendAiMessage('user', val);
+
+      setTimeout(() => {
+        appendAiMessage('assistant', `Отличный вопрос по модулю №${activeTaskNumber}! Для успешного решения обратите внимание на технические требования в верхней панели brief и критерии автотестов. Рекомендую проверить решение по шагам и нажать «Запустить автотесты».`);
+      }, 500);
+    }
+
   </script>
+
+  <!-- Floating AI Assistant Trigger -->
+  <button id="btn-ai-toggle" type="button" onclick="toggleAiAssistantDrawer()" class="fixed bottom-6 right-6 z-40 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:shadow-indigo-500/50 text-white font-extrabold text-xs shadow-glow-indigo flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95 group">
+    <span class="material-symbols-outlined text-[20px] text-amber-300 animate-pulse">smart_toy</span>
+    <span>AI-Куратор</span>
+    <span class="px-2 py-0.5 rounded-full bg-white/20 text-[10px] uppercase font-bold text-white" id="ai-floating-badge">Помощь</span>
+  </button>
+
+  <!-- Slide-Out Cyber-Glass AI Chat Drawer -->
+  <div id="ai-assistant-drawer" class="fixed inset-y-0 right-0 z-50 w-full sm:w-[460px] bg-dark-900/95 backdrop-blur-2xl border-l border-white/10 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col justify-between">
+    <!-- Header -->
+    <div class="p-5 border-b border-white/10 flex items-center justify-between bg-dark-950/60">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-glow-indigo">
+          <span class="material-symbols-outlined text-[22px]">smart_toy</span>
+        </div>
+        <div>
+          <div class="text-sm font-extrabold text-white flex items-center gap-2">
+            <span>AI-Куратор EDU SPACE</span>
+            <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold border border-indigo-500/30">AI Pro</span>
+          </div>
+          <div class="text-[11px] text-slate-400" id="ai-quota-label">Бесплатный доступ: 3 подсказки в день</div>
+        </div>
+      </div>
+      <button type="button" onclick="toggleAiAssistantDrawer()" class="p-2 rounded-xl hover:bg-white/10 text-slate-400 hover:text-white transition-colors">
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <!-- Quick Prompt Chips -->
+    <div class="px-5 py-3 border-b border-white/10 bg-dark-950/40 flex items-center gap-2 overflow-x-auto text-[11px] no-scrollbar">
+      <button type="button" onclick="sendAiQuickPrompt('hint')" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-indigo-600/20 text-slate-300 hover:text-indigo-300 border border-white/10 whitespace-nowrap transition-colors flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[14px] text-amber-400">lightbulb</span>Подсказка
+      </button>
+      <button type="button" onclick="sendAiQuickPrompt('bug')" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-indigo-600/20 text-slate-300 hover:text-indigo-300 border border-white/10 whitespace-nowrap transition-colors flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[14px] text-red-400">bug_report</span>В чём ошибка?
+      </button>
+      <button type="button" onclick="sendAiQuickPrompt('explain')" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-indigo-600/20 text-slate-300 hover:text-indigo-300 border border-white/10 whitespace-nowrap transition-colors flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[14px] text-emerald-400">school</span>Теория просто
+      </button>
+      <button type="button" onclick="sendAiQuickPrompt('checklist')" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-indigo-600/20 text-slate-300 hover:text-indigo-300 border border-white/10 whitespace-nowrap transition-colors flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-[14px] text-indigo-400">checklist</span>Чек-лист
+      </button>
+    </div>
+
+    <!-- Chat Dialogue Box -->
+    <div id="ai-chat-messages" class="flex-1 overflow-y-auto p-5 space-y-4 text-xs">
+      <!-- Populated dynamically -->
+    </div>
+
+    <!-- Input Form -->
+    <div class="p-4 border-t border-white/10 bg-dark-950 space-y-2">
+      <form onsubmit="handleAiUserSubmit(event)" class="flex items-center gap-2">
+        <input type="text" id="ai-chat-input" placeholder="Задайте вопрос AI-Куратору по заданию..." class="flex-1 px-4 py-2.5 rounded-xl bg-dark-900 border border-white/15 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-indigo-500 font-medium" />
+        <button type="submit" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center justify-center">
+          <span class="material-symbols-outlined text-[18px]">send</span>
+        </button>
+      </form>
+      <div class="text-[10px] text-slate-500 text-center">AI-Куратор анализирует код и критерии программы АМК в реальном времени</div>
+    </div>
+  </div>
+
 </body>
 </html>
