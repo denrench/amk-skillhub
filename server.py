@@ -645,19 +645,28 @@ def send_verification_code():
     """, (email, code, expires_at))
     conn.commit()
 
+    wa_phone = "77079079764"
+    wa_msg = f"Здравствуйте! Подтверждаю регистрацию в EDU SPACE (АМК). Мой код: [{code}], Email: {email}"
+    import urllib.parse
+    wa_url = f"https://wa.me/{wa_phone}?text={urllib.parse.quote(wa_msg)}"
+
+    # Optional background attempt via SMTP if configured
     sent_real, status_smtp = send_smtp_email(email, code)
 
-    msg_text = f"6-значный проверочный код отправлен на {email}" if sent_real else f"Код сформирован для {email} (демо-режим активен)"
     return jsonify({
         "success": True,
-        "message": msg_text,
+        "message": f"Код [{code}] готов для отправки в WhatsApp (+7 707 907 97 64)",
+        "code": code,
+        "whatsapp_phone": "+7 707 907 97 64",
+        "whatsapp_url": wa_url,
         "sent_via_smtp": sent_real,
         "expires_in_seconds": 600,
         "mail_preview": {
             "to": email,
-            "from": "d03509181@gmail.com",
+            "from": "+7 707 907 97 64 (WhatsApp)",
             "subject": f"{code} — Код подтверждения EDU SPACE (АМК)",
-            "code": code
+            "code": code,
+            "whatsapp_url": wa_url
         }
     })
 
