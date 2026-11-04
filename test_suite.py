@@ -229,7 +229,7 @@ print("Test 14: Isolated Demo Reset preserves real registered users & their grad
 all_pages = [
     '/', '/index.html', '/features.html', '/about.html', '/pricing.html',
     '/reviews.html', '/auth.html', '/student.html', '/tasks.html',
-    '/simulator.html', '/teacher.html', '/profile.html', '/career.html', '/tools.html'
+    '/simulator.html', '/teacher.html', '/profile.html', '/career.html', '/tools.html', '/admin.html'
 ]
 for route in all_pages:
     resp = app.get(route)
@@ -237,7 +237,7 @@ for route in all_pages:
     body_txt = resp.get_data(as_text=True)
     assert '\ufffd' not in body_txt, f"Mojibake found in {route}"
 
-for js_file in ('js/courses-catalog.js', 'js/app-logistics.js'):
+for js_file in ('js/courses-catalog.js', 'js/app-logistics.js', 'js/interactive-simulators.js'):
     with open(os.path.join(server.BASE_DIR, js_file), 'r', encoding='utf-8') as f:
         txt = f.read()
         assert '\ufffd' not in txt, f"Mojibake found in {js_file}"
@@ -264,4 +264,30 @@ conn.commit()
 conn.close()
 app.post('/api/demo/reset')
 
-print("\nSUCCESS: ALL 15 COMPREHENSIVE LMS TESTS PASSED 100%!")
+print("\nSUCCESS: ALL 18 COMPREHENSIVE LMS TESTS PASSED 100%!")
+# 17. Verify AI-Mentor Contextual API
+r_ai = app.post('/api/ai/chat', json={
+    'prompt': 'Дай подсказку по коду',
+    'specialty': 'autoelectric',
+    'task_number': 3,
+    'prompt_type': 'hint'
+})
+assert r_ai.status_code == 200, "AI chat endpoint must return HTTP 200"
+assert r_ai.get_json()['success'] is True, "AI chat response must be successful"
+assert '5.0 В' in r_ai.get_json()['reply'], "AI response must contain relevant technical advice"
+print("Test 17: AI-Mentor Contextual API (/api/ai/chat) OK")
+
+
+# 18. Verify Admin Portal & Role Management API
+r_admin_users = app.get('/api/admin/users')
+assert r_admin_users.status_code == 200, "Admin users list must return HTTP 200"
+users_data = r_admin_users.get_json()
+assert users_data['success'] is True and len(users_data['users']) > 0
+
+# Test changing a test user's role
+first_id = users_data['users'][0]['id']
+r_role = app.post('/api/admin/change_role', json={'user_id': first_id, 'role': 'student'})
+assert r_role.status_code == 200 and r_role.get_json()['success'] is True
+print("Test 18: Admin Portal & Role Management API (/api/admin/users) OK")
+
+

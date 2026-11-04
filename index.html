@@ -3,25 +3,24 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EDU SPACE PRO | Цифровая образовательная платформа колледжа АМК</title>
+  
   <!-- Open Graph / WhatsApp / Telegram Social Preview -->
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://amk-skillhub.onrender.com/"/>
-  <meta property="og:title" content="EDU SPACE — Цифровая образовательная среда АМК"/>
-  <meta property="og:description" content="Инновационная цифровая платформа Алматинского многопрофильного колледжа. 5 специальностей ТиПО, интерактивные тренажеры и реестр аккредитации."/>
+  <meta property="og:title" content="EDU SPACE PRO — Цифровой колледж прикладных профессий"/>
+  <meta property="og:description" content="Интерактивные 3D-тренажёры, практические симуляторы, AI-куратор и верифицированные сертификаты колледжа АМК в г. Алматы."/>
   <meta property="og:image" content="https://amk-skillhub.onrender.com/assets/eduspace-logo.svg"/>
-  <meta name="theme-color" content="#07090e"/>
-  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="theme-color" content="#4f46e5"/>
 
-  <title>EDU SPACE — Цифровая образовательная платформа АМК</title>
+  <!-- Fonts & Icons -->
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg"/>
-
-  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono for Code -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -29,83 +28,47 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
           },
           colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
-              950: '#1e1b4b'
-            },
             dark: {
-              950: '#07090e',
-              900: '#0b0f19',
-              850: '#101524',
-              800: '#161c2e',
-              700: '#1e263d',
-              600: '#2a3452'
+              800: '#1e2330',
+              850: '#161922',
+              900: '#0f1117',
+              950: '#090a0f',
             }
           },
           boxShadow: {
-            'glow-indigo': '0 0 50px -10px rgba(99, 102, 241, 0.35)',
-            'glow-purple': '0 0 50px -10px rgba(168, 85, 247, 0.35)',
-            'glow-cyan': '0 0 50px -10px rgba(6, 182, 212, 0.35)',
-            'glow-amber': '0 0 50px -10px rgba(245, 158, 11, 0.35)'
+            'glow-indigo': '0 0 35px -5px rgba(99, 102, 241, 0.45)',
+            'glow-cyan': '0 0 35px -5px rgba(6, 182, 212, 0.45)',
+            'glow-emerald': '0 0 35px -5px rgba(16, 185, 129, 0.45)',
+            'glow-amber': '0 0 35px -5px rgba(245, 158, 11, 0.45)',
           }
         }
       }
-    };
+    }
   </script>
-
-  <style>
-    /* Custom Modern Cyber-Grid Background */
-    .bg-grid-pattern {
-      background-image: radial-gradient(rgba(99, 102, 241, 0.15) 1px, transparent 1px);
-      background-size: 32px 32px;
-    }
-    .bg-grid-white {
-      background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
-      background-size: 32px 32px;
-    }
-    /* Smooth Scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0b0f19;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #2a3452;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #6366f1;
-    }
-  </style>
-
-  <script src="js/courses-catalog.js"></script>
-  <script src="js/app-logistics.js"></script>
+  <link rel="stylesheet" href="css/style.css"/>
 </head>
-<body class="font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+<body class="bg-dark-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white bg-grid-white relative">
 
-  <!-- ================= TOP NAVIGATION BAR ================= -->
-  <header class="fixed top-0 left-0 right-0 z-50 bg-dark-900/80 backdrop-blur-xl border-b border-white/10 transition-all duration-300">
+  <!-- Ambient background glow orbs -->
+  <div class="fixed top-20 left-1/4 w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-[160px] pointer-events-none"></div>
+  <div class="fixed top-1/2 right-10 w-[450px] h-[450px] bg-cyan-500/10 rounded-full blur-[160px] pointer-events-none"></div>
+  <div class="fixed bottom-10 left-1/3 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[180px] pointer-events-none"></div>
+
+  <!-- ========================================================================= -->
+  <!-- 1. NAVIGATION HEADER -->
+  <!-- ========================================================================= -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-dark-900/85 backdrop-blur-xl border-b border-white/10 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
       
       <!-- Brand Logo -->
       <a href="index.html" class="flex items-center gap-3.5 group">
-        <div class="relative w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-glow-indigo transition-transform group-hover:scale-105">
+        <div class="relative w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-glow-indigo transition-transform group-hover:scale-105">
           <div class="w-full h-full bg-dark-900 rounded-[14px] flex items-center justify-center">
-            <img alt="EDU SPACE Logo" width="24" height="24" class="h-6 w-6 object-contain" src="assets/eduspace-logo.svg"/>
+            <img alt="EDU SPACE Logo" width="26" height="26" class="h-6 w-6 object-contain" src="assets/eduspace-logo.svg"/>
           </div>
         </div>
         <div class="flex flex-col">
@@ -113,608 +76,752 @@
             EDU SPACE
             <span class="px-1.5 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 text-[10px] font-bold border border-indigo-400/30">PRO</span>
           </span>
-          <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase mt-1">АМК Колледж</span>
+          <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase mt-1">Алматинский многопрофильный колледж</span>
         </div>
       </a>
 
-      <!-- Desktop Nav -->
-      <nav class="hidden md:flex items-center gap-1 bg-white/5 border border-white/10 p-1.5 rounded-2xl backdrop-blur-md">
-        <a href="index.html" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm transition-all">Главная</a>
-        <a href="features.html" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all">Возможности</a>
-        <a href="tasks.html" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all">5 Профессий</a>
-        <a href="about.html" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all">О платформе</a>
-        <a href="tools.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1"><span class="material-symbols-outlined text-[15px] text-cyan-400">construction</span>Инструменты</a>
-        <a href="career.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all flex items-center gap-1"><span class="material-symbols-outlined text-[15px] text-amber-300">work</span>Карьера</a>
-        <a href="pricing.html"  class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all">Тарифы</a>
-        <a href="reviews.html" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-all">Отзывы</a>
+      <!-- Desktop Navigation Menu -->
+      <nav class="hidden lg:flex items-center gap-1 bg-white/5 border border-white/10 p-1.5 rounded-2xl backdrop-blur-md text-xs font-semibold text-slate-300">
+        <a href="#specialties" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">Специальности</a>
+        <a href="#simulators" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">3D & Тренажёры</a>
+        <a href="#how-it-works" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">Обучение</a>
+        <a href="#ai-mentor" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">AI-Куратор</a>
+        <a href="gradebook.html" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">Журнал</a>
+        <a href="tools.html" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-[15px] text-cyan-400">construction</span>Инструменты
+        </a>
+        <a href="career.html" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-[15px] text-amber-300">work</span>Карьера
+        </a>
+        <a href="pricing.html" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-[15px] text-indigo-400">diamond</span>Тарифы
+        </a>
       </nav>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-3">
-        <button type="button" onclick="window.EduSpace.openGradesModal()" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 text-xs font-bold border border-indigo-400/30 transition-all">
-          <span class="material-symbols-outlined text-[16px]">format_list_bulleted</span>
-          <span>Проверка оценок</span>
-        </button>
-
-        <a href="auth.html?mode=login" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-300 hover:text-white hover:bg-white/10 transition-all">
-          Войти
+      <!-- User Auth CTA Buttons -->
+      <div class="flex items-center gap-2.5">
+        <a href="auth.html" id="header-auth-btn" class="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold transition-all flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px] text-indigo-400">login</span>
+          <span id="header-auth-text">Войти</span>
         </a>
-
-        <a href="auth.html?mode=register" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:opacity-95 text-white font-bold text-xs shadow-glow-indigo transition-all transform active:scale-95 flex items-center gap-1.5">
-          <span>Регистрация</span>
-          <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        <a href="student.html" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-glow-indigo transition-all flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px]">school</span>
+          <span>В кабинет</span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- ================= HERO SECTION ================= -->
-  <section class="relative pt-32 pb-24 md:pt-40 md:pb-32 overflow-hidden bg-dark-900 bg-grid-white">
-    <!-- Glowing Aurora Gradients Background -->
-    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-indigo-600/20 blur-[150px] rounded-full pointer-events-none -z-10"></div>
-    <div class="absolute top-1/3 right-10 w-[450px] h-[450px] bg-purple-600/15 blur-[140px] rounded-full pointer-events-none -z-10"></div>
-    <div class="absolute top-1/2 left-10 w-[500px] h-[500px] bg-cyan-600/15 blur-[150px] rounded-full pointer-events-none -z-10"></div>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-        
-        <!-- Left: Catchy Value Proposition -->
-        <div class="lg:col-span-7 space-y-6 text-left">
-          
-          <!-- Pill Banner -->
-          <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/5 border border-white/15 backdrop-blur-md shadow-inner">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span class="text-xs font-bold text-slate-200">
-              ⚡ Аккредитованная платформа ТиПО • 5 официальных специальностей
-            </span>
-          </div>
-
-          <!-- Main Bold Headline -->
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
-            Профессиональное образование с 
-            <span class="bg-gradient-to-r from-indigo-300 via-purple-300 to-cyan-300 bg-clip-text text-transparent">
-              живой практикой и кураторами
-            </span>
-          </h1>
-
-          <!-- Subtitle -->
-          <p class="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl font-normal">
-            Изучайте конспекты теории, проходите проверочные квизы и пишите реальный код в интерактивном симуляторе. Преподаватели кафедры контролируют график открытия модулей, рецензируют работы и выставляют итоговые зачёты.
-          </p>
-
-          <!-- CTAs -->
-          <div class="flex flex-wrap items-center gap-4 pt-2">
-            <a href="auth.html?mode=register" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-glow-indigo text-white font-extrabold text-sm tracking-wide transition-all transform active:scale-95 flex items-center justify-center gap-2 shadow-lg">
-              <span>Начать обучение бесплатно</span>
-              <span class="material-symbols-outlined text-[18px]">rocket_launch</span>
-            </a>
-
-            <a href="simulator.html" class="w-full sm:w-auto px-6 py-4 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm border border-white/20 transition-all flex items-center justify-center gap-2 backdrop-blur-md">
-              <span class="material-symbols-outlined text-cyan-400 text-[18px]">code</span>
-              <span>Открыть онлайн-тренажёр</span>
-            </a>
-          </div>
-
-          <!-- Micro Trust Stats -->
-          <div class="pt-6 border-t border-white/10 flex flex-wrap items-center gap-6 sm:gap-10 text-xs text-slate-300 font-medium">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-emerald-400 text-[20px]">verified</span>
-              <span>50 практических уроков</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-amber-400 text-[20px]">timer</span>
-              <span>График темпа: Дни 1–10</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-indigo-400 text-[20px]">grading</span>
-              <span>Электронный журнал оценок</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Modern Interactive Code & Review Simulator Mockup -->
-        <div class="lg:col-span-5 relative">
-          <div class="relative rounded-3xl bg-dark-850 border border-white/15 p-5 shadow-2xl shadow-indigo-950/80 backdrop-blur-2xl space-y-4">
-            
-            <!-- Window Topbar -->
-            <div class="flex items-center justify-between pb-3 border-b border-white/10">
-              <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-red-500"></span>
-                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-                <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                <span class="text-[11px] font-mono text-slate-400 ml-2">eduspace-ide — Web Design (Урок №1)</span>
-              </div>
-              <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold border border-emerald-500/30">● LIVE RUNNER</span>
-            </div>
-
-            <!-- Code Snippet Preview -->
-            <div class="bg-dark-950 rounded-2xl p-4 font-mono text-xs text-slate-300 border border-white/5 space-y-1 overflow-x-auto leading-relaxed">
-              <div class="text-slate-500">// Урок 1: Базовая вёрстка карточки в HTML & CSS</div>
-              <div><span class="text-purple-400">&lt;div</span> <span class="text-cyan-300">class=</span><span class="text-emerald-300">"profile-card"</span><span class="text-purple-400">&gt;</span></div>
-              <div class="pl-4"><span class="text-purple-400">&lt;h2&gt;</span>Алихан Касымов<span class="text-purple-400">&lt;/h2&gt;</span></div>
-              <div class="pl-4"><span class="text-purple-400">&lt;p</span> <span class="text-cyan-300">class=</span><span class="text-emerald-300">"role"</span><span class="text-purple-400">&gt;</span>Web Designer (Figma &amp; CSS)<span class="text-purple-400">&lt;/p&gt;</span></div>
-              <div class="pl-4"><span class="text-purple-400">&lt;button&gt;</span>Смотреть портфолио<span class="text-purple-400">&lt;/button&gt;</span></div>
-              <div><span class="text-purple-400">&lt;/div&gt;</span></div>
-            </div>
-
-            <!-- Auto-Test Status Bar -->
-            <div class="p-3.5 rounded-2xl bg-indigo-950/60 border border-indigo-500/30 flex items-center justify-between text-xs">
-              <div class="flex items-center gap-2">
-                <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">✓</span>
-                <span class="font-bold text-white">Автотесты: 3 / 3 пройдены</span>
-              </div>
-              <span class="font-extrabold text-emerald-400 font-mono">100 / 100</span>
-            </div>
-
-            <!-- Floating Teacher Review Card -->
-            <div class="p-3.5 rounded-2xl bg-purple-950/60 border border-purple-500/30 space-y-1 text-xs">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-purple-200 flex items-center gap-1.5">
-                  <span class="material-symbols-outlined text-[16px] text-amber-300">rate_review</span>
-                  <span>Рецензия куратора (Иванов С. П.)</span>
-                </span>
-                <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">Зачтено в ведомость</span>
-              </div>
-              <p class="text-[11px] text-slate-300 leading-snug">
-                «Отличная верстка карточки! Код чистый, теги семантичны. Модуль утверждён.»
-              </p>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= 5 OFFICIAL REGULATED PROFESSIONS ================= -->
-  <section id="professions" class="py-24 bg-dark-950 border-t border-b border-white/10 relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <!-- ========================================================================= -->
+  <!-- 2. HERO SECTION & LIVE INTERACTIVE PLAYGROUND -->
+  <!-- ========================================================================= -->
+  <section class="pt-36 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full relative">
+    
+    <div class="text-center max-w-4xl mx-auto space-y-6">
       
-      <!-- Section Header -->
-      <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-400/20 text-indigo-300 text-xs font-bold uppercase tracking-wider">
-          <span class="material-symbols-outlined text-[16px]">school</span>
-          <span>Профессиональные стандарты ТиПО</span>
-        </div>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          5 аккредитованных специальностей колледжа
-        </h2>
-        <p class="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto">
-          Каждая программа разбита на 10 практических уроков с серверным контролем темпа по дням, автоматической проверкой критериев и рецензированием преподавателя.
-        </p>
+      <!-- Top Eyebrow Badge -->
+      <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-cyan-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-bold shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>Официальная образовательная экосистема АМК • Стандарты WorldSkills Kazakhstan 2026</span>
       </div>
 
-      <!-- 5 Cards Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Main Headline -->
+      <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15]">
+        Интерактивный цифровой колледж:
+        <span class="bg-gradient-to-r from-indigo-400 via-purple-300 to-cyan-400 bg-clip-text text-transparent">
+          практика на симуляторах
+        </span>
+        и прямой выход на работу
+      </h1>
 
-        <!-- Card 1: Web Design (PO) -->
-        <div class="rounded-3xl bg-dark-900 border border-indigo-500/30 p-7 hover:border-indigo-400/80 hover:shadow-glow-indigo transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
-          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all"></div>
-          
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <span class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-400 text-white flex items-center justify-center font-bold shadow-md">
-                <span class="material-symbols-outlined text-[24px]">terminal</span>
-              </span>
-              <span class="px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-[11px] font-mono font-bold border border-indigo-500/30">
-                Код: 06130100
-              </span>
-            </div>
-
-            <div>
-              <h3 class="text-xl font-bold text-white group-hover:text-indigo-300 transition-colors">
-                Программное обеспечение (Web Design)
-              </h3>
-              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
-                Освоение дизайна и начальной вёрстки: работа в Photoshop, Figma, Illustrator, вёрстка страниц на HTML, стилизация CSS Flexbox и базовый JavaScript.
-              </p>
-            </div>
-
-            <!-- Tags -->
-            <div class="flex flex-wrap gap-1.5 pt-2">
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Photoshop</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Figma</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Illustrator</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">HTML / CSS</span>
-            </div>
-          </div>
-
-          <div class="pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
-            <span class="text-xs text-indigo-400 font-bold">10 уроков • Дни 1–10</span>
-            <a href="simulator.html?specialty=it" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all flex items-center gap-1 shadow-sm">
-              <span>В тренажёр</span>
-              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Card 2: Graphic Design -->
-        <div class="rounded-3xl bg-dark-900 border border-purple-500/30 p-7 hover:border-purple-400/80 hover:shadow-glow-purple transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
-          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all"></div>
-
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <span class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 text-white flex items-center justify-center font-bold shadow-md">
-                <span class="material-symbols-outlined text-[24px]">palette</span>
-              </span>
-              <span class="px-2.5 py-1 rounded-full bg-purple-500/20 text-purple-300 text-[11px] font-mono font-bold border border-purple-500/30">
-                Код: 02130100
-              </span>
-            </div>
-
-            <div>
-              <h3 class="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">
-                Графический Дизайн
-              </h3>
-              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
-                Разработка фирменного стиля, векторная графика, брендинг, рекламная полиграфия, типографика и подготовка макетов к печати.
-              </p>
-            </div>
-
-            <!-- Tags -->
-            <div class="flex flex-wrap gap-1.5 pt-2">
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Айдентика</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Логотипы</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Типографика</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Брендинг</span>
-            </div>
-          </div>
-
-          <div class="pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
-            <span class="text-xs text-purple-400 font-bold">10 уроков • Дни 1–10</span>
-            <a href="simulator.html?specialty=graphic_design" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-all flex items-center gap-1 shadow-sm">
-              <span>В тренажёр</span>
-              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Card 3: Autoelectric -->
-        <div class="rounded-3xl bg-dark-900 border border-amber-500/30 p-7 hover:border-amber-400/80 hover:shadow-glow-amber transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
-          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all"></div>
-
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <span class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-600 to-yellow-400 text-white flex items-center justify-center font-bold shadow-md">
-                <span class="material-symbols-outlined text-[24px]">electric_meter</span>
-              </span>
-              <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[11px] font-mono font-bold border border-amber-500/30">
-                Код: 07161301
-              </span>
-            </div>
-
-            <div>
-              <h3 class="text-xl font-bold text-white group-hover:text-amber-300 transition-colors">
-                Автоэлектрики
-              </h3>
-              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
-                Чтение принципиальных электросхем, диагностика CAN-шины, проверка электронных блоков управления (ЭБУ), систем зажигания и датчиков.
-              </p>
-            </div>
-
-            <!-- Tags -->
-            <div class="flex flex-wrap gap-1.5 pt-2">
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">CAN-шина</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">ЭБУ</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Осциллограф</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Мультиметр</span>
-            </div>
-          </div>
-
-          <div class="pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
-            <span class="text-xs text-amber-400 font-bold">10 уроков • Дни 1–10</span>
-            <a href="simulator.html?specialty=autoelectric" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs transition-all flex items-center gap-1 shadow-sm">
-              <span>В тренажёр</span>
-              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Card 4: HVAC / Refrigeration -->
-        <div class="rounded-3xl bg-dark-900 border border-cyan-500/30 p-7 hover:border-cyan-400/80 hover:shadow-glow-cyan transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
-          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all"></div>
-
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <span class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-600 to-teal-400 text-white flex items-center justify-center font-bold shadow-md">
-                <span class="material-symbols-outlined text-[24px]">ac_unit</span>
-              </span>
-              <span class="px-2.5 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-[11px] font-mono font-bold border border-cyan-500/30">
-                Код: 07130700
-              </span>
-            </div>
-
-            <div>
-              <h3 class="text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">
-                Ремонт Холодильного Оборудования
-              </h3>
-              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
-                Холодильные циклы, заправка хладагентами R134a/R404a, вакуумирование контура, капиллярные трубки, пайка медных магистралей и компрессоры.
-              </p>
-            </div>
-
-            <!-- Tags -->
-            <div class="flex flex-wrap gap-1.5 pt-2">
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Хладагенты</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Вакуумация</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Пайка меди</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Компрессоры</span>
-            </div>
-          </div>
-
-          <div class="pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
-            <span class="text-xs text-cyan-400 font-bold">10 уроков • Дни 1–10</span>
-            <a href="simulator.html?specialty=hvac" class="px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-xs transition-all flex items-center gap-1 shadow-sm">
-              <span>В тренажёр</span>
-              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Card 5: Auto Mechanics -->
-        <div class="rounded-3xl bg-dark-900 border border-emerald-500/30 p-7 hover:border-emerald-400/80 hover:shadow-glow-cyan transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
-          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all"></div>
-
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
-              <span class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-white flex items-center justify-center font-bold shadow-md">
-                <span class="material-symbols-outlined text-[24px]">build</span>
-              </span>
-              <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-mono font-bold border border-emerald-500/30">
-                Код: 07161300
-              </span>
-            </div>
-
-            <div>
-              <h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">
-                Автомеханики
-              </h3>
-              <p class="text-xs text-slate-400 mt-2 leading-relaxed">
-                Устройство двигателей внутреннего сгорания (ДВС), кривошипно-шатунный механизм, трансмиссия, ходовая часть, тормоза и регламент ТО.
-              </p>
-            </div>
-
-            <!-- Tags -->
-            <div class="flex flex-wrap gap-1.5 pt-2">
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">ДВС</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">ГРМ</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Трансмиссия</span>
-              <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-300 text-[11px] font-mono">Подвеска</span>
-            </div>
-          </div>
-
-          <div class="pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
-            <span class="text-xs text-emerald-400 font-bold">10 уроков • Дни 1–10</span>
-            <a href="simulator.html?specialty=automechanic" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-xs transition-all flex items-center gap-1 shadow-sm">
-              <span>В тренажёр</span>
-              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Card 6: All-In-One Catalog Card -->
-        <div class="rounded-3xl bg-gradient-to-br from-indigo-900/60 via-purple-950/60 to-dark-900 border border-white/20 p-7 flex flex-col justify-between backdrop-blur-xl relative overflow-hidden">
-          <div class="space-y-4">
-            <span class="px-3 py-1 rounded-full bg-white/10 text-white text-xs font-bold inline-block">
-              Академическая база колледжа
-            </span>
-            <h3 class="text-2xl font-extrabold text-white">
-              Единый электронный журнал и сводная ведомость
-            </h3>
-            <p class="text-xs text-slate-300 leading-relaxed">
-              Все 5 направлений объединены в общую ведомость оценок 1–10. Преподаватели рецензируют код, а студенты получают зачёты в личное дело.
-            </p>
-          </div>
-          <div class="pt-6 mt-6 border-t border-white/10 flex items-center justify-between">
-            <a href="tasks.html" class="w-full py-3 rounded-xl bg-white hover:bg-slate-100 text-dark-900 font-extrabold text-xs text-center transition-all shadow-md">
-              Открыть полный каталог заданий
-            </a>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ================= 3 PILLARS ARCHITECTURE ================= -->
-  <section class="py-24 bg-dark-900 relative">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
-      <div class="text-center max-w-3xl mx-auto mb-16 space-y-3">
-        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-purple-500/10 border border-purple-400/20 text-purple-300 text-xs font-bold uppercase tracking-wider">
-          <span class="material-symbols-outlined text-[16px]">architecture</span>
-          <span>Как устроена платформа</span>
-        </div>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-          Три уровня учебного процесса
-        </h2>
-        <p class="text-sm text-slate-400">
-          Студент, преподаватель и колледж объединены в общую цифровую экосистему.
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        
-        <!-- Pillar 1 -->
-        <div class="p-8 rounded-3xl bg-dark-850 border border-white/10 hover:border-indigo-500/50 transition-all space-y-4">
-          <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
-            <span class="material-symbols-outlined text-[28px]">code</span>
-          </div>
-          <h3 class="text-xl font-bold text-white">1. Студент и Тренажёр</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Полноценный онлайн-симулятор кода в браузере. Автоматические проверки тестов, консоль отладки, конспекты теории и отправка заданий на ревью куратору.
-          </p>
-          <a href="student.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300">
-            <span>Кабинет студента</span>
-            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-          </a>
-        </div>
-
-        <!-- Pillar 2 -->
-        <div class="p-8 rounded-3xl bg-dark-850 border border-white/10 hover:border-purple-500/50 transition-all space-y-4">
-          <div class="w-14 h-14 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold">
-            <span class="material-symbols-outlined text-[28px]">co_present</span>
-          </div>
-          <h3 class="text-xl font-bold text-white">2. Преподаватель и Куратор</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Серверное управление расписанием (открытие Дней 1–10), очередь проверки решений, написание рецензий, выставление баллов или возврат на доработку.
-          </p>
-          <button type="button" onclick="window.EduSpace.openGradesModal()" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300">
-            <span>Проверить свои оценки</span>
-            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-          </button>
-        </div>
-
-        <!-- Pillar 3 -->
-        <div class="p-8 rounded-3xl bg-dark-850 border border-white/10 hover:border-cyan-500/50 transition-all space-y-4">
-          <div class="w-14 h-14 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold">
-            <span class="material-symbols-outlined text-[28px]">verified_user</span>
-          </div>
-          <h3 class="text-xl font-bold text-white">3. Ведомость и Сертификат</h3>
-          <p class="text-xs text-slate-400 leading-relaxed">
-            Сводная матрица успеваемости по академическим стандартам ТиПО. Подсчёт GPA, экспорт в CSV / Excel и цифровой сертификат с QR-кодом валидации.
-          </p>
-          <a href="profile.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-400 hover:text-cyan-300">
-            <span>Цифровой сертификат</span>
-            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-          </a>
-        </div>
-
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ================= CALL TO ACTION ================= -->
-  <section class="py-20 bg-dark-950 border-t border-white/10 relative overflow-hidden">
-    <div class="absolute inset-0 bg-grid-white opacity-20 pointer-events-none"></div>
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 text-center space-y-6 relative z-10">
-      
-      <span class="px-4 py-1.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-extrabold border border-indigo-500/30">
-        Присоединяйтесь к потоку
-      </span>
-
-      <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
-        Готовы начать практику на платформе?
-      </h2>
-
-      <p class="text-base text-slate-400 max-w-xl mx-auto leading-relaxed">
-        Зарегистрируйтесь бесплатно, укажите учебную группу и получите мгновенный доступ к Уроку №1 и онлайн-симулятору.
+      <!-- Subtitle -->
+      <p class="text-base sm:text-lg text-slate-300 max-w-3xl mx-auto leading-relaxed font-normal">
+        Откажитесь от скучных учебников. Осваивайте востребованные прикладные профессии через интерактивные 3D-модели, виртуальные стенды, автопроверку заданий и персонального AI-наставника.
       </p>
 
-      <div class="flex flex-wrap items-center justify-center gap-4 pt-4">
-        <a href="auth.html?mode=register" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-glow-indigo text-white font-extrabold text-sm transition-all shadow-lg active:scale-95">
-          Создать аккаунт студента
+      <!-- Primary Action Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-4 pt-2">
+        <a href="auth.html" class="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:shadow-indigo-500/50 text-white font-extrabold text-sm shadow-glow-indigo transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
+          <span>Начать обучение бесплатно</span>
+          <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
         </a>
-        <button type="button" onclick="window.EduSpace.openGradesModal()" class="px-7 py-4 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-sm border border-white/20 transition-all flex items-center justify-center gap-2">
-          <span class="material-symbols-outlined text-[18px]">verified</span>
-          <span>Электронная ведомость оценок</span>
-        </button>
+        <a href="#live-playground" class="px-6 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 font-bold text-sm backdrop-blur-md transition-all flex items-center gap-2">
+          <span class="material-symbols-outlined text-[20px] text-cyan-400">play_circle</span>
+          <span>Попробовать симулятор</span>
+        </a>
+      </div>
+
+      <!-- Live Trust Metrics Grid -->
+      <div class="pt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto text-left">
+        <div class="p-4 rounded-2xl bg-dark-900/80 border border-white/10 backdrop-blur-xl">
+          <div class="text-2xl font-black text-indigo-400">50 уроков</div>
+          <div class="text-xs text-slate-400 mt-1">По 10 модулей на 5 прикладных профессий</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-dark-900/80 border border-white/10 backdrop-blur-xl">
+          <div class="text-2xl font-black text-cyan-400">100% автотесты</div>
+          <div class="text-xs text-slate-400 mt-1">Мгновенный объективный расчёт баллов</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-dark-900/80 border border-white/10 backdrop-blur-xl">
+          <div class="text-2xl font-black text-emerald-400">3.92 GPA</div>
+          <div class="text-xs text-slate-400 mt-1">Средний академический балл выпускников</div>
+        </div>
+        <div class="p-4 rounded-2xl bg-dark-900/80 border border-white/10 backdrop-blur-xl">
+          <div class="text-2xl font-black text-amber-400">до 650 000 ₸</div>
+          <div class="text-xs text-slate-400 mt-1">Зарплата в компаниях-партнёрах Алматы</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ======================================================================= -->
+    <!-- LIVE INTERACTIVE HERO PLAYGROUND WIDGET -->
+    <!-- ======================================================================= -->
+    <div id="live-playground" class="mt-14 p-6 sm:p-8 rounded-3xl bg-dark-900/90 border border-indigo-500/30 shadow-2xl backdrop-blur-2xl relative overflow-hidden">
+      
+      <!-- Top Widget Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-white/10 gap-4">
+        <div>
+          <div class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            Живая демонстрация тренажёров в браузере
+          </div>
+          <h3 class="text-lg font-bold text-white mt-1">Выберите специальность и протестируйте механику прямо сейчас:</h3>
+        </div>
+
+        <!-- Playground Specialty Switcher -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+          <button type="button" onclick="switchDemoPlayground('it')" id="p-btn-it" class="p-btn px-3.5 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs whitespace-nowrap shadow-glow-indigo transition-all">Web-разработка</button>
+          <button type="button" onclick="switchDemoPlayground('autoelectric')" id="p-btn-autoelectric" class="p-btn px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10 transition-all">Автоэлектрика</button>
+          <button type="button" onclick="switchDemoPlayground('hvac')" id="p-btn-hvac" class="p-btn px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10 transition-all">Холод (HVAC)</button>
+          <button type="button" onclick="switchDemoPlayground('automechanic')" id="p-btn-automechanic" class="p-btn px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10 transition-all">Автомеханика</button>
+          <button type="button" onclick="switchDemoPlayground('design')" id="p-btn-design" class="p-btn px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10 transition-all">UI/UX Дизайн</button>
+        </div>
+      </div>
+
+      <!-- Playground Dynamic Container -->
+      <div class="mt-6" id="playground-body">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Footer CTA inside playground -->
+      <div class="mt-6 pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-400 gap-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-emerald-400">check_circle</span>
+          <span>Все 50 модулей работают без установки стороннего ПО прямо в браузере</span>
+        </div>
+        <a href="simulator.html" class="text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1">
+          <span>Открыть полноэкранный симулятор</span>
+          <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+        </a>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 3. 5 SPECIALTIES CATALOG SECTION -->
+  <!-- ========================================================================= -->
+  <section id="specialties" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+    <div class="text-center max-w-3xl mx-auto mb-14">
+      <div class="text-xs uppercase font-extrabold text-indigo-400 tracking-wider">Прикладные профессии АМК</div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">5 ключевых направлений подготовки</h2>
+      <p class="text-sm text-slate-400 mt-3 leading-relaxed">
+        Каждое направление содержит 10 практических модулей от базовых понятий до квалификационного дипломного кейса.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      <!-- Card 1: Web Dev -->
+      <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 hover:border-indigo-500/50 transition-all flex flex-col justify-between group">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold">Код 06130100</span>
+            <span class="text-emerald-400 font-extrabold text-xs">от 380 000 ₸/мес</span>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-4 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-[28px]">code</span>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-indigo-300 transition-colors">Web-разработка & ПО</h3>
+          <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+            Адаптивная верстка HTML/CSS, алгоритмы JavaScript, DOM API, асинхронные запросы, REST API и развертывание проектов на облачном хостинге.
+          </p>
+          <div class="mt-4 pt-4 border-t border-white/5 space-y-1.5 text-xs text-slate-300">
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[15px] text-indigo-400">terminal</span>VS Code Web, DevTools, Git</div>
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[15px] text-emerald-400">task_alt</span>10 автотестов каждого модуля</div>
+          </div>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <a href="simulator.html?spec=it&task=1" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-indigo-600 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all">
+            <span>Открыть модуль №1</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 2: Graphic Design -->
+      <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 hover:border-purple-500/50 transition-all flex flex-col justify-between group">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[11px] font-bold">Код 02130100</span>
+            <span class="text-emerald-400 font-extrabold text-xs">от 320 000 ₸/мес</span>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 mb-4 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-[28px]">palette</span>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-purple-300 transition-colors">Графический & UI/UX Дизайн</h3>
+          <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+            Композиция, теория цвета, типографика, модульные сетки, работа со слоями, дизайн-системы в Figma и создание брендбуков.
+          </p>
+          <div class="mt-4 pt-4 border-t border-white/5 space-y-1.5 text-xs text-slate-300">
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[15px] text-purple-400">layers</span>Figma, Photoshop, Вектор</div>
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[15px] text-emerald-400">task_alt</span>Проверка WCAG контраста</div>
+          </div>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <a href="simulator.html?spec=design&task=1" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-purple-600 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all">
+            <span>Открыть модуль №1</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 3: Autoelectric -->
+      <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 hover:border-cyan-500/50 transition-all flex flex-col justify-between group">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-[11px] font-bold">Код 07161301</span>
+            <span class="text-emerald-400 font-extrabold text-xs">от 450 000 ₸/мес</span>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-cyan-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-4 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-[28px]">bolt</span>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">Автоэлектрика & Диагностика</h3>
+          <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+            Чтение электросхем, поиск неисправностей мультиметром, расшифровка кодов OBD-II, диагностика шины CAN-Bus и датчиков впрыска.
+          </p>
+          <div class="mt-4 pt-4 border-t border-white/5 space-y-1.5 text-xs text-slate-300">
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[15px] text-cyan-400">electrical_services</span>Мультиметр, Осциллограф, OBD-II</div>
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[15px] text-emerald-400">task_alt</span>Симуляция обрывов и КЗ</div>
+          </div>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <a href="simulator.html?spec=autoelectric&task=1" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-cyan-600 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all">
+            <span>Открыть модуль №1</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 4: HVAC -->
+      <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 hover:border-blue-500/50 transition-all flex flex-col justify-between group">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[11px] font-bold">Код 07130700</span>
+            <span class="text-emerald-400 font-extrabold text-xs">от 400 000 ₸/мес</span>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 mb-4 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-[28px]">ac_unit</span>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-blue-300 transition-colors">Холодильное оборудование & HVAC</h3>
+          <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+            Термодинамический цикл, свойства хладагентов R134a/R404a, расчёт перегрева (Superheat), вакуумирование и пайка медных трасс.
+          </p>
+          <div class="mt-4 pt-4 border-t border-white/5 space-y-1.5 text-xs text-slate-300">
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[15px] text-blue-400">speed</span>Манометрический коллектор, ТРВ</div>
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[15px] text-emerald-400">task_alt</span>Интерактивный контур хладагента</div>
+          </div>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <a href="simulator.html?spec=hvac&task=1" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-blue-600 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all">
+            <span>Открыть модуль №1</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Card 5: Automechanics -->
+      <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 hover:border-amber-500/50 transition-all flex flex-col justify-between group">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">Код 07161300</span>
+            <span class="text-emerald-400 font-extrabold text-xs">от 420 000 ₸/мес</span>
+          </div>
+          <div class="w-12 h-12 rounded-2xl bg-amber-600/20 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-4 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-[28px]">car_repair</span>
+          </div>
+          <h3 class="text-xl font-bold text-white group-hover:text-amber-300 transition-colors">Автомеханика & Мотористы</h3>
+          <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+            Устройство ДВС, кривошипно-шатунный механизм, газораспределение, динамометрическая затяжка ГБЦ по спирали и дефектовка деталей.
+          </p>
+          <div class="mt-4 pt-4 border-t border-white/5 space-y-1.5 text-xs text-slate-300">
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[15px] text-amber-400">build</span>Динамометрический ключ, Щупы</div>
+            <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[15px] text-emerald-400">task_alt</span>3D-разборка узлов двигателя</div>
+          </div>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <a href="simulator.html?spec=automechanic&task=1" class="w-full py-2.5 rounded-xl bg-white/5 hover:bg-amber-600 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all">
+            <span>Открыть модуль №1</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Feature Card: Career & Placement -->
+      <div class="p-6 rounded-3xl bg-gradient-to-br from-indigo-900/40 via-purple-900/30 to-dark-900 border border-indigo-500/30 flex flex-col justify-between">
+        <div>
+          <div class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold inline-block mb-4">
+            Карьерный хаб
+          </div>
+          <h3 class="text-xl font-bold text-white">Прямой найм в Алматы</h3>
+          <p class="text-xs text-slate-300 mt-2 leading-relaxed">
+            По окончании курса платформа автоматически формирует резюме по стандартам <strong class="text-white">hh.kz</strong> и <strong class="text-white">Enbek.kz</strong> и связывает с HR компаний Astana Motors, Allur Auto, Kaspi и Chocofamily.
+          </p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-white/10">
+          <a href="career.html" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-glow-indigo transition-all">
+            <span>Смотреть вакансии и резюме</span>
+            <span class="material-symbols-outlined text-[16px]">work</span>
+          </a>
+        </div>
       </div>
 
     </div>
   </section>
 
-  <!-- ================= FOOTER ================= -->
-    <footer class="bg-dark-950 border-t border-white/10 pt-16 pb-12 relative overflow-hidden text-xs text-slate-400">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
-        <!-- Col 1: Brand & College -->
-        <div class="lg:col-span-2 space-y-4">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white font-extrabold text-lg shadow-glow-indigo">
-              E
-            </div>
-            <div>
-              <span class="text-base font-extrabold text-white tracking-tight">EDU <span class="text-indigo-400">SPACE</span></span>
-              <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-400">Алматинский многопрофильный колледж</span>
-            </div>
+  <!-- ========================================================================= -->
+  <!-- 4. HOW LEARNING WORKS (7-STEP JOURNEY) -->
+  <!-- ========================================================================= -->
+  <section id="how-it-works" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+    <div class="text-center max-w-3xl mx-auto mb-16">
+      <div class="text-xs uppercase font-extrabold text-cyan-400 tracking-wider">Методика EDU SPACE</div>
+      <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">Как устроен образовательный процесс</h2>
+      <p class="text-sm text-slate-400 mt-3 leading-relaxed">
+        Студент не зубрит сухие параграфы, а проходит путь практикующего инженера в реальных производственных условиях.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+      
+      <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 relative">
+        <div class="text-3xl font-black text-indigo-500/40 mb-3">01</div>
+        <h4 class="text-base font-bold text-white">Интерактивная теория</h4>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          Наглядные схемы, 3D-анимации узлов и лаконичные выжимки без воды.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 relative">
+        <div class="text-3xl font-black text-cyan-500/40 mb-3">02</div>
+        <h4 class="text-base font-bold text-white">Виртуальный симулятор</h4>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          Работа с измерительными приборами, редактором кода и динамическими схемами.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 relative">
+        <div class="text-3xl font-black text-emerald-500/40 mb-3">03</div>
+        <h4 class="text-base font-bold text-white">Автотесты & AI-куратор</h4>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          Система мгновенно проверяет решение, а AI-наставник подсказывает, где допущена ошибка.
+        </p>
+      </div>
+
+      <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 relative">
+        <div class="text-3xl font-black text-amber-500/40 mb-3">04</div>
+        <h4 class="text-base font-bold text-white">Сертификат & Оффер</h4>
+        <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+          Официальный сертификат с QR-кодом АМК и отправка резюме работодателям в WhatsApp.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 5. AI-MENTOR SHOWCASE -->
+  <!-- ========================================================================= -->
+  <section id="ai-mentor" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+    <div class="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-indigo-950/60 via-dark-900 to-purple-950/60 border border-indigo-500/30 backdrop-blur-xl flex flex-col lg:flex-row items-center justify-between gap-10">
+      
+      <div class="space-y-5 max-w-xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-bold">
+          <span class="material-symbols-outlined text-[16px] text-amber-300 animate-spin">smart_toy</span>
+          Интеллектуальный наставник 24/7
+        </div>
+        <h2 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-snug">
+          AI-Куратор, знающий каждый винтик и каждую строчку кода
+        </h2>
+        <p class="text-sm text-slate-300 leading-relaxed">
+          Застряли на задаче? Нейросетевой наставник знает контекст вашего текущего урока, анализирует код и показатели приборов, не выдаёт готовых ответов, а последовательно учит думать как профессионал.
+        </p>
+        <div class="space-y-2 text-xs text-slate-300">
+          <div class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-[18px]">check</span>Находит синтаксические и логические ошибки</div>
+          <div class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-[18px]">check</span>Объясняет сложную физику и стандарты простыми словами</div>
+          <div class="flex items-center gap-2"><span class="material-symbols-outlined text-emerald-400 text-[18px]">check</span>Даёт чек-лист перед отправкой работы преподавателю</div>
+        </div>
+        <div class="pt-2">
+          <a href="simulator.html" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-glow-indigo transition-all inline-flex items-center gap-2">
+            <span>Протестировать AI в тренажёре</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Mock AI Chat Dialog Card -->
+      <div class="w-full lg:w-[460px] bg-dark-950/90 border border-white/10 rounded-2xl p-5 shadow-2xl space-y-3 font-mono text-xs">
+        <div class="flex items-center justify-between pb-3 border-b border-white/10">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+            <span class="font-sans font-bold text-white text-xs">AI-Куратор EDU SPACE</span>
           </div>
-          <p class="text-slate-400 text-xs leading-relaxed max-w-sm">
-            КГКП «Алматинский многопрофильный колледж» Управления образования г. Алматы (БИН: 990440001809). Инновационная цифровая образовательная среда подготовки специалистов ТиПО по 5 ключевым отраслям.
+          <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">Модуль №3: CAN-Bus</span>
+        </div>
+        
+        <div class="p-3 rounded-xl bg-dark-850 text-slate-300 text-[11px] leading-relaxed">
+          <span class="text-indigo-400 font-bold font-sans">Студент:</span> Почему мультиметр показывает 120 Ом на шине данных CAN вместо положенных 60 Ом?
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-indigo-950/40 border border-indigo-500/20 text-slate-200 text-[11px] leading-relaxed space-y-1.5">
+          <div class="text-amber-400 font-bold font-sans flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">lightbulb</span>AI-Куратор:
+          </div>
+          <div>На исправной шине два резистора по 120 Ом соединены параллельно: <code>R = 120 / 2 = 60 Ом</code>.</div>
+          <div class="text-slate-400 pt-1">Если вы замерили ровно 120 Ом — это указывает на обрыв одного из согласующих резисторов (в ЭБУ или панели приборов). Проверьте целостность проводки к блоку ABS!</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 6. ACADEMIC BOARD & OFFICIAL COLLEGE STATS -->
+  <!-- ========================================================================= -->
+  <section class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+    <div class="p-8 sm:p-10 rounded-3xl bg-dark-900 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-8">
+      
+      <div class="flex items-center gap-5">
+        <img src="assets/eduspace-logo.svg" alt="АМК" class="w-16 h-16 object-contain p-2 rounded-2xl bg-white/5 border border-white/10"/>
+        <div>
+          <div class="text-xs uppercase font-extrabold text-indigo-400">Официальный государственный статус</div>
+          <h3 class="text-xl sm:text-2xl font-black text-white mt-1">КГКП «Алматинский многопрофильный колледж»</h3>
+          <p class="text-xs text-slate-400 mt-1">
+            Государственная лицензия №KZ48LAA00003892 • БИН: 990440001809 • г. Алматы, ул. Жандосова, 63
           </p>
-          <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 text-[11px] text-slate-300 space-y-1">
-            <div class="font-bold text-white flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-indigo-400 text-[16px]">verified</span>
-              <span>Директор колледжа: Бейсетбаев Асылхан Косылханович</span>
+          <div class="text-xs text-slate-300 font-semibold mt-2">
+            Директор колледжа: <span class="text-white">Бейсетбаев Асылхан Косылханович</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="verify.html" class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-bold text-xs transition-all flex items-center gap-2">
+          <span class="material-symbols-outlined text-[18px] text-emerald-400">qr_code_scanner</span>
+          <span>Проверить сертификат по QR</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 7. FREQUENTLY ASKED QUESTIONS (FAQ ACCORDION) -->
+  <!-- ========================================================================= -->
+  <section class="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto w-full">
+    <div class="text-center mb-12">
+      <div class="text-xs uppercase font-extrabold text-indigo-400 tracking-wider">Ответы на вопросы</div>
+      <h2 class="text-3xl font-extrabold text-white mt-2">Часто задаваемые вопросы</h2>
+    </div>
+
+    <div class="space-y-4 text-xs" id="faq-accordion">
+      
+      <div class="p-5 rounded-2xl bg-dark-900 border border-white/10 space-y-2">
+        <h4 class="font-bold text-sm text-white flex items-center justify-between">
+          <span>Нужен ли мощный компьютер для работы с 3D и симуляторами?</span>
+          <span class="material-symbols-outlined text-[18px] text-slate-400">expand_more</span>
+        </h4>
+        <p class="text-slate-400 leading-relaxed">
+          Нет, платформа разработана с использованием легковесных WebGL и Canvas-технологий. Симуляторы и редакторы отлично работают на любом ноутбуке, планшете или смартфоне без установки дополнительного софта.
+        </p>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-dark-900 border border-white/10 space-y-2">
+        <h4 class="font-bold text-sm text-white flex items-center justify-between">
+          <span>Как работает график открытий модулей (Drip-Feed)?</span>
+          <span class="material-symbols-outlined text-[18px] text-slate-400">expand_more</span>
+        </h4>
+        <p class="text-slate-400 leading-relaxed">
+          Каждый следующий модуль открывается по расписанию дня (День 1 — Модуль 1, День 2 — Модуль 2). Сервер строго контролирует доступ, предотвращая поверхностное пролистывание курса.
+        </p>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-dark-900 border border-white/10 space-y-2">
+        <h4 class="font-bold text-sm text-white flex items-center justify-between">
+          <span>Как подтверждается сертификат выпускника?</span>
+          <span class="material-symbols-outlined text-[18px] text-slate-400">expand_more</span>
+        </h4>
+        <p class="text-slate-400 leading-relaxed">
+          Каждый сертификат имеет уникальный номер и защищённый QR-код. Любой работодатель может отсканировать QR или проверить номер на странице <a href="verify.html" class="text-indigo-400 underline font-semibold">verify.html</a>, получив официальное подтверждение успеваемости из реестра колледжа.
+        </p>
+      </div>
+
+      <div class="p-5 rounded-2xl bg-dark-900 border border-white/10 space-y-2">
+        <h4 class="font-bold text-sm text-white flex items-center justify-between">
+          <span>Сколько стоит обучение?</span>
+          <span class="material-symbols-outlined text-[18px] text-slate-400">expand_more</span>
+        </h4>
+        <p class="text-slate-400 leading-relaxed">
+          Первые 3 практических модуля по всем специальностям доступны абсолютно бесплатно. Полный квалификационный доступ (модули 4–10, безлимитный AI-куратор и официальный сертификат) открывается на тарифе Pro за 4 990 ₸.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 8. FOOTER WITH COMPLETE COLLEGE CREDENTIALS -->
+  <!-- ========================================================================= -->
+  <footer class="bg-dark-900 border-t border-white/10 py-12 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      
+      <div class="flex flex-col md:flex-row items-start justify-between gap-6 pb-8 border-b border-white/10">
+        <div class="flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-cyan-400 p-0.5 shadow-glow-indigo">
+            <div class="w-full h-full bg-dark-900 rounded-[14px] flex items-center justify-center">
+              <img alt="EDU SPACE Logo" width="22" height="22" class="h-5 w-5 object-contain" src="assets/eduspace-logo.svg"/>
             </div>
-            <div>Гос. лицензия ТиПО (eLicense.kz) • Аккредитация ГОСО РК 2026</div>
+          </div>
+          <div>
+            <div class="font-extrabold text-base text-white">EDU SPACE PRO</div>
+            <div class="text-[11px] text-slate-400">КГКП «Алматинский многопрофильный колледж»</div>
           </div>
         </div>
 
-        <!-- Col 2: Специальности -->
-        <div>
-          <div class="text-xs font-bold text-white uppercase tracking-wider mb-4">Специальности</div>
-          <ul class="space-y-2 text-slate-400">
-            <li><a href="tasks.html?specialty=it" class="hover:text-indigo-400 transition-colors">06130100 — Web Design (ПО)</a></li>
-            <li><a href="tasks.html?specialty=graphic_design" class="hover:text-indigo-400 transition-colors">02130100 — Графический дизайн</a></li>
-            <li><a href="tasks.html?specialty=autoelectric" class="hover:text-indigo-400 transition-colors">07161301 — Автоэлектрики</a></li>
-            <li><a href="tasks.html?specialty=hvac" class="hover:text-indigo-400 transition-colors">07130700 — Холодильные системы</a></li>
-            <li><a href="tasks.html?specialty=automechanic" class="hover:text-indigo-400 transition-colors">07161300 — Автомеханики</a></li>
-          </ul>
-        </div>
-
-        <!-- Col 3: Навигация -->
-        <div>
-          <div class="text-xs font-bold text-white uppercase tracking-wider mb-4">Навигация</div>
-          <ul class="space-y-2 text-slate-400">
-            <li><a href="features.html" class="hover:text-indigo-400 transition-colors">Возможности LMS</a></li>
-            <li><a href="tasks.html" class="hover:text-indigo-400 transition-colors">Каталог 50 модулей</a></li>
-            <li><a href="pricing.html" class="hover:text-indigo-400 transition-colors">Тарифы и подписка</a></li>
-            <li><a href="gradebook.html" class="hover:text-indigo-400 transition-colors">Ведомость оценок</a></li>
-            <li><a href="verify.html" class="hover:text-indigo-400 transition-colors">Реестр сертификатов</a></li>
-            <li><a href="reviews.html" class="hover:text-indigo-400 transition-colors">Отзывы студентов</a></li>
-          </ul>
-        </div>
-
-        <!-- Col 4: Контакты -->
-        <div>
-          <div class="text-xs font-bold text-white uppercase tracking-wider mb-4">Контакты и поддержка</div>
-          <ul class="space-y-2.5 text-slate-300">
-            <li class="flex items-start gap-2">
-              <span class="material-symbols-outlined text-indigo-400 text-[16px] shrink-0 mt-0.5">location_on</span>
-              <span>г. Алматы, Ауэзовский р-н, ул. Жандосова, 63 (угол ул. Алтынсарина)</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-emerald-400 text-[16px] shrink-0">chat</span>
-              <a href="https://wa.me/77079079764" target="_blank" class="text-emerald-400 hover:text-emerald-300 font-bold hover:underline">
-                WhatsApp: +7 707 907 97 64
-              </a>
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-indigo-400 text-[16px] shrink-0">call</span>
-              <a href="tel:+77079079764" class="hover:text-white transition-colors">
-                +7 707 907 97 64
-              </a>
-            </li>
-            <li class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-indigo-400 text-[16px] shrink-0">mail</span>
-              <a href="mailto:danidanilov333@gmail.com" class="hover:text-white transition-colors">
-                danidanilov333@gmail.com
-              </a>
-            </li>
-            <li class="flex items-center gap-2 text-slate-400 text-[11px] pt-1">
-              <span>Приемная колледжа: +7 (727) 309-59-44</span>
-            </li>
-          </ul>
+        <div class="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-400">
+          <a href="student.html" class="hover:text-white transition-colors">Каталог</a>
+          <a href="tasks.html" class="hover:text-white transition-colors">Задания</a>
+          <a href="simulator.html" class="hover:text-white transition-colors">Тренажёр</a>
+          <a href="gradebook.html" class="hover:text-white transition-colors">Журнал</a>
+          <a href="tools.html" class="hover:text-white transition-colors">Инструменты</a>
+          <a href="career.html" class="hover:text-white transition-colors">Карьера</a>
+          <a href="pricing.html" class="hover:text-white transition-colors">Тарифы</a>
         </div>
       </div>
 
-      <!-- Bottom Bar -->
-      <div class="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-        <span>&copy; 2026 КГКП «Алматинский многопрофильный колледж» (АМК). БИН: 990440001809. Все права защищены.</span>
+      <div class="flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+        <div>
+          <div>© 2026 КГКП «Алматинский многопрофильный колледж» • БИН: 990440001809</div>
+          <div class="text-[11px] mt-0.5">г. Алматы, ул. Жандосова, 63 • Директор: Бейсетбаев Асылхан Косылханович</div>
+        </div>
         <div class="flex items-center gap-4">
-          <a href="verify.html" class="hover:text-indigo-400 transition-colors">Реестр аккредитации</a>
-          <span class="text-slate-700">•</span>
-          <a href="pricing.html" class="hover:text-indigo-400 transition-colors">Тарифы</a>
-          <span class="text-slate-700">•</span>
-          <span class="text-slate-400">Версия 2.0 Cyber-Glass</span>
+          <a href="https://wa.me/77079079764" target="_blank" class="text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">call</span>+7 707 907 97 64 (WhatsApp)
+          </a>
+          <span>•</span>
+          <a href="mailto:danidanilov333@gmail.com" class="text-slate-400 hover:text-white font-medium">danidanilov333@gmail.com</a>
         </div>
       </div>
+
     </div>
   </footer>
 
+  <script src="js/courses-catalog.js"></script>
+  <script src="js/app-logistics.js"></script>
+  <script>
+    // Live Hero Playground Interactive Logic
+    const PLAYGROUND_DATA = {
+      it: {
+        title: 'Редактор кода и живой DOM',
+        desc: 'Измените стили кнопки и текст, чтобы увидеть мгновенный рендер в реальном времени:',
+        html: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-dark-850 border border-white/10 space-y-3">
+              <div class="text-xs font-bold text-indigo-400 uppercase">Исходный код (HTML + CSS)</div>
+              <textarea id="live-code-input" oninput="updateLiveCodePreview()" rows="4" class="w-full p-3 rounded-xl bg-dark-900 border border-white/10 text-white font-mono text-xs focus:outline-none focus:border-indigo-500"><button class="btn-demo">Записаться на курс</button></textarea>
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-400">Цвет:</span>
+                <button type="button" onclick="setLiveBtnColor('#4f46e5')" class="w-6 h-6 rounded-full bg-indigo-600 border border-white/30"></button>
+                <button type="button" onclick="setLiveBtnColor('#06b6d4')" class="w-6 h-6 rounded-full bg-cyan-500 border border-white/30"></button>
+                <button type="button" onclick="setLiveBtnColor('#10b981')" class="w-6 h-6 rounded-full bg-emerald-500 border border-white/30"></button>
+              </div>
+            </div>
+            <div class="p-4 rounded-2xl bg-dark-850 border border-white/10 flex flex-col justify-between">
+              <div class="text-xs font-bold text-cyan-400 uppercase">Живой результат (Live Sandbox)</div>
+              <div id="live-code-output" class="p-8 rounded-xl bg-dark-950 flex items-center justify-center min-h-[100px]">
+                <button class="px-5 py-2.5 rounded-xl font-bold text-xs text-white shadow-lg transition-transform hover:scale-105" style="background: #4f46e5;" id="demo-rendered-btn">Записаться на курс</button>
+              </div>
+              <div class="text-[11px] text-slate-400 text-center">DOM-дерево синхронизировано без задержки</div>
+            </div>
+          </div>
+        `
+      },
+      autoelectric: {
+        title: 'Виртуальный мультиметр & Диагностика цепи',
+        desc: 'Нажмите на контрольную точку схемы для замера потенциала напряжения:',
+        html: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-dark-850 border border-white/10 space-y-3">
+              <div class="text-xs font-bold text-cyan-400 uppercase">Электрическая схема цепи питания ЭБУ</div>
+              <div class="space-y-2">
+                <button type="button" onclick="readProbeVoltage('bat', 12.6, 'Клемма АКБ (+12В)')" class="w-full p-2.5 rounded-xl bg-dark-900 hover:bg-cyan-500/10 border border-white/10 text-left text-xs flex items-center justify-between">
+                  <span>Точка A: Вывод АКБ (+)</span>
+                  <span class="px-2 py-0.5 rounded bg-white/5 text-[10px] text-cyan-400 font-mono">Измерить</span>
+                </button>
+                <button type="button" onclick="readProbeVoltage('fuse', 12.5, 'После предохранителя 15A')" class="w-full p-2.5 rounded-xl bg-dark-900 hover:bg-cyan-500/10 border border-white/10 text-left text-xs flex items-center justify-between">
+                  <span>Точка B: За предохранителем EFI</span>
+                  <span class="px-2 py-0.5 rounded bg-white/5 text-[10px] text-cyan-400 font-mono">Измерить</span>
+                </button>
+                <button type="button" onclick="readProbeVoltage('sensor', 5.0, 'Опорное питание ДМРВ (5.0V)')" class="w-full p-2.5 rounded-xl bg-dark-900 hover:bg-cyan-500/10 border border-white/10 text-left text-xs flex items-center justify-between">
+                  <span>Точка C: Опорный сигнал датчика</span>
+                  <span class="px-2 py-0.5 rounded bg-white/5 text-[10px] text-cyan-400 font-mono">Измерить</span>
+                </button>
+                <button type="button" onclick="readProbeVoltage('gnd', 0.05, 'Масса двигателя (GND)')" class="w-full p-2.5 rounded-xl bg-dark-900 hover:bg-cyan-500/10 border border-white/10 text-left text-xs flex items-center justify-between">
+                  <span>Точка D: Масса кузова</span>
+                  <span class="px-2 py-0.5 rounded bg-white/5 text-[10px] text-cyan-400 font-mono">Измерить</span>
+                </button>
+              </div>
+            </div>
+            <div class="p-6 rounded-2xl bg-dark-950 border border-cyan-500/30 flex flex-col items-center justify-center text-center space-y-2">
+              <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Цифровой мультиметр Fluke</div>
+              <div class="text-4xl font-black text-cyan-400 font-mono" id="multimeter-display">12.60 V</div>
+              <div class="text-xs text-slate-300 font-medium" id="multimeter-node">Режим: Постоянное напряжение DC</div>
+            </div>
+          </div>
+        `
+      },
+      hvac: {
+        title: 'Контур хладагента R134a & Расчёт перегрева',
+        desc: 'Регулируйте манометрическое давление, чтобы наблюдать изменение температуры кипения:',
+        html: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-dark-850 border border-white/10 space-y-3">
+              <label class="block text-xs font-bold text-blue-400 uppercase">Давление всасывания (bar): <span id="hvac-p-val" class="text-white font-mono">2.0 bar</span></label>
+              <input type="range" min="1.0" max="4.0" step="0.1" value="2.0" oninput="updateHvacPlayground(this.value)" class="w-full accent-cyan-400 cursor-pointer"/>
+              <div class="text-[11px] text-slate-400 leading-relaxed">Нормальное рабочее давление для R134a в испарителе: 1.8 – 2.4 bar.</div>
+            </div>
+            <div class="p-6 rounded-2xl bg-dark-950 border border-blue-500/30 flex flex-col items-center justify-center text-center space-y-2">
+              <div class="text-[10px] text-slate-400 uppercase font-bold">Температура насыщения (кипения)</div>
+              <div class="text-3xl font-black text-cyan-400 font-mono" id="hvac-temp-display">-5.0 °C</div>
+              <div class="text-xs text-emerald-400 font-bold" id="hvac-status-display">✓ Нормальный холодильный цикл</div>
+            </div>
+          </div>
+        `
+      },
+      automechanic: {
+        title: 'Сборка ДВС & Динамометрический ключ',
+        desc: 'Отработайте технологию 3-этапной затяжки болтов головки блока цилиндров (ГБЦ):',
+        html: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-dark-850 border border-white/10 space-y-3">
+              <div class="text-xs font-bold text-amber-400 uppercase">Этапы обтяжки болтов ГБЦ (Toyota / VAG)</div>
+              <div class="space-y-2">
+                <button type="button" onclick="setTorqueStage(1, 35)" class="w-full p-2.5 rounded-xl bg-dark-900 hover:bg-amber-500/10 border border-white/10 text-left text-xs flex items-center justify-between">
+                  <span>Этап 1: Предварительная затяжка</span>
+                  <span class="px-2 py-0.5 rounded bg-white/5 text-[10px] text-amber-400 font-mono">35 Н·м</span>
+                </button>
+                <button type="button" onclick="setTorqueStage(2, 60)" class="w-full p-2.5 rounded-xl bg-dark-900 hover:bg-amber-500/10 border border-white/10 text-left text-xs flex items-center justify-between">
+                  <span>Этап 2: Основная затяжка</span>
+                  <span class="px-2 py-0.5 rounded bg-white/5 text-[10px] text-amber-400 font-mono">60 Н·м</span>
+                </button>
+                <button type="button" onclick="setTorqueStage(3, 90)" class="w-full p-2.5 rounded-xl bg-dark-900 hover:bg-amber-500/10 border border-white/10 text-left text-xs flex items-center justify-between">
+                  <span>Этап 3: Доворот на угол</span>
+                  <span class="px-2 py-0.5 rounded bg-white/5 text-[10px] text-amber-400 font-mono">+90°</span>
+                </button>
+              </div>
+            </div>
+            <div class="p-6 rounded-2xl bg-dark-950 border border-amber-500/30 flex flex-col items-center justify-center text-center space-y-2">
+              <div class="text-[10px] text-slate-400 uppercase font-bold">Динамометрическая шкала</div>
+              <div class="text-4xl font-black text-amber-400 font-mono" id="torque-val-display">35 N·m</div>
+              <div class="text-xs text-slate-300" id="torque-stage-label">Этап 1: Равномерная посадка прокладки ГБЦ</div>
+            </div>
+          </div>
+        `
+      },
+      design: {
+        title: 'Композиция & WCAG Контрастность',
+        desc: 'Протестируйте соответствие коэффициента контрастности стандартам доступности:',
+        html: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-dark-850 border border-white/10 space-y-3">
+              <div class="text-xs font-bold text-purple-400 uppercase">Выбор темы оформления</div>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" onclick="testWcagContrast('#ffffff', '#0f1117', '18.2:1 (AAA)')" class="p-2.5 rounded-xl bg-dark-900 border border-white/15 text-center text-xs text-white">Тёмная</button>
+                <button type="button" onclick="testWcagContrast('#0f172a', '#f8fafc', '16.4:1 (AAA)')" class="p-2.5 rounded-xl bg-white border border-slate-300 text-center text-xs text-slate-900 font-bold">Светлая</button>
+                <button type="button" onclick="testWcagContrast('#818cf8', '#090a0f', '7.5:1 (AA)')" class="p-2.5 rounded-xl bg-indigo-950 border border-indigo-500 text-center text-xs text-indigo-300">Неон</button>
+              </div>
+            </div>
+            <div class="p-6 rounded-2xl bg-dark-950 border border-purple-500/30 flex flex-col items-center justify-center text-center space-y-2" id="wcag-box">
+              <div class="text-[10px] text-slate-400 uppercase font-bold">Коэффициент контраста WCAG</div>
+              <div class="text-3xl font-black text-purple-400 font-mono" id="wcag-score">18.2 : 1</div>
+              <div class="text-xs text-emerald-400 font-bold">✓ Соответствует уровню AAA (Отлично)</div>
+            </div>
+          </div>
+        `
+      }
+    };
+
+    function switchDemoPlayground(key) {
+      document.querySelectorAll('.p-btn').forEach(b => {
+        b.className = 'p-btn px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10 transition-all';
+      });
+      const activeBtn = document.getElementById('p-btn-' + key);
+      if (activeBtn) {
+        activeBtn.className = 'p-btn px-3.5 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs whitespace-nowrap shadow-glow-indigo transition-all';
+      }
+
+      const item = PLAYGROUND_DATA[key];
+      if (item) {
+        document.getElementById('playground-body').innerHTML = item.html;
+      }
+    }
+
+    function setLiveBtnColor(color) {
+      const btn = document.getElementById('demo-rendered-btn');
+      if (btn) btn.style.backgroundColor = color;
+    }
+
+    function updateLiveCodePreview() {
+      const val = document.getElementById('live-code-input').value;
+      const cont = document.getElementById('live-code-output');
+      if (cont) cont.innerHTML = val;
+    }
+
+    function readProbeVoltage(node, val, desc) {
+      document.getElementById('multimeter-display').textContent = val.toFixed(2) + ' V';
+      document.getElementById('multimeter-node').textContent = desc;
+    }
+
+    function updateHvacPlayground(p) {
+      document.getElementById('hvac-p-val').textContent = p + ' bar';
+      const t = -26.0 + (parseFloat(p) * 10.5);
+      document.getElementById('hvac-temp-display').textContent = t.toFixed(1) + ' °C';
+    }
+
+    function setTorqueStage(stage, nm) {
+      const el = document.getElementById('torque-val-display');
+      const lbl = document.getElementById('torque-stage-label');
+      if (stage === 3) {
+        el.textContent = '+90° (угол)';
+        lbl.textContent = 'Этап 3: Финальный пластический доворот болта';
+      } else {
+        el.textContent = nm + ' N·m';
+        lbl.textContent = 'Этап ' + stage + ': Равномерная затяжка динамометрическим ключом';
+      }
+    }
+
+    function testWcagContrast(textC, bgC, score) {
+      document.getElementById('wcag-score').textContent = score;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      switchDemoPlayground('it');
+      const user = window.EduSpace.getActiveUser();
+      if (user && user.full_name) {
+        const authBtn = document.getElementById('header-auth-text');
+        if (authBtn) authBtn.textContent = user.first_name || user.full_name.split(' ')[0];
+      }
+    });
+  </script>
 </body>
 </html>

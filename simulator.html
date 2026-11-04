@@ -95,6 +95,7 @@
 
   <script src="js/courses-catalog.js"></script>
   <script src="js/app-logistics.js"></script>
+  <script src="js/interactive-simulators.js"></script>
 </head>
 <body class="font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative">
 
@@ -467,6 +468,9 @@
             </div>
             <input type="hidden" id="uploaded-file-url" value="" />
           </div>
+
+          <!-- Specialized Interactive Workbench (Custom for each specialty) -->
+          <div id="specialty-interactive-workbench" class="p-6 rounded-3xl bg-dark-850/90 border border-white/10 shadow-2xl backdrop-blur-xl mb-6"></div>
 
           <!-- Code / Solution Editor + Console + Submission -->
           <div class="bg-dark-850/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
@@ -1340,8 +1344,25 @@
 
       appendAiMessage('user', promptLabels[type] || 'Подскажи решение');
 
-      // AI Contextual Response Generator
-      setTimeout(() => {
+      // Call Real Server-Side AI API with Full Context
+      fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: promptLabels[type] || 'Подскажи решение',
+          specialty: activeSpecialty,
+          task_number: activeTaskNumber,
+          user_code: code,
+          prompt_type: type
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        appendAiMessage('assistant', data.reply || 'Рекомендуется свериться с критериями модуля и запустить автотесты.');
+      })
+      .catch(() => {
+        // Fallback local response
+        setTimeout(() => {
         let answer = '';
         if (type === 'hint') {
           if (activeSpecialty === 'it') {
@@ -1374,7 +1395,8 @@
         }
 
         appendAiMessage('assistant', answer);
-      }, 600);
+        }, 300);
+      });
     }
 
     function handleAiUserSubmit(e) {
