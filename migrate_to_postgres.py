@@ -29,15 +29,18 @@ def run_migration(pg_url=None):
         pg_conn = psycopg2.connect(pg_url)
     except ImportError:
         try:
+            import ssl
             import pg8000.dbapi
             # Parse url for pg8000
             u = urllib.parse.urlparse(pg_url)
+            ssl_ctx = ssl.create_default_context()
             pg_conn = pg8000.dbapi.connect(
                 user=u.username,
                 password=u.password,
                 host=u.hostname,
                 port=u.port or 5432,
-                database=u.path.lstrip('/')
+                database=u.path.lstrip('/'),
+                ssl_context=ssl_ctx
             )
         except Exception as e:
             print(f"ERROR: Could not import or connect with psycopg2/pg8000: {e}")
