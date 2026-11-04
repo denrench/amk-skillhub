@@ -172,8 +172,164 @@ COURSES_META = [
 COURSES_BY_SLUG = {c["slug"]: c for c in COURSES_META}
 
 
+import collections.abc
+import urllib.parse
+import ssl
+
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+class PostgresRow(collections.abc.Mapping):
+    def __init__(self, col_names, values):
+        self._col_names = col_names
+        self._values = list(values)
+        self._dict = {col: val for col, val in zip(col_names, values)}
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self._values[key]
+        return self._dict[key]
+
+    def __len__(self):
+        return len(self._dict)
+
+    def __iter__(self):
+        return iter(self._dict)
+
+    def keys(self):
+        return self._col_names
+
+    def values(self):
+        return self._values
+
+    def items(self):
+        return self._dict.items()
+
+    def get(self, key, default=None):
+        return self._dict.get(key, default)
+
+
+class PostgresCursorWrapper:
+    def __init__(self, raw_cursor, conn):
+        self._cur = raw_cursor
+        self._conn = conn
+        self.lastrowid = None
+
+    @property
+    def rowcount(self):
+        return getattr(self._cur, 'rowcount', -1)
+
+    @property
+    def description(self):
+        return self._cur.description
+
+    def execute(self, query, params=None):
+        clean_q = query.strip()
+        pg_query = clean_q.replace('?', '%s')
+        
+        # Translate SQLite syntax to PostgreSQL
+        if "INSERT OR IGNORE INTO" in pg_query:
+            pg_query = pg_query.replace("INSERT OR IGNORE INTO", "INSERT INTO")
+            if pg_query.endswith(';'):
+                pg_query = pg_query[:-1]
+            pg_query += " ON CONFLICT DO NOTHING"
+        elif "INSERT OR REPLACE INTO platform_settings" in pg_query:
+            pg_query = pg_query.replace("INSERT OR REPLACE INTO platform_settings", "INSERT INTO platform_settings")
+            if pg_query.endswith(';'):
+                pg_query = pg_query[:-1]
+            pg_query += " ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value"
+        
+        is_insert = pg_query.upper().startswith("INSERT INTO")
+        has_returning = "RETURNING" in pg_query.upper()
+        
+        # Tables without 'id' column
+        tables_without_id = ("email_verifications", "platform_settings")
+        table_has_no_id = any(tbl in pg_query.lower() for tbl in tables_without_id)
+
+        if is_insert and not has_returning and not table_has_no_id:
+            if pg_query.endswith(';'):
+                pg_query = pg_query[:-1]
+            pg_query += " RETURNING id"
+            has_returning = True
+
+        if params is not None:
+            self._cur.execute(pg_query, tuple(params))
+        else:
+            self._cur.execute(pg_query)
+
+        if is_insert and has_returning:
+            try:
+                res = self._cur.fetchone()
+                if res:
+                    self.lastrowid = res[0]
+            except Exception:
+                self.lastrowid = None
+        return self
+
+    def fetchone(self):
+        row = self._cur.fetchone()
+        if row is None:
+            return None
+        col_names = [d[0] for d in self._cur.description]
+        return PostgresRow(col_names, row)
+
+    def fetchall(self):
+        rows = self._cur.fetchall()
+        if not rows:
+            return []
+        col_names = [d[0] for d in self._cur.description]
+        return [PostgresRow(col_names, r) for r in rows]
+
+    def close(self):
+        self._cur.close()
+
+
+class PostgresConnectionWrapper:
+    def __init__(self, raw_conn):
+        self._conn = raw_conn
+
+    def cursor(self):
+        return PostgresCursorWrapper(self._conn.cursor(), self._conn)
+
+    def commit(self):
+        self._conn.commit()
+
+    def rollback(self):
+        self._conn.rollback()
+
+    def close(self):
+        self._conn.close()
+
+
+def create_postgres_conn(pg_url):
+    try:
+        import psycopg2
+        import psycopg2.extras
+        raw_conn = psycopg2.connect(pg_url)
+        return PostgresConnectionWrapper(raw_conn)
+    except ImportError:
+        import pg8000.dbapi
+        u = urllib.parse.urlparse(pg_url)
+        ssl_ctx = ssl.create_default_context()
+        raw_conn = pg8000.dbapi.connect(
+            user=u.username,
+            password=u.password,
+            host=u.hostname,
+            port=u.port or 5432,
+            database=u.path.lstrip('/'),
+            ssl_context=ssl_ctx
+        )
+        return PostgresConnectionWrapper(raw_conn)
+
+
 def get_db():
     if 'db' not in g:
+        pg_url = os.environ.get('DATABASE_URL')
+        if pg_url:
+            try:
+                g.db = create_postgres_conn(pg_url)
+                return g.db
+            except Exception as e:
+                print(f"[WARN] Failed to connect to DATABASE_URL: {e}. Falling back to SQLite.")
         g.db = sqlite3.connect(DB_PATH)
         g.db.row_factory = sqlite3.Row
     return g.db
@@ -214,6 +370,9 @@ def _load_catalog_lessons():
 
 
 def init_db():
+    if os.environ.get('DATABASE_URL'):
+        print("[INFO] DATABASE_URL detected. PostgreSQL database is active.")
+        return
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
