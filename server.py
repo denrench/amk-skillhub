@@ -2034,6 +2034,16 @@ def pricing_page():
 def reviews_page():
     return send_from_directory(APP_DIR, 'reviews.html')
 
+@app.route('/career')
+@app.route('/career.html')
+def career_page():
+    return send_from_directory(APP_DIR, 'career.html')
+
+@app.route('/tools')
+@app.route('/tools.html')
+def tools_page():
+    return send_from_directory(APP_DIR, 'tools.html')
+
 @app.route('/<path:path>')
 def static_proxy(path):
     return send_from_directory(APP_DIR, path)
