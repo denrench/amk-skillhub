@@ -8,3 +8,6 @@ services:
     startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 2 server:app
     healthCheckPath: /healthz
     autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql://eduspace_77wk_user:pq6n1r1EFNBCa7GQiFUy1yoBoWHCeM1E@dpg-dblcr1ugekts7381qqv0-a/eduspace_77wk
