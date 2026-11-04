@@ -300,16 +300,28 @@ class PostgresConnectionWrapper:
         self._conn.close()
 
 
+_LAST_DB_ERROR = None
+
 def create_postgres_conn(pg_url):
+    global _LAST_DB_ERROR
+    if pg_url.startswith("postgres://"):
+        pg_url = pg_url.replace("postgres://", "postgresql://", 1)
+
+    errors = []
+    # 1. Try psycopg2
     try:
         import psycopg2
-        import psycopg2.extras
         raw_conn = psycopg2.connect(pg_url)
         return PostgresConnectionWrapper(raw_conn)
-    except ImportError:
+    except Exception as e:
+        errors.append(f"psycopg2: {e}")
+
+    # 2. Try pg8000 with appropriate SSL
+    try:
         import pg8000.dbapi
         u = urllib.parse.urlparse(pg_url)
-        ssl_ctx = ssl.create_default_context()
+        is_internal = "render.com" not in (u.hostname or "")
+        ssl_ctx = None if is_internal else ssl.create_default_context()
         raw_conn = pg8000.dbapi.connect(
             user=u.username,
             password=u.password,
@@ -319,9 +331,15 @@ def create_postgres_conn(pg_url):
             ssl_context=ssl_ctx
         )
         return PostgresConnectionWrapper(raw_conn)
+    except Exception as e:
+        errors.append(f"pg8000: {e}")
+
+    _LAST_DB_ERROR = " | ".join(errors)
+    raise RuntimeError(_LAST_DB_ERROR)
 
 
 def get_db():
+    global _LAST_DB_ERROR
     if 'db' not in g:
         pg_url = os.environ.get('DATABASE_URL')
         if pg_url:
@@ -329,10 +347,28 @@ def get_db():
                 g.db = create_postgres_conn(pg_url)
                 return g.db
             except Exception as e:
+                _LAST_DB_ERROR = str(e)
                 print(f"[WARN] Failed to connect to DATABASE_URL: {e}. Falling back to SQLite.")
         g.db = sqlite3.connect(DB_PATH)
         g.db.row_factory = sqlite3.Row
     return g.db
+
+
+@app.route('/api/debug/db_status', methods=['GET'])
+def get_db_status():
+    db = get_db()
+    is_pg = isinstance(db, PostgresConnectionWrapper)
+    pg_url = os.environ.get('DATABASE_URL')
+    masked_url = ""
+    if pg_url:
+        masked_url = pg_url[:15] + "..." + pg_url[-15:]
+    return jsonify({
+        "database_type": "postgresql" if is_pg else "sqlite",
+        "database_url_configured": bool(pg_url),
+        "database_url_masked": masked_url,
+        "last_db_error": _LAST_DB_ERROR,
+        "sqlite_path": DB_PATH
+    })
 
 
 @app.teardown_appcontext
