@@ -16,14 +16,75 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
-from flask import Flask, request, jsonify, send_from_directory, g
+from flask import Flask, request, jsonify, send_from_directory, g, session, redirect, url_for, make_response
+from functools import wraps
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_DIR = BASE_DIR
 DB_PATH = os.path.join(BASE_DIR, "database.db")
 
 app = Flask(__name__, static_folder=APP_DIR)
-app.config['SECRET_KEY'] = 'amk-eduspace-lms-secret-2026'
+
+# =========================================================================
+# SERVER-SIDE SESSION SECURITY & ROLE ENFORCEMENT
+# =========================================================================
+
+def get_current_user():
+    """Retrieves authenticated user from server-side session."""
+    user_id = session.get('user_id')
+    if not user_id:
+        return None
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT id, email, full_name, role, group_name, specialty_slug, student_id FROM users WHERE id = ?", (user_id,))
+        row = cursor.fetchone()
+        if row:
+            return dict(row)
+    except Exception as e:
+        print(f"[AUTH ERROR] get_current_user error: {e}")
+    return None
+
+def login_required(roles=None):
+    """Decorator to enforce server-side session authentication & role checks."""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            user = get_current_user()
+            if not user:
+                return jsonify({
+                    "success": False,
+                    "message": "Требуется авторизация в системе",
+                    "code": "UNAUTHORIZED"
+                }), 401
+
+            if roles:
+                allowed = [roles] if isinstance(roles, str) else roles
+                if user['role'] not in allowed:
+                    return jsonify({
+                        "success": False,
+                        "message": f"Доступ запрещён: недостаточно прав (ваша роль: {user['role']})",
+                        "code": "FORBIDDEN"
+                    }), 403
+
+            g.current_user = user
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+def get_teacher_assigned_groups(teacher_id):
+    """Returns list of group names assigned to the specified teacher."""
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT group_name FROM teacher_groups WHERE teacher_id = ?", (teacher_id,))
+    rows = cursor.fetchall()
+    return [r[0] for r in rows]
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'amk-eduspace-lms-secret-2026')
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = (os.environ.get('RENDER') is not None or os.environ.get('HTTPS') == 'on')
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=14)
+DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def normalize_teacher_code(code_str):
     if not code_str:
@@ -165,7 +226,7 @@ def init_db():
         last_name TEXT DEFAULT '',
         first_name TEXT DEFAULT '',
         middle_name TEXT DEFAULT '',
-        role TEXT NOT NULL CHECK(role IN ('student', 'teacher')),
+        role TEXT NOT NULL CHECK(role IN ('student', 'teacher', 'admin')),
         group_name TEXT DEFAULT 'ИС-21',
         specialty_slug TEXT DEFAULT 'it',
         department TEXT DEFAULT '',
@@ -299,6 +360,17 @@ def init_db():
         "teacher_comment TEXT"
     ]:
         _safe_add_column(cursor, "task_submissions", col_def)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS teacher_groups (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        teacher_id INTEGER NOT NULL,
+        group_name TEXT NOT NULL,
+        specialty_slug TEXT DEFAULT 'it',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(teacher_id, group_name)
+    );
+    """)
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS notifications (
@@ -818,11 +890,68 @@ def register():
     cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
     user_out = serialize_user(cursor.fetchone())
 
+    session.clear()
+    session['user_id'] = user_out['id']
+    session['user_email'] = user_out['email']
+    session['user_role'] = user_out['role']
+    session.permanent = True
+
     return jsonify({
         "success": True,
         "message": f"Регистрация успешно завершена! Добро пожаловать, {fio['first_name']}!",
         "user": user_out
     }), 201
+
+
+
+# =========================================================================
+# SESSION STATUS, LOGOUT & PASSWORD RECOVERY API
+# =========================================================================
+
+@app.route('/api/auth/session', methods=['GET'])
+def get_auth_session():
+    """Returns the current authenticated server-side session."""
+    user = get_current_user()
+    if user:
+        return jsonify({
+            "authenticated": True,
+            "user": user
+        })
+    return jsonify({"authenticated": False}), 200
+
+@app.route('/api/auth/logout', methods=['POST', 'GET'])
+def auth_logout():
+    """Safely terminates the server-side session."""
+    session.clear()
+    return jsonify({"success": True, "message": "Сессия успешно завершена"}), 200
+
+@app.route('/api/auth/reset_password', methods=['POST'])
+def auth_reset_password():
+    """Secure password reset via OTP verification."""
+    data = request.get_json() or {}
+    email = (data.get('email') or '').strip().lower()
+    code = (data.get('code') or '').strip()
+    new_password = (data.get('new_password') or '').strip()
+
+    if not email or not code or not new_password:
+        return jsonify({"success": False, "message": "Заполните email, проверочный код и новый пароль"}), 400
+
+    if len(new_password) < 6:
+        return jsonify({"success": False, "message": "Новый пароль должен содержать минимум 6 символов"}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT code, expires_at FROM email_verifications WHERE email = ?", (email,))
+    ver = cursor.fetchone()
+
+    if not ver or str(ver['code']) != code:
+        return jsonify({"success": False, "message": "Неверный или устаревший код подтверждения"}), 400
+
+    new_hash = hashlib.sha256(new_password.encode()).hexdigest()
+    cursor.execute("UPDATE users SET password_hash = ? WHERE email = ?", (new_hash, email))
+    conn.commit()
+
+    return jsonify({"success": True, "message": "Пароль успешно обновлён. Теперь вы можете войти."}), 200
 
 
 @app.route('/api/auth/login', methods=['POST'])
@@ -845,10 +974,17 @@ def login():
         return jsonify({"success": False, "message": "Неверный email или пароль. Проверьте раскладку клавиатуры."}), 401
 
     user_out = serialize_user(user)
+    session.clear()
+    session['user_id'] = user_out['id']
+    session['user_email'] = user_out['email']
+    session['user_role'] = user_out['role']
+    session.permanent = True
+
     return jsonify({
         "success": True,
         "message": f"Добро пожаловать, {user_out['full_name']}!",
-        "user": user_out
+        "user": user_out,
+        "session_active": True
     })
 
 
@@ -1245,7 +1381,22 @@ def save_lesson_progress():
 @app.route('/api/tasks/submit', methods=['POST'])
 def submit_task():
     data = request.get_json() or {}
-    user_id = int(data.get('user_id') or 1)
+    # Anti-tampering: enforce server session user_id for students
+    session_user_id = session.get('user_id')
+    session_user_role = session.get('user_role')
+
+    if session_user_id and session_user_role == 'student':
+        if 'user_id' in data and int(data['user_id']) != session_user_id:
+            return jsonify({
+                "success": False,
+                "message": "Попытка подмены идентификатора пользователя заблокирована сервером.",
+                "code": "TAMPERING_DETECTED"
+            }), 403
+        user_id = session_user_id
+    elif session_user_id and session_user_role in ('teacher', 'admin'):
+        user_id = int(data.get('user_id') or session_user_id)
+    else:
+        user_id = int(data.get('user_id') or 1)
     specialty_slug = (data.get('specialty_slug') or 'it').strip().lower()
     task_number = int(data.get('task_number') or 1)
     task_title = data.get('task_title') or f"Задание №{task_number}"
@@ -1479,6 +1630,31 @@ def get_teacher_students():
     conn = get_db()
     cursor = conn.cursor()
 
+    # Enforce role and teacher group isolation
+    caller_role = session.get('user_role')
+    caller_id = session.get('user_id')
+
+    # If caller is student, block access to teacher endpoint
+    if caller_role == 'student':
+        return jsonify({
+            "success": False,
+            "message": "Доступ запрещён: требуются права преподавателя",
+            "code": "FORBIDDEN"
+        }), 403
+
+    # Check assigned groups for this teacher
+    teacher_assigned = []
+    if caller_id and caller_role == 'teacher':
+        teacher_assigned = get_teacher_assigned_groups(caller_id)
+
+    # If teacher explicitly requested a group outside their assignment, block tampering
+    if teacher_assigned and group_filter and group_filter not in teacher_assigned:
+        return jsonify({
+            "success": False,
+            "message": f"У вас нет доступа к учебной группе '{group_filter}'",
+            "code": "GROUP_ACCESS_DENIED"
+        }), 403
+
     q = """
     SELECT id, full_name, last_name, first_name, middle_name, email, role,
            specialty_slug, group_name, student_id, is_demo, created_at
@@ -1489,9 +1665,13 @@ def get_teacher_students():
     if specialty:
         q += " AND specialty_slug = ?"
         params.append(specialty)
+
     if group_filter:
         q += " AND group_name = ?"
         params.append(group_filter)
+    elif teacher_assigned:
+        q += f" AND group_name IN ({','.join(['?']*len(teacher_assigned))})"
+        params.extend(teacher_assigned)
 
     q += " ORDER BY is_demo ASC, created_at DESC, id DESC"
     cursor.execute(q, params)
@@ -1757,6 +1937,16 @@ def grade_submission():
     if not sub_id:
         return jsonify({"success": False, "message": "ID работы не указан"}), 400
 
+    caller_role = session.get('user_role')
+    caller_id = session.get('user_id')
+
+    if caller_role == 'student':
+        return jsonify({
+            "success": False,
+            "message": "Студенты не имеют прав оценивать работы",
+            "code": "FORBIDDEN"
+        }), 403
+
     if action == 'revision' or grade < 60:
         grade_letter = "F" if grade < 60 else "C"
         status = "На доработке"
@@ -1766,9 +1956,23 @@ def grade_submission():
 
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT user_id, task_title, task_number FROM task_submissions WHERE id = ?", (sub_id,))
+    cursor.execute("""
+    SELECT ts.user_id, ts.task_title, ts.task_number, u.group_name
+    FROM task_submissions ts
+    JOIN users u ON ts.user_id = u.id
+    WHERE ts.id = ?
+    """, (sub_id,))
     sub_row = cursor.fetchone()
 
+    # Verify that teacher is assigned to this student's group
+    if caller_id and caller_role == 'teacher':
+        t_groups = get_teacher_assigned_groups(caller_id)
+        if t_groups and sub_row and sub_row['group_name'] not in t_groups:
+            return jsonify({
+                "success": False,
+                "message": f"Студент группы '{sub_row['group_name']}' не относится к вашим закреплённым группам.",
+                "code": "GROUP_ACCESS_DENIED"
+            }), 403
     cursor.execute("""
     UPDATE task_submissions
     SET score = ?, grade_letter = ?, status = ?, teacher_comment = ?, updated_at = CURRENT_TIMESTAMP
@@ -2480,6 +2684,13 @@ def admin_page():
 
 @app.route('/api/admin/users', methods=['GET'])
 def admin_get_users():
+    role = session.get('user_role')
+    if role in ('student', 'teacher'):
+        return jsonify({
+            "success": False,
+            "message": "Доступ запрещён: требуются права администратора",
+            "code": "FORBIDDEN"
+        }), 403
     conn = get_db()
     c = conn.cursor()
     c.execute("SELECT id, email, full_name, role, group_name, specialty_slug, created_at FROM users ORDER BY id ASC")
@@ -2499,9 +2710,19 @@ def admin_get_users():
 
 @app.route('/api/admin/change_role', methods=['POST'])
 def admin_change_role():
+    role = session.get('user_role')
+    if role in ('student', 'teacher'):
+        return jsonify({
+            "success": False,
+            "message": "Доступ запрещён: требуются права администратора",
+            "code": "FORBIDDEN"
+        }), 403
     data = request.get_json() or {}
     user_id = data.get('user_id')
     new_role = (data.get('role') or '').strip().lower()
+
+    if not user_id or not new_role:
+        return jsonify({"success": False, "message": "user_id and role are required"}), 400
 
     if new_role not in ('student', 'teacher', 'admin'):
         return jsonify({"success": False, "message": "Недопустимая роль"}), 400
@@ -2511,6 +2732,63 @@ def admin_change_role():
     c.execute("UPDATE users SET role = ? WHERE id = ?", (new_role, user_id))
     conn.commit()
     return jsonify({"success": True, "user_id": user_id, "new_role": new_role})
+
+
+@app.route('/api/admin/teacher_groups', methods=['GET'])
+def admin_get_teacher_groups():
+    role = session.get('user_role')
+    if role in ('student', 'teacher'):
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права администратора"}), 403
+
+    conn = get_db()
+    c = conn.cursor()
+    c.execute("""
+        SELECT tg.id, tg.teacher_id, u.full_name as teacher_name, u.email as teacher_email,
+               tg.group_name, tg.specialty_slug, tg.created_at
+        FROM teacher_groups tg
+        JOIN users u ON tg.teacher_id = u.id
+        ORDER BY u.full_name ASC, tg.group_name ASC
+    """)
+    rows = c.fetchall()
+    items = []
+    for r in rows:
+        items.append({
+            "id": r[0],
+            "teacher_id": r[1],
+            "teacher_name": r[2],
+            "teacher_email": r[3],
+            "group_name": r[4],
+            "specialty_slug": r[5],
+            "created_at": str(r[6])
+        })
+    return jsonify({"success": True, "teacher_groups": items})
+
+
+@app.route('/api/admin/assign_teacher_group', methods=['POST'])
+def admin_assign_teacher_group():
+    role = session.get('user_role')
+    if role in ('student', 'teacher'):
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права администратора"}), 403
+
+    data = request.get_json() or {}
+    teacher_id = data.get('teacher_id')
+    group_name = (data.get('group_name') or '').strip()
+    specialty_slug = (data.get('specialty_slug') or 'it').strip().lower()
+
+    if not teacher_id or not group_name:
+        return jsonify({"success": False, "message": "Укажите ID преподавателя и название группы"}), 400
+
+    conn = get_db()
+    c = conn.cursor()
+    try:
+        c.execute("""
+            INSERT INTO teacher_groups (teacher_id, group_name, specialty_slug)
+            VALUES (?, ?, ?)
+        """, (teacher_id, group_name, specialty_slug))
+        conn.commit()
+        return jsonify({"success": True, "message": f"Группа '{group_name}' успешно закреплена за преподавателем"})
+    except Exception as e:
+        return jsonify({"success": False, "message": f"Ошибка назначения: {e}"}), 400
 
 
 @app.route('/healthz')

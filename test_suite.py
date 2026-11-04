@@ -278,7 +278,11 @@ assert '5.0 В' in r_ai.get_json()['reply'], "AI response must contain relevant 
 print("Test 17: AI-Mentor Contextual API (/api/ai/chat) OK")
 
 
-# 18. Verify Admin Portal & Role Management API
+# 18. Verify Admin Portal & Role Management API (Requires Admin Role)
+with app.session_transaction() as sess:
+    sess['user_id'] = 1
+    sess['user_role'] = 'admin'
+
 r_admin_users = app.get('/api/admin/users')
 assert r_admin_users.status_code == 200, "Admin users list must return HTTP 200"
 users_data = r_admin_users.get_json()
