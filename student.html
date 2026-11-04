@@ -112,59 +112,65 @@
         </div>
       </a>
 
-      <nav class="space-y-1.5">
-        <a href="student.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold text-sm shadow-glow-indigo transition-all">
-          <span class="material-symbols-outlined text-[20px]">grid_view</span>
-          <span>Моё обучение</span>
+      <nav class="space-y-1 text-xs">
+        <a href="student.html" class="flex items-center gap-3 px-3 py-2 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold shadow-glow-indigo transition-all">
+          <span class="material-symbols-outlined text-[19px]">home</span>
+          <span>Главная</span>
         </a>
-        <a href="javascript:void(0)" onclick="openSubjectsModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">menu_book</span>
-          <span>Мои курсы</span>
+        <a href="javascript:void(0)" onclick="openSubjectsModal()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">school</span>
+          <span>Мои специальности</span>
         </a>
-        <a href="tasks.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
+        <a href="tasks.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">event_note</span>
+          <span>Учебный план</span>
+        </a>
+        <a href="tasks.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
           <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px]">assignment</span>
-            <span>Уроки и задания</span>
+            <span class="material-symbols-outlined text-[19px]">menu_book</span>
+            <span>Уроки</span>
           </div>
-          <span id="sidebar-available-badge" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">1 открыто</span>
+          <span id="sidebar-available-badge" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">1 открыт</span>
         </a>
-        <a href="javascript:void(0)" onclick="openGradesModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">grade</span>
-          <span>Оценки и зачётка</span>
+        <a href="simulator.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-cyan-400">code</span>
+          <span>Практика</span>
         </a>
-        <a href="javascript:void(0)" onclick="openScheduleModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">schedule</span>
-          <span>Расписание занятий</span>
+        <a href="tools.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-amber-300">construction</span>
+          <span>Тренажёры</span>
         </a>
-        <a href="javascript:void(0)" onclick="openCalendarModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">calendar_month</span>
-          <span>Календарь дедлайнов</span>
+        <a href="simulator.html#ai" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-indigo-400">smart_toy</span>
+          <span>AI-наставник</span>
         </a>
-        <a href="javascript:void(0)" onclick="openMessengerModal()" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
-            <span>Чат с куратором</span>
-          </div>
-          <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-glow-cyan"></span>
+        <a href="tasks.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">assignment</span>
+          <span>Мои задания</span>
         </a>
-        <a href="javascript:void(0)" onclick="openNotificationsModal()" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px]">notifications</span>
-            <span>Уведомления</span>
-          </div>
-          <span id="sidebar-notif-count" data-notif-badge class="hidden px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold">1</span>
+        <a href="gradebook.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">grade</span>
+          <span>Оценки</span>
         </a>
-        <a href="profile.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">account_circle</span>
-          <span>Профиль и сертификат</span>
+        <a href="profile.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-amber-400">military_tech</span>
+          <span>Достижения</span>
         </a>
-        <a href="career.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px] text-amber-300">work</span>
-          <span>Карьера & Резюме</span>
+        <a href="verify.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-emerald-400">verified</span>
+          <span>Сертификаты</span>
         </a>
-        <a href="tools.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px] text-cyan-400">construction</span>
-          <span>Инструменты</span>
+        <a href="career.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-purple-400">work</span>
+          <span>Карьера</span>
+        </a>
+        <a href="profile.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">account_circle</span>
+          <span>Профиль</span>
+        </a>
+        <a href="javascript:void(0)" onclick="openSettingsModal()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">settings</span>
+          <span>Настройки</span>
         </a>
       </nav>
     </div>
