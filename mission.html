@@ -159,6 +159,8 @@
     ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #00D9FF; }
   </style>
+  <script src="js/courses-catalog.js"></script>
+  <script src="js/app-logistics.js"></script>
 </head>
 
 <body class="selection:bg-neo-cyan selection:text-neo-bg">
@@ -1118,10 +1120,18 @@
 
     function getCurrentUserId() {
       try {
-        const raw = localStorage.getItem('eduspace_user');
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed && parsed.id) return parsed.id;
+        if (window.EduSpace && typeof window.EduSpace.getActiveUser === 'function') {
+          const u = window.EduSpace.getActiveUser();
+          if (u && u.id) return Number(u.id);
+        }
+      } catch (e) {}
+      try {
+        for (const k of ['eduspace_active_user', 'eduspace_user', 'active_user']) {
+          const raw = localStorage.getItem(k);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.id) return Number(parsed.id);
+          }
         }
       } catch (e) {}
       const params = new URLSearchParams(window.location.search);
