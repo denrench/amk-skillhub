@@ -948,6 +948,28 @@
       if (!sub) return;
 
       const safeCode = (sub.submitted_code || '// Код не прикреплён').replace(/</g, '&lt;');
+      let palettePreviewHtml = '';
+      try {
+        const parsedMission = JSON.parse(sub.submitted_code || '{}');
+        if (parsedMission && Array.isArray(parsedMission.palette)) {
+          const swatchesHtml = parsedMission.palette.map(p => `
+            <div class="p-2.5 rounded-xl bg-dark-950 border border-white/10 text-center space-y-1">
+              <div class="w-full h-10 rounded-lg border border-white/20" style="background:${p.hex}"></div>
+              <div class="font-mono font-bold text-white text-[11px]">${p.hex}</div>
+              <div class="text-[10px] text-slate-400 truncate">${p.role || ''}</div>
+            </div>
+          `).join('');
+          palettePreviewHtml = `
+            <div class="p-4 rounded-xl bg-dark-950/90 border border-cyan-500/30 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="font-extrabold text-cyan-400 text-xs">🎨 Созданная студентом палитра («${parsedMission.mission_title || 'Архитектор цвета'}»)</span>
+                <span class="px-2.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono text-[10px]">${parsedMission.harmony_type || 'Гармония'}</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">${swatchesHtml}</div>
+            </div>
+          `;
+        }
+      } catch (e) {}
       openModal(`📝 Рецензирование работы — ${sub.student_name} (${sub.group_name})`, `
         <div class="space-y-4 text-xs text-slate-200">
           <div class="p-3.5 rounded-xl bg-dark-950/60 border border-white/10 flex flex-wrap justify-between gap-2">
@@ -958,7 +980,8 @@
             <span class="font-extrabold text-indigo-400 text-sm">Автобалл: ${sub.score}/100</span>
           </div>
 
-          ${sub.student_comment ? `<div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-300"><strong>Комментарий студента:</strong> ${sub.student_comment.replace(/</g, '&lt;')}</div>` : ''}
+          ${palettePreviewHtml}
+          ${sub.student_comment ? `<div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-300"><strong>Обоснование / комментарий студента:</strong> ${sub.student_comment.replace(/</g, '&lt;')}</div>` : ''}
 
           <div>
             <div class="font-bold text-slate-300 mb-1">Отправленное решение студента:</div>

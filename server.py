@@ -412,6 +412,29 @@ def _load_catalog_lessons():
 def init_db():
     if os.environ.get('DATABASE_URL'):
         print("[INFO] DATABASE_URL detected. PostgreSQL database is active.")
+        try:
+            pg_conn = create_postgres_conn(os.environ.get('DATABASE_URL'))
+            pg_cur = pg_conn.cursor()
+            for pg_ddl in [
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS bonus_xp INTEGER DEFAULT 0",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS streak_days INTEGER DEFAULT 1",
+                "ALTER TABLE users ADD COLUMN IF NOT EXISTS achievements_json TEXT DEFAULT '[]'",
+                "ALTER TABLE lesson_progress ADD COLUMN IF NOT EXISTS current_stage INTEGER DEFAULT 1",
+                "ALTER TABLE lesson_progress ADD COLUMN IF NOT EXISTS mission_state_json TEXT DEFAULT '{}'",
+                "ALTER TABLE lesson_progress ADD COLUMN IF NOT EXISTS mission_xp INTEGER DEFAULT 0",
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_tasks_spec_num ON tasks (specialty_slug, task_number)",
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users (email)",
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_email_verif_email ON email_verifications (email)",
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_lesson_prog_user_spec_num ON lesson_progress (user_id, specialty_slug, task_number)",
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_platform_settings_key ON platform_settings (key)",
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_enrollments_user_spec ON enrollments (user_id, specialty_slug)",
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_teacher_groups_tid_grp ON teacher_groups (teacher_id, group_name)"
+            ]:
+                pg_cur.execute(pg_ddl)
+            pg_conn.commit()
+            pg_conn.close()
+        except Exception as e:
+            print(f"[WARN] PostgreSQL DDL sync warning: {e}")
         return
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -445,7 +468,10 @@ def init_db():
         "email_verified INTEGER DEFAULT 0",
         "is_demo INTEGER DEFAULT 0",
         "subscription_tier TEXT DEFAULT 'free'",
-        "pro_expires_at TIMESTAMP NULL"
+        "pro_expires_at TIMESTAMP NULL",
+        "bonus_xp INTEGER DEFAULT 0",
+        "streak_days INTEGER DEFAULT 1",
+        "achievements_json TEXT DEFAULT '[]'"
     ]:
         _safe_add_column(cursor, "users", col_def)
 
@@ -480,11 +506,21 @@ def init_db():
         quiz_score INTEGER DEFAULT 0,
         quiz_total INTEGER DEFAULT 3,
         draft_code TEXT DEFAULT '',
+        current_stage INTEGER DEFAULT 1,
+        mission_state_json TEXT DEFAULT '{}',
+        mission_xp INTEGER DEFAULT 0,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_id, specialty_slug, task_number),
         FOREIGN KEY (user_id) REFERENCES users(id)
     );
     """)
+
+    for col_def in [
+        "current_stage INTEGER DEFAULT 1",
+        "mission_state_json TEXT DEFAULT '{}'",
+        "mission_xp INTEGER DEFAULT 0"
+    ]:
+        _safe_add_column(cursor, "lesson_progress", col_def)
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS grades (
@@ -1299,7 +1335,8 @@ def get_profile(user_id):
     scores = [v["score"] for v in spec_subs if v["score"] > 0]
     avg_score = round(sum(scores) / len(scores), 1) if scores else 0.0
     gpa_4 = round((avg_score / 100.0) * 4.0, 2) if scores else 0.0
-    xp_total = sum(v["score"] * 3 for v in latest_by_task.values() if v["score"] >= 60)
+    bonus_xp = int(user_dict.get("bonus_xp") or 0)
+    xp_total = sum(v["score"] * 3 for v in latest_by_task.values() if v["score"] >= 60) + bonus_xp
     level = 1 + (xp_total // 500)
 
     course_meta = COURSES_BY_SLUG[spec_slug]
@@ -1447,7 +1484,7 @@ def get_tasks():
             user_subs[(sub['specialty_slug'], sub['task_number'])] = dict(sub)
 
         cursor.execute("""
-        SELECT specialty_slug, task_number, status, quiz_score, quiz_total, draft_code
+        SELECT specialty_slug, task_number, status, quiz_score, quiz_total, draft_code, current_stage, mission_xp, mission_state_json
         FROM lesson_progress
         WHERE user_id = ?
         """, (user_id,))
@@ -1518,6 +1555,9 @@ def get_tasks():
         t_data['teacher_comment'] = sub_info.get('teacher_comment') if sub_info else None
         t_data['quiz_score'] = (sub_info.get('quiz_score') if sub_info else None) or (prog_info.get('quiz_score') if prog_info else 0)
         t_data['draft_code'] = prog_info.get('draft_code') if prog_info else None
+        t_data['current_stage'] = prog_info.get('current_stage', 1) if prog_info else 1
+        t_data['mission_xp'] = prog_info.get('mission_xp', 0) if prog_info else 0
+        t_data['is_interactive_mission'] = (t['specialty_slug'] == 'graphic_design' and int(t['task_number']) == 1)
         tasks_out.append(t_data)
 
     return jsonify({
@@ -1816,6 +1856,7 @@ def reset_demo():
         c.execute(f"DELETE FROM task_submissions WHERE user_id IN ({placeholders});", demo_uids)
         c.execute(f"DELETE FROM grades WHERE user_id IN ({placeholders});", demo_uids)
         c.execute(f"DELETE FROM lesson_progress WHERE user_id IN ({placeholders});", demo_uids)
+        c.execute(f"UPDATE users SET bonus_xp = 0, achievements_json = '[]' WHERE id IN ({placeholders});", demo_uids)
 
     c.execute("INSERT OR REPLACE INTO platform_settings (key, value) VALUES ('current_study_day', '1');")
     conn.commit()
@@ -3073,6 +3114,579 @@ def admin_assign_teacher_group():
         return jsonify({"success": True, "message": f"Группа '{group_name}' успешно закреплена за преподавателем"})
     except Exception as e:
         return jsonify({"success": False, "message": f"Ошибка назначения: {e}"}), 400
+
+
+
+
+# =========================================================================
+# INTERACTIVE GAMIFIED MISSION ENGINE («АРХИТЕКТОР ЦВЕТА»)
+# =========================================================================
+
+MISSION_XP_EVENTS = {
+    "stage_1_start": 25,
+    "stage_2_theory": 75,
+    "training_1_combo": 50,
+    "training_2_comp": 50,
+    "training_3_match": 50,
+    "training_4_drag": 50,
+    "stage_4_lab": 100,
+    "stage_5_submit": 100
+}
+
+MISSION_ACHIEVEMENTS_CATALOG = {
+    "initiate_spectrum": {
+        "id": "initiate_spectrum",
+        "title": "Искатель спектра",
+        "description": "Изучены все 5 интерактивных модулей теории цветовой гармонии",
+        "icon": "palette",
+        "xp_Check": "stage_2_theory"
+    },
+    "harmony_tactician": {
+        "id": "harmony_tactician",
+        "title": "Тактик гармонии",
+        "description": "Успешно пройдены все 4 тренировочных испытания без ошибок",
+        "icon": "Rule",
+        "xp_Check": "training_all"
+    },
+    "color_alchemist": {
+        "id": "color_alchemist",
+        "title": "Алхимик палитр",
+        "description": "Создана и проверена собственная гармоничная палитра в Цветовой лаборатории",
+        "icon": "science",
+        "xp_Check": "stage_4_lab"
+    },
+    "color_architect": {
+        "id": "color_architect",
+        "title": "Архитектор цвета",
+        "description": "Финальный дизайн-проект палитры защищён и отправлен преподавателю",
+        "icon": "workspace_premium",
+        "xp_Check": "stage_5_submit"
+    }
+}
+
+@app.route('/mission')
+@app.route('/mission.html')
+def serve_mission_page():
+    return send_from_directory(APP_DIR, 'mission.html')
+
+
+@app.route('/api/mission/state', methods=['GET'])
+def get_mission_state():
+    specialty_slug = (request.args.get('specialty') or 'graphic_design').strip().lower()
+    task_number = request.args.get('task', 1, type=int)
+    req_user_id = request.args.get('user_id', type=int)
+
+    session_uid = session.get('user_id')
+    session_role = session.get('user_role')
+
+    if session_uid and session_role == 'student':
+        if req_user_id and int(req_user_id) != int(session_uid):
+            return jsonify({
+                "success": False,
+                "message": "Доступ к чужому прогрессу миссии запрещён.",
+                "code": "TAMPERING_DETECTED"
+            }), 403
+        user_id = int(session_uid)
+    elif session_uid and session_role in ('teacher', 'admin'):
+        user_id = int(req_user_id or session_uid)
+    elif req_user_id:
+        user_id = int(req_user_id)
+    else:
+        return jsonify({"success": False, "message": "Требуется авторизация для прохождения миссии.", "code": "UNAUTHORIZED"}), 401
+
+    current_day = get_current_day()
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM tasks WHERE specialty_slug = ? AND task_number = ?", (specialty_slug, task_number))
+    task_row = cursor.fetchone()
+    unlock_day = int(task_row['unlock_day']) if task_row else task_number
+    if unlock_day > current_day and session_role not in ('teacher', 'admin'):
+        return jsonify({
+            "success": False,
+            "is_locked": True,
+            "unlock_day": unlock_day,
+            "current_study_day": current_day,
+            "message": f"Миссия заблокирована по расписанию до Дня {unlock_day}."
+        }), 403
+
+    cursor.execute("SELECT id, full_name, email, role, group_name, specialty_slug, bonus_xp, streak_days, achievements_json FROM users WHERE id = ?", (user_id,))
+    u_row = cursor.fetchone()
+    if not u_row:
+        return jsonify({"success": False, "message": "Пользователь не найден"}), 404
+
+    cursor.execute("""
+        SELECT status, quiz_score, draft_code, current_stage, mission_state_json, mission_xp, updated_at
+        FROM lesson_progress
+        WHERE user_id = ? AND specialty_slug = ? AND task_number = ?
+    """, (user_id, specialty_slug, task_number))
+    lp_row = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT id, score, grade_letter, status, submitted_code, student_comment, teacher_comment, updated_at
+        FROM task_submissions
+        WHERE user_id = ? AND specialty_slug = ? AND task_number = ?
+        ORDER BY updated_at DESC, id DESC LIMIT 1
+    """, (user_id, specialty_slug, task_number))
+    sub_row = cursor.fetchone()
+
+    mission_state = {}
+    if lp_row and lp_row['mission_state_json']:
+        try:
+            mission_state = json.loads(lp_row['mission_state_json'])
+        except Exception:
+            mission_state = {}
+
+    achievements = []
+    if u_row['achievements_json']:
+        try:
+            achievements = json.loads(u_row['achievements_json'])
+        except Exception:
+            achievements = []
+
+    cursor.execute("SELECT score FROM task_submissions WHERE user_id = ? AND score >= 60", (user_id,))
+    graded_xp = sum(int(r['score']) * 3 for r in cursor.fetchall())
+    bonus_xp = int(u_row['bonus_xp'] or 0)
+    total_xp = graded_xp + bonus_xp
+    level = 1 + (total_xp // 500)
+
+    submission_data = None
+    if sub_row:
+        sub_dict = dict(sub_row)
+        raw_st = (sub_dict.get('status') or '').lower()
+        is_pending = ('на проверке' in raw_st or 'отправлено' in raw_st or raw_st == 'submitted')
+        submission_data = {
+            "id": sub_dict["id"],
+            "status": sub_dict["status"],
+            "is_pending_review": is_pending,
+            "score": None if is_pending else sub_dict["score"],
+            "grade_letter": "—" if is_pending else sub_dict["grade_letter"],
+            "student_comment": sub_dict.get("student_comment") or "",
+            "teacher_comment": sub_dict.get("teacher_comment") or "",
+            "submitted_code": sub_dict.get("submitted_code") or "",
+            "updated_at": sub_dict.get("updated_at")
+        }
+
+    return jsonify({
+        "success": True,
+        "user": {
+            "id": u_row["id"],
+            "full_name": u_row["full_name"],
+            "group_name": u_row["group_name"],
+            "role": u_row["role"],
+            "bonus_xp": bonus_xp,
+            "total_xp": total_xp,
+            "level": level,
+            "streak_days": int(u_row["streak_days"] or 1),
+            "achievements": achievements
+        },
+        "mission": {
+            "specialty_slug": specialty_slug,
+            "task_number": task_number,
+            "title": task_row["title"] if task_row else "Архитектор цвета",
+            "current_stage": int(lp_row["current_stage"] or 1) if lp_row else 1,
+            "mission_xp": int(lp_row["mission_xp"] or 0) if lp_row else 0,
+            "status": lp_row["status"] if lp_row else "not_started",
+            "state": mission_state,
+            "submission": submission_data
+        }
+    })
+
+
+@app.route('/api/mission/save_stage', methods=['POST'])
+def save_mission_stage():
+    data = request.get_json() or {}
+    session_uid = session.get('user_id')
+    session_role = session.get('user_role')
+    req_user_id = data.get('user_id')
+
+    if session_uid and session_role == 'student':
+        if req_user_id and int(req_user_id) != int(session_uid):
+            return jsonify({
+                "success": False,
+                "message": "Сохранение прогресса для чужого аккаунта запрещено.",
+                "code": "TAMPERING_DETECTED"
+            }), 403
+        user_id = int(session_uid)
+    elif session_uid:
+        user_id = int(req_user_id or session_uid)
+    elif req_user_id:
+        user_id = int(req_user_id)
+    else:
+        return jsonify({"success": False, "message": "Требуется авторизация.", "code": "UNAUTHORIZED"}), 401
+
+    specialty_slug = (data.get('specialty_slug') or 'graphic_design').strip().lower()
+    task_number = int(data.get('task_number') or 1)
+    requested_stage = max(1, min(7, int(data.get('current_stage') or 1)))
+    incoming_state = data.get('state') or {}
+    event_key = (data.get('event_key') or '').strip()
+
+    current_day = get_current_day()
+    if task_number > current_day and session_role not in ('teacher', 'admin'):
+        return jsonify({"success": False, "is_locked": True, "message": f"Миссия заблокирована до Дня {task_number}."}), 403
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT current_stage, mission_state_json, mission_xp, quiz_score
+        FROM lesson_progress
+        WHERE user_id = ? AND specialty_slug = ? AND task_number = ?
+    """, (user_id, specialty_slug, task_number))
+    lp_row = cursor.fetchone()
+
+    saved_state = {}
+    if lp_row and lp_row['mission_state_json']:
+        try:
+            saved_state = json.loads(lp_row['mission_state_json'])
+        except Exception:
+            saved_state = {}
+
+    # Merge incoming state safely
+    for k in ('theory_completed', 'training_completed', 'lab_palette', 'final_palette', 'final_explanation', 'lab_criteria_met'):
+        if k in incoming_state and incoming_state[k] is not None:
+            saved_state[k] = incoming_state[k]
+
+    awarded_events = list(saved_state.get('awarded_events') or [])
+    theory_done = list(saved_state.get('theory_completed') or [])
+    training_done = list(saved_state.get('training_completed') or [])
+    lab_palette = list(saved_state.get('lab_palette') or [])
+
+    # Enforce server-side stage gatekeeping (prevent skipping locked stages)
+    max_allowed_stage = 2
+    if len(theory_done) >= 5:
+        max_allowed_stage = 3
+    if len(theory_done) >= 5 and len(training_done) >= 4:
+        max_allowed_stage = 4
+    if len(theory_done) >= 5 and len(training_done) >= 4 and len(lab_palette) >= 3:
+        max_allowed_stage = 5
+    if 'stage_5_submit' in awarded_events:
+        max_allowed_stage = 7
+
+    if requested_stage > max_allowed_stage:
+        return jsonify({
+            "success": False,
+            "code": "STAGE_LOCKED",
+            "max_allowed_stage": max_allowed_stage,
+            "message": f"Нельзя перепрыгнуть на Этап {requested_stage}: сначала завершите обязательные задания предыдущего этапа."
+        }), 403
+
+    # Award XP strictly once per verified event
+    xp_gained_now = 0
+    if event_key and event_key in MISSION_XP_EVENTS and event_key not in awarded_events:
+        valid_event = False
+        if event_key == "stage_1_start":
+            valid_event = True
+        elif event_key == "stage_2_theory" and len(theory_done) >= 5:
+            valid_event = True
+        elif event_key == "training_1_combo" and 1 in training_done:
+            valid_event = True
+        elif event_key == "training_2_comp" and 2 in training_done:
+            valid_event = True
+        elif event_key == "training_3_match" and 3 in training_done:
+            valid_event = True
+        elif event_key == "training_4_drag" and 4 in training_done:
+            valid_event = True
+        elif event_key == "stage_4_lab" and len(lab_palette) >= 3:
+            valid_event = True
+
+        if valid_event:
+            xp_gained_now = MISSION_XP_EVENTS[event_key]
+            awarded_events.append(event_key)
+
+    saved_state['awarded_events'] = awarded_events
+    mission_xp = sum(MISSION_XP_EVENTS.get(ev, 0) for ev in awarded_events)
+    quiz_score = min(3, len(training_done))
+
+    cursor.execute("SELECT bonus_xp, achievements_json, streak_days FROM users WHERE id = ?", (user_id,))
+    u_row = cursor.fetchone()
+    current_bonus_xp = int((u_row['bonus_xp'] if u_row else 0) or 0)
+    achievements = []
+    if u_row and u_row['achievements_json']:
+        try:
+            achievements = json.loads(u_row['achievements_json'])
+        except Exception:
+            achievements = []
+    existing_ach_ids = {a['id'] if isinstance(a, dict) else a for a in achievements}
+    new_achievements = []
+
+    if 'stage_2_theory' in awarded_events and 'initiate_spectrum' not in existing_ach_ids:
+        ach = MISSION_ACHIEVEMENTS_CATALOG['initiate_spectrum']
+        achievements.append(ach)
+        new_achievements.append(ach)
+    if len(training_done) >= 4 and 'harmony_tactician' not in existing_ach_ids:
+        ach = MISSION_ACHIEVEMENTS_CATALOG['harmony_tactician']
+        achievements.append(ach)
+        new_achievements.append(ach)
+    if 'stage_4_lab' in awarded_events and 'color_alchemist' not in existing_ach_ids:
+        ach = MISSION_ACHIEVEMENTS_CATALOG['color_alchemist']
+        achievements.append(ach)
+        new_achievements.append(ach)
+
+    new_bonus_xp = current_bonus_xp + xp_gained_now
+    cursor.execute("""
+        UPDATE users
+        SET bonus_xp = ?, achievements_json = ?
+        WHERE id = ?
+    """, (new_bonus_xp, json.dumps(achievements, ensure_ascii=False), user_id))
+
+    draft_summary = json.dumps({
+        "lab_palette": lab_palette,
+        "final_palette": saved_state.get("final_palette") or lab_palette,
+        "final_explanation": saved_state.get("final_explanation") or ""
+    }, ensure_ascii=False)
+
+    cursor.execute("""
+        INSERT INTO lesson_progress (
+            user_id, specialty_slug, task_number, status, quiz_score, quiz_total,
+            draft_code, current_stage, mission_state_json, mission_xp, updated_at
+        ) VALUES (?, ?, ?, 'in_progress', ?, 4, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(user_id, specialty_slug, task_number) DO UPDATE SET
+            status = excluded.status,
+            quiz_score = excluded.quiz_score,
+            draft_code = excluded.draft_code,
+            current_stage = excluded.current_stage,
+            mission_state_json = excluded.mission_state_json,
+            mission_xp = excluded.mission_xp,
+            updated_at = CURRENT_TIMESTAMP
+    """, (
+        user_id, specialty_slug, task_number, quiz_score,
+        draft_summary, requested_stage, json.dumps(saved_state, ensure_ascii=False), mission_xp
+    ))
+    conn.commit()
+
+    cursor.execute("SELECT score FROM task_submissions WHERE user_id = ? AND score >= 60", (user_id,))
+    graded_xp = sum(int(r['score']) * 3 for r in cursor.fetchall())
+    total_xp = graded_xp + new_bonus_xp
+    level = 1 + (total_xp // 500)
+
+    return jsonify({
+        "success": True,
+        "current_stage": requested_stage,
+        "max_allowed_stage": max_allowed_stage,
+        "xp_gained": xp_gained_now,
+        "mission_xp": mission_xp,
+        "total_xp": total_xp,
+        "level": level,
+        "new_achievements": new_achievements,
+        "achievements": achievements,
+        "state": saved_state
+    })
+
+
+@app.route('/api/mission/submit', methods=['POST'])
+def submit_mission_project():
+    data = request.get_json() or {}
+    session_uid = session.get('user_id')
+    session_role = session.get('user_role')
+    req_user_id = data.get('user_id')
+
+    if session_uid and session_role == 'student':
+        if req_user_id and int(req_user_id) != int(session_uid):
+            return jsonify({
+                "success": False,
+                "message": "Попытка отправки работы от чужого имени заблокирована.",
+                "code": "TAMPERING_DETECTED"
+            }), 403
+        user_id = int(session_uid)
+    elif session_uid:
+        user_id = int(req_user_id or session_uid)
+    elif req_user_id:
+        user_id = int(req_user_id)
+    else:
+        return jsonify({"success": False, "message": "Требуется авторизация.", "code": "UNAUTHORIZED"}), 401
+
+    specialty_slug = (data.get('specialty_slug') or 'graphic_design').strip().lower()
+    task_number = int(data.get('task_number') or 1)
+    palette = data.get('palette') or []
+    harmony_type = (data.get('harmony_type') or 'complementary').strip()
+    explanation = (data.get('explanation') or '').strip()
+    project_name = (data.get('project_name') or 'Образовательная платформа EduSpace Neo').strip()
+
+    # XSS Sanitization
+    explanation = re.sub(r'<script.*?>.*?</script>', '', explanation, flags=re.IGNORECASE | re.DOTALL)
+    explanation = explanation.replace('<script>', '').replace('</script>', '')
+
+    if not isinstance(palette, list) or len(palette) < 3 or len(palette) > 6:
+        return jsonify({"success": False, "message": "Палитра проекта должна содержать от 3 до 6 цветов в формате HEX."}), 400
+
+    hex_re = re.compile(r'^#[0-9A-Fa-f]{6}$')
+    clean_palette = []
+    for item in palette:
+        if isinstance(item, dict):
+            hex_val = (item.get('hex') or '').strip().upper()
+            role_val = (item.get('role') or 'Accent').strip()
+        else:
+            hex_val = str(item).strip().upper()
+            role_val = 'Color'
+        if not hex_re.match(hex_val):
+            return jsonify({"success": False, "message": f"Некорректный HEX-код цвета: {hex_val}"}), 400
+        clean_palette.append({"hex": hex_val, "role": role_val})
+
+    if len(explanation) < 15:
+        return jsonify({"success": False, "message": "Напишите осмысленное объяснение выбора вашей цветовой палитры (минимум 15 символов)."}), 400
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT current_stage, mission_state_json, mission_xp
+        FROM lesson_progress
+        WHERE user_id = ? AND specialty_slug = ? AND task_number = ?
+    """, (user_id, specialty_slug, task_number))
+    lp_row = cursor.fetchone()
+    saved_state = {}
+    if lp_row and lp_row['mission_state_json']:
+        try:
+            saved_state = json.loads(lp_row['mission_state_json'])
+        except Exception:
+            saved_state = {}
+
+    theory_done = list(saved_state.get('theory_completed') or [])
+    training_done = list(saved_state.get('training_completed') or [])
+    if len(theory_done) < 5 or len(training_done) < 4:
+        return jsonify({
+            "success": False,
+            "code": "STAGES_INCOMPLETE",
+            "message": "Невозможно отправить финальную работу до прохождения всех этапов теории и тренировки."
+        }), 403
+
+    awarded_events = list(saved_state.get('awarded_events') or [])
+    xp_gained_now = 0
+    if 'stage_5_submit' not in awarded_events:
+        xp_gained_now = MISSION_XP_EVENTS['stage_5_submit']
+        awarded_events.append('stage_5_submit')
+
+    saved_state['awarded_events'] = awarded_events
+    saved_state['final_palette'] = clean_palette
+    saved_state['final_explanation'] = explanation
+    saved_state['harmony_type'] = harmony_type
+    mission_xp = sum(MISSION_XP_EVENTS.get(ev, 0) for ev in awarded_events)
+
+    cursor.execute("SELECT full_name, group_name, student_id, bonus_xp, achievements_json FROM users WHERE id = ?", (user_id,))
+    u_row = cursor.fetchone()
+    student_name = u_row['full_name'] if u_row else 'Студент'
+    group_name = u_row['group_name'] if u_row and u_row['group_name'] else 'ДЗ-21'
+    student_id = u_row['student_id'] if u_row and u_row['student_id'] else f'KZ-AMK-2026-{10000 + user_id}'
+    current_bonus_xp = int((u_row['bonus_xp'] if u_row else 0) or 0)
+
+    achievements = []
+    if u_row and u_row['achievements_json']:
+        try:
+            achievements = json.loads(u_row['achievements_json'])
+        except Exception:
+            achievements = []
+    existing_ach_ids = {a['id'] if isinstance(a, dict) else a for a in achievements}
+    new_achievements = []
+    if 'color_architect' not in existing_ach_ids:
+        ach = MISSION_ACHIEVEMENTS_CATALOG['color_architect']
+        achievements.append(ach)
+        new_achievements.append(ach)
+
+    new_bonus_xp = current_bonus_xp + xp_gained_now
+    cursor.execute("UPDATE users SET bonus_xp = ?, achievements_json = ? WHERE id = ?",
+                   (new_bonus_xp, json.dumps(achievements, ensure_ascii=False), user_id))
+
+    cursor.execute("""
+        INSERT INTO lesson_progress (
+            user_id, specialty_slug, task_number, status, quiz_score, quiz_total,
+            draft_code, current_stage, mission_state_json, mission_xp, updated_at
+        ) VALUES (?, ?, ?, 'submitted', 4, 4, ?, 6, ?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(user_id, specialty_slug, task_number) DO UPDATE SET
+            status = 'submitted',
+            quiz_score = 4,
+            draft_code = excluded.draft_code,
+            current_stage = 6,
+            mission_state_json = excluded.mission_state_json,
+            mission_xp = excluded.mission_xp,
+            updated_at = CURRENT_TIMESTAMP
+    """, (
+        user_id, specialty_slug, task_number,
+        json.dumps({"final_palette": clean_palette, "explanation": explanation}, ensure_ascii=False),
+        json.dumps(saved_state, ensure_ascii=False),
+        mission_xp
+    ))
+
+    # Format structured submission for Teacher Review (no fake grade!)
+    submission_payload = {
+        "mission_title": "Архитектор цвета",
+        "project_name": project_name,
+        "harmony_type": harmony_type,
+        "palette": clean_palette,
+        "training_completed": len(training_done),
+        "theory_completed": len(theory_done),
+        "mission_xp": mission_xp,
+        "explanation": explanation
+    }
+    submitted_code_str = json.dumps(submission_payload, ensure_ascii=False, indent=2)
+
+    cursor.execute("SELECT id, title FROM tasks WHERE specialty_slug = ? AND task_number = ?", (specialty_slug, task_number))
+    t_row = cursor.fetchone()
+    task_id = t_row['id'] if t_row else 11
+    task_title = "Миссия 01: Архитектор цвета"
+
+    cursor.execute("""
+        SELECT id FROM task_submissions
+        WHERE user_id = ? AND specialty_slug = ? AND task_number = ?
+    """, (user_id, specialty_slug, task_number))
+    existing_sub = cursor.fetchone()
+
+    status_text = "Отправлено на проверку"
+    grade_letter = "—"
+    initial_score = 0
+
+    if existing_sub:
+        sub_id = existing_sub['id']
+        cursor.execute("""
+            UPDATE task_submissions
+            SET student_name = ?, group_name = ?, task_title = ?, score = ?, grade_letter = ?,
+                status = ?, submitted_code = ?, student_comment = ?, autotest_passed = 4,
+                autotest_total = 4, quiz_score = 3, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """, (
+            student_name, group_name, task_title, initial_score, grade_letter,
+            status_text, submitted_code_str, explanation, sub_id
+        ))
+    else:
+        cursor.execute("""
+            INSERT INTO task_submissions (
+                user_id, student_id, student_name, group_name, task_id, specialty_slug,
+                task_number, task_title, score, grade_letter, status, time_spent_seconds,
+                submitted_code, repo_url, student_comment, autotest_passed, autotest_total, quiz_score
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 900, ?, '', ?, 4, 4, 3)
+        """, (
+            user_id, student_id, student_name, group_name, task_id, specialty_slug,
+            task_number, task_title, initial_score, grade_letter, status_text,
+            submitted_code_str, explanation
+        ))
+        sub_id = cursor.lastrowid
+
+    conn.commit()
+
+    cursor.execute("SELECT score FROM task_submissions WHERE user_id = ? AND score >= 60", (user_id,))
+    graded_xp = sum(int(r['score']) * 3 for r in cursor.fetchall())
+    total_xp = graded_xp + new_bonus_xp
+    level = 1 + (total_xp // 500)
+
+    return jsonify({
+        "success": True,
+        "message": "Палитра и обоснование отправлены преподавателю! Статус: Ожидает проверки.",
+        "submission": {
+            "id": sub_id,
+            "status": status_text,
+            "is_pending_review": True,
+            "score": None,
+            "grade_letter": "—",
+            "student_comment": explanation,
+            "teacher_comment": ""
+        },
+        "xp_gained": xp_gained_now,
+        "mission_xp": mission_xp,
+        "total_xp": total_xp,
+        "level": level,
+        "new_achievements": new_achievements,
+        "achievements": achievements
+    })
 
 
 @app.route('/healthz')

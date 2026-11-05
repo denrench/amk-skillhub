@@ -1,0 +1,2067 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Миссия 01: Архитектор цвета — EDU SPACE Neo</title>
+  <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            neo: {
+              bg: '#080B16',
+              surface: '#11182A',
+              cyan: '#00D9FF',
+              purple: '#8957FF',
+              white: '#F4F7FF',
+              gray: '#8B96AD',
+              success: '#36E6A0'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    :root {
+      --bg-main: #080B16;
+      --bg-surface: #11182A;
+      --accent-cyan: #00D9FF;
+      --accent-purple: #8957FF;
+      --text-white: #F4F7FF;
+      --text-gray: #8B96AD;
+      --status-success: #36E6A0;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-white);
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Sci-Fi Glassmorphism */
+    .neo-glass {
+      background: rgba(17, 24, 42, 0.78);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(0, 217, 255, 0.16);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(244, 247, 255, 0.08);
+    }
+
+    .neo-glass-purple {
+      background: rgba(17, 24, 42, 0.82);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(137, 87, 255, 0.28);
+      box-shadow: 0 20px 50px rgba(137, 87, 255, 0.12), inset 0 1px 0 rgba(244, 247, 255, 0.08);
+    }
+
+    .neo-card {
+      background: linear-gradient(145deg, rgba(17, 24, 42, 0.92), rgba(8, 11, 22, 0.92));
+      border: 1px solid rgba(139, 150, 173, 0.18);
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .neo-card:hover {
+      border-color: rgba(0, 217, 255, 0.42);
+      box-shadow: 0 12px 32px rgba(0, 217, 255, 0.12);
+    }
+
+    .glow-cyan {
+      box-shadow: 0 0 25px rgba(0, 217, 255, 0.35);
+    }
+
+    .glow-purple {
+      box-shadow: 0 0 25px rgba(137, 87, 255, 0.38);
+    }
+
+    .glow-success {
+      box-shadow: 0 0 25px rgba(54, 230, 160, 0.35);
+    }
+
+    /* 3D Orbital Background Elements */
+    .orb-3d {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(2px);
+      pointer-events: none;
+      animation: floatOrb 9s ease-in-out infinite;
+    }
+
+    .orb-cyan {
+      background: radial-gradient(circle at 30% 30%, #F4F7FF, #00D9FF 45%, rgba(0, 217, 255, 0) 75%);
+      box-shadow: 0 0 60px rgba(0, 217, 255, 0.5);
+    }
+
+    .orb-purple {
+      background: radial-gradient(circle at 30% 30%, #F4F7FF, #8957FF 45%, rgba(137, 87, 255, 0) 75%);
+      box-shadow: 0 0 60px rgba(137, 87, 255, 0.5);
+      animation-delay: -3s;
+    }
+
+    .orb-emerald {
+      background: radial-gradient(circle at 30% 30%, #F4F7FF, #36E6A0 45%, rgba(54, 230, 160, 0) 75%);
+      box-shadow: 0 0 60px rgba(54, 230, 160, 0.45);
+      animation-delay: -6s;
+    }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+      50% { transform: translate3d(0, -18px, 0) scale(1.06); }
+    }
+
+    @keyframes pulseRing {
+      0%, 100% { opacity: 0.35; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.04); }
+    }
+
+    .stage-panel {
+      animation: stageFadeIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes stageFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Reduced motion accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    body.reduced-motion *, body.reduced-motion ::before, body.reduced-motion ::after {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #080B16; }
+    ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #00D9FF; }
+  </style>
+</head>
+
+<body class="selection:bg-neo-cyan selection:text-neo-bg">
+
+  <!-- Ambient Sci-Fi Grid & Glows -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-neo-cyan/10 blur-[120px]"></div>
+    <div class="absolute top-1/3 -right-40 w-[28rem] h-[28rem] rounded-full bg-neo-purple/15 blur-[140px]"></div>
+    <div class="absolute -bottom-40 left-1/3 w-96 h-96 rounded-full bg-neo-success/10 blur-[130px]"></div>
+  </div>
+
+  <!-- Top Mission HUD Bar -->
+  <header class="sticky top-0 z-40 neo-glass border-b border-neo-cyan/20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Left: Back & Mission Identity -->
+      <div class="flex items-center gap-3">
+        <a href="tasks.html?specialty=graphic_design" class="px-3 py-2 rounded-xl bg-neo-surface hover:bg-white/10 border border-white/10 text-neo-gray hover:text-neo-white flex items-center gap-1.5 text-xs font-bold transition-colors">
+          <span class="material-symbols-outlined text-[18px] text-neo-cyan">arrow_back</span>
+          <span>К списку миссий</span>
+        </a>
+        <div class="hidden sm:flex items-center gap-2.5 pl-2 border-l border-white/10">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-neo-cyan to-neo-purple flex items-center justify-center shadow-lg">
+            <span class="material-symbols-outlined text-neo-bg font-bold">palette</span>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-neo-cyan/15 text-neo-cyan border border-neo-cyan/30">МИССИЯ 01</span>
+              <span class="text-xs text-neo-gray">Основы дизайна</span>
+            </div>
+            <h1 class="text-sm font-extrabold text-neo-white tracking-tight">Архитектор цвета</h1>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Auto-save status -->
+      <div id="autosave-badge" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neo-surface/90 border border-white/10 text-[11px] text-neo-gray">
+        <span id="autosave-dot" class="w-2 h-2 rounded-full bg-neo-success"></span>
+        <span id="autosave-text">Синхронизировано с PostgreSQL</span>
+      </div>
+
+      <!-- Right: Gamification HUD (Streak, Level, XP, Reduced Motion) -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <div class="px-3 py-1.5 rounded-xl bg-neo-surface border border-amber-400/30 flex items-center gap-1.5 text-xs font-bold text-amber-300" title="Серия дней обучения">
+          <span class="material-symbols-outlined text-[16px]">local_fire_department</span>
+          <span id="hud-streak">1 дн.</span>
+        </div>
+
+        <div class="px-3 py-1.5 rounded-xl bg-neo-surface border border-neo-purple/40 flex items-center gap-2 text-xs">
+          <span class="font-mono font-bold text-neo-purple" id="hud-level">LVL 1</span>
+          <div class="w-16 h-2 rounded-full bg-neo-bg overflow-hidden border border-white/10">
+            <div id="hud-level-bar" class="h-full bg-gradient-to-r from-neo-purple to-neo-cyan transition-all duration-500" style="width: 10%"></div>
+          </div>
+        </div>
+
+        <div class="relative px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-neo-cyan/20 to-neo-purple/20 border border-neo-cyan/40 flex items-center gap-1.5 text-xs font-extrabold text-neo-cyan">
+          <span class="material-symbols-outlined text-[16px]">bolt</span>
+          <span id="hud-mission-xp">0 / 500 XP</span>
+          <div id="xp-float-popup" class="hidden absolute -bottom-9 right-0 px-2.5 py-1 rounded-lg bg-neo-success text-neo-bg font-mono font-extrabold text-xs shadow-lg">
+            +50 XP
+          </div>
+        </div>
+
+        <button type="button" id="btn-reduced-motion" onclick="toggleReducedMotion()" class="p-2 rounded-xl bg-neo-surface hover:bg-white/10 border border-white/10 text-neo-gray hover:text-neo-white text-xs" title="Переключить режим энергосбережения / анимаций">
+          <span class="material-symbols-outlined text-[18px]">motion_photos_off</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- 7-Stage Interactive Progress Stepper -->
+    <div class="bg-neo-bg/80 border-t border-white/5">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 overflow-x-auto">
+        <div class="flex items-center justify-between min-w-[680px] gap-2" id="stage-stepper">
+          <!-- Populated dynamically by JS -->
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Mission Viewport -->
+  <main class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- Notification / Feedback Banner -->
+    <div id="mission-toast" class="hidden fixed bottom-6 right-6 z-50 max-w-md neo-glass border-l-4 border-neo-cyan px-5 py-4 rounded-2xl shadow-2xl flex items-start gap-3">
+      <span id="mission-toast-icon" class="material-symbols-outlined text-neo-cyan text-2xl">info</span>
+      <div class="flex-1">
+        <div id="mission-toast-title" class="font-extrabold text-sm text-neo-white">Системное уведомление</div>
+        <div id="mission-toast-body" class="text-xs text-neo-gray mt-0.5"></div>
+      </div>
+      <button onclick="hideMissionToast()" class="text-neo-gray hover:text-neo-white">
+        <span class="material-symbols-outlined text-sm">close</span>
+      </button>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- ЭТАП 1. ВСТУПЛЕНИЕ (MISSION BRIEFING)                               -->
+    <!-- =================================================================== -->
+    <section id="stage-1" class="stage-panel">
+      <div class="relative rounded-3xl neo-glass overflow-hidden p-8 sm:p-12 border border-neo-cyan/30">
+        <!-- 3D Visual Abstract Objects -->
+        <div class="orb-3d orb-cyan w-36 h-36 top-10 right-16 opacity-80"></div>
+        <div class="orb-3d orb-purple w-44 h-44 bottom-8 right-1/4 opacity-75"></div>
+        <div class="orb-3d orb-emerald w-24 h-24 top-1/2 right-10 opacity-75"></div>
+
+        <div class="relative z-10 max-w-3xl space-y-6">
+          <div class="inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-full bg-neo-surface border border-neo-cyan/40 text-xs font-semibold text-neo-cyan">
+            <span class="material-symbols-outlined text-[16px]">auto_awesome</span>
+            <span>ИНТЕРАКТИВНАЯ МИССИЯ • ОСНОВЫ ДИЗАЙНА</span>
+          </div>
+
+          <h2 class="text-4xl sm:text-6xl font-black tracking-tight text-neo-white leading-none">
+            АРХИТЕКТОР <span class="text-transparent bg-clip-text bg-gradient-to-r from-neo-cyan via-neo-purple to-neo-success">ЦВЕТА</span>
+          </h2>
+
+          <p class="text-base sm:text-lg text-neo-gray leading-relaxed">
+            Добро пожаловать в нейро-лабораторию визуального проектирования <strong class="text-neo-white">EduSpace Neo</strong>.
+            Цвет в цифровых продуктах — это не случайный декор, а точная инженерная система управления вниманием, эмоциями и читаемостью интерфейса. В этой миссии вы освоите геометрию цветового круга, пройдёте 4 тактических испытания, соберёте собственную палитру в Цветовой лаборатории и защитите финальный дизайн-проект перед преподавателем.
+          </p>
+
+          <!-- Mission Specs Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3.5 pt-2">
+            <div class="neo-card p-4 rounded-2xl">
+              <div class="text-[11px] font-mono uppercase text-neo-gray">Уровень сложности</div>
+              <div class="text-base font-extrabold text-neo-cyan mt-1 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px]">signal_cellular_alt</span>
+                <span>Средний (Rank B)</span>
+              </div>
+            </div>
+            <div class="neo-card p-4 rounded-2xl">
+              <div class="text-[11px] font-mono uppercase text-neo-gray">Время прохождения</div>
+              <div class="text-base font-extrabold text-neo-white mt-1 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px] text-neo-purple">schedule</span>
+                <span>~25 минут</span>
+              </div>
+            </div>
+            <div class="neo-card p-4 rounded-2xl">
+              <div class="text-[11px] font-mono uppercase text-neo-gray">Награда миссии</div>
+              <div class="text-base font-extrabold text-neo-success mt-1 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px]">bolt</span>
+                <span>+500 XP + 4 Бейджа</span>
+              </div>
+            </div>
+            <div class="neo-card p-4 rounded-2xl">
+              <div class="text-[11px] font-mono uppercase text-neo-gray">Формат проверки</div>
+              <div class="text-base font-extrabold text-amber-300 mt-1 flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px]">verified_user</span>
+                <span>Оценка куратора</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mission Roadmap Pills -->
+          <div class="p-4 rounded-2xl bg-neo-bg/70 border border-white/10 space-y-2">
+            <div class="text-xs font-bold text-neo-white uppercase tracking-wider">Маршрут выполнения миссии (7 этапов):</div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-neo-gray">
+              <div><strong class="text-neo-cyan">01–02.</strong> Брифинг и 5 интерактивных узлов спектра</div>
+              <div><strong class="text-neo-purple">03–04.</strong> 4 тактических тренажёра и Цветовая лаборатория</div>
+              <div><strong class="text-neo-success">05–07.</strong> Защита палитры UI, рецензия преподавателя и награды</div>
+            </div>
+          </div>
+
+          <div class="pt-3 flex flex-wrap items-center gap-4">
+            <button type="button" id="btn-start-mission" onclick="startMissionStage1()" class="px-8 py-4 rounded-2xl bg-gradient-to-r from-neo-cyan to-neo-purple hover:opacity-95 text-neo-bg font-black text-base tracking-wide glow-cyan flex items-center gap-2.5 transition-transform active:scale-95">
+              <span class="material-symbols-outlined font-bold">rocket_launch</span>
+              <span>Начать миссию (+25 XP)</span>
+            </button>
+            <span class="text-xs text-neo-gray">Весь прогресс автоматически сохраняется в PostgreSQL на каждом этапе.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- ЭТАП 2. ИЗУЧЕНИЕ МАТЕРИАЛА (5 ИНТЕРАКТИВНЫХ БЛОКОВ)                  -->
+    <!-- =================================================================== -->
+    <section id="stage-2" class="stage-panel hidden space-y-6">
+      <div class="neo-glass p-6 rounded-3xl flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono uppercase text-neo-cyan">ЭТАП 02 • ИНТЕРАКТИВНАЯ БАЗА ЗНАНИЙ</span>
+          <h2 class="text-2xl font-black text-neo-white mt-0.5">Геометрия цвета и законы гармонии</h2>
+          <p class="text-xs text-neo-gray mt-1">Взаимодействуйте с каждым из 5 интерактивных модулей ниже, чтобы разблокировать тренировочный полигон (+75 XP).</p>
+        </div>
+        <div class="px-4 py-2.5 rounded-2xl bg-neo-bg border border-neo-cyan/30 text-xs font-bold">
+          Изучено модулей: <span id="theory-progress-count" class="text-neo-cyan font-mono text-sm">0 / 5</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left Column: Interactive SVG Color Wheel & Harmony Visualizer (Cols 5) -->
+        <div class="lg:col-span-5 neo-glass p-6 rounded-3xl flex flex-col items-center justify-between space-y-5">
+          <div class="w-full flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-neo-cyan">Интерактивный спектр 360°</span>
+            <span id="wheel-harmony-badge" class="px-2.5 py-1 rounded-lg bg-neo-purple/20 border border-neo-purple/40 text-neo-white text-[11px] font-mono">Свободный обзор</span>
+          </div>
+
+          <!-- Interactive 12-Sector SVG Color Wheel -->
+          <div class="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center">
+            <svg id="interactive-color-wheel" viewBox="-120 -120 240 240" class="w-full h-full drop-shadow-[0_0_25px_rgba(0,217,255,0.2)]">
+              <!-- Populated by JS with 12 clickable sectors + harmony geometry lines -->
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div id="wheel-center-swatch" class="w-20 h-20 rounded-full border-4 border-neo-bg shadow-xl flex flex-col items-center justify-center text-[10px] font-mono font-bold text-neo-white" style="background:#00D9FF; color:#080B16;">
+                <span id="wheel-center-hex">#00D9FF</span>
+                <span id="wheel-center-deg">190°</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selected Hue Live Telemetry -->
+          <div class="w-full p-4 rounded-2xl bg-neo-bg/90 border border-white/10 space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-neo-gray">Выбранный сектор:</span>
+              <span id="wheel-sector-name" class="font-bold text-neo-white">Циановый (180°–200°)</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-neo-gray">Температура и роль:</span>
+              <span id="wheel-sector-temp" class="font-semibold text-neo-cyan">Холодный • Технологичный акцент</span>
+            </div>
+            <div id="wheel-harmony-swatches" class="pt-2 flex items-center gap-2"></div>
+          </div>
+        </div>
+
+        <!-- Right Column: 5 Interactive Knowledge Blocks (Cols 7) -->
+        <div class="lg:col-span-7 space-y-4">
+
+          <!-- Module 1: Color Wheel -->
+          <div id="theory-card-1" class="neo-card p-5 rounded-2xl border border-white/10 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-neo-cyan/15 text-neo-cyan font-mono font-bold text-xs flex items-center justify-center">01</span>
+                <h3 class="font-extrabold text-sm sm:text-base text-neo-white">Цветовой круг и температура тонов</h3>
+              </div>
+              <span id="theory-status-1" class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-white/5 text-neo-gray">Нажмите на круг или кнопку</span>
+            </div>
+            <p class="text-xs text-neo-gray leading-relaxed">
+              Цветовой круг делит спектр на <strong class="text-neo-white">тёплые тона (0°–150°: красный, оранжевый, жёлтый)</strong> — они визуально приближают элементы и сигнализируют об энергии, и <strong class="text-neo-cyan">холодные тона (160°–290°: циан, синий, фиолетовый)</strong> — они создают ощущение глубины, спокойствия и технологичности.
+            </p>
+            <div class="flex flex-wrap gap-2 pt-1">
+              <button type="button" onclick="interactTheoryModule(1, 'warm')" class="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 text-xs font-bold">
+                🔥 Показать тёплый полюс (30°)
+              </button>
+              <button type="button" onclick="interactTheoryModule(1, 'cold')" class="px-3.5 py-2 rounded-xl bg-neo-cyan/20 hover:bg-neo-cyan/30 border border-neo-cyan/40 text-neo-cyan text-xs font-bold">
+                ❄️ Показать холодный полюс (195°)
+              </button>
+            </div>
+          </div>
+
+          <!-- Module 2: Primary & Secondary Colors -->
+          <div id="theory-card-2" class="neo-card p-5 rounded-2xl border border-white/10 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-neo-purple/20 text-neo-purple font-mono font-bold text-xs flex items-center justify-center">02</span>
+                <h3 class="font-extrabold text-sm sm:text-base text-neo-white">Основные, составные и третичные цвета (Синтезатор)</h3>
+              </div>
+              <span id="theory-status-2" class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-white/5 text-neo-gray">Не изучено</span>
+            </div>
+            <p class="text-xs text-neo-gray leading-relaxed">
+              В цифровых экранах (аддитивная модель RGB) базовыми лучами служат <strong class="text-red-400">Red</strong>, <strong class="text-emerald-400">Green</strong> и <strong class="text-blue-400">Blue</strong>. При их смешении рождаются вторичные неоновые цвета: <strong class="text-neo-cyan">Cyan (#00D9FF)</strong>, <strong class="text-fuchsia-400">Magenta (#FF00CC)</strong> и <strong class="text-yellow-300">Yellow (#FFE600)</strong>.
+            </p>
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+              <button type="button" onclick="mixPrimaryColors('B+G')" class="px-3 py-1.5 rounded-xl bg-neo-surface hover:bg-neo-cyan/20 border border-white/15 text-xs font-bold text-neo-white">
+                Blue + Green = <span class="text-neo-cyan">Cyan</span>
+              </button>
+              <button type="button" onclick="mixPrimaryColors('R+B')" class="px-3 py-1.5 rounded-xl bg-neo-surface hover:bg-neo-purple/20 border border-white/15 text-xs font-bold text-neo-white">
+                Red + Blue = <span class="text-neo-purple">Electric Violet</span>
+              </button>
+              <button type="button" onclick="mixPrimaryColors('R+G')" class="px-3 py-1.5 rounded-xl bg-neo-surface hover:bg-amber-400/20 border border-white/15 text-xs font-bold text-neo-white">
+                Red + Green = <span class="text-amber-300">Solar Amber</span>
+              </button>
+              <span id="mix-result-pill" class="text-xs font-mono text-neo-cyan ml-auto"></span>
+            </div>
+          </div>
+
+          <!-- Module 3: Analogous Harmony -->
+          <div id="theory-card-3" class="neo-card p-5 rounded-2xl border border-white/10 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-neo-cyan/15 text-neo-cyan font-mono font-bold text-xs flex items-center justify-center">03</span>
+                <h3 class="font-extrabold text-sm sm:text-base text-neo-white">Аналоговая гармония (Соседние сектора ±30°)</h3>
+              </div>
+              <span id="theory-status-3" class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-white/5 text-neo-gray">Не изучено</span>
+            </div>
+            <p class="text-xs text-neo-gray leading-relaxed">
+              Использует 3 соседних сектора цветового круга (например: Синий → Циан → Изумрудный). Идеальна для создания мягких градиентов, фоновых подложек и спокойных образовательных интерфейсов без резких раздражителей.
+            </p>
+            <button type="button" onclick="visualizeHarmonyOnWheel('analogous', 3)" class="px-4 py-2 rounded-xl bg-neo-cyan/15 hover:bg-neo-cyan/25 border border-neo-cyan/40 text-neo-cyan text-xs font-bold flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">blur_linear</span>
+              <span>Построить аналоговую дугу на круге</span>
+            </button>
+          </div>
+
+          <!-- Module 4: Complementary Harmony -->
+          <div id="theory-card-4" class="neo-card p-5 rounded-2xl border border-white/10 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-neo-purple/20 text-neo-purple font-mono font-bold text-xs flex items-center justify-center">04</span>
+                <h3 class="font-extrabold text-sm sm:text-base text-neo-white">Комплементарная гармония (Контраст 180°)</h3>
+              </div>
+              <span id="theory-status-4" class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-white/5 text-neo-gray">Не изучено</span>
+            </div>
+            <p class="text-xs text-neo-gray leading-relaxed">
+              Цвета, расположенные строго друг напротив друга (угол 180°). Обеспечивают максимальный динамический контраст — применяется для выделения главных кнопок действия (CTA), индикаторов и ключевых акцентов на спокойном фоне.
+            </p>
+            <button type="button" onclick="visualizeHarmonyOnWheel('complementary', 4)" class="px-4 py-2 rounded-xl bg-neo-purple/20 hover:bg-neo-purple/30 border border-neo-purple/40 text-neo-white text-xs font-bold flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">compare_arrows</span>
+              <span>Построить вектор 180° на круге</span>
+            </button>
+          </div>
+
+          <!-- Module 5: Triadic Harmony -->
+          <div id="theory-card-5" class="neo-card p-5 rounded-2xl border border-white/10 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-neo-success/20 text-neo-success font-mono font-bold text-xs flex items-center justify-center">05</span>
+                <h3 class="font-extrabold text-sm sm:text-base text-neo-white">Триадная гармония (Треугольник 120°)</h3>
+              </div>
+              <span id="theory-status-5" class="text-[11px] font-mono px-2.5 py-1 rounded-md bg-white/5 text-neo-gray">Не изучено</span>
+            </div>
+            <p class="text-xs text-neo-gray leading-relaxed">
+              Три цвета, равноудалённые друг от друга на 120° (равносторонний треугольник). Позволяет одновременно развести в интерфейсе основной бренд-акцент (<code class="text-neo-cyan">#00D9FF</code>), вторичный геймификационный цвет (<code class="text-neo-purple">#8957FF</code>) и статус успеха (<code class="text-neo-success">#36E6A0</code>).
+            </p>
+            <button type="button" onclick="visualizeHarmonyOnWheel('triadic', 5)" class="px-4 py-2 rounded-xl bg-neo-success/20 hover:bg-neo-success/30 border border-neo-success/40 text-neo-success text-xs font-bold flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">change_history</span>
+              <span>Построить триаду 120° на круге</span>
+            </button>
+          </div>
+
+          <!-- Advance to Stage 3 CTA -->
+          <div class="pt-2 flex items-center justify-between gap-4">
+            <button type="button" onclick="goToStage(1)" class="px-4 py-2.5 rounded-xl bg-neo-surface hover:bg-white/10 border border-white/10 text-xs font-bold text-neo-gray">
+              ← Назад к брифингу
+            </button>
+            <button type="button" id="btn-complete-stage-2" onclick="completeStage2Theory()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-neo-cyan to-neo-purple text-neo-bg font-extrabold text-xs sm:text-sm opacity-50 cursor-not-allowed flex items-center gap-2">
+              <span>Перейти к интерактивной тренировке (Этап 3)</span>
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- ЭТАП 3. ИНТЕРАКТИВНАЯ ТРЕНИРОВКА (4 МИНИ-ИСПЫТАНИЯ)                  -->
+    <!-- =================================================================== -->
+    <section id="stage-3" class="stage-panel hidden space-y-6">
+      <div class="neo-glass p-6 rounded-3xl flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono uppercase text-neo-purple">ЭТАП 03 • ТАКТИЧЕСКИЙ ПОЛИГОН</span>
+          <h2 class="text-2xl font-black text-neo-white mt-0.5">Интерактивная тренировка (4 испытания)</h2>
+          <p class="text-xs text-neo-gray mt-1">Каждое испытание требует осмысленного выбора и подтверждения кнопкой проверки. За каждое верное решение начисляется +50 XP.</p>
+        </div>
+        <div class="px-4 py-2.5 rounded-2xl bg-neo-bg border border-neo-purple/40 text-xs font-bold">
+          Выполнено испытаний: <span id="training-progress-count" class="text-neo-purple font-mono text-sm">0 / 4</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- ИСПЫТАНИЕ 1: Определить правильное сочетание цветов -->
+        <div class="neo-glass p-6 rounded-3xl space-y-4 border border-white/10" id="challenge-box-1">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-bold text-neo-cyan">ИСПЫТАНИЕ 3.1 • +50 XP</span>
+            <span id="challenge-badge-1" class="px-2.5 py-0.5 rounded bg-white/5 text-neo-gray text-[11px] font-mono">Ожидает решения</span>
+          </div>
+          <h3 class="text-base font-extrabold text-neo-white">1. Определите правильное сочетание цветов для UI-карточки</h3>
+          <p class="text-xs text-neo-gray">Выберите вариант палитры, который обеспечивает высокую читаемость текста и гармоничный неоновый акцент без визуальной вибрации:</p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="ch1-options">
+            <button type="button" onclick="selectCh1Option('A')" id="ch1-opt-A" class="p-3.5 rounded-2xl border-2 border-white/10 text-left space-y-2 transition-all" style="background:#FF0033; color:#0033FF;">
+              <div class="text-xs font-black">Вариант А</div>
+              <div class="text-[11px] font-mono">#FF0033 + #0033FF</div>
+              <div class="px-2 py-1 rounded text-[10px] font-bold" style="background:#00FF00; color:#FF0033;">Кнопка урока</div>
+            </button>
+
+            <button type="button" onclick="selectCh1Option('B')" id="ch1-opt-B" class="p-3.5 rounded-2xl border-2 border-white/10 text-left space-y-2 transition-all" style="background:#11182A; color:#F4F7FF;">
+              <div class="text-xs font-black">Вариант Б</div>
+              <div class="text-[11px] font-mono text-neo-gray">#11182A + #00D9FF</div>
+              <div class="px-2 py-1 rounded text-[10px] font-bold" style="background:#00D9FF; color:#080B16;">Кнопка урока</div>
+            </button>
+
+            <button type="button" onclick="selectCh1Option('C')" id="ch1-opt-C" class="p-3.5 rounded-2xl border-2 border-white/10 text-left space-y-2 transition-all" style="background:#FFFF99; color:#FFFFFF;">
+              <div class="text-xs font-black" style="color:#E2E8F0;">Вариант В</div>
+              <div class="text-[11px] font-mono" style="color:#CBD5E1;">#FFFF99 + #FFFFFF</div>
+              <div class="px-2 py-1 rounded text-[10px] font-bold" style="background:#FAF089; color:#FFFFFF;">Кнопка урока</div>
+            </button>
+          </div>
+
+          <button type="button" onclick="verifyChallenge1()" class="w-full py-2.5 rounded-xl bg-neo-cyan/20 hover:bg-neo-cyan/30 border border-neo-cyan/40 text-neo-cyan font-bold text-xs">
+            Проверить выбранное сочетание
+          </button>
+          <div id="ch1-feedback" class="hidden p-3.5 rounded-xl text-xs leading-relaxed"></div>
+        </div>
+
+        <!-- ИСПЫТАНИЕ 2: Найти комплементарный цвет -->
+        <div class="neo-glass p-6 rounded-3xl space-y-4 border border-white/10" id="challenge-box-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-bold text-neo-purple">ИСПЫТАНИЕ 3.2 • +50 XP</span>
+            <span id="challenge-badge-2" class="px-2.5 py-0.5 rounded bg-white/5 text-neo-gray text-[11px] font-mono">Ожидает решения</span>
+          </div>
+          <h3 class="text-base font-extrabold text-neo-white">2. Найдите комплементарный цвет (полюс 180°)</h3>
+          <p class="text-xs text-neo-gray">Базовый цвет проекта — <strong class="text-neo-cyan">Неоновый Сине-Голубой (#0088FF, угол 210°)</strong>. Выберите его точный комплементарный партнёр на противоположной стороне круга (угол 30°):</p>
+
+          <div class="flex items-center gap-3 p-3 rounded-2xl bg-neo-bg border border-white/10">
+            <div class="w-12 h-12 rounded-xl border border-white/20 shrink-0" style="background:#0088FF;"></div>
+            <div class="text-xs">
+              <div class="font-bold text-neo-white">Базовый вектор: #0088FF (Hue 210°)</div>
+              <div class="text-neo-gray">Формула комплементарности: (210° + 180°) mod 360° = <strong class="text-amber-300">30°</strong></div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            <button type="button" onclick="selectCh2Option('#00FFAA')" id="ch2-opt-1" class="p-3 rounded-xl border-2 border-white/10 bg-neo-bg text-center space-y-1.5">
+              <div class="w-full h-8 rounded-lg" style="background:#00FFAA;"></div>
+              <div class="font-mono text-[11px] text-neo-white">#00FFAA (160°)</div>
+            </button>
+            <button type="button" onclick="selectCh2Option('#FF8800')" id="ch2-opt-2" class="p-3 rounded-xl border-2 border-white/10 bg-neo-bg text-center space-y-1.5">
+              <div class="w-full h-8 rounded-lg" style="background:#FF8800;"></div>
+              <div class="font-mono text-[11px] text-neo-white">#FF8800 (30°)</div>
+            </button>
+            <button type="button" onclick="selectCh2Option('#8957FF')" id="ch2-opt-3" class="p-3 rounded-xl border-2 border-white/10 bg-neo-bg text-center space-y-1.5">
+              <div class="w-full h-8 rounded-lg" style="background:#8957FF;"></div>
+              <div class="font-mono text-[11px] text-neo-white">#8957FF (258°)</div>
+            </button>
+            <button type="button" onclick="selectCh2Option('#002266')" id="ch2-opt-4" class="p-3 rounded-xl border-2 border-white/10 bg-neo-bg text-center space-y-1.5">
+              <div class="w-full h-8 rounded-lg" style="background:#002266;"></div>
+              <div class="font-mono text-[11px] text-neo-white">#002266 (215°)</div>
+            </button>
+          </div>
+
+          <button type="button" onclick="verifyChallenge2()" class="w-full py-2.5 rounded-xl bg-neo-purple/20 hover:bg-neo-purple/30 border border-neo-purple/40 text-neo-white font-bold text-xs">
+            Подтвердить комплементарную пару
+          </button>
+          <div id="ch2-feedback" class="hidden p-3.5 rounded-xl text-xs leading-relaxed"></div>
+        </div>
+
+        <!-- ИСПЫТАНИЕ 3: Соединить понятия с определениями -->
+        <div class="neo-glass p-6 rounded-3xl space-y-4 border border-white/10" id="challenge-box-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-bold text-neo-cyan">ИСПЫТАНИЕ 3.3 • +50 XP</span>
+            <span id="challenge-badge-3" class="px-2.5 py-0.5 rounded bg-white/5 text-neo-gray text-[11px] font-mono">Ожидает решения</span>
+          </div>
+          <h3 class="text-base font-extrabold text-neo-white">3. Соедините понятия с правильными определениями</h3>
+          <p class="text-xs text-neo-gray">Для каждого типа цветовой схемы выберите точное геометрическое правило:</p>
+
+          <div class="space-y-2.5 text-xs">
+            <div class="p-3 rounded-xl bg-neo-bg border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <span class="font-bold text-neo-cyan">1. Аналоговая гармония</span>
+              <select id="ch3-match-1" class="px-3 py-1.5 rounded-lg bg-neo-surface border border-white/15 text-neo-white text-xs">
+                <option value="">— Выберите определение —</option>
+                <option value="adj">Соседние цвета спектра (шаг ±30°)</option>
+                <option value="opp">Противоположные цвета (угол 180°)</option>
+                <option value="tri">Три равноудалённых цвета (угол 120°)</option>
+                <option value="mono">Оттенки и светлота одного базового тона</option>
+              </select>
+            </div>
+
+            <div class="p-3 rounded-xl bg-neo-bg border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <span class="font-bold text-neo-purple">2. Комплементарная схема</span>
+              <select id="ch3-match-2" class="px-3 py-1.5 rounded-lg bg-neo-surface border border-white/15 text-neo-white text-xs">
+                <option value="">— Выберите определение —</option>
+                <option value="adj">Соседние цвета спектра (шаг ±30°)</option>
+                <option value="opp">Противоположные цвета (угол 180°)</option>
+                <option value="tri">Три равноудалённых цвета (угол 120°)</option>
+                <option value="mono">Оттенки и светлота одного базового тона</option>
+              </select>
+            </div>
+
+            <div class="p-3 rounded-xl bg-neo-bg border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <span class="font-bold text-neo-success">3. Триадная гармония</span>
+              <select id="ch3-match-3" class="px-3 py-1.5 rounded-lg bg-neo-surface border border-white/15 text-neo-white text-xs">
+                <option value="">— Выберите определение —</option>
+                <option value="adj">Соседние цвета спектра (шаг ±30°)</option>
+                <option value="opp">Противоположные цвета (угол 180°)</option>
+                <option value="tri">Три равноудалённых цвета (угол 120°)</option>
+                <option value="mono">Оттенки и светлота одного базового тона</option>
+              </select>
+            </div>
+
+            <div class="p-3 rounded-xl bg-neo-bg border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <span class="font-bold text-amber-300">4. Монохромная гамма</span>
+              <select id="ch3-match-4" class="px-3 py-1.5 rounded-lg bg-neo-surface border border-white/15 text-neo-white text-xs">
+                <option value="">— Выберите определение —</option>
+                <option value="adj">Соседние цвета спектра (шаг ±30°)</option>
+                <option value="opp">Противоположные цвета (угол 180°)</option>
+                <option value="tri">Три равноудалённых цвета (угол 120°)</option>
+                <option value="mono">Оттенки и светлота одного базового тона</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="button" onclick="verifyChallenge3()" class="w-full py-2.5 rounded-xl bg-neo-cyan/20 hover:bg-neo-cyan/30 border border-neo-cyan/40 text-neo-cyan font-bold text-xs">
+            Проверить таблицу соответствий
+          </button>
+          <div id="ch3-feedback" class="hidden p-3.5 rounded-xl text-xs leading-relaxed"></div>
+        </div>
+
+        <!-- ИСПЫТАНИЕ 4: Перетащить цветовые элементы в подходящие категории -->
+        <div class="neo-glass p-6 rounded-3xl space-y-4 border border-white/10" id="challenge-box-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-bold text-neo-success">ИСПЫТАНИЕ 3.4 • +50 XP</span>
+            <span id="challenge-badge-4" class="px-2.5 py-0.5 rounded bg-white/5 text-neo-gray text-[11px] font-mono">Ожидает решения</span>
+          </div>
+          <h3 class="text-base font-extrabold text-neo-white">4. Распределите цветовые токены по категориям дизайн-системы</h3>
+          <p class="text-xs text-neo-gray">Перетащите цветовые чипы мышью (или нажмите на чип, а затем на нужную категорию на мобильном экране):</p>
+
+          <!-- Unassigned Chips Pool -->
+          <div id="ch4-pool" class="p-3 rounded-2xl bg-neo-bg/80 border border-dashed border-white/20 min-h-[54px] flex flex-wrap gap-2">
+            <!-- Rendered by JS -->
+          </div>
+
+          <!-- 3 Target Drop Zones -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+            <div onclick="handleZoneClick('surface')" ondragover="event.preventDefault()" ondrop="handleChipDrop(event, 'surface')" class="p-3 rounded-2xl bg-neo-bg border border-white/15 hover:border-neo-cyan cursor-pointer min-h-[96px] flex flex-col justify-between">
+              <div class="font-bold text-neo-gray text-[11px] uppercase">1. Базовые тёмные фоны (Surface)</div>
+              <div id="zone-surface" class="flex flex-wrap gap-1.5 mt-2"></div>
+            </div>
+
+            <div onclick="handleZoneClick('accent')" ondragover="event.preventDefault()" ondrop="handleChipDrop(event, 'accent')" class="p-3 rounded-2xl bg-neo-bg border border-white/15 hover:border-neo-purple cursor-pointer min-h-[96px] flex flex-col justify-between">
+              <div class="font-bold text-neo-purple text-[11px] uppercase">2. Неоновые акценты (Brand)</div>
+              <div id="zone-accent" class="flex flex-wrap gap-1.5 mt-2"></div>
+            </div>
+
+            <div onclick="handleZoneClick('semantic')" ondragover="event.preventDefault()" ondrop="handleChipDrop(event, 'semantic')" class="p-3 rounded-2xl bg-neo-bg border border-white/15 hover:border-neo-success cursor-pointer min-h-[96px] flex flex-col justify-between">
+              <div class="font-bold text-neo-success text-[11px] uppercase">3. Семантика статуса (Status)</div>
+              <div id="zone-semantic" class="flex flex-wrap gap-1.5 mt-2"></div>
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button type="button" onclick="resetChallenge4Chips()" class="px-3 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-neo-gray text-xs font-bold">
+              Сбросить
+            </button>
+            <button type="button" onclick="verifyChallenge4()" class="flex-1 py-2.5 rounded-xl bg-neo-success/20 hover:bg-neo-success/30 border border-neo-success/40 text-neo-success font-bold text-xs">
+              Проверить распределение категорий
+            </button>
+          </div>
+          <div id="ch4-feedback" class="hidden p-3.5 rounded-xl text-xs leading-relaxed"></div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <button type="button" onclick="goToStage(2)" class="px-4 py-2.5 rounded-xl bg-neo-surface hover:bg-white/10 border border-white/10 text-xs font-bold text-neo-gray">
+          ← Назад к теории
+        </button>
+        <button type="button" id="btn-complete-stage-3" onclick="goToStage(4)" class="px-6 py-3 rounded-xl bg-gradient-to-r from-neo-purple to-neo-cyan text-neo-bg font-extrabold text-xs sm:text-sm opacity-50 cursor-not-allowed flex items-center gap-2">
+          <span>Открыть Цветовую лабораторию (Этап 4)</span>
+          <span class="material-symbols-outlined text-[18px]">science</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- ЭТАП 4. ЦВЕТОВАЯ ЛАБОРАТОРИЯ (CREATIVE COLOR LAB)                    -->
+    <!-- =================================================================== -->
+    <section id="stage-4" class="stage-panel hidden space-y-6">
+      <div class="neo-glass p-6 rounded-3xl flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-mono uppercase text-neo-cyan">ЭТАП 04 • ТВОРЧЕСКАЯ ЛАБОРАТОРИЯ (+100 XP)</span>
+          <h2 class="text-2xl font-black text-neo-white mt-0.5">Цветовая лаборатория: Сборка собственной палитры</h2>
+          <p class="text-xs text-neo-gray mt-1">Экспериментируйте с оттенками, меняйте HEX-коды, добавляйте или удаляйте цвета и проверяйте контрастность на живом макете.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button type="button" onclick="applyLabPreset('cyber')" class="px-3 py-2 rounded-xl bg-neo-surface hover:bg-neo-cyan/20 border border-neo-cyan/30 text-xs font-bold text-neo-cyan">
+            ⚡ Генератор: Cyber Neon
+          </button>
+          <button type="button" onclick="applyLabPreset('aurora')" class="px-3 py-2 rounded-xl bg-neo-surface hover:bg-neo-purple/20 border border-neo-purple/30 text-xs font-bold text-neo-purple">
+            🌌 Генератор: Aurora Triad
+          </button>
+          <button type="button" onclick="addLabColorSlot()" class="px-3 py-2 rounded-xl bg-neo-success/20 hover:bg-neo-success/30 border border-neo-success/40 text-xs font-bold text-neo-success">
+            + Добавить цвет
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left: Interactive Palette Slots & HSL/HEX Controls (Cols 7) -->
+        <div class="lg:col-span-7 neo-glass p-6 rounded-3xl space-y-5">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-extrabold uppercase tracking-wider text-neo-white">Рабочие слоты палитры (от 3 до 6 цветов)</h3>
+            <span id="lab-slot-count" class="text-xs font-mono text-neo-cyan">5 цветов</span>
+          </div>
+
+          <!-- Palette Swatches Cards -->
+          <div id="lab-palette-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Active Slot Fine-Tuning Sliders -->
+          <div class="p-4 rounded-2xl bg-neo-bg/90 border border-white/10 space-y-3">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-neo-white">Точная настройка выбранного слота: <span id="lab-active-slot-label" class="text-neo-cyan font-mono">#1</span></span>
+              <input type="color" id="lab-native-picker" oninput="updateActiveSlotFromPicker(this.value)" class="w-8 h-8 rounded cursor-pointer bg-transparent border-0" />
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div>
+                <label class="text-neo-gray flex justify-between"><span>Тон (Hue)</span><span id="lbl-hue" class="font-mono text-neo-white">190°</span></label>
+                <input type="range" id="slider-hue" min="0" max="360" value="190" oninput="updateSlotFromHSL()" class="w-full accent-neo-cyan mt-1" />
+              </div>
+              <div>
+                <label class="text-neo-gray flex justify-between"><span>Насыщенность</span><span id="lbl-sat" class="font-mono text-neo-white">100%</span></label>
+                <input type="range" id="slider-sat" min="0" max="100" value="100" oninput="updateSlotFromHSL()" class="w-full accent-neo-purple mt-1" />
+              </div>
+              <div>
+                <label class="text-neo-gray flex justify-between"><span>Светлота</span><span id="lbl-light" class="font-mono text-neo-white">50%</span></label>
+                <input type="range" id="slider-light" min="4" max="96" value="50" oninput="updateSlotFromHSL()" class="w-full accent-neo-success mt-1" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Evaluation Criteria Checklist -->
+          <div class="p-4 rounded-2xl bg-neo-bg/70 border border-white/10 space-y-2">
+            <div class="text-xs font-extrabold uppercase text-neo-white">Критерии оценки лабораторной палитры:</div>
+            <div id="lab-criteria-list" class="space-y-1.5 text-xs">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Live Visual UI Mockup Preview & Contrast Telemetry (Cols 5) -->
+        <div class="lg:col-span-5 neo-glass p-6 rounded-3xl flex flex-col justify-between space-y-5">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-neo-cyan">Живой предпросмотр сочетания</span>
+              <span id="lab-contrast-badge" class="px-2.5 py-1 rounded-lg bg-neo-success/20 text-neo-success font-mono text-xs font-bold">Контраст: 12.4 : 1 (AAA)</span>
+            </div>
+
+            <!-- Live Preview Card rendered with Student's Palette -->
+            <div id="lab-live-mockup" class="p-6 rounded-2xl border transition-all space-y-4" style="background:#080B16; border-color:#00D9FF44;">
+              <div id="lab-live-surface" class="p-5 rounded-xl space-y-3 border border-white/10" style="background:#11182A;">
+                <div class="flex items-center justify-between">
+                  <span id="lab-live-badge" class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold uppercase" style="background:#8957FF33; color:#8957FF;">МОДУЛЬ КОЛОРИСТИКИ</span>
+                  <span id="lab-live-status" class="text-xs font-bold" style="color:#36E6A0;">● Активен</span>
+                </div>
+                <h4 id="lab-live-title" class="text-lg font-black" style="color:#F4F7FF;">Предпросмотр вашей палитры в реальном UI</h4>
+                <p class="text-xs leading-relaxed" style="color:#8B96AD;">
+                  Так ваша цветовая схема выглядит в реальном образовательном интерфейсе. Обратите внимание на баланс тёмной подложки и ярких акцентов.
+                </p>
+                <div class="pt-2 flex flex-wrap gap-2.5">
+                  <button type="button" id="lab-live-cta" class="px-4 py-2 rounded-xl font-extrabold text-xs" style="background:#00D9FF; color:#080B16;">
+                    Главное действие (Primary)
+                  </button>
+                  <button type="button" id="lab-live-sec" class="px-4 py-2 rounded-xl font-bold text-xs border" style="border-color:#8957FF; color:#F4F7FF;">
+                    Вторичная кнопка
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <button type="button" onclick="saveLabPaletteAndContinue()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-neo-cyan to-neo-success text-neo-bg font-black text-sm glow-cyan flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined">save</span>
+              <span>Сохранить палитру в PostgreSQL и перейти к Финалу (+100 XP)</span>
+            </button>
+            <button type="button" onclick="goToStage(3)" class="w-full py-2.5 rounded-xl bg-neo-surface hover:bg-white/10 text-xs font-bold text-neo-gray">
+              ← Вернуться к тренировке (Этап 3)
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- ЭТАП 5. ФИНАЛЬНОЕ ИСПЫТАНИЕ (PROJECT SUBMISSION)                     -->
+    <!-- =================================================================== -->
+    <section id="stage-5" class="stage-panel hidden space-y-6">
+      <div class="neo-glass-purple p-6 sm:p-8 rounded-3xl space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
+          <div>
+            <span class="text-xs font-mono uppercase text-neo-cyan">ЭТАП 05 • ФИНАЛЬНОЕ ПРОЕКТНОЕ ЗАДАНИЕ (+100 XP)</span>
+            <h2 class="text-2xl sm:text-3xl font-black text-neo-white mt-1">Дизайн-код для образовательного приложения «EduSpace Mobile»</h2>
+            <p class="text-xs sm:text-sm text-neo-gray mt-1">
+              Утвердите вашу итоговую гармоничную палитру, напишите короткое профессиональное обоснование выбора цветов и отправьте работу преподавателю на проверку.
+            </p>
+          </div>
+          <span class="px-3.5 py-1.5 rounded-xl bg-neo-purple/20 border border-neo-purple/40 text-xs font-mono font-bold text-neo-white">
+            Куратор: Сейдахметова А. К.
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Left: Final Palette Summary & Harmony Selector (Cols 5) -->
+          <div class="lg:col-span-5 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase text-neo-white">Итоговая палитра проекта:</span>
+              <button type="button" onclick="goToStage(4)" class="text-xs text-neo-cyan hover:underline font-semibold">
+                Изменить в лаборатории →
+              </button>
+            </div>
+
+            <div id="final-palette-preview" class="space-y-2.5">
+              <!-- Populated by JS from labPalette -->
+            </div>
+
+            <div class="pt-2">
+              <label class="block text-xs font-bold text-neo-gray mb-1.5">Использованная схема гармонии:</label>
+              <select id="final-harmony-type" onchange="scheduleAutoSaveDraft()" class="w-full px-3.5 py-2.5 rounded-xl bg-neo-bg border border-white/15 text-neo-white text-xs font-semibold">
+                <option value="Триадная неоновая гармония (120°)">Триадная неоновая гармония (120°)</option>
+                <option value="Комплементарный высокий контраст (180°)">Комплементарный высокий контраст (180°)</option>
+                <option value="Аналоговая технологичная гамма (±30°)">Аналоговая технологичная гамма (±30°)</option>
+                <option value="Авторская смешанная схема (Dark UI)">Авторская смешанная схема (Dark UI)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Right: Student Design Explanation & Submit to Teacher (Cols 7) -->
+          <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+              <label for="final-explanation" class="block text-sm font-extrabold text-neo-white">
+                Объяснение вашего цветового решения для преподавателя:
+              </label>
+              <p class="text-xs text-neo-gray">
+                Опишите, какой цвет выбран для фона и карточек, какие цвета отвечают за акценты (CTA) и почему ваша палитра комфортна для длительного обучения студента:
+              </p>
+              <textarea
+                id="final-explanation"
+                rows="6"
+                oninput="scheduleAutoSaveDraft()"
+                placeholder="Например: Для базового фона я выбрал глубокий тёмно-синий оттенок #080B16 и поверхность #11182A, чтобы снизить нагрузку на зрение в вечернее время. В качестве главного акцента использован неоновый циан #00D9FF (высокий контраст AAA), а для геймификации и XP — фиолетовый #8957FF..."
+                class="w-full p-4 rounded-2xl bg-neo-bg border border-white/15 focus:border-neo-cyan focus:outline-none text-sm text-neo-white leading-relaxed"
+              ></textarea>
+              <div class="flex justify-between text-[11px] text-neo-gray">
+                <span>Минимум 15 символов • Автосохранение черновика активно</span>
+                <span id="explanation-char-count" class="font-mono">0 симв.</span>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-neo-bg/80 border border-neo-cyan/25 text-xs text-neo-gray flex items-start gap-3">
+              <span class="material-symbols-outlined text-neo-cyan text-xl shrink-0">verified</span>
+              <div>
+                <strong class="text-neo-white">Честная академическая проверка:</strong> после нажатия кнопки ваша палитра и объяснение сохраняются в таблице <code class="text-neo-cyan">task_submissions</code> PostgreSQL. Работа получит статус <em>«Отправлено на проверку»</em> до тех пор, пока преподаватель не выставит реальную оценку в своём кабинете.
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <button type="button" onclick="goToStage(4)" class="px-4 py-3 rounded-xl bg-neo-surface hover:bg-white/10 text-xs font-bold text-neo-gray">
+                ← Назад в лабораторию
+              </button>
+              <button type="button" id="btn-submit-mission" onclick="submitFinalMissionToTeacher()" class="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-neo-cyan via-neo-purple to-neo-success text-neo-bg font-black text-sm glow-cyan flex items-center gap-2">
+                <span class="material-symbols-outlined">send</span>
+                <span>Отправить работу преподавателю (+100 XP)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- ЭТАП 6. ПРОВЕРКА РЕЗУЛЬТАТА (VERIFICATION & TEACHER REVIEW STATUS)    -->
+    <!-- =================================================================== -->
+    <section id="stage-6" class="stage-panel hidden space-y-6">
+      <div class="neo-glass p-8 rounded-3xl space-y-6 border border-neo-cyan/30">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-mono uppercase text-neo-cyan">ЭТАП 06 • СТАТУС ПРОВЕРКИ РАБОТЫ</span>
+            <h2 class="text-2xl sm:text-3xl font-black text-neo-white mt-1">Отчёт об отправке проекта преподавателю</h2>
+          </div>
+          <div id="stage6-status-pill" class="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 font-extrabold text-xs flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">hourglass_top</span>
+            <span id="stage6-status-text">Ожидает проверки преподавателем</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Submitted Palette & Explanation -->
+          <div class="lg:col-span-7 p-6 rounded-2xl bg-neo-bg/90 border border-white/10 space-y-4">
+            <div class="text-xs font-bold uppercase text-neo-gray">Отправленная цветовая палитра (сохранена в PostgreSQL):</div>
+            <div id="stage6-palette-swatches" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5"></div>
+
+            <div class="pt-2">
+              <div class="text-xs font-bold uppercase text-neo-gray mb-1">Ваше обоснование проекта:</div>
+              <div id="stage6-student-explanation" class="p-4 rounded-xl bg-neo-surface border border-white/10 text-xs text-neo-white leading-relaxed"></div>
+            </div>
+          </div>
+
+          <!-- Teacher Grade & Comment Card -->
+          <div class="lg:col-span-5 p-6 rounded-2xl bg-neo-bg/90 border border-white/10 flex flex-col justify-between space-y-4">
+            <div class="space-y-3">
+              <div class="text-xs font-bold uppercase text-neo-gray">Рецензия и академическая оценка куратора:</div>
+              <div id="stage6-grade-box" class="p-5 rounded-2xl bg-neo-surface border border-white/10 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-neo-gray">Академический балл:</span>
+                  <span id="stage6-score-val" class="text-xl font-black text-amber-300 font-mono">Ожидает проверки</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span class="text-xs text-neo-gray">Буквенный грейд:</span>
+                  <span id="stage6-letter-val" class="text-sm font-bold text-neo-white font-mono">—</span>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-neo-surface/70 border border-white/10 space-y-1">
+                <div class="text-xs font-bold text-neo-cyan">Комментарий преподавателя:</div>
+                <p id="stage6-teacher-comment" class="text-xs text-neo-gray leading-relaxed">
+                  Работа передана в электронную ведомость кафедры дизайна. Как только преподаватель проверит вашу палитру в кабинете куратора, здесь появятся оценка и разбор.
+                </p>
+              </div>
+            </div>
+
+            <div class="space-y-2.5 pt-2">
+              <button type="button" onclick="refreshMissionFromServer(true)" class="w-full py-2.5 rounded-xl bg-neo-surface hover:bg-white/10 border border-neo-cyan/30 text-neo-cyan font-bold text-xs flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px]">refresh</span>
+                <span>Проверить обновление оценки с сервера</span>
+              </button>
+              <button type="button" onclick="goToStage(7)" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-neo-cyan to-neo-success text-neo-bg font-black text-sm glow-success flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">emoji_events</span>
+                <span>Перейти к финальному экрану наград (Этап 7)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- ЭТАП 7. ЗАВЕРШЕНИЕ МИССИИ (MISSION DEBRIEF & REWARDS)                 -->
+    <!-- =================================================================== -->
+    <section id="stage-7" class="stage-panel hidden space-y-6">
+      <div class="relative neo-glass p-8 sm:p-12 rounded-3xl border border-neo-success/40 overflow-hidden">
+        <div class="orb-3d orb-emerald w-48 h-48 -top-10 right-12 opacity-70"></div>
+        <div class="orb-3d orb-purple w-40 h-40 bottom-4 right-1/3 opacity-60"></div>
+
+        <div class="relative z-10 space-y-8">
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="space-y-2">
+              <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neo-success/20 border border-neo-success/40 text-neo-success text-xs font-extrabold">
+                <span class="material-symbols-outlined text-[16px]">verified</span>
+                <span>МИССИЯ 01 УСПЕШНО ЗАВЕРШЕНА</span>
+              </div>
+              <h2 class="text-3xl sm:text-5xl font-black text-neo-white">Поздравляем, Архитектор цвета!</h2>
+              <p class="text-sm text-neo-gray max-w-2xl">
+                Вы прошли все интерактивные модули спектра, выполнили 4 тренировочных испытания, собрали рабочую палитру в Цветовой лаборатории и защитили дизайн-проект.
+              </p>
+            </div>
+
+            <div class="p-5 rounded-3xl bg-neo-bg/90 border border-neo-cyan/40 text-center min-w-[180px] glow-cyan">
+              <div class="text-xs font-mono uppercase text-neo-gray">Заработано в миссии</div>
+              <div id="stage7-xp-earned" class="text-3xl font-black text-neo-cyan font-mono mt-1">+500 XP</div>
+              <div id="stage7-level-label" class="text-xs font-bold text-neo-purple mt-1">Уровень 2 • Опыт синхронизирован</div>
+            </div>
+          </div>
+
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="neo-card p-5 rounded-2xl space-y-1">
+              <div class="text-xs text-neo-gray">Статус академической проверки</div>
+              <div id="stage7-academic-status" class="text-lg font-extrabold text-amber-300">Ожидает проверки</div>
+              <div id="stage7-academic-sub" class="text-xs text-neo-gray">Оценка появится сразу после рецензии преподавателя</div>
+            </div>
+
+            <div class="neo-card p-5 rounded-2xl space-y-1">
+              <div class="text-xs text-neo-gray">Комментарий преподавателя</div>
+              <div id="stage7-teacher-feedback" class="text-xs font-semibold text-neo-white leading-relaxed">
+                Ожидает проверки преподавателем кафедры графического дизайна.
+              </div>
+            </div>
+
+            <div class="neo-card p-5 rounded-2xl space-y-1">
+              <div class="text-xs text-neo-gray">Следующая миссия по расписанию</div>
+              <div class="text-base font-extrabold text-neo-cyan">Миссия 02: Типографика и Сетки</div>
+              <div class="text-xs text-neo-gray">Доступна в каталоге заданий курса</div>
+            </div>
+          </div>
+
+          <!-- Earned Achievements Grid -->
+          <div class="space-y-3">
+            <h3 class="text-sm font-extrabold uppercase tracking-wider text-neo-white">Разблокированные достижения (сохранены на сервере):</h3>
+            <div id="stage7-achievements-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <div class="pt-4 flex flex-wrap items-center gap-3">
+            <a href="student.html" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-neo-cyan to-neo-purple text-neo-bg font-black text-xs sm:text-sm flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">dashboard</span>
+              <span>Вернуться в кабинет студента</span>
+            </a>
+            <a href="tasks.html?specialty=graphic_design" class="px-5 py-3.5 rounded-2xl bg-neo-surface hover:bg-white/10 border border-white/15 text-neo-white font-bold text-xs sm:text-sm">
+              Открыть карту миссий курса
+            </a>
+            <button type="button" onclick="goToStage(5)" class="px-4 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 text-neo-gray font-bold text-xs">
+              Редактировать отправленную палитру
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // =========================================================================
+    // MISSION STATE & GAMIFICATION ENGINE (POSTGRESQL BACKED)
+    // =========================================================================
+    const STAGE_META = [
+      { num: 1, title: 'Вступление', icon: 'rocket_launch' },
+      { num: 2, title: 'Изучение', icon: 'auto_stories' },
+      { num: 3, title: 'Тренировка', icon: 'sports_esports' },
+      { num: 4, title: 'Лаборатория', icon: 'science' },
+      { num: 5, title: 'Финал', icon: 'architecture' },
+      { num: 6, title: 'Проверка', icon: 'fact_check' },
+      { num: 7, title: 'Награды', icon: 'emoji_events' }
+    ];
+
+    const WHEEL_SECTORS = [
+      { deg: 0, hex: '#FF2A55', name: 'Алый неон (0°)', temp: 'Тёплый • Энергия и внимание' },
+      { deg: 30, hex: '#FF7A00', name: 'Солнечный оранж (30°)', temp: 'Тёплый • Динамический акцент' },
+      { deg: 60, hex: '#FFD600', name: 'Кибер-жёлтый (60°)', temp: 'Тёплый • Сигнал и фокус' },
+      { deg: 90, hex: '#9EFF00', name: 'Лаймовый спектр (90°)', temp: 'Тёпло-нейтральный • Рост' },
+      { deg: 120, hex: '#00E676', name: 'Изумрудный импульс (120°)', temp: 'Нейтральный • Баланс и успех' },
+      { deg: 150, hex: '#36E6A0', name: 'Мятный неон (150°)', temp: 'Холодный • Статус чистоты' },
+      { deg: 180, hex: '#00D9FF', name: 'Кибер-циан (180°)', temp: 'Холодный • Интеллект и технологии' },
+      { deg: 210, hex: '#0088FF', name: 'Глубокий лазурный (210°)', temp: 'Холодный • Надёжность и глубина' },
+      { deg: 240, hex: '#3B4BFF', name: 'Ультрамарин (240°)', temp: 'Холодный • Фундаментальность' },
+      { deg: 270, hex: '#8957FF', name: 'Галактический фиолет (270°)', temp: 'Холодный • Креатив и геймификация' },
+      { deg: 300, hex: '#D946EF', name: 'Пурпурный плазменный (300°)', temp: 'Холодно-тёплый • Инновации' },
+      { deg: 330, hex: '#FF2E93', name: 'Маджента (330°)', temp: 'Тёплый • Эмоциональный пик' }
+    ];
+
+    const CH4_INITIAL_CHIPS = [
+      { id: 'c1', hex: '#080B16', label: '#080B16 Deep Void', category: 'surface' },
+      { id: 'c2', hex: '#11182A', label: '#11182A Glass Surface', category: 'surface' },
+      { id: 'c3', hex: '#00D9FF', label: '#00D9FF Cyber Cyan', category: 'accent' },
+      { id: 'c4', hex: '#8957FF', label: '#8957FF Neon Purple', category: 'accent' },
+      { id: 'c5', hex: '#36E6A0', label: '#36E6A0 Matrix Mint', category: 'semantic' },
+      { id: 'c6', hex: '#FFB020', label: '#FFB020 Solar Warning', category: 'semantic' }
+    ];
+
+    let missionState = {
+      currentStage: 1,
+      maxAllowedStage: 2,
+      missionXp: 0,
+      totalXp: 0,
+      level: 1,
+      streakDays: 1,
+      theoryCompleted: [],
+      trainingCompleted: [],
+      awardedEvents: [],
+      achievements: [],
+      labPalette: [
+        { hex: '#080B16', role: 'Background (Основной фон)' },
+        { hex: '#11182A', role: 'Surface (Карточки и панели)' },
+        { hex: '#00D9FF', role: 'Primary Accent (Главный акцент)' },
+        { hex: '#8957FF', role: 'Secondary Accent (Геймификация)' },
+        { hex: '#36E6A0', role: 'Success (Статус успеха)' }
+      ],
+      finalExplanation: '',
+      harmonyType: 'Триадная неоновая гармония (120°)',
+      submission: null
+    };
+
+    let selectedCh1 = null;
+    let selectedCh2 = null;
+    let ch4Placements = {}; // chipId -> 'pool' | 'surface' | 'accent' | 'semantic'
+    let selectedChipForTap = null;
+    let activeLabSlotIndex = 2;
+    let draftSaveTimer = null;
+
+    function getCurrentUserId() {
+      try {
+        const raw = localStorage.getItem('eduspace_user');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.id) return parsed.id;
+        }
+      } catch (e) {}
+      const params = new URLSearchParams(window.location.search);
+      return Number(params.get('user_id') || 2);
+    }
+
+    function showMissionToast(title, body, type = 'info') {
+      const toast = document.getElementById('mission-toast');
+      const icon = document.getElementById('mission-toast-icon');
+      document.getElementById('mission-toast-title').textContent = title;
+      document.getElementById('mission-toast-body').textContent = body;
+      toast.classList.remove('hidden', 'border-neo-cyan', 'border-neo-success', 'border-red-400');
+      if (type === 'success') {
+        toast.classList.add('border-neo-success');
+        icon.textContent = 'check_circle';
+        icon.className = 'material-symbols-outlined text-neo-success text-2xl';
+      } else if (type === 'error') {
+        toast.classList.add('border-red-400');
+        icon.textContent = 'warning';
+        icon.className = 'material-symbols-outlined text-red-400 text-2xl';
+      } else {
+        toast.classList.add('border-neo-cyan');
+        icon.textContent = 'bolt';
+        icon.className = 'material-symbols-outlined text-neo-cyan text-2xl';
+      }
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(hideMissionToast, 4500);
+    }
+
+    function hideMissionToast() {
+      document.getElementById('mission-toast').classList.add('hidden');
+    }
+
+    function toggleReducedMotion() {
+      document.body.classList.toggle('reduced-motion');
+      const isReduced = document.body.classList.contains('reduced-motion');
+      showMissionToast(
+        isReduced ? 'Режим экономии ресурсов включён' : 'Плавные анимации включены',
+        isReduced ? 'Интенсивные анимации отключены для повышения производительности.' : 'Все визуальные эффекты активны.'
+      );
+    }
+
+    function computeMaxAllowedStage() {
+      let maxSt = 2;
+      if (missionState.theoryCompleted.length >= 5) maxSt = 3;
+      if (missionState.theoryCompleted.length >= 5 && missionState.trainingCompleted.length >= 4) maxSt = 4;
+      if (missionState.theoryCompleted.length >= 5 && missionState.trainingCompleted.length >= 4 && missionState.labPalette.length >= 3) maxSt = 5;
+      if (missionState.awardedEvents.includes('stage_5_submit') || missionState.submission) maxSt = 7;
+      missionState.maxAllowedStage = maxSt;
+      return maxSt;
+    }
+
+    function renderHUD() {
+      computeMaxAllowedStage();
+      document.getElementById('hud-streak').textContent = `${missionState.streakDays || 1} дн.`;
+      document.getElementById('hud-level').textContent = `LVL ${missionState.level || 1}`;
+      const levelProgress = ((missionState.totalXp || 0) % 500) / 5;
+      document.getElementById('hud-level-bar').style.width = `${Math.max(8, Math.min(100, levelProgress))}%`;
+      document.getElementById('hud-mission-xp').textContent = `${missionState.missionXp || 0} / 500 XP`;
+
+      // Render 7-stage stepper
+      const stepper = document.getElementById('stage-stepper');
+      stepper.innerHTML = STAGE_META.map(st => {
+        const isCurrent = (missionState.currentStage === st.num);
+        const isUnlocked = (st.num <= missionState.maxAllowedStage);
+        const isDone = (st.num < missionState.currentStage) || (st.num === 2 && missionState.theoryCompleted.length >= 5) || (st.num === 3 && missionState.trainingCompleted.length >= 4) || (st.num >= 6 && missionState.submission);
+
+        let cls = 'border-white/10 bg-neo-surface/50 text-neo-gray opacity-55 cursor-not-allowed';
+        if (isCurrent) {
+          cls = 'border-neo-cyan bg-neo-cyan/20 text-neo-white glow-cyan cursor-pointer';
+        } else if (isDone && isUnlocked) {
+          cls = 'border-neo-success/50 bg-neo-success/10 text-neo-success cursor-pointer hover:bg-neo-success/20';
+        } else if (isUnlocked) {
+          cls = 'border-neo-purple/40 bg-neo-surface text-neo-white cursor-pointer hover:border-neo-cyan';
+        }
+
+        return `
+          <button type="button" onclick="goToStage(${st.num})" class="flex-1 px-3 py-2 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition-all ${cls}">
+            <span class="material-symbols-outlined text-[16px]">${isDone && !isCurrent ? 'check_circle' : (isUnlocked ? st.icon : 'lock')}</span>
+            <span>${st.num}. ${st.title}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function showXpGainAnimation(xpAmount) {
+      if (!xpAmount || xpAmount <= 0) return;
+      const pop = document.getElementById('xp-float-popup');
+      pop.textContent = `+${xpAmount} XP`;
+      pop.classList.remove('hidden');
+      setTimeout(() => pop.classList.add('hidden'), 2400);
+    }
+
+    async function saveStageToServer(targetStage, eventKey = '') {
+      const dot = document.getElementById('autosave-dot');
+      const txt = document.getElementById('autosave-text');
+      dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+      txt.textContent = 'Сохранение в PostgreSQL...';
+
+      try {
+        const resp = await fetch('/api/mission/save_stage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: getCurrentUserId(),
+            specialty_slug: 'graphic_design',
+            task_number: 1,
+            current_stage: targetStage,
+            event_key: eventKey,
+            state: {
+              theory_completed: missionState.theoryCompleted,
+              training_completed: missionState.trainingCompleted,
+              lab_palette: missionState.labPalette,
+              final_palette: missionState.labPalette,
+              final_explanation: missionState.finalExplanation
+            }
+          })
+        });
+        const data = await resp.json();
+        if (resp.ok && data.success) {
+          missionState.currentStage = data.current_stage;
+          missionState.maxAllowedStage = data.max_allowed_stage;
+          missionState.missionXp = data.mission_xp;
+          missionState.totalXp = data.total_xp;
+          missionState.level = data.level;
+          missionState.achievements = data.achievements || missionState.achievements;
+          if (data.state && data.state.awarded_events) {
+            missionState.awardedEvents = data.state.awarded_events;
+          }
+          if (data.xp_gained > 0) {
+            showXpGainAnimation(data.xp_gained);
+          }
+          if (data.new_achievements && data.new_achievements.length > 0) {
+            data.new_achievements.forEach(ach => {
+              showMissionToast(`🏆 Разблокировано достижение: ${ach.title}`, ach.description, 'success');
+            });
+          }
+          dot.className = 'w-2 h-2 rounded-full bg-neo-success';
+          txt.textContent = 'Сохранено в PostgreSQL';
+          renderHUD();
+          return true;
+        } else {
+          dot.className = 'w-2 h-2 rounded-full bg-red-400';
+          txt.textContent = data.message || 'Ошибка доступа к этапу';
+          showMissionToast('Этап заблокирован', data.message || 'Сначала завершите текущий этап.', 'error');
+          return false;
+        }
+      } catch (err) {
+        dot.className = 'w-2 h-2 rounded-full bg-red-400';
+        txt.textContent = 'Ошибка сети';
+        return false;
+      }
+    }
+
+    async function goToStage(stageNum) {
+      computeMaxAllowedStage();
+      if (stageNum > missionState.maxAllowedStage) {
+        showMissionToast(
+          `Этап ${stageNum} ещё закрыт`,
+          'Последовательно выполните задания текущего этапа, чтобы открыть следующий модуль миссии.',
+          'error'
+        );
+        return;
+      }
+
+      missionState.currentStage = stageNum;
+      document.querySelectorAll('.stage-panel').forEach(el => el.classList.add('hidden'));
+      const activePanel = document.getElementById(`stage-${stageNum}`);
+      if (activePanel) activePanel.classList.remove('hidden');
+
+      if (stageNum === 4) renderLabUI();
+      if (stageNum === 5) renderStage5ProjectUI();
+      if (stageNum === 6) renderStage6VerificationUI();
+      if (stageNum === 7) renderStage7RewardsUI();
+
+      renderHUD();
+      await saveStageToServer(stageNum);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function startMissionStage1() {
+      await saveStageToServer(2, 'stage_1_start');
+      document.querySelectorAll('.stage-panel').forEach(el => el.classList.add('hidden'));
+      document.getElementById('stage-2').classList.remove('hidden');
+      renderHUD();
+    }
+
+    // =========================================================================
+    // STAGE 2: INTERACTIVE COLOR WHEEL & 5 KNOWLEDGE MODULES
+    // =========================================================================
+    function buildInteractiveColorWheel() {
+      const svg = document.getElementById('interactive-color-wheel');
+      let html = '';
+      const rOuter = 108;
+      const rInner = 46;
+
+      WHEEL_SECTORS.forEach((sec, idx) => {
+        const startAngle = (sec.deg - 15 - 90) * (Math.PI / 180);
+        const endAngle = (sec.deg + 15 - 90) * (Math.PI / 180);
+        const x1 = rOuter * Math.cos(startAngle);
+        const y1 = rOuter * Math.sin(startAngle);
+        const x2 = rOuter * Math.cos(endAngle);
+        const y2 = rOuter * Math.sin(endAngle);
+        const x3 = rInner * Math.cos(endAngle);
+        const y3 = rInner * Math.sin(endAngle);
+        const x4 = rInner * Math.cos(startAngle);
+        const y4 = rInner * Math.sin(startAngle);
+
+        const d = `M ${x1} ${y1} A ${rOuter} ${rOuter} 0 0 1 ${x2} ${y2} L ${x3} ${y3} A ${rInner} ${rInner} 0 0 0 ${x4} ${y4} Z`;
+        html += `<path d="${d}" fill="${sec.hex}" stroke="#080B16" stroke-width="2" class="cursor-pointer transition-transform hover:scale-105" onclick="selectWheelSector(${idx})" />`;
+      });
+
+      html += `<g id="wheel-harmony-overlay"></g>`;
+      svg.innerHTML = html;
+    }
+
+    function selectWheelSector(idx) {
+      const sec = WHEEL_SECTORS[idx];
+      const center = document.getElementById('wheel-center-swatch');
+      center.style.background = sec.hex;
+      document.getElementById('wheel-center-hex').textContent = sec.hex;
+      document.getElementById('wheel-center-deg').textContent = `${sec.deg}°`;
+      document.getElementById('wheel-sector-name').textContent = sec.name;
+      document.getElementById('wheel-sector-temp').textContent = sec.temp;
+      markTheoryModuleDone(1);
+    }
+
+    function interactTheoryModule(modNum, mode) {
+      if (mode === 'warm') selectWheelSector(1);
+      if (mode === 'cold') selectWheelSector(6);
+      markTheoryModuleDone(modNum);
+    }
+
+    function mixPrimaryColors(pair) {
+      const pill = document.getElementById('mix-result-pill');
+      if (pair === 'B+G') {
+        pill.textContent = 'Синтезирован: #00D9FF (Cyber Cyan)';
+        selectWheelSector(6);
+      } else if (pair === 'R+B') {
+        pill.textContent = 'Синтезирован: #8957FF (Electric Violet)';
+        selectWheelSector(9);
+      } else {
+        pill.textContent = 'Синтезирован: #FFD600 (Solar Amber)';
+        selectWheelSector(2);
+      }
+      markTheoryModuleDone(2);
+    }
+
+    function visualizeHarmonyOnWheel(type, modNum) {
+      const overlay = document.getElementById('wheel-harmony-overlay');
+      const badge = document.getElementById('wheel-harmony-badge');
+      const swatches = document.getElementById('wheel-harmony-swatches');
+      const radius = 76;
+
+      let indices = [];
+      if (type === 'analogous') {
+        indices = [5, 6, 7]; // 150°, 180°, 210°
+        badge.textContent = 'Аналоговая дуга (±30°)';
+      } else if (type === 'complementary') {
+        indices = [6, 0]; // 180° and 0°
+        badge.textContent = 'Комплементарная ось (180°)';
+      } else if (type === 'triadic') {
+        indices = [6, 9, 4]; // Cyan, Purple, Emerald
+        badge.textContent = 'Триадная геометрия (120°)';
+      }
+
+      const pts = indices.map(i => {
+        const ang = (WHEEL_SECTORS[i].deg - 90) * (Math.PI / 180);
+        return { x: radius * Math.cos(ang), y: radius * Math.sin(ang), hex: WHEEL_SECTORS[i].hex };
+      });
+
+      let poly = `<polygon points="${pts.map(p => `${p.x},${p.y}`).join(' ')}" fill="rgba(0,217,255,0.14)" stroke="#F4F7FF" stroke-width="2.5" stroke-dasharray="4 2" />`;
+      pts.forEach(p => {
+        poly += `<circle cx="${p.x}" cy="${p.y}" r="7" fill="${p.hex}" stroke="#F4F7FF" stroke-width="2.5" />`;
+      });
+      overlay.innerHTML = poly;
+
+      swatches.innerHTML = pts.map(p => `
+        <div class="flex-1 py-1.5 rounded-lg text-center font-mono text-[10px] font-bold border border-white/20" style="background:${p.hex}; color:#080B16;">
+          ${p.hex}
+        </div>
+      `).join('');
+
+      markTheoryModuleDone(modNum);
+    }
+
+    async function markTheoryModuleDone(modNum) {
+      if (!missionState.theoryCompleted.includes(modNum)) {
+        missionState.theoryCompleted.push(modNum);
+      }
+      renderTheoryProgressUI();
+      if (missionState.theoryCompleted.length >= 5) {
+        await saveStageToServer(missionState.currentStage, 'stage_2_theory');
+      } else {
+        await saveStageToServer(missionState.currentStage);
+      }
+    }
+
+    function renderTheoryProgressUI() {
+      document.getElementById('theory-progress-count').textContent = `${missionState.theoryCompleted.length} / 5`;
+      for (let i = 1; i <= 5; i++) {
+        const st = document.getElementById(`theory-status-${i}`);
+        const card = document.getElementById(`theory-card-${i}`);
+        if (missionState.theoryCompleted.includes(i)) {
+          st.textContent = '✓ Изучено';
+          st.className = 'text-[11px] font-mono px-2.5 py-1 rounded-md bg-neo-success/20 text-neo-success font-bold';
+          card.classList.add('border-neo-success/40');
+        }
+      }
+      const btn = document.getElementById('btn-complete-stage-2');
+      if (missionState.theoryCompleted.length >= 5) {
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.classList.add('glow-cyan');
+      }
+    }
+
+    async function completeStage2Theory() {
+      if (missionState.theoryCompleted.length < 5) {
+        showMissionToast('Изучите все 5 интерактивных блоков', 'Нажмите на интерактивные кнопки в каждом из 5 блоков теории спектра, чтобы разблокировать Этап 3.', 'error');
+        return;
+      }
+      await saveStageToServer(3, 'stage_2_theory');
+      await goToStage(3);
+    }
+
+    // =========================================================================
+    // STAGE 3: 4 INTERACTIVE TRAINING CHALLENGES
+    // =========================================================================
+    function selectCh1Option(opt) {
+      selectedCh1 = opt;
+      ['A', 'B', 'C'].forEach(k => {
+        const el = document.getElementById(`ch1-opt-${k}`);
+        el.style.borderColor = (k === opt) ? '#00D9FF' : 'rgba(255,255,255,0.1)';
+      });
+    }
+
+    async function verifyChallenge1() {
+      const fb = document.getElementById('ch1-feedback');
+      fb.classList.remove('hidden');
+      if (!selectedCh1) {
+        fb.className = 'p-3.5 rounded-xl text-xs bg-amber-500/20 border border-amber-400/40 text-amber-200';
+        fb.textContent = 'Сначала выберите один из вариантов карточки (А, Б или В), затем нажмите кнопку проверки.';
+        return;
+      }
+      if (selectedCh1 === 'B') {
+        fb.className = 'p-3.5 rounded-xl text-xs bg-neo-success/15 border border-neo-success/40 text-neo-white';
+        fb.innerHTML = '<strong class="text-neo-success">✓ Верно!</strong> Тёмная поверхность <code>#11182A</code> в сочетании с чистым белым текстом <code>#F4F7FF</code> и циановым акцентом <code>#00D9FF</code> даёт контрастность 14.8:1 (уровень WCAG AAA). Вариант А вызывает хроматическую аберрацию (красный с синим), а Вариант В нечитаем из-за жёлтого на белом.';
+        if (!missionState.trainingCompleted.includes(1)) missionState.trainingCompleted.push(1);
+        renderTrainingProgressUI();
+        await saveStageToServer(3, 'training_1_combo');
+      } else {
+        fb.className = 'p-3.5 rounded-xl text-xs bg-red-500/15 border border-red-400/40 text-red-200';
+        fb.innerHTML = '<strong>✗ Неверно.</strong> В выбранном варианте нарушен яркостный контраст между фоном и текстом. Выберите карточку с глубоким тёмным фоном <code>#11182A</code> и чётким неоновым акцентом.';
+      }
+    }
+
+    function selectCh2Option(hex) {
+      selectedCh2 = hex;
+      ['#00FFAA', '#FF8800', '#8957FF', '#002266'].forEach((h, idx) => {
+        const el = document.getElementById(`ch2-opt-${idx + 1}`);
+        el.style.borderColor = (h === hex) ? '#8957FF' : 'rgba(255,255,255,0.1)';
+      });
+    }
+
+    async function verifyChallenge2() {
+      const fb = document.getElementById('ch2-feedback');
+      fb.classList.remove('hidden');
+      if (!selectedCh2) {
+        fb.className = 'p-3.5 rounded-xl text-xs bg-amber-500/20 border border-amber-400/40 text-amber-200';
+        fb.textContent = 'Выберите один из 4 цветовых образцов перед проверкой.';
+        return;
+      }
+      if (selectedCh2 === '#FF8800') {
+        fb.className = 'p-3.5 rounded-xl text-xs bg-neo-success/15 border border-neo-success/40 text-neo-white';
+        fb.innerHTML = '<strong class="text-neo-success">✓ Точное попадание!</strong> Для лазурного <code>#0088FF</code> (210°) противоположным полюсом (210° - 180° = 30°) является насыщенный оранжевый <code>#FF8800</code>.';
+        if (!missionState.trainingCompleted.includes(2)) missionState.trainingCompleted.push(2);
+        renderTrainingProgressUI();
+        await saveStageToServer(3, 'training_2_comp');
+      } else {
+        fb.className = 'p-3.5 rounded-xl text-xs bg-red-500/15 border border-red-400/40 text-red-200';
+        fb.innerHTML = `<strong>✗ Ошибка угла.</strong> Цвет <code>${selectedCh2}</code> не лежит на оси 180° напротив 210°. Найдите тёплый оранжевый тон с углом 30°.`;
+      }
+    }
+
+    async function verifyChallenge3() {
+      const m1 = document.getElementById('ch3-match-1').value;
+      const m2 = document.getElementById('ch3-match-2').value;
+      const m3 = document.getElementById('ch3-match-3').value;
+      const m4 = document.getElementById('ch3-match-4').value;
+      const fb = document.getElementById('ch3-feedback');
+      fb.classList.remove('hidden');
+
+      if (!m1 || !m2 || !m3 || !m4) {
+        fb.className = 'p-3.5 rounded-xl text-xs bg-amber-500/20 border border-amber-400/40 text-amber-200';
+        fb.textContent = 'Выберите определения для всех 4 понятий в выпадающих списках.';
+        return;
+      }
+
+      if (m1 === 'adj' && m2 === 'opp' && m3 === 'tri' && m4 === 'mono') {
+        fb.className = 'p-3.5 rounded-xl text-xs bg-neo-success/15 border border-neo-success/40 text-neo-white';
+        fb.innerHTML = '<strong class="text-neo-success">✓ Все 4 понятия соединены безупречно!</strong> Вы точно усвоили геометрию цветовых гармоний.';
+        if (!missionState.trainingCompleted.includes(3)) missionState.trainingCompleted.push(3);
+        renderTrainingProgressUI();
+        await saveStageToServer(3, 'training_3_match');
+      } else {
+        fb.className = 'p-3.5 rounded-xl text-xs bg-red-500/15 border border-red-400/40 text-red-200';
+        fb.innerHTML = '<strong>✗ Есть несовпадения.</strong> Подсказка: Аналоговая = соседние ±30°, Комплементарная = 180°, Триадная = 120°, Монохромная = оттенки одного тона.';
+      }
+    }
+
+    function initChallenge4Chips() {
+      CH4_INITIAL_CHIPS.forEach(ch => {
+        if (!ch4Placements[ch.id]) ch4Placements[ch.id] = 'pool';
+      });
+      renderChallenge4Chips();
+    }
+
+    function resetChallenge4Chips() {
+      CH4_INITIAL_CHIPS.forEach(ch => { ch4Placements[ch.id] = 'pool'; });
+      selectedChipForTap = null;
+      renderChallenge4Chips();
+    }
+
+    function renderChallenge4Chips() {
+      const zones = {
+        pool: document.getElementById('ch4-pool'),
+        surface: document.getElementById('zone-surface'),
+        accent: document.getElementById('zone-accent'),
+        semantic: document.getElementById('zone-semantic')
+      };
+      Object.values(zones).forEach(z => { if (z) z.innerHTML = ''; });
+
+      CH4_INITIAL_CHIPS.forEach(ch => {
+        const loc = ch4Placements[ch.id] || 'pool';
+        const isSelected = (selectedChipForTap === ch.id);
+        const btn = document.createElement('div');
+        btn.draggable = true;
+        btn.ondragstart = (ev) => { ev.dataTransfer.setData('text/plain', ch.id); };
+        btn.onclick = (ev) => {
+          ev.stopPropagation();
+          selectedChipForTap = (selectedChipForTap === ch.id) ? null : ch.id;
+          renderChallenge4Chips();
+        };
+        btn.className = `px-2.5 py-1.5 rounded-lg border text-[11px] font-mono font-bold flex items-center gap-1.5 cursor-grab select-none transition-all ${isSelected ? 'border-neo-cyan ring-2 ring-neo-cyan/50 bg-neo-cyan/20 text-neo-white' : 'border-white/15 bg-neo-surface text-neo-white hover:border-white/40'}`;
+        btn.innerHTML = `<span class="w-3.5 h-3.5 rounded-full border border-white/30 shrink-0" style="background:${ch.hex}"></span><span>${ch.label}</span>`;
+        if (zones[loc]) zones[loc].appendChild(btn);
+      });
+    }
+
+    function handleChipDrop(ev, targetZone) {
+      ev.preventDefault();
+      const chipId = ev.dataTransfer.getData('text/plain');
+      if (chipId && ch4Placements[chipId]) {
+        ch4Placements[chipId] = targetZone;
+        selectedChipForTap = null;
+        renderChallenge4Chips();
+      }
+    }
+
+    function handleZoneClick(targetZone) {
+      if (selectedChipForTap) {
+        ch4Placements[selectedChipForTap] = targetZone;
+        selectedChipForTap = null;
+        renderChallenge4Chips();
+      }
+    }
+
+    async function verifyChallenge4() {
+      const fb = document.getElementById('ch4-feedback');
+      fb.classList.remove('hidden');
+
+      const allPlaced = CH4_INITIAL_CHIPS.every(ch => ch4Placements[ch.id] && ch4Placements[ch.id] !== 'pool');
+      if (!allPlaced) {
+        fb.className = 'p-3.5 rounded-xl text-xs bg-amber-500/20 border border-amber-400/40 text-amber-200';
+        fb.textContent = 'Перетащите все 6 цветовых токенов из верхнего пула в 3 категории ниже.';
+        return;
+      }
+
+      const allCorrect = CH4_INITIAL_CHIPS.every(ch => ch4Placements[ch.id] === ch.category);
+      if (allCorrect) {
+        fb.className = 'p-3.5 rounded-xl text-xs bg-neo-success/15 border border-neo-success/40 text-neo-white';
+        fb.innerHTML = '<strong class="text-neo-success">✓ Блестяще!</strong> Все 6 токенов дизайн-системы распределены верно: тёмные базы <code>#080B16</code> и <code>#11182A</code> в Surface, неоновые <code>#00D9FF</code> и <code>#8957FF</code> в Brand, а <code>#36E6A0</code> и <code>#FFB020</code> в семантику статусов.';
+        if (!missionState.trainingCompleted.includes(4)) missionState.trainingCompleted.push(4);
+        renderTrainingProgressUI();
+        await saveStageToServer(3, 'training_4_drag');
+      } else {
+        fb.className = 'p-3.5 rounded-xl text-xs bg-red-500/15 border border-red-400/40 text-red-200';
+        fb.innerHTML = '<strong>✗ Проверьте категории.</strong> Тёмные тона (#080B16, #11182A) относятся к Surface, голубой и фиолетовый (#00D9FF, #8957FF) — к Неоновым акцентам, а изумрудный и янтарный (#36E6A0, #FFB020) — к Семантике статуса.';
+      }
+    }
+
+    function renderTrainingProgressUI() {
+      document.getElementById('training-progress-count').textContent = `${missionState.trainingCompleted.length} / 4`;
+      for (let i = 1; i <= 4; i++) {
+        const b = document.getElementById(`challenge-badge-${i}`);
+        const box = document.getElementById(`challenge-box-${i}`);
+        if (missionState.trainingCompleted.includes(i)) {
+          b.textContent = '✓ Пройдено (+50 XP)';
+          b.className = 'px-2.5 py-0.5 rounded bg-neo-success/20 text-neo-success text-[11px] font-mono font-bold';
+          box.classList.add('border-neo-success/40');
+        }
+      }
+      const btn = document.getElementById('btn-complete-stage-3');
+      if (missionState.trainingCompleted.length >= 4) {
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.classList.add('glow-purple');
+      }
+    }
+
+    // =========================================================================
+    // STAGE 4: CREATIVE COLOR LAB
+    // =========================================================================
+    function hslToHex(h, s, l) {
+      s /= 100;
+      l /= 100;
+      const k = n => (n + h / 30) % 12;
+      const a = s * Math.min(l, 1 - l);
+      const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+      const toHex = x => Math.round(255 * x).toString(16).padStart(2, '0');
+      return `#${toHex(f(0))}${toHex(f(8))}${toHex(f(4))}`.toUpperCase();
+    }
+
+    function getLuminance(hex) {
+      const clean = hex.replace('#', '');
+      const r = parseInt(clean.substring(0, 2), 16) / 255;
+      const g = parseInt(clean.substring(2, 4), 16) / 255;
+      const b = parseInt(clean.substring(4, 6), 16) / 255;
+      const a = [r, g, b].map(v => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+      return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+    }
+
+    function getContrastRatio(hex1, hex2) {
+      try {
+        const l1 = getLuminance(hex1);
+        const l2 = getLuminance(hex2);
+        return ((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)).toFixed(1);
+      } catch (e) {
+        return '8.5';
+      }
+    }
+
+    function renderLabUI() {
+      const grid = document.getElementById('lab-palette-grid');
+      document.getElementById('lab-slot-count').textContent = `${missionState.labPalette.length} цветов`;
+
+      grid.innerHTML = missionState.labPalette.map((slot, idx) => {
+        const isActive = (idx === activeLabSlotIndex);
+        return `
+          <div onclick="selectLabSlot(${idx})" class="p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center gap-3 ${isActive ? 'border-neo-cyan bg-neo-cyan/10 glow-cyan' : 'border-white/10 bg-neo-bg/80 hover:border-white/30'}">
+            <div class="w-12 h-12 rounded-xl border border-white/20 shrink-0 shadow-inner" style="background:${slot.hex}"></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[11px] text-neo-gray truncate">${slot.role}</div>
+              <input type="text" value="${slot.hex}" onchange="updateSlotHexInput(${idx}, this.value)" onclick="event.stopPropagation()" class="mt-0.5 w-28 px-2 py-0.5 rounded bg-neo-surface border border-white/15 font-mono font-bold text-xs text-neo-white uppercase" />
+            </div>
+            ${missionState.labPalette.length > 3 ? `
+              <button type="button" onclick="event.stopPropagation(); removeLabSlot(${idx})" class="text-neo-gray hover:text-red-400 p-1" title="Удалить цвет">
+                <span class="material-symbols-outlined text-[18px]">delete</span>
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      const activeSlot = missionState.labPalette[activeLabSlotIndex] || missionState.labPalette[0];
+      if (activeSlot) {
+        document.getElementById('lab-active-slot-label').textContent = `#${activeLabSlotIndex + 1} (${activeSlot.role}) — ${activeSlot.hex}`;
+        document.getElementById('lab-native-picker').value = activeSlot.hex;
+      }
+
+      // Update Live UI Preview
+      const bgHex = missionState.labPalette[0]?.hex || '#080B16';
+      const surfHex = missionState.labPalette[1]?.hex || '#11182A';
+      const primHex = missionState.labPalette[2]?.hex || '#00D9FF';
+      const secHex = missionState.labPalette[3]?.hex || primHex;
+      const succHex = missionState.labPalette[4]?.hex || '#36E6A0';
+
+      const mockup = document.getElementById('lab-live-mockup');
+      const surf = document.getElementById('lab-live-surface');
+      const badge = document.getElementById('lab-live-badge');
+      const status = document.getElementById('lab-live-status');
+      const cta = document.getElementById('lab-live-cta');
+      const secBtn = document.getElementById('lab-live-sec');
+
+      mockup.style.background = bgHex;
+      mockup.style.borderColor = primHex;
+      surf.style.background = surfHex;
+      badge.style.background = `${secHex}33`;
+      badge.style.color = secHex;
+      status.style.color = succHex;
+      cta.style.background = primHex;
+      cta.style.color = bgHex;
+      secBtn.style.borderColor = secHex;
+
+      const ratio = Number(getContrastRatio(bgHex, primHex));
+      const cBadge = document.getElementById('lab-contrast-badge');
+      cBadge.textContent = `Контраст фона и акцента: ${ratio} : 1 ${ratio >= 4.5 ? '(Отлично)' : '(Допустимо)'}`;
+
+      // Criteria checks
+      const countOk = missionState.labPalette.length >= 3 && missionState.labPalette.length <= 6;
+      const contrastOk = ratio >= 3.0;
+      const uniqueHexes = new Set(missionState.labPalette.map(x => x.hex.toUpperCase())).size === missionState.labPalette.length;
+
+      document.getElementById('lab-criteria-list').innerHTML = `
+        <div class="flex items-center gap-2 ${countOk ? 'text-neo-success' : 'text-amber-300'}">
+          <span class="material-symbols-outlined text-[16px]">${countOk ? 'check_circle' : 'error'}</span>
+          <span>Объём палитры от 3 до 6 цветов (сейчас: ${missionState.labPalette.length})</span>
+        </div>
+        <div class="flex items-center gap-2 ${contrastOk ? 'text-neo-success' : 'text-amber-300'}">
+          <span class="material-symbols-outlined text-[16px]">${contrastOk ? 'check_circle' : 'error'}</span>
+          <span>Контрастность базового фона и главного акцента ≥ 3.0:1 (сейчас: ${ratio}:1)</span>
+        </div>
+        <div class="flex items-center gap-2 ${uniqueHexes ? 'text-neo-success' : 'text-amber-300'}">
+          <span class="material-symbols-outlined text-[16px]">${uniqueHexes ? 'check_circle' : 'error'}</span>
+          <span>Все цвета в палитре уникальны (отсутствуют дубликаты HEX)</span>
+        </div>
+      `;
+    }
+
+    function selectLabSlot(idx) {
+      activeLabSlotIndex = idx;
+      renderLabUI();
+    }
+
+    function updateSlotHexInput(idx, val) {
+      let clean = val.trim().toUpperCase();
+      if (!clean.startsWith('#')) clean = '#' + clean;
+      if (/^#[0-9A-F]{6}$/.test(clean)) {
+        missionState.labPalette[idx].hex = clean;
+        renderLabUI();
+        scheduleAutoSaveDraft();
+      } else {
+        showMissionToast('Неверный формат HEX', 'Введите 6-значный HEX-код, например #00D9FF.', 'error');
+        renderLabUI();
+      }
+    }
+
+    function updateActiveSlotFromPicker(hexVal) {
+      if (missionState.labPalette[activeLabSlotIndex]) {
+        missionState.labPalette[activeLabSlotIndex].hex = hexVal.toUpperCase();
+        renderLabUI();
+        scheduleAutoSaveDraft();
+      }
+    }
+
+    function updateSlotFromHSL() {
+      const h = Number(document.getElementById('slider-hue').value);
+      const s = Number(document.getElementById('slider-sat').value);
+      const l = Number(document.getElementById('slider-light').value);
+      document.getElementById('lbl-hue').textContent = `${h}°`;
+      document.getElementById('lbl-sat').textContent = `${s}%`;
+      document.getElementById('lbl-light').textContent = `${l}%`;
+      if (missionState.labPalette[activeLabSlotIndex]) {
+        missionState.labPalette[activeLabSlotIndex].hex = hslToHex(h, s, l);
+        renderLabUI();
+        scheduleAutoSaveDraft();
+      }
+    }
+
+    function addLabColorSlot() {
+      if (missionState.labPalette.length >= 6) {
+        showMissionToast('Максимум 6 цветов', 'Для чистоты UI-палитры рекомендуется не более 6 базовых токенов.', 'info');
+        return;
+      }
+      missionState.labPalette.push({ hex: '#FFB020', role: `Доп. акцент #${missionState.labPalette.length + 1}` });
+      activeLabSlotIndex = missionState.labPalette.length - 1;
+      renderLabUI();
+      scheduleAutoSaveDraft();
+    }
+
+    function removeLabSlot(idx) {
+      if (missionState.labPalette.length <= 3) return;
+      missionState.labPalette.splice(idx, 1);
+      activeLabSlotIndex = Math.max(0, activeLabSlotIndex - 1);
+      renderLabUI();
+      scheduleAutoSaveDraft();
+    }
+
+    function applyLabPreset(preset) {
+      if (preset === 'cyber') {
+        missionState.labPalette = [
+          { hex: '#080B16', role: 'Background (Основной фон)' },
+          { hex: '#11182A', role: 'Surface (Карточки и панели)' },
+          { hex: '#00D9FF', role: 'Primary Accent (Главный акцент)' },
+          { hex: '#8957FF', role: 'Secondary Accent (Геймификация)' },
+          { hex: '#36E6A0', role: 'Success (Статус успеха)' }
+        ];
+      } else {
+        missionState.labPalette = [
+          { hex: '#090D1A', role: 'Background (Глубокий космос)' },
+          { hex: '#151F38', role: 'Surface (Стеклянная панель)' },
+          { hex: '#36E6A0', role: 'Primary Accent (Аврора неон)' },
+          { hex: '#00D9FF', role: 'Secondary Accent (Кибер-лазурь)' },
+          { hex: '#FF2E93', role: 'Highlight (Энергетический пик)' }
+        ];
+      }
+      renderLabUI();
+      scheduleAutoSaveDraft();
+    }
+
+    async function saveLabPaletteAndContinue() {
+      await saveStageToServer(5, 'stage_4_lab');
+      await goToStage(5);
+    }
+
+    // =========================================================================
+    // STAGE 5: FINAL PROJECT SUBMISSION & AUTO-SAVE
+    // =========================================================================
+    function renderStage5ProjectUI() {
+      const container = document.getElementById('final-palette-preview');
+      container.innerHTML = missionState.labPalette.map(slot => `
+        <div class="p-3 rounded-xl bg-neo-bg border border-white/10 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg border border-white/20" style="background:${slot.hex}"></div>
+            <span class="text-xs font-semibold text-neo-white">${slot.role}</span>
+          </div>
+          <span class="font-mono text-xs font-bold text-neo-cyan">${slot.hex}</span>
+        </div>
+      `).join('');
+
+      const expEl = document.getElementById('final-explanation');
+      if (missionState.finalExplanation && !expEl.value) {
+        expEl.value = missionState.finalExplanation;
+      }
+      document.getElementById('explanation-char-count').textContent = `${expEl.value.length} симв.`;
+    }
+
+    function scheduleAutoSaveDraft() {
+      const expEl = document.getElementById('final-explanation');
+      if (expEl) {
+        missionState.finalExplanation = expEl.value;
+        document.getElementById('explanation-char-count').textContent = `${expEl.value.length} симв.`;
+      }
+      const harmEl = document.getElementById('final-harmony-type');
+      if (harmEl) {
+        missionState.harmonyType = harmEl.value;
+      }
+      clearTimeout(draftSaveTimer);
+      draftSaveTimer = setTimeout(() => {
+        saveStageToServer(missionState.currentStage);
+      }, 900);
+    }
+
+    async function submitFinalMissionToTeacher() {
+      const expEl = document.getElementById('final-explanation');
+      const explanation = (expEl.value || '').trim();
+      const harmonyType = document.getElementById('final-harmony-type').value;
+
+      if (explanation.length < 15) {
+        showMissionToast('Дополните объяснение проекта', 'Напишите хотя бы 1–2 предложения (минимум 15 символов) о том, почему вы выбрали эти цвета.', 'error');
+        expEl.focus();
+        return;
+      }
+
+      const btn = document.getElementById('btn-submit-mission');
+      btn.disabled = true;
+      btn.opacity = '0.6';
+
+      try {
+        const resp = await fetch('/api/mission/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: getCurrentUserId(),
+            specialty_slug: 'graphic_design',
+            task_number: 1,
+            palette: missionState.labPalette,
+            harmony_type: harmonyType,
+            explanation: explanation,
+            project_name: 'Образовательное приложение EduSpace Neo'
+          })
+        });
+        const data = await resp.json();
+        btn.disabled = false;
+
+        if (resp.ok && data.success) {
+          missionState.submission = data.submission;
+          missionState.missionXp = data.mission_xp;
+          missionState.totalXp = data.total_xp;
+          missionState.level = data.level;
+          missionState.achievements = data.achievements || missionState.achievements;
+          if (!missionState.awardedEvents.includes('stage_5_submit')) {
+            missionState.awardedEvents.push('stage_5_submit');
+          }
+          if (data.xp_gained > 0) showXpGainAnimation(data.xp_gained);
+          showMissionToast('Работа отправлена преподавателю!', data.message, 'success');
+          await goToStage(6);
+        } else {
+          showMissionToast('Ошибка отправки', data.message || 'Не удалось отправить работу.', 'error');
+        }
+      } catch (err) {
+        btn.disabled = false;
+        showMissionToast('Ошибка соединения', 'Проверьте подключение к серверу.', 'error');
+      }
+    }
+
+    // =========================================================================
+    // STAGE 6 & 7: REAL TEACHER REVIEW VERIFICATION & REWARDS
+    // =========================================================================
+    function renderStage6VerificationUI() {
+      const swatches = document.getElementById('stage6-palette-swatches');
+      swatches.innerHTML = missionState.labPalette.map(s => `
+        <div class="p-3 rounded-xl bg-neo-surface border border-white/10 text-center space-y-1.5">
+          <div class="w-full h-10 rounded-lg border border-white/20" style="background:${s.hex}"></div>
+          <div class="font-mono text-xs font-bold text-neo-white">${s.hex}</div>
+          <div class="text-[10px] text-neo-gray truncate">${s.role}</div>
+        </div>
+      `).join('');
+
+      const sub = missionState.submission;
+      document.getElementById('stage6-student-explanation').textContent = (sub && sub.student_comment) || missionState.finalExplanation || 'Объяснение сохранено.';
+
+      const pill = document.getElementById('stage6-status-pill');
+      const stText = document.getElementById('stage6-status-text');
+      const scoreVal = document.getElementById('stage6-score-val');
+      const letterVal = document.getElementById('stage6-letter-val');
+      const tComment = document.getElementById('stage6-teacher-comment');
+
+      if (!sub || sub.is_pending_review) {
+        pill.className = 'px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 font-extrabold text-xs flex items-center gap-2';
+        stText.textContent = (sub && sub.status) || 'Отправлено на проверку (ожидает преподавателя)';
+        scoreVal.textContent = 'Ожидает проверки';
+        scoreVal.className = 'text-lg font-black text-amber-300 font-mono';
+        letterVal.textContent = '—';
+        tComment.textContent = (sub && sub.teacher_comment) || 'Работа находится в очереди проверки у преподавателя. Фиктивные оценки не выставляются — здесь отобразится реальный балл куратора.';
+      } else {
+        pill.className = 'px-4 py-2 rounded-xl bg-neo-success/20 border border-neo-success/40 text-neo-success font-extrabold text-xs flex items-center gap-2';
+        stText.textContent = sub.status;
+        scoreVal.textContent = `${sub.score} / 100`;
+        scoreVal.className = 'text-2xl font-black text-neo-success font-mono';
+        letterVal.textContent = sub.grade_letter || 'A';
+        tComment.textContent = sub.teacher_comment || 'Работа проверена преподавателем.';
+      }
+    }
+
+    function renderStage7RewardsUI() {
+      document.getElementById('stage7-xp-earned').textContent = `+${missionState.missionXp || 0} XP`;
+      document.getElementById('stage7-level-label').textContent = `Уровень ${missionState.level || 1} • Всего ${missionState.totalXp || 0} XP`;
+
+      const sub = missionState.submission;
+      const acStatus = document.getElementById('stage7-academic-status');
+      const acSub = document.getElementById('stage7-academic-sub');
+      const tFeed = document.getElementById('stage7-teacher-feedback');
+
+      if (!sub || sub.is_pending_review) {
+        acStatus.textContent = 'На проверке у преподавателя';
+        acStatus.className = 'text-lg font-extrabold text-amber-300';
+        acSub.textContent = 'Статус: Отправлено на проверку (оценка выставляется куратором)';
+        tFeed.textContent = (sub && sub.teacher_comment) || 'Работа ожидает рецензии преподавателя в журнале.';
+      } else {
+        acStatus.textContent = `${sub.score} / 100 баллов (Грейд ${sub.grade_letter})`;
+        acStatus.className = 'text-lg font-extrabold text-neo-success';
+        acSub.textContent = `Статус: ${sub.status}`;
+        tFeed.textContent = sub.teacher_comment || 'Отличная работа с цветовой гармонией!';
+      }
+
+      const allCatalog = [
+        { id: 'initiate_spectrum', title: 'Искатель спектра', description: 'Изучены все 5 интерактивных модулей теории цветовой гармонии', icon: 'palette' },
+        { id: 'harmony_tactician', title: 'Тактик гармонии', description: 'Успешно пройдены все 4 тренировочных испытания', icon: 'rule' },
+        { id: 'color_alchemist', title: 'Алхимик палитр', description: 'Собрана собственная палитра в Цветовой лаборатории', icon: 'science' },
+        { id: 'color_architect', title: 'Архитектор цвета', description: 'Финальный дизайн-проект палитры отправлен преподавателю', icon: 'workspace_premium' }
+      ];
+      const unlockedIds = new Set((missionState.achievements || []).map(a => a.id || a));
+
+      document.getElementById('stage7-achievements-grid').innerHTML = allCatalog.map(ach => {
+        const isUnlocked = unlockedIds.has(ach.id);
+        return `
+          <div class="p-4 rounded-2xl border ${isUnlocked ? 'bg-neo-surface border-neo-cyan/50 glow-cyan' : 'bg-neo-bg/50 border-white/10 opacity-50'} space-y-2">
+            <div class="w-10 h-10 rounded-xl ${isUnlocked ? 'bg-gradient-to-br from-neo-cyan to-neo-purple text-neo-bg' : 'bg-white/5 text-neo-gray'} flex items-center justify-center">
+              <span class="material-symbols-outlined">${ach.icon}</span>
+            </div>
+            <div class="font-extrabold text-sm text-neo-white">${ach.title}</div>
+            <p class="text-xs text-neo-gray leading-relaxed">${ach.description}</p>
+            <div class="text-[10px] font-mono uppercase ${isUnlocked ? 'text-neo-success font-bold' : 'text-neo-gray'}">
+              ${isUnlocked ? '✓ Разблокировано' : 'Закрыто'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function refreshMissionFromServer(notify = false) {
+      try {
+        const resp = await fetch(`/api/mission/state?specialty=graphic_design&task=1&user_id=${getCurrentUserId()}`);
+        const data = await resp.json();
+        if (resp.ok && data.success) {
+          const m = data.mission;
+          const u = data.user;
+          missionState.currentStage = m.current_stage || 1;
+          missionState.missionXp = m.mission_xp || 0;
+          missionState.totalXp = u.total_xp || 0;
+          missionState.level = u.level || 1;
+          missionState.streakDays = u.streak_days || 1;
+          missionState.achievements = u.achievements || [];
+          missionState.submission = m.submission || null;
+
+          if (m.state) {
+            missionState.theoryCompleted = m.state.theory_completed || [];
+            missionState.trainingCompleted = m.state.training_completed || [];
+            missionState.awardedEvents = m.state.awarded_events || [];
+            if (Array.isArray(m.state.lab_palette) && m.state.lab_palette.length >= 3) {
+              missionState.labPalette = m.state.lab_palette;
+            }
+            if (m.state.final_explanation) {
+              missionState.finalExplanation = m.state.final_explanation;
+            }
+          }
+
+          // Check URL ?stage= parameter if unlocked
+          const urlStage = Number(new URLSearchParams(window.location.search).get('stage') || 0);
+          computeMaxAllowedStage();
+          if (urlStage >= 1 && urlStage <= missionState.maxAllowedStage) {
+            missionState.currentStage = urlStage;
+          }
+
+          renderTheoryProgressUI();
+          renderTrainingProgressUI();
+          renderLabUI();
+          renderStage5ProjectUI();
+          renderStage6VerificationUI();
+          renderStage7RewardsUI();
+          renderHUD();
+
+          document.querySelectorAll('.stage-panel').forEach(el => el.classList.add('hidden'));
+          const activePanel = document.getElementById(`stage-${missionState.currentStage}`);
+          if (activePanel) activePanel.classList.remove('hidden');
+
+          if (notify) {
+            showMissionToast('Данные синхронизированы', 'Актуальный статус проверки загружен из PostgreSQL.', 'success');
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load mission state:', e);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      buildInteractiveColorWheel();
+      initChallenge4Chips();
+      await refreshMissionFromServer(false);
+    });
+  </script>
+</body>
+</html>

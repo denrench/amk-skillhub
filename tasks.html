@@ -489,8 +489,8 @@
                          <span class="material-symbols-outlined text-[16px]">lock_clock</span>
                          <span>Откроется ${t.unlock_date_exact}</span>
                        </button>`
-                    : `<a href="simulator.html?specialty=${currentSpec}&task=${t.task_number}" class="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/40 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-2 hover:scale-[1.02]">
-                         <span>${sc === 'graded' ? 'Повторить / Просмотреть' : (sc === 'in_progress' || sc === 'revision' ? 'Продолжить урок' : 'Открыть урок и практику')}</span>
+                    : `<a href="${(currentSpec === 'graphic_design' && t.task_number === 1) ? 'mission.html' : `simulator.html?specialty=${currentSpec}&task=${t.task_number}`}" class="px-5 py-3 rounded-xl bg-gradient-to-r ${(currentSpec === 'graphic_design' && t.task_number === 1) ? 'from-cyan-400 via-purple-500 to-emerald-400 text-slate-950 font-black' : 'from-indigo-500 via-purple-600 to-indigo-600 text-white font-bold'} hover:shadow-indigo-500/40 text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-2 hover:scale-[1.02]">
+                         <span>${(currentSpec === 'graphic_design' && t.task_number === 1) ? '🚀 Запустить миссию «Архитектор цвета»' : (sc === 'graded' ? 'Повторить / Просмотреть' : (sc === 'in_progress' || sc === 'revision' ? 'Продолжить урок' : 'Открыть урок и практику'))}</span>
                          <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
                        </a>`
                   )
