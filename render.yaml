@@ -10,4 +10,4 @@ services:
     autoDeploy: true
     envVars:
       - key: DATABASE_URL
-        value: postgresql://eduspace_77wk_user:pq6n1r1EFNBCa7GQiFUy1yoBoWHCeM1E@dpg-dblcr1ugekts7381qqv0-a/eduspace_77wk
+        sync: false

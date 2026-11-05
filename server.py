@@ -178,11 +178,20 @@ import ssl
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
+import decimal
+
+def _normalize_pg_val(val):
+    if isinstance(val, decimal.Decimal):
+        return float(val)
+    if hasattr(val, 'strftime'):
+        return val.strftime("%Y-%m-%d %H:%M:%S")
+    return val
+
 class PostgresRow(collections.abc.Mapping):
     def __init__(self, col_names, values):
         self._col_names = col_names
-        self._values = list(values)
-        self._dict = {col: val for col, val in zip(col_names, values)}
+        self._values = [_normalize_pg_val(v) for v in values]
+        self._dict = {col: val for col, val in zip(col_names, self._values)}
 
     def __getitem__(self, key):
         if isinstance(key, int):
@@ -359,15 +368,10 @@ def get_db_status():
     db = get_db()
     is_pg = isinstance(db, PostgresConnectionWrapper)
     pg_url = os.environ.get('DATABASE_URL')
-    masked_url = ""
-    if pg_url:
-        masked_url = pg_url[:15] + "..." + pg_url[-15:]
     return jsonify({
         "database_type": "postgresql" if is_pg else "sqlite",
         "database_url_configured": bool(pg_url),
-        "database_url_masked": masked_url,
-        "last_db_error": _LAST_DB_ERROR,
-        "sqlite_path": DB_PATH
+        "last_db_error": _LAST_DB_ERROR
     })
 
 
@@ -884,6 +888,7 @@ def send_smtp_email(to_email, code):
 def send_verification_code():
     data = request.get_json() or {}
     email = (data.get('email') or '').strip().lower()
+    purpose = (data.get('purpose') or 'register').strip().lower()
 
     ok, err = validate_email_addr(email)
     if not ok:
@@ -892,7 +897,14 @@ def send_verification_code():
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
-    if cursor.fetchone():
+    existing_user = cursor.fetchone()
+    if purpose == 'reset':
+        if not existing_user:
+            return jsonify({
+                "success": False,
+                "message": "Аккаунт с таким email не найден в системе."
+            }), 404
+    elif existing_user:
         return jsonify({
             "success": False,
             "message": "Пользователь с таким email уже зарегистрирован. Перейдите на вкладку «Вход»."
@@ -1246,6 +1258,14 @@ def enroll_course():
 
 @app.route('/api/user/profile/<int:user_id>', methods=['GET'])
 def get_profile(user_id):
+    session_uid = session.get('user_id')
+    session_role = session.get('user_role')
+    if session_uid and session_role == 'student' and int(user_id) != int(session_uid):
+        return jsonify({
+            "success": False,
+            "message": "Доступ к чужому профилю запрещён.",
+            "code": "TAMPERING_DETECTED"
+        }), 403
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
@@ -1328,6 +1348,16 @@ def get_profile(user_id):
 def update_profile():
     data = request.get_json() or {}
     user_id = data.get('user_id')
+    session_uid = session.get('user_id')
+    session_role = session.get('user_role')
+    if session_uid and session_role == 'student':
+        if user_id and int(user_id) != int(session_uid):
+            return jsonify({
+                "success": False,
+                "message": "Изменение чужого профиля запрещено.",
+                "code": "TAMPERING_DETECTED"
+            }), 403
+        user_id = session_uid
     if not user_id:
         return jsonify({"success": False, "message": "Не указан ID пользователя."}), 400
 
@@ -1532,6 +1562,16 @@ def get_task(task_id):
 def save_lesson_progress():
     data = request.get_json() or {}
     user_id = data.get('user_id')
+    session_uid = session.get('user_id')
+    session_role = session.get('user_role')
+    if session_uid and session_role == 'student':
+        if user_id and int(user_id) != int(session_uid):
+            return jsonify({
+                "success": False,
+                "message": "Сохранение прогресса для чужого аккаунта запрещено.",
+                "code": "TAMPERING_DETECTED"
+            }), 403
+        user_id = session_uid
     specialty_slug = (data.get('specialty_slug') or 'it').strip().lower()
     task_number = int(data.get('task_number') or 1)
     quiz_score = data.get('quiz_score')
@@ -1797,6 +1837,8 @@ def reset_demo():
 
 @app.route('/api/teacher/advance_day', methods=['POST'])
 def advance_study_day():
+    if session.get('user_role') == 'student':
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права преподавателя", "code": "FORBIDDEN"}), 403
     data = request.get_json() or {}
     new_day = data.get('day')
 
@@ -2034,10 +2076,25 @@ def simulate_submission():
 
 @app.route('/api/teacher/journal', methods=['GET'])
 def get_teacher_journal():
+    caller_role = session.get('user_role')
+    caller_id = session.get('user_id')
+    if caller_role == 'student':
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права преподавателя", "code": "FORBIDDEN"}), 403
+
     specialty = request.args.get('specialty')
     group_filter = request.args.get('group')
     conn = get_db()
     cursor = conn.cursor()
+
+    teacher_assigned = []
+    if caller_id and caller_role == 'teacher':
+        teacher_assigned = get_teacher_assigned_groups(caller_id)
+    if teacher_assigned and group_filter and group_filter not in teacher_assigned:
+        return jsonify({
+            "success": False,
+            "message": f"У вас нет доступа к учебной группе '{group_filter}'",
+            "code": "GROUP_ACCESS_DENIED"
+        }), 403
 
     q = """
     SELECT s.id, s.user_id, s.student_id, s.student_name, s.group_name, s.specialty_slug,
@@ -2054,6 +2111,9 @@ def get_teacher_journal():
     if group_filter:
         q += " AND s.group_name = ?"
         params.append(group_filter)
+    elif teacher_assigned:
+        q += f" AND s.group_name IN ({','.join(['?']*len(teacher_assigned))})"
+        params.extend(teacher_assigned)
     q += " ORDER BY s.updated_at DESC, s.id DESC"
 
     cursor.execute(q, params)
@@ -2199,6 +2259,8 @@ def grade_submission():
 
 @app.route('/api/teacher/create_task', methods=['POST'])
 def create_or_update_task():
+    if session.get('user_role') == 'student':
+        return jsonify({"success": False, "message": "Студенты не могут создавать или изменять задания", "code": "FORBIDDEN"}), 403
     data = request.get_json() or {}
     specialty_slug = (data.get('specialty_slug') or 'it').strip().lower()
     task_number = int(data.get('task_number') or 1)
@@ -2236,8 +2298,31 @@ def create_or_update_task():
     return jsonify({"success": True, "message": f"Задание №{task_number} для курса «{specialty_slug.upper()}» сохранено!"})
 
 
+@app.route('/api/teacher/delete_task', methods=['POST', 'DELETE'])
+def delete_teacher_task():
+    if session.get('user_role') == 'student':
+        return jsonify({"success": False, "message": "Студенты не могут удалять задания", "code": "FORBIDDEN"}), 403
+    data = request.get_json(silent=True) or {}
+    task_id = data.get('task_id') or request.args.get('task_id', type=int)
+    specialty_slug = (data.get('specialty_slug') or request.args.get('specialty_slug') or '').strip().lower()
+    task_number = data.get('task_number') or request.args.get('task_number', type=int)
+
+    conn = get_db()
+    cursor = conn.cursor()
+    if task_id:
+        cursor.execute("DELETE FROM tasks WHERE id = ?", (int(task_id),))
+    elif specialty_slug and task_number:
+        cursor.execute("DELETE FROM tasks WHERE specialty_slug = ? AND task_number = ?", (specialty_slug, int(task_number)))
+    else:
+        return jsonify({"success": False, "message": "Укажите task_id или (specialty_slug и task_number)"}), 400
+    conn.commit()
+    return jsonify({"success": True, "message": "Задание успешно удалено"})
+
+
 @app.route('/api/teacher/broadcast', methods=['POST'])
 def teacher_broadcast():
+    if session.get('user_role') == 'student':
+        return jsonify({"success": False, "message": "Студенты не могут отправлять общеколледжные объявления", "code": "FORBIDDEN"}), 403
     data = request.get_json() or {}
     title = (data.get('title') or '').strip()
     body = (data.get('body') or '').strip()
@@ -2342,7 +2427,8 @@ def send_message_api():
     sender_name = (data.get('sender_name') or 'Пользователь').strip()
     sender_role = (data.get('sender_role') or 'student').strip()
     channel = (data.get('channel') or 'general').strip()
-    body = (data.get('body') or '').strip()
+    body = re.sub(r'<script[^>]*>.*?</script>', '', (data.get('body') or ''), flags=re.IGNORECASE | re.DOTALL).strip()
+    body = body.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;')
 
     if not body:
         return jsonify({"success": False, "message": "Сообщение не может быть пустым."}), 400
@@ -2364,11 +2450,14 @@ def save_grade():
 
 @app.route('/api/health', methods=['GET'])
 def health():
+    db = get_db()
+    is_pg = isinstance(db, PostgresConnectionWrapper)
     return jsonify({
         "status": "healthy",
         "service": "EDU SPACE LMS Platform",
         "institution": "Алматинский многопрофильный колледж (АМК)",
-        "database": "SQLite3 (50 lessons catalog synced)",
+        "database": "PostgreSQL (50 lessons catalog synced)" if is_pg else "SQLite3 (50 lessons catalog synced)",
+        "database_type": "postgresql" if is_pg else "sqlite",
         "tasks_total": 50,
         "current_study_day": get_current_day(),
         "timestamp": datetime.now().isoformat()
@@ -2748,7 +2837,7 @@ def verify_certificate():
     cert_number = u.get('student_id') or f"KZ-AMK-2026-{10000 + u['id']}"
     hash_seed = f"{cert_number}-{u['full_name']}-AMK-EDUSPACE-VERIFIED-2026"
     digital_signature = hashlib.sha256(hash_seed.encode('utf-8')).hexdigest()[:24].upper()
-    issue_date = (u.get('created_at') or '2026-09-01 09:00:00')[:10]
+    issue_date = str(u.get('created_at') or '2026-09-01 09:00:00')[:10]
 
     return jsonify({
         "success": True,
