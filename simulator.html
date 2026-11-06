@@ -98,6 +98,8 @@
   <script src="js/interactive-simulators.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/eduspace-3d-engine.js"></script>
 </head>
 <body class="font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative">
 
@@ -203,7 +205,7 @@
               Заблокировано по графику обучения
             </span>
             <h2 class="font-extrabold text-2xl text-white" id="sim-locked-title">
-              Этот модуль откроется по расписанию курса
+              Этот модуль заблокирован до выполнения предыдущих модулей
             </h2>
             <p class="text-slate-300 text-sm leading-relaxed" id="sim-locked-desc">
               Студент не может пройти все задания курса за один день. Дождитесь даты открытия или обратитесь к преподавателю.
@@ -426,6 +428,26 @@
               <span class="material-symbols-outlined text-[18px]">lock_open</span>
               <span>Активировать Pro (4 990 ₸)</span>
             </a>
+          </div>
+
+          <!-- Specialty-Specific Interactive Workbench -->
+          <!-- 3D INTERACTIVE WORKBENCH VISUALIZER -->
+          <div id="sim-3d-workbench-container" class="glass-panel-ultra rounded-3xl p-6 shadow-2xl space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+                <span class="material-symbols-outlined text-cyan-400 text-[20px]">view_in_ar</span>
+                <span class="font-extrabold text-sm text-white" id="sim-3d-title">3D Интерактивная лабораторная модель</span>
+              </div>
+              <span class="text-[11px] font-mono px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold" id="sim-3d-badge">WebGL 3D Core</span>
+            </div>
+            <div id="sim-3d-canvas-box" class="w-full h-72 rounded-2xl bg-dark-950/80 border border-white/10 overflow-hidden relative shadow-inner">
+              <!-- Rendered by EduSpace3D -->
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+              <span>Интерактивная 3D-сцена узла специальности в реальном времени</span>
+              <span class="text-cyan-400 font-mono">Three.js WebGL Engine v128</span>
+            </div>
           </div>
 
           <!-- Specialty-Specific Interactive Workbench -->
@@ -707,6 +729,9 @@
 
       // Render Specialty-Specific Interactive Workbench
       renderSpecialtyWorkbench(activeSpecialty, activeTaskNumber);
+      if (window.EduSimulators) {
+        window.EduSimulators.init(activeSpecialty, activeTaskNumber, document.getElementById('specialty-interactive-workbench'));
+      }
     }
 
     function renderQuizQuestions() {
@@ -928,7 +953,7 @@
       });
 
       if (res.status === 403 || (res.data && res.data.is_locked)) {
-        showToast((res.data && res.data.error) || 'Задание заблокировано по расписанию!', 'error');
+        showToast((res.data && res.data.error) || 'Задание заблокировано! Завершите предыдущие модули курса.', 'error');
         return;
       }
 
@@ -1022,6 +1047,28 @@
     // ==========================================
 
     function renderSpecialtyWorkbench(spec, taskNum) {
+      // Mount corresponding 3D Model
+      if (window.EduSpace3D) {
+        setTimeout(() => {
+          if (spec === 'it') {
+            document.getElementById('sim-3d-title').textContent = '3D Кластер серверов и сетевая инфраструктура';
+            window.EduSpace3D.renderIt3d('sim-3d-canvas-box');
+          } else if (spec === 'graphic_design') {
+            document.getElementById('sim-3d-title').textContent = '3D Цветовое пространство и оптический спектр (RGB/CMYK)';
+            window.EduSpace3D.renderDesign3d('sim-3d-canvas-box');
+          } else if (spec === 'autoelectric') {
+            document.getElementById('sim-3d-title').textContent = '3D Архитектура жгута шины CAN-Bus и терминаторы 120 Ом';
+            window.EduSpace3D.renderAutoelectric3d('sim-3d-canvas-box');
+          } else if (spec === 'hvac') {
+            document.getElementById('sim-3d-title').textContent = '3D Термодинамический цикл холодильной установки (Карно)';
+            window.EduSpace3D.renderHvac3d('sim-3d-canvas-box');
+          } else if (spec === 'automechanic') {
+            document.getElementById('sim-3d-title').textContent = '3D Цилиндропоршневая группа и фазы 4-тактного ДВС';
+            window.EduSpace3D.renderAutomechanic3d('sim-3d-canvas-box');
+          }
+        }, 150);
+      }
+
       const container = document.getElementById('workbench-dynamic-body');
       const titleEl = document.getElementById('workbench-title');
       const iconEl = document.getElementById('workbench-icon');
@@ -1169,7 +1216,9 @@
 
       let htmlDoc = code;
       if (!code.includes('<html') && !code.includes('<body') && !code.includes('<!DOCTYPE')) {
-        htmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;padding:16px;color:#1e293b;}</style></head><body>${code}</body></html>`;
+        htmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;padding:16px;color:#1e293b;}</style>  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/eduspace-3d-engine.js"></script>
+</head><body>${code}</body></html>`;
       }
       iframe.srcdoc = htmlDoc;
     }

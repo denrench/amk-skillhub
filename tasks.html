@@ -134,9 +134,9 @@
           <span class="material-symbols-outlined text-[20px]">grade</span>
           <span>Оценки и зачётка</span>
         </a>
-        <a href="javascript:void(0)" onclick="openScheduleModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
+        <a href="javascript:void(0)" onclick="openInteractiveRoadmapModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
           <span class="material-symbols-outlined text-[20px]">schedule</span>
-          <span>Расписание занятий</span>
+          <span>Интерактивный роадмап</span>
         </a>
         <a href="javascript:void(0)" onclick="openCalendarModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
           <span class="material-symbols-outlined text-[20px]">calendar_month</span>
@@ -237,7 +237,7 @@
               Программное обеспечение и Веб-разработка
             </h1>
             <p class="text-slate-300 text-xs sm:text-sm leading-relaxed" id="course-main-desc">
-              Каждый модуль включает конспект теории, квиз и практический тренажёр. Новые модули открываются по дням расписания — выполнить весь курс за один день нельзя.
+              Каждый модуль включает конспект теории, квиз и практический тренажёр. Каждый модуль содержит практический интерактивный тренажёр, лабораторные симуляции и тесты.
             </p>
           </div>
 
@@ -462,7 +462,7 @@
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
               <div class="space-y-2 flex-1">
                 <div class="flex flex-wrap items-center gap-2">
-                  <span class="px-2.5 py-0.5 rounded-lg bg-white/5 border border-white/10 text-slate-300 text-[11px] font-extrabold">Модуль №${t.task_number}</span>
+                  <span class="px-3 py-1 rounded-xl bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/40 text-indigo-300 text-[11px] font-black tracking-wide shadow-sm flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>МОДУЛЬ №${t.task_number}</span>
                   ${tierBadge}
                   ${statusPill}
                   <span class="px-2.5 py-0.5 rounded-lg bg-white/5 text-slate-400 text-[11px] font-semibold">${t.difficulty} • ${t.time_limit}</span>
@@ -491,7 +491,7 @@
                          <span class="material-symbols-outlined text-[16px]">lock_clock</span>
                          <span>Откроется ${t.unlock_date_exact}</span>
                        </button>`
-                    : `<a href="${(currentSpec === 'graphic_design' && t.task_number === 1) ? 'mission.html' : `simulator.html?specialty=${currentSpec}&task=${t.task_number}`}" class="px-5 py-3 rounded-xl bg-gradient-to-r ${(currentSpec === 'graphic_design' && t.task_number === 1) ? 'from-cyan-400 via-purple-500 to-emerald-400 text-slate-950 font-black' : 'from-indigo-500 via-purple-600 to-indigo-600 text-white font-bold'} hover:shadow-indigo-500/40 text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-2 hover:scale-[1.02]">
+                    : `<a href="${(currentSpec === 'graphic_design' && t.task_number === 1) ? 'mission.html' : `simulator.html?specialty=${currentSpec}&task=${t.task_number}`}" class="px-5 py-3 rounded-xl bg-gradient-to-r ${(currentSpec === 'graphic_design' && t.task_number === 1) ? 'from-cyan-400 via-purple-500 to-emerald-400 text-slate-950 font-black' : 'from-indigo-500 via-purple-600 to-cyan-500 text-white font-black hover:scale-[1.03] shadow-glow-indigo'} hover:shadow-indigo-500/40 text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-2 hover:scale-[1.02]">
                          <span>${(currentSpec === 'graphic_design' && t.task_number === 1) ? '🚀 Запустить миссию «Архитектор цвета»' : (sc === 'graded' ? 'Повторить / Просмотреть' : (sc === 'in_progress' || sc === 'revision' ? 'Продолжить урок' : 'Открыть урок и практику'))}</span>
                          <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
                        </a>`
