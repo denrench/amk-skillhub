@@ -8591,6 +8591,7 @@
 
 
       path.endsWith('profile.html') || path.endsWith('/profile');
+    const isProtectedTeacher = path.endsWith('teacher.html') || path.endsWith('/teacher') || path.endsWith('gradebook.html') || path.endsWith('/gradebook');
 
 
 

@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
 import sqlite3
+
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
 import server
 
 app = server.app.test_client()
@@ -25,7 +32,7 @@ for slug in ('it', 'graphic_design', 'autoelectric', 'hvac', 'automechanic'):
     rt = app.get(f'/api/tasks?specialty={slug}')
     assert rt.status_code == 200
     assert rt.get_json()['count'] == 10, f"Course {slug} must have 10 lessons"
-print("Test 2: All 5 courses × 10 lessons (50 total) OK")
+print("Test 2: All 5 courses x 10 lessons (50 total) OK")
 
 # 3. FIO Validation (Single word & digits must be rejected)
 r_bad_fio1 = app.post('/api/auth/register', json={
