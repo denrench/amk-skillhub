@@ -428,7 +428,10 @@ def init_db():
                 "CREATE UNIQUE INDEX IF NOT EXISTS idx_lesson_prog_user_spec_num ON lesson_progress (user_id, specialty_slug, task_number)",
                 "CREATE UNIQUE INDEX IF NOT EXISTS idx_platform_settings_key ON platform_settings (key)",
                 "CREATE UNIQUE INDEX IF NOT EXISTS idx_enrollments_user_spec ON enrollments (user_id, specialty_slug)",
-                "CREATE UNIQUE INDEX IF NOT EXISTS idx_teacher_groups_tid_grp ON teacher_groups (teacher_id, group_name)"
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_teacher_groups_tid_grp ON teacher_groups (teacher_id, group_name)",
+                "CREATE TABLE IF NOT EXISTS xp_transactions (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, amount INTEGER NOT NULL, source_type VARCHAR(64) NOT NULL, source_id VARCHAR(128) NOT NULL, description VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_xp_user_source UNIQUE(user_id, source_type, source_id))",
+                "CREATE TABLE IF NOT EXISTS audit_logs (id SERIAL PRIMARY KEY, actor_id INTEGER, actor_email VARCHAR(128), actor_role VARCHAR(32), action VARCHAR(128) NOT NULL, target_type VARCHAR(64), target_id VARCHAR(128), details TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
+                "CREATE TABLE IF NOT EXISTS daily_quests_log (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, quest_key VARCHAR(64) NOT NULL, quest_date VARCHAR(32) NOT NULL, completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_daily_user_quest UNIQUE(user_id, quest_key, quest_date))"
             ]:
                 pg_cur.execute(pg_ddl)
             pg_conn.commit()
@@ -668,6 +671,46 @@ def init_db():
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS xp_transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        amount INTEGER NOT NULL,
+        source_type TEXT NOT NULL,
+        source_id TEXT NOT NULL,
+        description TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, source_type, source_id),
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS audit_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        actor_id INTEGER,
+        actor_email TEXT,
+        actor_role TEXT,
+        action TEXT NOT NULL,
+        target_type TEXT,
+        target_id TEXT,
+        details TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS daily_quests_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        quest_key TEXT NOT NULL,
+        quest_date TEXT NOT NULL,
+        completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, quest_key, quest_date),
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+    """)
     cursor.execute("INSERT OR IGNORE INTO platform_settings (key, value) VALUES ('current_study_day', '1');")
     # Clean out obsolete tasks & migrate legacy slugs
     cursor.execute("DELETE FROM tasks WHERE specialty_slug NOT IN ('it', 'graphic_design', 'autoelectric', 'hvac', 'automechanic');")
@@ -817,6 +860,198 @@ def validate_email_addr(email):
     if len(domain_part) < 4 or domain_part.startswith("-") or domain_part.endswith("-"):
         return False, "Указан некорректный почтовый домен."
     return True, None
+
+
+
+# =========================================================================
+# FUTURISTIC GAMIFICATION, LEVEL SYSTEM, XP LEDGER & AUDIT TRAIL
+# =========================================================================
+
+LEVELS_TIERS = [
+    {"level": 1, "name": "Новичок", "min_xp": 0, "max_xp": 299, "icon": "shield", "color": "#94a3b8"},
+    {"level": 2, "name": "Исследователь", "min_xp": 300, "max_xp": 699, "icon": "explore", "color": "#06b6d4"},
+    {"level": 3, "name": "Практик", "min_xp": 700, "max_xp": 1299, "icon": "bolt", "color": "#10b981"},
+    {"level": 4, "name": "Специалист", "min_xp": 1300, "max_xp": 2199, "icon": "biotech", "color": "#f59e0b"},
+    {"level": 5, "name": "Эксперт", "min_xp": 2200, "max_xp": 3499, "icon": "psychology", "color": "#a855f7"},
+    {"level": 6, "name": "Мастер", "min_xp": 3500, "max_xp": 4999, "icon": "workspace_premium", "color": "#ef4444"},
+    {"level": 7, "name": "Легенда", "min_xp": 5000, "max_xp": 999999, "icon": "military_tech", "color": "#ec4899"}
+]
+
+def get_level_info(xp_total):
+    xp_val = max(0, int(xp_total or 0))
+    for tier in reversed(LEVELS_TIERS):
+        if xp_val >= tier["min_xp"]:
+            lvl = tier["level"]
+            min_xp = tier["min_xp"]
+            max_xp = tier["max_xp"]
+            span = max(1, max_xp - min_xp)
+            progress_pct = 100 if lvl >= 7 else min(100, int(((xp_val - min_xp) / span) * 100))
+            return {
+                "level": lvl,
+                "name": tier["name"],
+                "icon": tier["icon"],
+                "color": tier["color"],
+                "xp_total": xp_val,
+                "min_xp": min_xp,
+                "max_xp": max_xp,
+                "progress_percent": progress_pct,
+                "next_level_xp": max_xp + 1 if lvl < 7 else None
+            }
+    return LEVELS_TIERS[0]
+
+def award_xp(conn, user_id, amount, source_type, source_id, description):
+    """
+    Atomically awards XP using xp_transactions table with unique idempotency.
+    Returns (awarded_bool, total_xp, level_info).
+    """
+    cursor = conn.cursor()
+    awarded = False
+    try:
+        cursor.execute("""
+        INSERT INTO xp_transactions (user_id, amount, source_type, source_id, description)
+        VALUES (?, ?, ?, ?, ?)
+        """, (user_id, int(amount), str(source_type), str(source_id), str(description)))
+        conn.commit()
+        awarded = True
+    except Exception:
+        # Already awarded (unique constraint violation)
+        pass
+
+    cursor.execute("SELECT COALESCE(SUM(amount), 0) FROM xp_transactions WHERE user_id = ?", (user_id,))
+    total_ledger_xp = cursor.fetchone()[0]
+    cursor.execute("SELECT bonus_xp FROM users WHERE id = ?", (user_id,))
+    u_row = cursor.fetchone()
+    old_bonus = u_row['bonus_xp'] if u_row and u_row['bonus_xp'] else 0
+    final_bonus = max(int(total_ledger_xp), int(old_bonus))
+    cursor.execute("UPDATE users SET bonus_xp = ? WHERE id = ?", (final_bonus, user_id))
+    conn.commit()
+    return awarded, final_bonus, get_level_info(final_bonus)
+
+PLATFORM_ACHIEVEMENTS = [
+    {
+        "id": "first_step",
+        "title": "Первый шаг в EduSpace",
+        "desc": "Успешно отправлено и зачтено первое задание курса",
+        "icon": "school",
+        "xp": 50,
+        "color": "#06b6d4"
+    },
+    {
+        "id": "quiz_master",
+        "title": "Эрудит EduSpace",
+        "desc": "Сдан проверочный тест на максимальный балл (3/3)",
+        "icon": "psychology",
+        "xp": 50,
+        "color": "#818cf8"
+    },
+    {
+        "id": "high_five",
+        "title": "Твёрдая пятёрка",
+        "desc": "Успешно сдано 5 практических заданий",
+        "icon": "stars",
+        "xp": 150,
+        "color": "#10b981"
+    },
+    {
+        "id": "perfect_score",
+        "title": "Высший балл (100/100)",
+        "desc": "Получена идеальная оценка 100/100 от преподавателя",
+        "icon": "military_tech",
+        "xp": 100,
+        "color": "#f59e0b"
+    },
+    {
+        "id": "streak_master",
+        "title": "Хранитель серии",
+        "desc": "Непрерывная серия обучения 3+ дней подряд",
+        "icon": "local_fire_department",
+        "xp": 100,
+        "color": "#ef4444"
+    },
+    {
+        "id": "course_champion",
+        "title": "Покоритель курса",
+        "desc": "Успешно сданы все 10 заданий специализации",
+        "icon": "workspace_premium",
+        "xp": 300,
+        "color": "#a855f7"
+    },
+    {
+        "id": "color_architect",
+        "title": "Архитектор цвета",
+        "desc": "Завершена интерактивная миссия космической колористики",
+        "icon": "palette",
+        "xp": 200,
+        "color": "#ec4899"
+    }
+]
+
+def check_and_unlock_achievements(conn, user_id):
+    """Checks user stats and unlocks newly achieved milestones automatically."""
+    cursor = conn.cursor()
+    cursor.execute("SELECT achievements_json, streak_days FROM users WHERE id = ?", (user_id,))
+    u_row = cursor.fetchone()
+    if not u_row:
+        return []
+
+    achievements = []
+    if u_row['achievements_json']:
+        try:
+            achievements = json.loads(u_row['achievements_json'])
+        except Exception:
+            achievements = []
+
+    existing_ids = {a['id'] if isinstance(a, dict) else a for a in achievements}
+    new_unlocked = []
+
+    cursor.execute("SELECT count(*), max(score) FROM task_submissions WHERE user_id = ? AND score >= 60", (user_id,))
+    passed_row = cursor.fetchone()
+    passed_count = passed_row[0] if passed_row else 0
+    max_score = passed_row[1] if passed_row and passed_row[1] is not None else 0
+
+    cursor.execute("SELECT count(*) FROM lesson_progress WHERE user_id = ? AND quiz_score >= 3", (user_id,))
+    q_row = cursor.fetchone()
+    perfect_quizzes = q_row[0] if q_row else 0
+
+    streak = u_row['streak_days'] or 1
+
+    checks = [
+        ("first_step", passed_count >= 1),
+        ("quiz_master", perfect_quizzes >= 1),
+        ("high_five", passed_count >= 5),
+        ("perfect_score", max_score >= 100),
+        ("streak_master", streak >= 3),
+        ("course_champion", passed_count >= 10),
+    ]
+
+    for ach_id, condition in checks:
+        if condition and ach_id not in existing_ids:
+            ach_item = next((a for a in PLATFORM_ACHIEVEMENTS if a["id"] == ach_id), None)
+            if ach_item:
+                achievements.append(ach_item)
+                new_unlocked.append(ach_item)
+                award_xp(conn, user_id, ach_item["xp"], "achievement", ach_id, f"Достижение: {ach_item['title']}")
+                cursor.execute("""
+                INSERT INTO notifications (user_id, target_role, title, body, type)
+                VALUES (?, 'student', ?, ?, 'achievement')
+                """, (user_id, f"🏆 Новое достижение: {ach_item['title']}!", f"Вы получили +{ach_item['xp']} XP за «{ach_item['desc']}». Поздравляем!"))
+
+    if new_unlocked:
+        cursor.execute("UPDATE users SET achievements_json = ? WHERE id = ?", (json.dumps(achievements, ensure_ascii=False), user_id))
+        conn.commit()
+
+    return new_unlocked
+
+def log_audit_event(conn, actor_id, actor_email, actor_role, action, target_type, target_id, details=""):
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+        INSERT INTO audit_logs (actor_id, actor_email, actor_role, action, target_type, target_id, details)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (actor_id, actor_email or "", actor_role or "", action, target_type or "", str(target_id or ""), details or ""))
+        conn.commit()
+    except Exception as e:
+        print(f"[AUDIT LOG ERROR] {e}")
 
 
 def serialize_user(row):
@@ -1336,8 +1571,22 @@ def get_profile(user_id):
     avg_score = round(sum(scores) / len(scores), 1) if scores else 0.0
     gpa_4 = round((avg_score / 100.0) * 4.0, 2) if scores else 0.0
     bonus_xp = int(user_dict.get("bonus_xp") or 0)
-    xp_total = sum(v["score"] * 3 for v in latest_by_task.values() if v["score"] >= 60) + bonus_xp
-    level = 1 + (xp_total // 500)
+    cursor.execute("SELECT COALESCE(SUM(amount), 0) FROM xp_transactions WHERE user_id = ?", (user_id,))
+    tx_xp_row = cursor.fetchone()
+    tx_xp = tx_xp_row[0] if tx_xp_row else 0
+    final_bonus = max(bonus_xp, tx_xp)
+    xp_total = sum(v["score"] * 3 for v in latest_by_task.values() if v["score"] >= 60) + final_bonus
+    level_meta = get_level_info(xp_total)
+    level = level_meta["level"]
+    check_and_unlock_achievements(conn, user_id)
+    cursor.execute("SELECT achievements_json FROM users WHERE id = ?", (user_id,))
+    ach_row = cursor.fetchone()
+    achievements_list = []
+    if ach_row and ach_row['achievements_json']:
+        try:
+            achievements_list = json.loads(ach_row['achievements_json'])
+        except Exception:
+            achievements_list = []
 
     course_meta = COURSES_BY_SLUG[spec_slug]
     current_day = get_current_day()
@@ -1374,8 +1623,15 @@ def get_profile(user_id):
             "avg_score": avg_score,
             "gpa": gpa_4,
             "xp": xp_total,
-            "level": level
+            "level": level,
+            "rank_name": level_meta["name"],
+            "rank_icon": level_meta["icon"],
+            "rank_color": level_meta["color"],
+            "level_progress_percent": level_meta["progress_percent"],
+            "next_level_xp": level_meta["next_level_xp"],
+            "streak_days": user_dict.get("streak_days") or 1
         },
+        "achievements": achievements_list,
         "skills": skills_out,
         "submissions": list(latest_by_task.values())
     })
@@ -1650,6 +1906,10 @@ def save_lesson_progress():
     """, (user_id, specialty_slug, task_number, q_val, d_val))
     conn.commit()
 
+    if q_val >= 3:
+        award_xp(conn, user_id, 30, "quiz_completion", f"quiz_{specialty_slug}_{task_number}", f"Тест №{task_number} ({specialty_slug})")
+        check_and_unlock_achievements(conn, user_id)
+
     return jsonify({"success": True, "message": "Прогресс урока сохранён.", "quiz_score": q_val})
 
 
@@ -1717,6 +1977,26 @@ def submit_task():
         if task_number > current_day:
             return jsonify({"success": False, "error": "Задание заблокировано по графику.", "is_locked": True}), 403
         task_id = task_number
+
+    if task_number > 1 and session_user_role == 'student':
+        cursor.execute("""
+        SELECT id, status, score FROM task_submissions 
+        WHERE user_id = ? AND specialty_slug = ? AND task_number = ?
+        """, (user_id, specialty_slug, task_number - 1))
+        prev_sub = cursor.fetchone()
+        cursor.execute("""
+        SELECT status FROM lesson_progress
+        WHERE user_id = ? AND specialty_slug = ? AND task_number = ?
+        """, (user_id, specialty_slug, task_number - 1))
+        prev_prog = cursor.fetchone()
+        prev_ok = (prev_sub and prev_sub['status'] not in ('На доработке', 'rejected') and (prev_sub['score'] >= 60 or 'на проверке' in str(prev_sub['status']).lower())) or (prev_prog and prev_prog['status'] == 'completed')
+        if not prev_ok:
+            return jsonify({
+                "success": False,
+                "is_locked": True,
+                "error": f"Задание №{task_number} заблокировано. Для доступа необходимо сначала успешно завершить предыдущее задание №{task_number - 1}.",
+                "message": f"Необходимо завершить Задание №{task_number - 1}."
+            }), 403
     student_name = u_row['full_name'] if u_row else (data.get('student_name') or 'Студент')
     group_name = u_row['group_name'] if u_row and u_row['group_name'] else (data.get('group_name') or 'ИС-21')
     student_id = u_row['student_id'] if u_row and u_row['student_id'] else (data.get('student_id') or f'KZ-AMK-2026-{10000 + user_id}')
@@ -1778,6 +2058,12 @@ def submit_task():
     """, (user_id, student_id, specialty_slug, course_meta['short_title'], score, status))
 
     conn.commit()
+
+    if score >= 60 and not await_teacher:
+        award_xp(conn, user_id, 50, "task_completion", f"{specialty_slug}_{task_number}", f"Сдано задание №{task_number} ({specialty_slug})")
+        if score == 100:
+            award_xp(conn, user_id, 25, "perfect_score_bonus", f"perfect_{specialty_slug}_{task_number}", "Бонус за идеальный балл 100/100")
+        check_and_unlock_achievements(conn, user_id)
 
     return jsonify({
         "success": True,
@@ -1878,7 +2164,7 @@ def reset_demo():
 
 @app.route('/api/teacher/advance_day', methods=['POST'])
 def advance_study_day():
-    if session.get('user_role') == 'student':
+    if session.get('user_role') not in ('teacher', 'admin'):
         return jsonify({"success": False, "message": "Доступ запрещён: требуются права преподавателя", "code": "FORBIDDEN"}), 403
     data = request.get_json() or {}
     new_day = data.get('day')
@@ -1912,8 +2198,8 @@ def get_teacher_students():
     caller_role = session.get('user_role')
     caller_id = session.get('user_id')
 
-    # If caller is student, block access to teacher endpoint
-    if caller_role == 'student':
+    # Enforce teacher or admin role
+    if caller_role not in ('teacher', 'admin'):
         return jsonify({
             "success": False,
             "message": "Доступ запрещён: требуются права преподавателя",
@@ -1991,6 +2277,8 @@ def get_teacher_students():
 
 @app.route('/api/teacher/sync_user', methods=['POST'])
 def sync_user():
+    if session.get('user_role') not in ('teacher', 'admin'):
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права преподавателя", "code": "FORBIDDEN"}), 403
     data = request.get_json() or {}
     email = (data.get('email') or '').strip().lower()
     full_name = (data.get('full_name') or '').strip()
@@ -2039,6 +2327,8 @@ def sync_user():
 
 @app.route('/api/teacher/simulate_submission', methods=['POST'])
 def simulate_submission():
+    if session.get('user_role') not in ('teacher', 'admin'):
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права преподавателя", "code": "FORBIDDEN"}), 403
     data = request.get_json() or {}
     user_id = data.get('user_id')
     specialty_slug = (data.get('specialty_slug') or 'it').strip().lower()
@@ -2119,7 +2409,7 @@ def simulate_submission():
 def get_teacher_journal():
     caller_role = session.get('user_role')
     caller_id = session.get('user_id')
-    if caller_role == 'student':
+    if caller_role not in ('teacher', 'admin'):
         return jsonify({"success": False, "message": "Доступ запрещён: требуются права преподавателя", "code": "FORBIDDEN"}), 403
 
     specialty = request.args.get('specialty')
@@ -2175,6 +2465,8 @@ def get_teacher_submissions():
 
 @app.route('/api/teacher/matrix', methods=['GET'])
 def get_gradebook_matrix():
+    if session.get('user_role') not in ('teacher', 'admin'):
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права преподавателя", "code": "FORBIDDEN"}), 403
     specialty = request.args.get('specialty', 'it')
     conn = get_db()
     cursor = conn.cursor()
@@ -2236,7 +2528,7 @@ def grade_submission():
     caller_role = session.get('user_role')
     caller_id = session.get('user_id')
 
-    if caller_role == 'student':
+    if caller_role not in ('teacher', 'admin'):
         return jsonify({
             "success": False,
             "message": "Студенты не имеют прав оценивать работы",
@@ -2290,6 +2582,14 @@ def grade_submission():
             f"Комментарий преподавателя: {feedback}",
             "warning" if status == "На доработке" else "success"
         ))
+        if grade >= 60:
+            cursor.execute("SELECT specialty_slug FROM task_submissions WHERE id = ?", (sub_id,))
+            s_spec_row = cursor.fetchone()
+            s_spec = s_spec_row[0] if s_spec_row else 'it'
+            award_xp(conn, sub_row['user_id'], 50, "task_completion", f"{s_spec}_{sub_row['task_number']}", f"Зачтено задание №{sub_row['task_number']}")
+            if grade == 100:
+                award_xp(conn, sub_row['user_id'], 25, "perfect_score_bonus", f"perfect_{s_spec}_{sub_row['task_number']}", "Бонус за высший балл 100/100")
+            check_and_unlock_achievements(conn, sub_row['user_id'])
 
     conn.commit()
     return jsonify({
@@ -2300,8 +2600,8 @@ def grade_submission():
 
 @app.route('/api/teacher/create_task', methods=['POST'])
 def create_or_update_task():
-    if session.get('user_role') == 'student':
-        return jsonify({"success": False, "message": "Студенты не могут создавать или изменять задания", "code": "FORBIDDEN"}), 403
+    if session.get('user_role') not in ('teacher', 'admin'):
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права преподавателя", "code": "FORBIDDEN"}), 403
     data = request.get_json() or {}
     specialty_slug = (data.get('specialty_slug') or 'it').strip().lower()
     task_number = int(data.get('task_number') or 1)
@@ -2341,7 +2641,7 @@ def create_or_update_task():
 
 @app.route('/api/teacher/delete_task', methods=['POST', 'DELETE'])
 def delete_teacher_task():
-    if session.get('user_role') == 'student':
+    if session.get('user_role') not in ('teacher', 'admin'):
         return jsonify({"success": False, "message": "Студенты не могут удалять задания", "code": "FORBIDDEN"}), 403
     data = request.get_json(silent=True) or {}
     task_id = data.get('task_id') or request.args.get('task_id', type=int)
@@ -2362,8 +2662,8 @@ def delete_teacher_task():
 
 @app.route('/api/teacher/broadcast', methods=['POST'])
 def teacher_broadcast():
-    if session.get('user_role') == 'student':
-        return jsonify({"success": False, "message": "Студенты не могут отправлять общеколледжные объявления", "code": "FORBIDDEN"}), 403
+    if session.get('user_role') not in ('teacher', 'admin'):
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права преподавателя", "code": "FORBIDDEN"}), 403
     data = request.get_json() or {}
     title = (data.get('title') or '').strip()
     body = (data.get('body') or '').strip()
@@ -2385,6 +2685,8 @@ def teacher_broadcast():
 
 @app.route('/api/teacher/stats', methods=['GET'])
 def get_teacher_stats():
+    if session.get('user_role') not in ('teacher', 'admin'):
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права преподавателя", "code": "FORBIDDEN"}), 403
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute('SELECT COUNT(*) FROM task_submissions')
@@ -3010,7 +3312,7 @@ def admin_page():
 @app.route('/api/admin/users', methods=['GET'])
 def admin_get_users():
     role = session.get('user_role')
-    if role in ('student', 'teacher'):
+    if role != 'admin':
         return jsonify({
             "success": False,
             "message": "Доступ запрещён: требуются права администратора",
@@ -3036,7 +3338,7 @@ def admin_get_users():
 @app.route('/api/admin/change_role', methods=['POST'])
 def admin_change_role():
     role = session.get('user_role')
-    if role in ('student', 'teacher'):
+    if role != 'admin':
         return jsonify({
             "success": False,
             "message": "Доступ запрещён: требуются права администратора",
@@ -3062,8 +3364,8 @@ def admin_change_role():
 @app.route('/api/admin/teacher_groups', methods=['GET'])
 def admin_get_teacher_groups():
     role = session.get('user_role')
-    if role in ('student', 'teacher'):
-        return jsonify({"success": False, "message": "Доступ запрещён: требуются права администратора"}), 403
+    if role != 'admin':
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права администратора", "code": "FORBIDDEN"}), 403
 
     conn = get_db()
     c = conn.cursor()
@@ -3092,8 +3394,8 @@ def admin_get_teacher_groups():
 @app.route('/api/admin/assign_teacher_group', methods=['POST'])
 def admin_assign_teacher_group():
     role = session.get('user_role')
-    if role in ('student', 'teacher'):
-        return jsonify({"success": False, "message": "Доступ запрещён: требуются права администратора"}), 403
+    if role != 'admin':
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права администратора", "code": "FORBIDDEN"}), 403
 
     data = request.get_json() or {}
     teacher_id = data.get('teacher_id')
@@ -3687,6 +3989,157 @@ def submit_mission_project():
         "new_achievements": new_achievements,
         "achievements": achievements
     })
+
+
+
+# =========================================================================
+# LEADERBOARD, DAILY QUESTS & AUDIT LOGS ENDPOINTS
+# =========================================================================
+
+@app.route('/api/leaderboard', methods=['GET'])
+def get_leaderboard():
+    group_filter = request.args.get('group')
+    conn = get_db()
+    cursor = conn.cursor()
+
+    query = """
+    SELECT u.id, u.full_name, u.email, u.group_name, u.specialty_slug, u.bonus_xp, u.achievements_json, u.is_demo,
+           COALESCE((SELECT SUM(amount) FROM xp_transactions WHERE user_id = u.id), 0) as ledger_xp,
+           COALESCE((SELECT SUM(score * 3) FROM task_submissions WHERE user_id = u.id AND score >= 60), 0) as task_xp,
+           (SELECT count(*) FROM task_submissions WHERE user_id = u.id AND score >= 60) as passed_tasks,
+           COALESCE((SELECT AVG(score) FROM task_submissions WHERE user_id = u.id AND score > 0), 0) as avg_score
+    FROM users u
+    WHERE u.role = 'student' AND u.is_demo = 0
+    """
+    params = []
+    if group_filter and group_filter != 'all':
+        query += " AND u.group_name = ?"
+        params.append(group_filter)
+
+    query += " ORDER BY (COALESCE((SELECT SUM(amount) FROM xp_transactions WHERE user_id = u.id), 0) + u.bonus_xp + COALESCE((SELECT SUM(score * 3) FROM task_submissions WHERE user_id = u.id AND score >= 60), 0)) DESC, passed_tasks DESC, u.id ASC LIMIT 100"
+
+    cursor.execute(query, params)
+    rows = cursor.fetchall()
+
+    leaderboard = []
+    for rank, r in enumerate(rows, 1):
+        total_xp = max(r['ledger_xp'], r['bonus_xp']) + r['task_xp']
+        lvl_info = get_level_info(total_xp)
+        achs = []
+        if r['achievements_json']:
+            try:
+                achs = json.loads(r['achievements_json'])
+            except Exception:
+                achs = []
+
+        name = r['full_name'] or 'Студент'
+        parts = name.split()
+        initials = (parts[0][0] + (parts[1][0] if len(parts) > 1 else '')) if parts else 'ST'
+
+        leaderboard.append({
+            "rank": rank,
+            "user_id": r['id'],
+            "full_name": name,
+            "initials": initials,
+            "group_name": r['group_name'] or 'ИС-21',
+            "specialty_slug": r['specialty_slug'] or 'it',
+            "total_xp": total_xp,
+            "level": lvl_info['level'],
+            "rank_name": lvl_info['name'],
+            "rank_icon": lvl_info['icon'],
+            "rank_color": lvl_info['color'],
+            "achievements_count": len(achs),
+            "passed_tasks": r['passed_tasks'],
+            "avg_score": round(float(r['avg_score']), 1)
+        })
+
+    cursor.execute("SELECT DISTINCT group_name FROM users WHERE role = 'student' AND group_name != '' ORDER BY group_name ASC")
+    groups = [row[0] for row in cursor.fetchall()]
+
+    return jsonify({
+        "success": True,
+        "leaderboard": leaderboard,
+        "total_students": len(leaderboard),
+        "groups": groups
+    })
+
+
+@app.route('/api/daily_quests', methods=['GET', 'POST'])
+def daily_quests():
+    user_id = session.get('user_id') or request.args.get('user_id', type=int)
+    if not user_id and request.method == 'POST':
+        data = request.get_json() or {}
+        user_id = data.get('user_id')
+    if not user_id:
+        return jsonify({"success": False, "message": "Требуется авторизация"}), 401
+
+    conn = get_db()
+    cursor = conn.cursor()
+    today_str = datetime.now().strftime("%Y-%m-%d")
+
+    QUESTS_DEF = [
+        {"key": "study_topic", "title": "Изучить тему дня", "desc": "Ознакомьтесь с теоретическим материалом открытого урока", "xp": 25, "icon": "menu_book"},
+        {"key": "pass_quiz", "title": "Пройти проверочный тест", "desc": "Ответьте на 3 контрольных вопроса без ошибок", "xp": 25, "icon": "quiz"},
+        {"key": "code_practice", "title": "Практическое задание", "desc": "Запустите интерактивный симулятор и протестируйте код", "xp": 25, "icon": "terminal"},
+        {"key": "streak_bonus", "title": "Сохранить серию обучения", "desc": "Заходите на платформу каждый день для умножения XP", "xp": 25, "icon": "local_fire_department"}
+    ]
+
+    if request.method == 'POST':
+        data = request.get_json() or {}
+        quest_key = data.get('quest_key')
+        quest_meta = next((q for q in QUESTS_DEF if q["key"] == quest_key), None)
+        if not quest_meta:
+            return jsonify({"success": False, "message": "Неизвестное ежедневное задание"}), 400
+
+        awarded, total_xp, lvl_info = award_xp(conn, user_id, quest_meta["xp"], "daily_quest", f"{quest_key}_{today_str}", f"Ежедневный квест: {quest_meta['title']}")
+        if awarded:
+            try:
+                cursor.execute("INSERT INTO daily_quests_log (user_id, quest_key, quest_date) VALUES (?, ?, ?)", (user_id, quest_key, today_str))
+                conn.commit()
+            except Exception:
+                pass
+        return jsonify({
+            "success": True,
+            "awarded": awarded,
+            "quest_key": quest_key,
+            "xp_earned": quest_meta["xp"] if awarded else 0,
+            "total_xp": total_xp,
+            "level": lvl_info
+        })
+
+    # GET
+    cursor.execute("SELECT quest_key FROM daily_quests_log WHERE user_id = ? AND quest_date = ?", (user_id, today_str))
+    completed_keys = {r[0] for r in cursor.fetchall()}
+
+    cursor.execute("SELECT streak_days FROM users WHERE id = ?", (user_id,))
+    u_row = cursor.fetchone()
+    streak = u_row['streak_days'] if u_row and u_row['streak_days'] else 1
+
+    quests_out = []
+    for q in QUESTS_DEF:
+        q_copy = dict(q)
+        q_copy['completed'] = q['key'] in completed_keys
+        quests_out.append(q_copy)
+
+    return jsonify({
+        "success": True,
+        "date": today_str,
+        "streak_days": streak,
+        "quests": quests_out,
+        "completed_count": len(completed_keys),
+        "total_count": len(QUESTS_DEF)
+    })
+
+
+@app.route('/api/admin/audit_logs', methods=['GET'])
+def admin_audit_logs():
+    if session.get('user_role') != 'admin':
+        return jsonify({"success": False, "message": "Доступ запрещён: требуются права администратора", "code": "FORBIDDEN"}), 403
+    conn = get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, actor_email, actor_role, action, target_type, target_id, details, created_at FROM audit_logs ORDER BY id DESC LIMIT 50")
+    logs = [dict(r) for r in cursor.fetchall()]
+    return jsonify({"success": True, "logs": logs})
 
 
 @app.route('/healthz')

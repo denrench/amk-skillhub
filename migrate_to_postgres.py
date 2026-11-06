@@ -244,6 +244,41 @@ def run_migration(pg_url=None):
             receipt_number VARCHAR(100) UNIQUE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS xp_transactions (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            amount INTEGER NOT NULL,
+            source_type VARCHAR(64) NOT NULL,
+            source_id VARCHAR(128) NOT NULL,
+            description VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT uq_xp_user_source UNIQUE(user_id, source_type, source_id)
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS audit_logs (
+            id SERIAL PRIMARY KEY,
+            actor_id INTEGER,
+            actor_email VARCHAR(128),
+            actor_role VARCHAR(32),
+            action VARCHAR(128) NOT NULL,
+            target_type VARCHAR(64),
+            target_id VARCHAR(128),
+            details TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS daily_quests_log (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            quest_key VARCHAR(64) NOT NULL,
+            quest_date VARCHAR(32) NOT NULL,
+            completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT uq_daily_user_quest UNIQUE(user_id, quest_key, quest_date)
+        );
         """
     ]
 
