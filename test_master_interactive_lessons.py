@@ -148,6 +148,16 @@ def run_scenario_b_teacher_journey():
     })
     assert res.status_code == 200
     print("[OK] Step 5: Teacher graded student submission and left feedback")
+
+    # 6. Self-cleanup of test entities to maintain pristine catalog
+    client.delete(f'/api/lessons/{created_lesson_id}')
+    with app.app_context():
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("DELETE FROM course_modules WHERE id = ?", (module_id,))
+        cur.execute("DELETE FROM courses WHERE id = ?", (course_id,))
+        conn.commit()
+    print("[OK] Step 6: Test course & lesson cleaned up from database")
     return True
 
 def run_scenario_c_ai_systems():

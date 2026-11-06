@@ -13,358 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
 
   <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com">
-    // ==========================================
-    // VISUAL LESSON BUILDER ENGINE
-    // ==========================================
-    let builderCourses = [];
-    let builderModules = [];
-    let builderLessons = [];
-    let currentBuilderLesson = null;
-    let currentBuilderBlocks = [];
-
-    async function loadBuilderData() {
-      try {
-        const res = await fetch('/api/courses/manage');
-        const data = await res.json();
-        if (data.success) {
-          builderCourses = data.courses || [];
-          populateBuilderCourseSelect();
-        }
-      } catch (e) {
-        console.error('Error loading builder courses:', e);
-      }
-    }
-
-    function populateBuilderCourseSelect() {
-      const sel = document.getElementById('b-course-select');
-      if (!sel) return;
-      sel.innerHTML = builderCourses.map(c => `
-        <option value="${c.id}">${c.title} (${c.slug})</option>
-      `).join('');
-      if (builderCourses.length) onBuilderCourseChange();
-    }
-
-    async function onBuilderCourseChange() {
-      const courseId = document.getElementById('b-course-select').value;
-      if (!courseId) return;
-      try {
-        const res = await fetch(`/api/courses/${courseId}/modules`);
-        const data = await res.json();
-        builderModules = data.modules || [];
-        populateBuilderModuleSelect();
-      } catch (e) {
-        console.error('Error loading modules:', e);
-      }
-    }
-
-    function populateBuilderModuleSelect() {
-      const sel = document.getElementById('b-module-select');
-      if (!sel) return;
-      sel.innerHTML = builderModules.map(m => `
-        <option value="${m.id}">${m.title}</option>
-      `).join('');
-      if (builderModules.length) onBuilderModuleChange();
-    }
-
-    async function onBuilderModuleChange() {
-      const moduleId = document.getElementById('b-module-select').value;
-      const courseId = document.getElementById('b-course-select').value;
-      try {
-        const res = await fetch(`/api/lessons?course_id=${courseId}&module_id=${moduleId}`);
-        const data = await res.json();
-        builderLessons = data.lessons || [];
-        populateBuilderLessonSelect();
-      } catch (e) {
-        console.error('Error loading lessons:', e);
-      }
-    }
-
-    function populateBuilderLessonSelect() {
-      const sel = document.getElementById('b-lesson-select');
-      if (!sel) return;
-      sel.innerHTML = builderLessons.map(l => `
-        <option value="${l.id}">${l.title}</option>
-      `).join('');
-      if (builderLessons.length) {
-        onBuilderLessonChange();
-      } else {
-        createNewLessonInBuilder();
-      }
-    }
-
-    async function onBuilderLessonChange() {
-      const lessonId = document.getElementById('b-lesson-select').value;
-      if (!lessonId) return;
-      try {
-        const res = await fetch(`/api/lessons/${lessonId}`);
-        const data = await res.json();
-        if (data.success && data.lesson) {
-          currentBuilderLesson = data.lesson;
-          currentBuilderBlocks = currentBuilderLesson.blocks || [];
-          document.getElementById('b-lesson-title').value = currentBuilderLesson.title || '';
-          document.getElementById('b-lesson-type').value = currentBuilderLesson.lesson_type || 'theory';
-          document.getElementById('b-lesson-xp').value = currentBuilderLesson.xp_reward || 60;
-          document.getElementById('b-lesson-day').value = currentBuilderLesson.unlock_day || 1;
-          renderBuilderBlocks();
-        }
-      } catch (e) {
-        console.error('Error loading lesson details:', e);
-      }
-    }
-
-    function createNewLessonInBuilder() {
-      currentBuilderLesson = { id: null };
-      document.getElementById('b-lesson-title').value = 'Новый интерактивный урок';
-      document.getElementById('b-lesson-type').value = 'theory';
-      document.getElementById('b-lesson-xp').value = 60;
-      document.getElementById('b-lesson-day').value = 1;
-
-      // Default 8 template blocks
-      currentBuilderBlocks = [
-        { id: "b1_hook", type: "hook", title: "Кейс из практики", badge: "Ситуация", content: "Опишите реальную производственную ситуацию для вовлечения студентов..." },
-        { id: "b2_objectives", type: "objectives", title: "Цели обучения", items: ["Конкретный навык 1", "Конкретный навык 2"] },
-        { id: "b3_theory", type: "theory", title: "Теоретический базис", chunks: [{ heading: "Ключевая концепция", text: "Объяснение темы понятным языком..." }] },
-        { id: "b4_interactive", type: "interactive", widget_type: "flip_cards", title: "Интерактивное закрепление", cards: [{ front: "Термин", back: "Определение" }] },
-        { id: "b5_check", type: "inline_check", title: "Проверка понимания", question: "Контрольный вопрос?", options: ["Вариант А", "Вариант Б"], correct_index: 0, explanation: "Пояснение..." },
-        { id: "b6_practice", type: "practical", title: "Практическое задание", task_description: "Описание практической задачи...", guidelines: ["Шаг 1"] },
-        { id: "b7_assessment", type: "assessment", title: "Итоговое испытание", questions: [{ question: "Тестовый вопрос?", options: ["Да", "Нет"], correct: 0 }] },
-        { id: "b8_summary", type: "summary", title: "Результаты урока", xp: 60, skills_acquired: ["Освоен практический навык"] }
-      ];
-      renderBuilderBlocks();
-    }
-
-    function renderBuilderBlocks() {
-      const container = document.getElementById('builder-blocks-list');
-      if (!container) return;
-      document.getElementById('b-blocks-count').textContent = `${currentBuilderBlocks.length} блоков`;
-
-      const blockIconMap = {
-        hook: 'lightbulb',
-        objectives: 'flag',
-        theory: 'menu_book',
-        interactive: 'touch_app',
-        inline_check: 'help',
-        practical: 'terminal',
-        assessment: 'quiz',
-        summary: 'emoji_events'
-      };
-
-      container.innerHTML = currentBuilderBlocks.map((b, idx) => `
-        <div class="bg-dark-850/80 rounded-2xl p-4 sm:p-5 border border-white/10 shadow-lg space-y-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center justify-center font-bold font-mono text-xs">
-                ${idx + 1}
-              </span>
-              <span class="material-symbols-outlined text-slate-400 text-[18px]">
-                ${blockIconMap[b.type] || 'extension'}
-              </span>
-              <span class="font-bold text-xs text-white uppercase tracking-wider">${b.type}</span>
-            </div>
-
-            <div class="flex items-center gap-1">
-              <button type="button" onclick="moveBlock(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="p-1 rounded-lg text-slate-400 hover:text-white disabled:opacity-30">
-                <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
-              </button>
-              <button type="button" onclick="moveBlock(${idx}, 1)" ${idx === currentBuilderBlocks.length - 1 ? 'disabled' : ''} class="p-1 rounded-lg text-slate-400 hover:text-white disabled:opacity-30">
-                <span class="material-symbols-outlined text-[16px]">arrow_downward</span>
-              </button>
-              <button type="button" onclick="deleteBlock(${idx})" class="p-1 rounded-lg text-rose-400 hover:text-rose-300">
-                <span class="material-symbols-outlined text-[16px]">delete</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="space-y-2 text-xs">
-            <input type="text" value="${b.title || ''}" onchange="updateBlockField(${idx}, 'title', this.value)" placeholder="Заголовок блока..." class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-white font-bold" />
-            ${b.content !== undefined ? `
-              <textarea rows="2" onchange="updateBlockField(${idx}, 'content', this.value)" class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-slate-300 leading-relaxed">${b.content}</textarea>
-            ` : ''}
-            ${b.question !== undefined ? `
-              <input type="text" value="${b.question || ''}" onchange="updateBlockField(${idx}, 'question', this.value)" placeholder="Формулировка вопроса..." class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-amber-300 font-semibold" />
-            ` : ''}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function moveBlock(idx, dir) {
-      const target = idx + dir;
-      if (target < 0 || target >= currentBuilderBlocks.length) return;
-      const temp = currentBuilderBlocks[idx];
-      currentBuilderBlocks[idx] = currentBuilderBlocks[target];
-      currentBuilderBlocks[target] = temp;
-      renderBuilderBlocks();
-    }
-
-    function deleteBlock(idx) {
-      if (confirm('Удалить этот блок?')) {
-        currentBuilderBlocks.splice(idx, 1);
-        renderBuilderBlocks();
-      }
-    }
-
-    function updateBlockField(idx, field, value) {
-      if (currentBuilderBlocks[idx]) {
-        currentBuilderBlocks[idx][field] = value;
-      }
-    }
-
-    function onAddBlockSelected(sel) {
-      const type = sel.value;
-      if (!type) return;
-      currentBuilderBlocks.push({
-        id: `b_${Date.now()}`,
-        type: type,
-        title: `Новый блок: ${type}`,
-        content: "Содержимое блока..."
-      });
-      sel.value = '';
-      renderBuilderBlocks();
-    }
-
-    async function saveBuilderLesson() {
-      const title = document.getElementById('b-lesson-title').value.trim();
-      if (!title) {
-        alert('Укажите название урока!');
-        return;
-      }
-      const courseId = parseInt(document.getElementById('b-course-select').value);
-      const moduleId = parseInt(document.getElementById('b-module-select').value);
-      const lessonType = document.getElementById('b-lesson-type').value;
-      const xpReward = parseInt(document.getElementById('b-lesson-xp').value) || 60;
-      const unlockDay = parseInt(document.getElementById('b-lesson-day').value) || 1;
-      const isPublished = document.querySelector('input[name="builder_pub_status"]:checked')?.value || 1;
-
-      const payload = {
-        course_id: courseId,
-        module_id: moduleId,
-        title: title,
-        lesson_type: lessonType,
-        xp_reward: xpReward,
-        unlock_day: unlockDay,
-        is_published: parseInt(isPublished),
-        blocks: currentBuilderBlocks
-      };
-
-      try {
-        let res;
-        if (currentBuilderLesson && currentBuilderLesson.id) {
-          res = await fetch(`/api/lessons/${currentBuilderLesson.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-        } else {
-          res = await fetch('/api/lessons', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-        }
-        const data = await res.json();
-        if (data.success) {
-          alert('Урок успешно сохранен!');
-          await onBuilderModuleChange();
-        } else {
-          alert('Ошибка сохранения: ' + data.message);
-        }
-      } catch (e) {
-        console.error('Save lesson failed:', e);
-      }
-    }
-
-    function previewCurrentLesson() {
-      if (currentBuilderLesson && currentBuilderLesson.id) {
-        window.open(`lesson_player.html?lesson_id=${currentBuilderLesson.id}`, '_blank');
-      } else {
-        alert('Сначала сохраните урок, чтобы открыть предпросмотр в плеере.');
-      }
-    }
-
-    // AI Modal Handlers
-    function openAiLessonModal() {
-      document.getElementById('modal-ai-lesson-builder').classList.remove('hidden');
-      document.getElementById('modal-ai-lesson-builder').classList.add('flex');
-    }
-
-    function closeAiLessonModal() {
-      document.getElementById('modal-ai-lesson-builder').classList.add('hidden');
-      document.getElementById('modal-ai-lesson-builder').classList.remove('flex');
-    }
-
-    async function triggerAiLessonGen() {
-      const topic = document.getElementById('ai-topic-input').value.trim();
-      if (!topic) {
-        alert('Укажите тему урока для ИИ!');
-        return;
-      }
-      const disc = document.getElementById('ai-disc-input').value;
-      const diff = document.getElementById('ai-diff-input').value;
-      const goal = document.getElementById('ai-goal-input').value;
-
-      const statusBox = document.getElementById('ai-gen-status');
-      statusBox.classList.remove('hidden');
-      statusBox.className = 'p-3.5 rounded-xl bg-indigo-500/20 text-indigo-200 border border-indigo-500/30 text-xs italic';
-      statusBox.textContent = 'AI формирует 8-блочную структуру урока... Пожалуйста, подождите.';
-
-      try {
-        const res = await fetch('/api/ai/generate_lesson', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            topic: topic,
-            discipline: disc,
-            difficulty: diff,
-            objectives: goal
-          })
-        });
-        const data = await res.json();
-        if (data.success && data.blocks) {
-          currentBuilderBlocks = data.blocks;
-          document.getElementById('b-lesson-title').value = `Урок. ${topic}`;
-          renderBuilderBlocks();
-          statusBox.className = 'p-3.5 rounded-xl bg-emerald-500/20 text-emerald-200 border border-emerald-500/30 text-xs font-bold';
-          statusBox.textContent = `✓ Урок успешно сгенерирован (${data.provider})! 8 блоков вставлены в конструктор.`;
-          setTimeout(() => { closeAiLessonModal(); }, 1200);
-        } else {
-          statusBox.className = 'p-3.5 rounded-xl bg-rose-500/20 text-rose-200 border border-rose-500/30 text-xs font-bold';
-          statusBox.textContent = 'Ошибка: ' + (data.message || 'Не удалось сгенерировать урок');
-        }
-      } catch (e) {
-        statusBox.textContent = 'Ошибка соединения с сервером AI: ' + e;
-      }
-    }
-
-    async function createQuickCourse() {
-      const title = document.getElementById('quick-course-title').value.trim();
-      const slug = document.getElementById('quick-course-slug').value.trim().toLowerCase();
-      if (!title) {
-        alert('Укажите название курса');
-        return;
-      }
-      try {
-        const res = await fetch('/api/courses', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, slug })
-        });
-        const data = await res.json();
-        if (data.success) {
-          alert('Курс успешно создан!');
-          document.getElementById('quick-course-title').value = '';
-          document.getElementById('quick-course-slug').value = '';
-          await loadBuilderData();
-        } else {
-          alert('Ошибка: ' + data.message);
-        }
-      } catch (e) {
-        console.error('Course create failed:', e);
-      }
-    }
-
-  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -745,7 +394,7 @@
       </section>
 
       <!-- TAB PANEL 2: SUBMISSIONS REVIEW QUEUE -->
-      <section id="teacher-panel-queue" style="display:none;" class="hidden bg-dark-850/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
+      <section id="teacher-panel-queue" class="hidden bg-dark-850/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
         <div class="p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 class="font-extrabold text-lg text-white">Очередь проверки студенческих заданий</h2>
@@ -819,7 +468,7 @@
       </section>
 
       <!-- TAB PANEL 4: TASK BUILDER & GROUP BROADCAST -->
-      <section id="teacher-panel-builder" style="display:none;" class="hidden space-y-6">
+      <section id="teacher-panel-builder" class="hidden space-y-6">
 
         <!-- BUILDER TOP TOOLBAR -->
         <div class="bg-dark-850/80 backdrop-blur-xl rounded-3xl p-6 border border-white/10 shadow-xl space-y-4">
@@ -1031,14 +680,20 @@
 
         if (k === tab) {
           if (btn) btn.className = 'px-5 py-2.5 rounded-xl font-bold text-xs bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-1.5';
-          if (panel) panel.classList.remove('hidden');
+          if (panel) {
+            panel.classList.remove('hidden');
+            panel.style.display = '';
+          }
           if (sideLink) {
             sideLink.classList.add('bg-indigo-500/20', 'text-indigo-300', 'border', 'border-indigo-500/30');
             sideLink.classList.remove('text-slate-400');
           }
         } else {
           if (btn) btn.className = 'px-5 py-2.5 rounded-xl font-bold text-xs text-slate-400 hover:text-white transition-all flex items-center gap-1.5';
-          if (panel) panel.classList.add('hidden');
+          if (panel) {
+            panel.classList.add('hidden');
+            panel.style.display = 'none';
+          }
           if (sideLink) {
             sideLink.classList.remove('bg-indigo-500/20', 'text-indigo-300', 'border', 'border-indigo-500/30');
             sideLink.classList.add('text-slate-400');
@@ -1543,6 +1198,357 @@
     }
 
     document.addEventListener('DOMContentLoaded', loadTeacherDashboard);
+  
+
+// ==========================================
+    // VISUAL LESSON BUILDER ENGINE
+    // ==========================================
+    let builderCourses = [];
+    let builderModules = [];
+    let builderLessons = [];
+    let currentBuilderLesson = null;
+    let currentBuilderBlocks = [];
+
+    async function loadBuilderData() {
+      try {
+        const res = await fetch('/api/courses/manage');
+        const data = await res.json();
+        if (data.success) {
+          builderCourses = data.courses || [];
+          populateBuilderCourseSelect();
+        }
+      } catch (e) {
+        console.error('Error loading builder courses:', e);
+      }
+    }
+
+    function populateBuilderCourseSelect() {
+      const sel = document.getElementById('b-course-select');
+      if (!sel) return;
+      sel.innerHTML = builderCourses.map(c => `
+        <option value="${c.id}">${c.title} (${c.slug})</option>
+      `).join('');
+      if (builderCourses.length) onBuilderCourseChange();
+    }
+
+    async function onBuilderCourseChange() {
+      const courseId = document.getElementById('b-course-select').value;
+      if (!courseId) return;
+      try {
+        const res = await fetch(`/api/courses/${courseId}/modules`);
+        const data = await res.json();
+        builderModules = data.modules || [];
+        populateBuilderModuleSelect();
+      } catch (e) {
+        console.error('Error loading modules:', e);
+      }
+    }
+
+    function populateBuilderModuleSelect() {
+      const sel = document.getElementById('b-module-select');
+      if (!sel) return;
+      sel.innerHTML = builderModules.map(m => `
+        <option value="${m.id}">${m.title}</option>
+      `).join('');
+      if (builderModules.length) onBuilderModuleChange();
+    }
+
+    async function onBuilderModuleChange() {
+      const moduleId = document.getElementById('b-module-select').value;
+      const courseId = document.getElementById('b-course-select').value;
+      try {
+        const res = await fetch(`/api/lessons?course_id=${courseId}&module_id=${moduleId}`);
+        const data = await res.json();
+        builderLessons = data.lessons || [];
+        populateBuilderLessonSelect();
+      } catch (e) {
+        console.error('Error loading lessons:', e);
+      }
+    }
+
+    function populateBuilderLessonSelect() {
+      const sel = document.getElementById('b-lesson-select');
+      if (!sel) return;
+      sel.innerHTML = builderLessons.map(l => `
+        <option value="${l.id}">${l.title}</option>
+      `).join('');
+      if (builderLessons.length) {
+        onBuilderLessonChange();
+      } else {
+        createNewLessonInBuilder();
+      }
+    }
+
+    async function onBuilderLessonChange() {
+      const lessonId = document.getElementById('b-lesson-select').value;
+      if (!lessonId) return;
+      try {
+        const res = await fetch(`/api/lessons/${lessonId}`);
+        const data = await res.json();
+        if (data.success && data.lesson) {
+          currentBuilderLesson = data.lesson;
+          currentBuilderBlocks = currentBuilderLesson.blocks || [];
+          document.getElementById('b-lesson-title').value = currentBuilderLesson.title || '';
+          document.getElementById('b-lesson-type').value = currentBuilderLesson.lesson_type || 'theory';
+          document.getElementById('b-lesson-xp').value = currentBuilderLesson.xp_reward || 60;
+          document.getElementById('b-lesson-day').value = currentBuilderLesson.unlock_day || 1;
+          renderBuilderBlocks();
+        }
+      } catch (e) {
+        console.error('Error loading lesson details:', e);
+      }
+    }
+
+    function createNewLessonInBuilder() {
+      currentBuilderLesson = { id: null };
+      document.getElementById('b-lesson-title').value = 'Новый интерактивный урок';
+      document.getElementById('b-lesson-type').value = 'theory';
+      document.getElementById('b-lesson-xp').value = 60;
+      document.getElementById('b-lesson-day').value = 1;
+
+      // Default 8 template blocks
+      currentBuilderBlocks = [
+        { id: "b1_hook", type: "hook", title: "Кейс из практики", badge: "Ситуация", content: "Опишите реальную производственную ситуацию для вовлечения студентов..." },
+        { id: "b2_objectives", type: "objectives", title: "Цели обучения", items: ["Конкретный навык 1", "Конкретный навык 2"] },
+        { id: "b3_theory", type: "theory", title: "Теоретический базис", chunks: [{ heading: "Ключевая концепция", text: "Объяснение темы понятным языком..." }] },
+        { id: "b4_interactive", type: "interactive", widget_type: "flip_cards", title: "Интерактивное закрепление", cards: [{ front: "Термин", back: "Определение" }] },
+        { id: "b5_check", type: "inline_check", title: "Проверка понимания", question: "Контрольный вопрос?", options: ["Вариант А", "Вариант Б"], correct_index: 0, explanation: "Пояснение..." },
+        { id: "b6_practice", type: "practical", title: "Практическое задание", task_description: "Описание практической задачи...", guidelines: ["Шаг 1"] },
+        { id: "b7_assessment", type: "assessment", title: "Итоговое испытание", questions: [{ question: "Тестовый вопрос?", options: ["Да", "Нет"], correct: 0 }] },
+        { id: "b8_summary", type: "summary", title: "Результаты урока", xp: 60, skills_acquired: ["Освоен практический навык"] }
+      ];
+      renderBuilderBlocks();
+    }
+
+    function renderBuilderBlocks() {
+      const container = document.getElementById('builder-blocks-list');
+      if (!container) return;
+      document.getElementById('b-blocks-count').textContent = `${currentBuilderBlocks.length} блоков`;
+
+      const blockIconMap = {
+        hook: 'lightbulb',
+        objectives: 'flag',
+        theory: 'menu_book',
+        interactive: 'touch_app',
+        inline_check: 'help',
+        practical: 'terminal',
+        assessment: 'quiz',
+        summary: 'emoji_events'
+      };
+
+      container.innerHTML = currentBuilderBlocks.map((b, idx) => `
+        <div class="bg-dark-850/80 rounded-2xl p-4 sm:p-5 border border-white/10 shadow-lg space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex items-center justify-center font-bold font-mono text-xs">
+                ${idx + 1}
+              </span>
+              <span class="material-symbols-outlined text-slate-400 text-[18px]">
+                ${blockIconMap[b.type] || 'extension'}
+              </span>
+              <span class="font-bold text-xs text-white uppercase tracking-wider">${b.type}</span>
+            </div>
+
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="moveBlock(${idx}, -1)" ${idx === 0 ? 'disabled' : ''} class="p-1 rounded-lg text-slate-400 hover:text-white disabled:opacity-30">
+                <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
+              </button>
+              <button type="button" onclick="moveBlock(${idx}, 1)" ${idx === currentBuilderBlocks.length - 1 ? 'disabled' : ''} class="p-1 rounded-lg text-slate-400 hover:text-white disabled:opacity-30">
+                <span class="material-symbols-outlined text-[16px]">arrow_downward</span>
+              </button>
+              <button type="button" onclick="deleteBlock(${idx})" class="p-1 rounded-lg text-rose-400 hover:text-rose-300">
+                <span class="material-symbols-outlined text-[16px]">delete</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <input type="text" value="${b.title || ''}" onchange="updateBlockField(${idx}, 'title', this.value)" placeholder="Заголовок блока..." class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-white font-bold" />
+            ${b.content !== undefined ? `
+              <textarea rows="2" onchange="updateBlockField(${idx}, 'content', this.value)" class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-slate-300 leading-relaxed">${b.content}</textarea>
+            ` : ''}
+            ${b.question !== undefined ? `
+              <input type="text" value="${b.question || ''}" onchange="updateBlockField(${idx}, 'question', this.value)" placeholder="Формулировка вопроса..." class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-amber-300 font-semibold" />
+            ` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function moveBlock(idx, dir) {
+      const target = idx + dir;
+      if (target < 0 || target >= currentBuilderBlocks.length) return;
+      const temp = currentBuilderBlocks[idx];
+      currentBuilderBlocks[idx] = currentBuilderBlocks[target];
+      currentBuilderBlocks[target] = temp;
+      renderBuilderBlocks();
+    }
+
+    function deleteBlock(idx) {
+      if (confirm('Удалить этот блок?')) {
+        currentBuilderBlocks.splice(idx, 1);
+        renderBuilderBlocks();
+      }
+    }
+
+    function updateBlockField(idx, field, value) {
+      if (currentBuilderBlocks[idx]) {
+        currentBuilderBlocks[idx][field] = value;
+      }
+    }
+
+    function onAddBlockSelected(sel) {
+      const type = sel.value;
+      if (!type) return;
+      currentBuilderBlocks.push({
+        id: `b_${Date.now()}`,
+        type: type,
+        title: `Новый блок: ${type}`,
+        content: "Содержимое блока..."
+      });
+      sel.value = '';
+      renderBuilderBlocks();
+    }
+
+    async function saveBuilderLesson() {
+      const title = document.getElementById('b-lesson-title').value.trim();
+      if (!title) {
+        alert('Укажите название урока!');
+        return;
+      }
+      const courseId = parseInt(document.getElementById('b-course-select').value);
+      const moduleId = parseInt(document.getElementById('b-module-select').value);
+      const lessonType = document.getElementById('b-lesson-type').value;
+      const xpReward = parseInt(document.getElementById('b-lesson-xp').value) || 60;
+      const unlockDay = parseInt(document.getElementById('b-lesson-day').value) || 1;
+      const isPublished = document.querySelector('input[name="builder_pub_status"]:checked')?.value || 1;
+
+      const payload = {
+        course_id: courseId,
+        module_id: moduleId,
+        title: title,
+        lesson_type: lessonType,
+        xp_reward: xpReward,
+        unlock_day: unlockDay,
+        is_published: parseInt(isPublished),
+        blocks: currentBuilderBlocks
+      };
+
+      try {
+        let res;
+        if (currentBuilderLesson && currentBuilderLesson.id) {
+          res = await fetch(`/api/lessons/${currentBuilderLesson.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          res = await fetch('/api/lessons', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        }
+        const data = await res.json();
+        if (data.success) {
+          alert('Урок успешно сохранен!');
+          await onBuilderModuleChange();
+        } else {
+          alert('Ошибка сохранения: ' + data.message);
+        }
+      } catch (e) {
+        console.error('Save lesson failed:', e);
+      }
+    }
+
+    function previewCurrentLesson() {
+      if (currentBuilderLesson && currentBuilderLesson.id) {
+        window.open(`lesson_player.html?lesson_id=${currentBuilderLesson.id}`, '_blank');
+      } else {
+        alert('Сначала сохраните урок, чтобы открыть предпросмотр в плеере.');
+      }
+    }
+
+    // AI Modal Handlers
+    function openAiLessonModal() {
+      document.getElementById('modal-ai-lesson-builder').classList.remove('hidden');
+      document.getElementById('modal-ai-lesson-builder').classList.add('flex');
+    }
+
+    function closeAiLessonModal() {
+      document.getElementById('modal-ai-lesson-builder').classList.add('hidden');
+      document.getElementById('modal-ai-lesson-builder').classList.remove('flex');
+    }
+
+    async function triggerAiLessonGen() {
+      const topic = document.getElementById('ai-topic-input').value.trim();
+      if (!topic) {
+        alert('Укажите тему урока для ИИ!');
+        return;
+      }
+      const disc = document.getElementById('ai-disc-input').value;
+      const diff = document.getElementById('ai-diff-input').value;
+      const goal = document.getElementById('ai-goal-input').value;
+
+      const statusBox = document.getElementById('ai-gen-status');
+      statusBox.classList.remove('hidden');
+      statusBox.className = 'p-3.5 rounded-xl bg-indigo-500/20 text-indigo-200 border border-indigo-500/30 text-xs italic';
+      statusBox.textContent = 'AI формирует 8-блочную структуру урока... Пожалуйста, подождите.';
+
+      try {
+        const res = await fetch('/api/ai/generate_lesson', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic: topic,
+            discipline: disc,
+            difficulty: diff,
+            objectives: goal
+          })
+        });
+        const data = await res.json();
+        if (data.success && data.blocks) {
+          currentBuilderBlocks = data.blocks;
+          document.getElementById('b-lesson-title').value = `Урок. ${topic}`;
+          renderBuilderBlocks();
+          statusBox.className = 'p-3.5 rounded-xl bg-emerald-500/20 text-emerald-200 border border-emerald-500/30 text-xs font-bold';
+          statusBox.textContent = `✓ Урок успешно сгенерирован (${data.provider})! 8 блоков вставлены в конструктор.`;
+          setTimeout(() => { closeAiLessonModal(); }, 1200);
+        } else {
+          statusBox.className = 'p-3.5 rounded-xl bg-rose-500/20 text-rose-200 border border-rose-500/30 text-xs font-bold';
+          statusBox.textContent = 'Ошибка: ' + (data.message || 'Не удалось сгенерировать урок');
+        }
+      } catch (e) {
+        statusBox.textContent = 'Ошибка соединения с сервером AI: ' + e;
+      }
+    }
+
+    async function createQuickCourse() {
+      const title = document.getElementById('quick-course-title').value.trim();
+      const slug = document.getElementById('quick-course-slug').value.trim().toLowerCase();
+      if (!title) {
+        alert('Укажите название курса');
+        return;
+      }
+      try {
+        const res = await fetch('/api/courses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, slug })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('Курс успешно создан!');
+          document.getElementById('quick-course-title').value = '';
+          document.getElementById('quick-course-slug').value = '';
+          await loadBuilderData();
+        } else {
+          alert('Ошибка: ' + data.message);
+        }
+      } catch (e) {
+        console.error('Course create failed:', e);
+      }
+    }
   </script>
 
   <!-- AI LESSON BUILDER MODAL -->
