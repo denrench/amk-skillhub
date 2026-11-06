@@ -431,7 +431,12 @@ def init_db():
                 "CREATE UNIQUE INDEX IF NOT EXISTS idx_teacher_groups_tid_grp ON teacher_groups (teacher_id, group_name)",
                 "CREATE TABLE IF NOT EXISTS xp_transactions (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, amount INTEGER NOT NULL, source_type VARCHAR(64) NOT NULL, source_id VARCHAR(128) NOT NULL, description VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_xp_user_source UNIQUE(user_id, source_type, source_id))",
                 "CREATE TABLE IF NOT EXISTS audit_logs (id SERIAL PRIMARY KEY, actor_id INTEGER, actor_email VARCHAR(128), actor_role VARCHAR(32), action VARCHAR(128) NOT NULL, target_type VARCHAR(64), target_id VARCHAR(128), details TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
-                "CREATE TABLE IF NOT EXISTS daily_quests_log (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, quest_key VARCHAR(64) NOT NULL, quest_date VARCHAR(32) NOT NULL, completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_daily_user_quest UNIQUE(user_id, quest_key, quest_date))"
+                "CREATE TABLE IF NOT EXISTS daily_quests_log (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, quest_key VARCHAR(64) NOT NULL, quest_date VARCHAR(32) NOT NULL, completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_daily_user_quest UNIQUE(user_id, quest_key, quest_date))",
+                "CREATE TABLE IF NOT EXISTS courses (id SERIAL PRIMARY KEY, slug VARCHAR(64) UNIQUE NOT NULL, title VARCHAR(255) NOT NULL, code VARCHAR(64) DEFAULT '', description TEXT DEFAULT '', curator_id INTEGER, is_published INTEGER DEFAULT 1, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
+                "CREATE TABLE IF NOT EXISTS course_modules (id SERIAL PRIMARY KEY, course_id INTEGER NOT NULL, title VARCHAR(255) NOT NULL, order_num INTEGER DEFAULT 1, is_published INTEGER DEFAULT 1, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
+                "CREATE TABLE IF NOT EXISTS lessons (id SERIAL PRIMARY KEY, course_id INTEGER NOT NULL, module_id INTEGER, title VARCHAR(255) NOT NULL, lesson_type VARCHAR(64) DEFAULT 'theory', order_num INTEGER DEFAULT 1, xp_reward INTEGER DEFAULT 60, unlock_day INTEGER DEFAULT 1, is_published INTEGER DEFAULT 1, content_json TEXT DEFAULT '[]', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
+                "CREATE TABLE IF NOT EXISTS lesson_block_progress (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, lesson_id INTEGER NOT NULL, block_id VARCHAR(64) NOT NULL, completed INTEGER DEFAULT 0, state_json TEXT DEFAULT '{}', updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_block_prog UNIQUE(user_id, lesson_id, block_id))",
+                "CREATE TABLE IF NOT EXISTS ai_conversations (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, context_type VARCHAR(64) NOT NULL, context_id VARCHAR(128) DEFAULT '', user_message TEXT NOT NULL, assistant_message TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
             ]:
                 pg_cur.execute(pg_ddl)
             pg_conn.commit()
@@ -711,6 +716,83 @@ def init_db():
         FOREIGN KEY (user_id) REFERENCES users(id)
     );
     """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS courses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT UNIQUE NOT NULL,
+        title TEXT NOT NULL,
+        code TEXT DEFAULT '',
+        description TEXT DEFAULT '',
+        curator_id INTEGER,
+        is_published INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS course_modules (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        course_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        order_num INTEGER DEFAULT 1,
+        is_published INTEGER DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (course_id) REFERENCES courses(id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS lessons (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        course_id INTEGER NOT NULL,
+        module_id INTEGER,
+        title TEXT NOT NULL,
+        lesson_type TEXT DEFAULT 'theory',
+        order_num INTEGER DEFAULT 1,
+        xp_reward INTEGER DEFAULT 60,
+        unlock_day INTEGER DEFAULT 1,
+        is_published INTEGER DEFAULT 1,
+        content_json TEXT DEFAULT '[]',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (course_id) REFERENCES courses(id),
+        FOREIGN KEY (module_id) REFERENCES course_modules(id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS lesson_block_progress (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        lesson_id INTEGER NOT NULL,
+        block_id TEXT NOT NULL,
+        completed INTEGER DEFAULT 0,
+        state_json TEXT DEFAULT '{}',
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, lesson_id, block_id),
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (lesson_id) REFERENCES lessons(id)
+    );
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS ai_conversations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        context_type TEXT NOT NULL,
+        context_id TEXT DEFAULT '',
+        user_message TEXT NOT NULL,
+        assistant_message TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    try:
+        from curriculum_seeder import seed_interactive_curriculum
+        seed_interactive_curriculum(cursor)
+    except Exception as e:
+        print(f"[WARN] Curriculum seeder notice: {e}")
+
     cursor.execute("INSERT OR IGNORE INTO platform_settings (key, value) VALUES ('current_study_day', '1');")
     # Clean out obsolete tasks & migrate legacy slugs
     cursor.execute("DELETE FROM tasks WHERE specialty_slug NOT IN ('it', 'graphic_design', 'autoelectric', 'hvac', 'automechanic');")
@@ -4148,7 +4230,16 @@ def healthz():
     return jsonify({"status": "healthy", "service": "EDU SPACE LMS", "version": "2.0"}), 200
 
 
+
+# Register Interactive Lessons & AI Blueprint
+try:
+    from routes_interactive_lessons import interactive_lessons_bp
+    app.register_blueprint(interactive_lessons_bp)
+except Exception as e:
+    print(f"[ERROR] Failed to register interactive_lessons_bp: {e}")
+
 if __name__ == '__main__':
+
     init_db()
     port = int(os.environ.get('PORT', 5000))
     print(f"EDU SPACE LMS Server running on http://0.0.0.0:{port}")

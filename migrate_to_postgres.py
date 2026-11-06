@@ -279,6 +279,67 @@ def run_migration(pg_url=None):
             completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             CONSTRAINT uq_daily_user_quest UNIQUE(user_id, quest_key, quest_date)
         );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS courses (
+            id SERIAL PRIMARY KEY,
+            slug VARCHAR(64) UNIQUE NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            code VARCHAR(64) DEFAULT '',
+            description TEXT DEFAULT '',
+            curator_id INTEGER,
+            is_published INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS course_modules (
+            id SERIAL PRIMARY KEY,
+            course_id INTEGER NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            order_num INTEGER DEFAULT 1,
+            is_published INTEGER DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS lessons (
+            id SERIAL PRIMARY KEY,
+            course_id INTEGER NOT NULL,
+            module_id INTEGER,
+            title VARCHAR(255) NOT NULL,
+            lesson_type VARCHAR(64) DEFAULT 'theory',
+            order_num INTEGER DEFAULT 1,
+            xp_reward INTEGER DEFAULT 60,
+            unlock_day INTEGER DEFAULT 1,
+            is_published INTEGER DEFAULT 1,
+            content_json TEXT DEFAULT '[]',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS lesson_block_progress (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            lesson_id INTEGER NOT NULL,
+            block_id VARCHAR(64) NOT NULL,
+            completed INTEGER DEFAULT 0,
+            state_json TEXT DEFAULT '{}',
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT uq_block_prog UNIQUE(user_id, lesson_id, block_id)
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS ai_conversations (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            context_type VARCHAR(64) NOT NULL,
+            context_id VARCHAR(128) DEFAULT '',
+            user_message TEXT NOT NULL,
+            assistant_message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
         """
     ]
 
