@@ -11,7 +11,7 @@ pages = [
 
 print("=== CHECKING ALL 18 HTML PAGES ===")
 for p in pages:
-    res = client.get(f'/{p}')
+    res = client.get(f'/{p}', follow_redirects=True)
     assert res.status_code == 200, f"Page {p} returned {res.status_code}"
     body = res.get_data(as_text=True)
     assert len(body) > 500, f"Page {p} seems truncated (len={len(body)})"

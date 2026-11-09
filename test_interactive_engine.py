@@ -20,21 +20,53 @@ assert res.status_code == 200
 lessons_data = res.get_json()
 assert lessons_data.get('success') is True
 lessons = lessons_data.get('lessons', [])
-assert len(lessons) >= 5, "Should have seeded lessons"
-print(f"[OK] Test 2: Lessons API returns {len(lessons)} interactive lessons")
+assert len(lessons) == 50, f"Expected exactly 50 seeded lessons across 5 courses, got {len(lessons)}"
+print(f"[OK] Test 2: Lessons API returns {len(lessons)} interactive lessons (10 per specialty)")
 
-# 3. Check Lesson Detail with 8 Blocks
-lesson_id = lessons[0]['id']
-res = client.get(f'/api/lessons/{lesson_id}')
-assert res.status_code == 200
-detail = res.get_json()
-assert detail.get('success') is True
-blocks = detail['lesson'].get('blocks', [])
-assert len(blocks) == 8, f"Expected 8 blocks, got {len(blocks)}"
-block_types = [b['type'] for b in blocks]
+# 3. Check All 50 Lessons Have Valid 8 Blocks, Sequential Traversal & Verify Specialty Aliases
 expected_types = ['hook', 'objectives', 'theory', 'interactive', 'inline_check', 'practical', 'assessment', 'summary']
-assert block_types == expected_types, f"Block types mismatch: {block_types}"
-print(f"[OK] Test 3: Lesson {lesson_id} contains all 8 required educational blocks ({block_types})")
+for les_item in lessons:
+    lid = les_item['id']
+    r_detail = client.get(f'/api/lessons/{lid}')
+    assert r_detail.status_code == 200, f"Failed to load lesson {lid}"
+    d = r_detail.get_json()
+    assert d.get('success') is True
+    les = d['lesson']
+    blks = les.get('blocks', [])
+    assert len(blks) == 8, f"Lesson {lid} expected 8 blocks, got {len(blks)}"
+    b_types = [b['type'] for b in blks]
+    assert b_types == expected_types, f"Block types mismatch in lesson {lid}: {b_types}"
+
+    # Verify sequential traversal pointers
+    order_num = les.get('order_num', 1)
+    if order_num < 10:
+        assert les.get('next_lesson_id') is not None, f"Lesson {lid} (order {order_num}) must have next_lesson_id"
+    else:
+        assert les.get('next_lesson_id') is None, f"Lesson {lid} (order {order_num}) is last in course, next_lesson_id must be None"
+    if order_num > 1:
+        assert les.get('prev_lesson_id') is not None, f"Lesson {lid} (order {order_num}) must have prev_lesson_id"
+    else:
+        assert les.get('prev_lesson_id') is None, f"Lesson {lid} (order {order_num}) is first in course, prev_lesson_id must be None"
+
+# Verify module de-duplication: each default course must have exactly 1 active module with 10 lessons
+for cid in range(1, 6):
+    r_mods = client.get(f'/api/courses/{cid}/modules')
+    assert r_mods.status_code == 200
+    mods = r_mods.get_json().get('modules', [])
+    assert len(mods) == 1, f"Course {cid} should have exactly 1 module, got {len(mods)}"
+    assert len(mods[0].get('lessons', [])) == 10, f"Course {cid} module 1 should have 10 lessons"
+
+# Verify specialty alias endpoints
+for alias, expected_count in [('power', 10), ('mechanics', 10), ('logistics', 10), ('accounting', 10)]:
+    r_alias = client.get(f'/api/lessons?specialty={alias}')
+    assert r_alias.status_code == 200
+    assert len(r_alias.get_json().get('lessons', [])) == expected_count, f"Alias {alias} expected {expected_count} lessons"
+    r_task_alias = client.get(f'/api/tasks?specialty={alias}')
+    assert r_task_alias.status_code == 200
+    assert len(r_task_alias.get_json().get('tasks', [])) == expected_count, f"Alias {alias} expected {expected_count} tasks"
+
+lesson_id = lessons[0]['id']
+print(f"[OK] Test 3: Verified all 50 lessons contain 8 modular blocks, valid next/prev traversal pointers, and clean modules")
 
 # Get real student and teacher users from DB
 with app.app_context():
@@ -148,6 +180,69 @@ assert res.get_json()['lesson']['title'] == "Урок 99. Автотесты API
 client.delete(f'/api/lessons/{new_les_id}')
 print("[OK] Test 8: Teacher full CRUD on lessons verified (Create, Read, Update, Delete)")
 
+# 9. Check PostgreSQL Connection Pooling, Wrapper Resilience & Transaction Safety
+from server import PostgresConnectionWrapper, PostgresCursorWrapper, Pg8000ConnectionPool
+
+class MockRawConn:
+    def __init__(self):
+        self.closed = 0
+        self.rolled_back = False
+        self.committed = False
+        self.is_closed = False
+
+    def rollback(self):
+        self.rolled_back = True
+
+    def commit(self):
+        self.committed = True
+
+    def close(self):
+        self.closed = 1
+        self.is_closed = True
+
+    def cursor(self):
+        return self
+
+    def execute(self, q, params=None):
+        pass
+
+class MockPool:
+    def __init__(self):
+        self.returned_conns = []
+        self.closed_conns = []
+
+    def putconn(self, conn, close=False):
+        if close:
+            self.closed_conns.append(conn)
+        else:
+            self.returned_conns.append(conn)
+
+# Verify rollback is called before returning connection to pool
+mock_c = MockRawConn()
+mock_p = MockPool()
+wrapper = PostgresConnectionWrapper(mock_c, pool=mock_p)
+wrapper.close()
+assert mock_c.rolled_back is True, "Connection must be rolled back on return to pool to avoid transaction poisoning"
+assert len(mock_p.returned_conns) == 1
+assert len(mock_p.closed_conns) == 0
+
+# Verify broken connection is permanently removed from pool
+mock_c_broken = MockRawConn()
+def bad_rollback():
+    raise RuntimeError("Dead connection")
+mock_c_broken.rollback = bad_rollback
+wrapper_broken = PostgresConnectionWrapper(mock_c_broken, pool=mock_p)
+wrapper_broken.close()
+assert len(mock_p.closed_conns) == 1, "Broken connection must be closed and removed from pool"
+
+# Verify PostgresCursorWrapper prevents double wrapping
+mock_cur = MockRawConn()
+c_wrap1 = PostgresCursorWrapper(mock_cur, mock_c)
+c_wrap2 = PostgresCursorWrapper(c_wrap1, mock_c)
+assert c_wrap2._cur is mock_cur, "Double-wrapped cursor wrapper must unwrap to the root cursor"
+
+print("[OK] Test 9: PostgreSQL connection pooling rollback on close, broken connection disposal & wrapper safety verified")
+
 print("\n=======================================================")
-print("ALL 8 MASTER INTERACTIVE LESSONS & AI CHECKS PASSED 100%!")
+print("ALL 9 MASTER INTERACTIVE LESSONS & AI CHECKS PASSED 100%!")
 print("=======================================================")

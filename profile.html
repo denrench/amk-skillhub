@@ -21,7 +21,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS Local & CDN -->
+  <link rel="stylesheet" href="css/tailwind.min.css"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -96,13 +97,91 @@
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
 </head>
-<body class="font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative">
+<body class="font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
 
   <!-- Ambient background glow orbs -->
   <div class="fixed top-20 left-1/3 w-96 h-96 bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none"></div>
   <div class="fixed bottom-20 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[140px] pointer-events-none"></div>
 
-  <!-- SIDEBAR -->
+  <!-- MOBILE NAVIGATION DRAWER BACKDROP & DRAWER -->
+  <div id="mobile-nav-backdrop" onclick="toggleMobileNav(false)" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 transition-opacity duration-300 opacity-0 pointer-events-none lg:hidden"></div>
+
+  <aside id="mobile-nav-drawer" class="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-dark-950/98 border-r border-white/10 z-50 flex flex-col justify-between shadow-2xl transition-transform duration-300 transform -translate-x-full lg:hidden">
+    <div class="flex flex-col flex-1 overflow-y-auto px-4 py-6">
+      <div class="flex items-center justify-between mb-6">
+        <a href="index.html" class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-glow-indigo">
+            <div class="w-full h-full bg-dark-900 rounded-[10px] flex items-center justify-center">
+              <img alt="EDU SPACE Logo" width="18" height="18" class="h-4 w-4 object-contain" src="assets/eduspace-logo.svg"/>
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-extrabold text-sm text-white tracking-tight flex items-center gap-1">
+              EDU SPACE <span class="text-[9px] uppercase font-bold px-1 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">АМК</span>
+            </span>
+            <span class="text-[9px] font-semibold text-indigo-400 uppercase">Цифровой паспорт</span>
+          </div>
+        </a>
+        <button type="button" onclick="toggleMobileNav(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5" aria-label="Закрыть меню">
+          <span class="material-symbols-outlined text-[22px]">close</span>
+        </button>
+      </div>
+
+      <nav class="space-y-1.5">
+        <a href="student.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">grid_view</span>
+          <span>Моё обучение</span>
+        </a>
+        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openSubjectsModal();" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">menu_book</span>
+          <span>Мои курсы</span>
+        </a>
+        <a href="tasks.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">assignment</span>
+          <span>Уроки и задания</span>
+        </a>
+        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openInteractiveRoadmapModal();" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+          <span>Интерактивный роадмап</span>
+        </a>
+        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openMessengerModal();" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+          <span>Чат с куратором</span>
+        </a>
+        <a href="profile.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold text-sm shadow-glow-indigo">
+          <span class="material-symbols-outlined text-[20px]">account_circle</span>
+          <span>Профиль и сертификат</span>
+        </a>
+        <a href="career.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px] text-amber-300">work</span>
+          <span>Карьера & Резюме</span>
+        </a>
+        <a href="tools.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
+          <span class="material-symbols-outlined text-[20px] text-cyan-400">construction</span>
+          <span>Инструменты</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-white/10 space-y-2 bg-dark-950/60">
+      <button type="button" onclick="toggleMobileNav(false); resetDemoMode();" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold transition-all border border-amber-500/30">
+        <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+        <span>Сбросить демо в начало</span>
+      </button>
+      <div class="flex items-center justify-between pt-2">
+        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openSettingsModal();" class="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors">
+          <span class="material-symbols-outlined text-[18px]">settings</span>
+          <span>Настройки</span>
+        </a>
+        <button type="button" onclick="logoutUser()" class="flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors">
+          <span class="material-symbols-outlined text-[18px]">logout</span>
+          <span>Выйти</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- DESKTOP SIDEBAR -->
   <aside class="fixed left-0 top-0 h-full w-64 bg-dark-950/95 backdrop-blur-xl border-r border-white/10 z-50 hidden lg:flex flex-col justify-between shadow-2xl">
     <div class="flex flex-col flex-1 overflow-y-auto px-4 py-6">
       <a href="index.html" class="flex items-center gap-3 px-2 mb-8 group">
@@ -178,7 +257,10 @@
 
     <!-- HEADER -->
     <header class="fixed top-0 left-0 lg:left-64 right-0 h-16 bg-dark-900/80 backdrop-blur-xl border-b border-white/10 z-40 flex items-center justify-between px-4 sm:px-8">
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button type="button" onclick="toggleMobileNav(true)" class="lg:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 -ml-1 mr-1" aria-label="Открыть меню">
+          <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
         <a href="student.html" id="header-back-link" class="text-slate-400 hover:text-white flex items-center gap-1 text-xs font-bold transition-colors">
           <span class="material-symbols-outlined text-[18px]">arrow_back</span>
           <span>В кабинет</span>
@@ -331,6 +413,16 @@
   <script>
     let profilePayload = null;
 
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     async function initProfilePage() {
       const user = window.EduSpace.getActiveUser();
       if (!user) return;
@@ -371,7 +463,7 @@
       skillsBox.innerHTML = skills.map(sk => `
         <div class="space-y-1.5 text-xs">
           <div class="flex items-center justify-between gap-2 font-semibold">
-            <span class="text-slate-200">${sk.name}</span>
+            <span class="text-slate-200">${escapeHtml(sk.name)}</span>
             <span class="${sk.percent > 0 ? 'text-indigo-400 font-extrabold' : 'text-slate-500'}">
               ${sk.percent > 0 ? `${sk.percent}% (${sk.completed}/${sk.total})` : (sk.unlocked ? '0% (модуль открыт)' : `0% (откроется в День ${sk.unlock_day})`)}
             </span>
@@ -397,13 +489,13 @@
           const ok = s.score >= 60 && !String(s.status).includes('доработ');
           return `
             <tr class="hover:bg-white/[0.03]">
-              <td class="p-4 font-bold text-white">Урок №${s.task_number}. ${s.task_title}</td>
-              <td class="p-4 uppercase text-[10px] font-extrabold text-indigo-400">${s.specialty_slug}</td>
-              <td class="p-4 font-extrabold text-white">${s.score}/100 (${s.grade_letter})</td>
+              <td class="p-4 font-bold text-white">Урок №${Number(s.task_number) || 1}. ${escapeHtml(s.task_title)}</td>
+              <td class="p-4 uppercase text-[10px] font-extrabold text-indigo-400">${escapeHtml(s.specialty_slug)}</td>
+              <td class="p-4 font-extrabold text-white">${Number(s.score)}/100 (${escapeHtml(s.grade_letter)})</td>
               <td class="p-4">
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${ok ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">${s.status}</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${ok ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">${escapeHtml(s.status)}</span>
               </td>
-              <td class="p-4 text-slate-300">${s.teacher_comment || 'Подтверждено автотестами платформы'}</td>
+              <td class="p-4 text-slate-300">${escapeHtml(s.teacher_comment || 'Подтверждено автотестами платформы')}</td>
             </tr>
           `;
         }).join('');
@@ -427,11 +519,11 @@
           </h3>
           <p class="text-xs text-slate-400">Настоящим удостоверяется, что слушатель</p>
           <div class="font-extrabold text-xl sm:text-2xl text-indigo-300 py-1 border-b border-white/10 max-w-md mx-auto">
-            ${user.full_name}
+            ${escapeHtml(user.full_name)}
           </div>
           <p class="text-xs text-slate-300 max-w-lg mx-auto leading-relaxed">
-            осваивает образовательную программу <strong class="text-white">«${course.code} — ${course.title}»</strong>.<br/>
-            Зачтено модулей: <strong class="text-emerald-400">${stats.passed_count} из 10 (${stats.progress_percent}%)</strong> • Средний балл: <strong class="text-indigo-400">${stats.avg_score > 0 ? `${stats.avg_score}/100 (GPA ${stats.gpa})` : 'В процессе'}</strong>.
+            осваивает образовательную программу <strong class="text-white">«${escapeHtml(course.code)} — ${escapeHtml(course.title)}»</strong>.<br/>
+            Зачтено модулей: <strong class="text-emerald-400">${Number(stats.passed_count)} из 10 (${Number(stats.progress_percent)}%)</strong> • Средний балл: <strong class="text-indigo-400">${stats.avg_score > 0 ? `${escapeHtml(stats.avg_score)}/100 (GPA ${escapeHtml(stats.gpa)})` : 'В процессе'}</strong>.
           </p>
 
           <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-left text-xs">
@@ -468,8 +560,6 @@
       `, 'max-w-2xl');
     }
 
-    document.addEventListener('DOMContentLoaded', initProfilePage);
-  
     function renderProfileBadges() {
       const user = window.EduSpace.getActiveUser();
       if (!user) return;
@@ -500,7 +590,29 @@
       `).join('');
     }
 
+    function toggleMobileNav(open) {
+      const backdrop = document.getElementById('mobile-nav-backdrop');
+      const drawer = document.getElementById('mobile-nav-drawer');
+      if (!backdrop || !drawer) return;
+      if (open) {
+        backdrop.classList.remove('opacity-0', 'pointer-events-none');
+        backdrop.classList.add('opacity-100');
+        drawer.classList.remove('-translate-x-full');
+        drawer.classList.add('translate-x-0');
+        document.body.classList.add('overflow-hidden');
+      } else {
+        backdrop.classList.remove('opacity-100');
+        backdrop.classList.add('opacity-0', 'pointer-events-none');
+        drawer.classList.remove('translate-x-0');
+        drawer.classList.add('-translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initProfilePage();
+      renderProfileBadges();
+    });
   </script>
 </body>
-</html>  renderProfileBadges();
-    
+</html>

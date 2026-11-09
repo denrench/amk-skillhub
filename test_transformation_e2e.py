@@ -14,11 +14,13 @@ Verifies:
 import sys
 import json
 import time
+import sqlite3
 
 # Ensure utf-8 output on Windows
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
 
+import server
 from server import app as flask_app, get_db, init_db, award_xp, check_and_unlock_achievements, get_level_info
 
 # Initialize fresh database schema
@@ -158,7 +160,12 @@ ts_str = str(int(time.time()))
 s_email = f"student.e2e.{ts_str}@amk.kz"
 
 # 1. Send OTP & Verify
-otp = client.post('/api/auth/send_code', json={'email': s_email}).get_json()['mail_preview']['code']
+client.post('/api/auth/send_code', json={'email': s_email})
+_conn = sqlite3.connect(server.DB_PATH)
+_cur = _conn.cursor()
+_cur.execute("SELECT code FROM email_verifications WHERE email = ? ORDER BY rowid DESC LIMIT 1", (s_email,))
+otp = _cur.fetchone()[0]
+_conn.close()
 client.post('/api/auth/verify_code', json={'email': s_email, 'code': otp})
 
 # 2. Register fresh student

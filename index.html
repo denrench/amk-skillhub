@@ -20,7 +20,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS Local & CDN -->
+  <link rel="stylesheet" href="css/tailwind.min.css"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -111,9 +112,58 @@
           <span class="material-symbols-outlined text-[18px]">school</span>
           <span>В кабинет</span>
         </a>
+        <button type="button" onclick="toggleMobileNav(true)" class="lg:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/5" aria-label="Открыть мобильное меню">
+          <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
       </div>
     </div>
   </header>
+
+  <!-- MOBILE NAVIGATION DRAWER BACKDROP & DRAWER -->
+  <div id="mobile-nav-backdrop" onclick="toggleMobileNav(false)" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 transition-opacity duration-300 opacity-0 pointer-events-none lg:hidden"></div>
+
+  <aside id="mobile-nav-drawer" class="fixed inset-y-0 right-0 w-72 max-w-[85vw] bg-dark-950/98 border-l border-white/10 z-50 flex flex-col justify-between shadow-2xl transition-transform duration-300 transform translate-x-full lg:hidden">
+    <div class="flex flex-col flex-1 overflow-y-auto px-5 py-6">
+      <div class="flex items-center justify-between mb-6">
+        <span class="font-extrabold text-sm text-white">Меню навигации</span>
+        <button type="button" onclick="toggleMobileNav(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5" aria-label="Закрыть меню">
+          <span class="material-symbols-outlined text-[22px]">close</span>
+        </button>
+      </div>
+      <nav class="space-y-1.5 text-sm">
+        <a href="#specialties" onclick="toggleMobileNav(false)" class="block px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold transition-colors">Специальности</a>
+        <a href="#simulators" onclick="toggleMobileNav(false)" class="block px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold transition-colors">3D & Тренажёры</a>
+        <a href="#how-it-works" onclick="toggleMobileNav(false)" class="block px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold transition-colors">Обучение</a>
+        <a href="#ai-mentor" onclick="toggleMobileNav(false)" class="block px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold transition-colors">AI-Куратор</a>
+        <a href="gradebook.html" onclick="toggleMobileNav(false)" class="block px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold transition-colors">Журнал</a>
+        <a href="tools.html" onclick="toggleMobileNav(false)" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[17px] text-cyan-400">construction</span>
+          <span>Инструменты</span>
+        </a>
+        <a href="career.html" onclick="toggleMobileNav(false)" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[17px] text-amber-300">work</span>
+          <span>Карьера</span>
+        </a>
+        <a href="pricing.html" onclick="toggleMobileNav(false)" class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[17px] text-indigo-400">diamond</span>
+          <span>Тарифы</span>
+        </a>
+        <a href="features.html" onclick="toggleMobileNav(false)" class="block px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold transition-colors">Возможности</a>
+        <a href="about.html" onclick="toggleMobileNav(false)" class="block px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold transition-colors">О колледже</a>
+        <a href="reviews.html" onclick="toggleMobileNav(false)" class="block px-3.5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 font-semibold transition-colors">Отзывы</a>
+      </nav>
+    </div>
+    <div class="p-4 border-t border-white/10 space-y-2 bg-dark-950/60">
+      <a href="student.html" onclick="toggleMobileNav(false)" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-glow-indigo transition-all">
+        <span class="material-symbols-outlined text-[18px]">school</span>
+        <span>В кабинет</span>
+      </a>
+      <a href="auth.html" onclick="toggleMobileNav(false)" class="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs border border-white/10 transition-all">
+        <span class="material-symbols-outlined text-[18px]">login</span>
+        <span>Вход / Регистрация</span>
+      </a>
+    </div>
+  </aside>
 
   <!-- ========================================================================= -->
   <!-- 2. HERO SECTION & LIVE INTERACTIVE PLAYGROUND -->
@@ -832,6 +882,25 @@
 
     function testWcagContrast(textC, bgC, score) {
       document.getElementById('wcag-score').textContent = score;
+    }
+
+    function toggleMobileNav(open) {
+      const backdrop = document.getElementById('mobile-nav-backdrop');
+      const drawer = document.getElementById('mobile-nav-drawer');
+      if (!backdrop || !drawer) return;
+      if (open) {
+        backdrop.classList.remove('opacity-0', 'pointer-events-none');
+        backdrop.classList.add('opacity-100');
+        drawer.classList.remove('translate-x-full');
+        drawer.classList.add('translate-x-0');
+        document.body.classList.add('overflow-hidden');
+      } else {
+        backdrop.classList.remove('opacity-100');
+        backdrop.classList.add('opacity-0', 'pointer-events-none');
+        drawer.classList.remove('translate-x-0');
+        drawer.classList.add('translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {

@@ -5,13 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EduSpace — Интерактивный плеер урока</title>
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg">
+  <link rel="stylesheet" href="css/tailwind.min.css"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
   <style>
-    body { font-family: 'Space Grotesk', sans-serif; background-color: #0b0f19; color: #f8fafc; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f8fafc; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
     .flip-card-inner { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
     .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
@@ -25,42 +28,42 @@
   <script src="js/courses-catalog.js"></script>
   <script src="js/eduspace-3d-engine.js"></script>
 </head>
-<body class="h-full flex flex-col overflow-hidden bg-slate-950 text-slate-100">
+<body class="h-full flex flex-col overflow-x-hidden bg-slate-950 text-slate-100">
 
   <!-- TOP APP BAR -->
-  <header class="h-16 flex-shrink-0 bg-dark-900/90 backdrop-blur-xl border-b border-white/10 px-4 sm:px-6 flex items-center justify-between z-30">
-    <div class="flex items-center gap-4">
-      <a href="student.html" class="flex items-center gap-2 text-slate-400 hover:text-white px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-xs font-semibold">
+  <header class="h-16 flex-shrink-0 bg-dark-900/90 backdrop-blur-xl border-b border-white/10 px-3 sm:px-6 flex items-center justify-between z-30">
+    <div class="flex items-center gap-2 sm:gap-4 min-w-0">
+      <a href="student.html" class="flex items-center gap-1 text-slate-400 hover:text-white p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-xs font-semibold shrink-0">
         <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-        <span class="hidden sm:inline">Выйти к курсам</span>
+        <span class="hidden sm:inline">Выйти</span>
       </a>
-      <div class="h-4 w-[1px] bg-white/10"></div>
-      <div>
-        <div class="flex items-center gap-2">
-          <span id="lp-course-badge" class="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">IT</span>
-          <h1 id="lp-lesson-title" class="text-sm sm:text-base font-extrabold text-white truncate max-w-[220px] sm:max-w-md">Загрузка урока...</h1>
+      <div class="h-4 w-[1px] bg-white/10 shrink-0"></div>
+      <div class="min-w-0">
+        <div class="flex items-center gap-1.5 min-w-0">
+          <span id="lp-course-badge" class="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shrink-0">IT</span>
+          <h1 id="lp-lesson-title" class="text-xs sm:text-base font-extrabold text-white truncate max-w-[120px] sm:max-w-md">Загрузка урока...</h1>
         </div>
-        <p id="lp-module-title" class="text-[11px] text-slate-400 truncate">Модуль 1</p>
+        <p id="lp-module-title" class="text-[10px] text-slate-400 truncate hidden sm:block">Модуль 1</p>
       </div>
     </div>
 
-    <div class="flex items-center gap-3 sm:gap-5">
+    <div class="flex items-center gap-2 sm:gap-4 shrink-0">
       <!-- Progress Pill -->
-      <div class="flex items-center gap-3 bg-dark-950/60 px-3.5 py-1.5 rounded-2xl border border-white/10">
-        <div class="w-24 sm:w-32 bg-slate-800 rounded-full h-2 overflow-hidden">
+      <div class="flex items-center gap-2 bg-dark-950/60 px-2 sm:px-3.5 py-1.5 rounded-2xl border border-white/10">
+        <div class="w-14 sm:w-32 bg-slate-800 rounded-full h-2 overflow-hidden">
           <div id="lp-progress-bar" class="bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400 h-2 rounded-full transition-all duration-500" style="width: 12.5%"></div>
         </div>
-        <span id="lp-progress-text" class="text-xs font-bold font-mono text-cyan-300">1 / 8</span>
+        <span id="lp-progress-text" class="text-xs font-bold font-mono text-cyan-300">1/8</span>
       </div>
 
       <!-- XP Badge -->
-      <div class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold text-xs">
+      <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold text-xs">
         <span class="material-symbols-outlined text-amber-400 text-[16px]">military_tech</span>
         <span id="lp-xp-badge">+60 XP</span>
       </div>
 
       <!-- AI Tutor Trigger -->
-      <button type="button" onclick="toggleAiTutor(true)" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-glow-indigo transition-all">
+      <button type="button" onclick="toggleAiTutor(true)" class="p-2 sm:px-3.5 sm:py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center gap-1.5">
         <span class="material-symbols-outlined text-[18px]">smart_toy</span>
         <span class="hidden md:inline">AI Тьютор</span>
       </button>
@@ -192,6 +195,11 @@
   <!-- CELEBRATION MODAL OVERLAY -->
   <div id="lp-celebration-modal" class="fixed inset-0 bg-dark-950/85 backdrop-blur-md hidden items-center justify-center p-4 z-50">
     <div class="bg-dark-900 rounded-3xl p-6 sm:p-8 max-w-md w-full border border-indigo-500/30 text-center space-y-5 glow-indigo relative overflow-hidden">
+      <div class="confetti-piece" style="left:12%;background:#6366f1;animation-delay:0s"></div>
+      <div class="confetti-piece" style="left:28%;background:#06b6d4;animation-delay:0.6s"></div>
+      <div class="confetti-piece" style="left:52%;background:#a855f7;animation-delay:1.1s"></div>
+      <div class="confetti-piece" style="left:72%;background:#10b981;animation-delay:0.3s"></div>
+      <div class="confetti-piece" style="left:88%;background:#f59e0b;animation-delay:0.8s"></div>
       <div class="absolute -top-12 -right-12 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl"></div>
       <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-cyan-500/20 rounded-full blur-2xl"></div>
 
@@ -219,9 +227,16 @@
       </div>
 
       <div class="space-y-2 pt-2">
-        <a href="student.html" class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-bold text-xs shadow-glow-indigo hover:from-indigo-500 hover:to-cyan-500 transition-all">
-          <span>Вернуться в дашборд студента</span>
+        <a id="lp-next-lesson-btn" href="#" class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-cyan-600 text-white font-bold text-xs shadow-glow-emerald hover:from-emerald-500 transition-all">
+          <span>Следующий интерактивный урок</span>
           <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </a>
+        <a id="lp-tasks-btn" href="tasks.html" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs border border-white/10 transition-all">
+          <span>К списку заданий курса</span>
+          <span class="material-symbols-outlined text-[16px]">list_alt</span>
+        </a>
+        <a href="student.html" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-slate-400 hover:text-white text-xs transition-all">
+          <span>Вернуться в дашборд студента</span>
         </a>
       </div>
     </div>
@@ -233,31 +248,76 @@
     let currentBlockIdx = 0;
     let savedProgress = {};
 
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     // Fallback generator from window.EDU_LESSONS or window.EDU_COURSES (ensures 100% GitHub Pages functionality)
     function createFallbackLesson(lessonId) {
       const idNum = parseInt(lessonId, 10) || 1;
       const urlParams = new URLSearchParams(window.location.search);
-      const specSlug = urlParams.get('specialty') || 'it';
+      const specs = ['it', 'graphic_design', 'autoelectric', 'hvac', 'automechanic'];
+      const specAliases = {
+        'logistics': 'graphic_design',
+        'accounting': 'hvac',
+        'power': 'autoelectric',
+        'mechanics': 'automechanic',
+        'design': 'graphic_design',
+        'auto': 'autoelectric'
+      };
+      let rawSlug = (urlParams.get('specialty') || '').toLowerCase().trim();
+      let specSlug = specAliases[rawSlug] || rawSlug;
+      let taskParam = parseInt(urlParams.get('task'), 10);
+      let lessonNum = (!isNaN(taskParam) && taskParam >= 1 && taskParam <= 10) ? taskParam : idNum;
+
+      if (!specSlug || !specs.includes(specSlug)) {
+        if (idNum > 10) {
+          const specIdx = Math.min(specs.length - 1, Math.floor((idNum - 1) / 10));
+          specSlug = specs[specIdx];
+          lessonNum = ((idNum - 1) % 10) + 1;
+        } else {
+          specSlug = 'it';
+          lessonNum = Math.min(10, Math.max(1, idNum));
+        }
+      } else if (lessonNum > 10) {
+        lessonNum = ((lessonNum - 1) % 10) + 1;
+      }
+
+      const courseInfo = (window.EDU_COURSES || []).find(c => c.slug === specSlug);
+      const courseTitle = courseInfo ? courseInfo.title : 'Информационные системы и программирование';
+      const moduleTitle = `Модуль 1. Основы архитектуры и практики: ${courseTitle}`;
 
       let catLesson = null;
       if (window.EDU_LESSONS && window.EDU_LESSONS[specSlug]) {
-        catLesson = window.EDU_LESSONS[specSlug].find(l => l.num === idNum) || window.EDU_LESSONS[specSlug][0];
+        catLesson = window.EDU_LESSONS[specSlug].find(l => l.num === lessonNum) || window.EDU_LESSONS[specSlug][0];
       }
 
-      const title = catLesson ? catLesson.title : `Урок ${idNum}. Интерактивный модуль`;
+      const title = catLesson ? catLesson.title : `Урок ${lessonNum}. Интерактивный модуль: ${courseTitle}`;
       const starter = catLesson ? catLesson.starter_code : '// Ваше решение';
+
+      const nextLessonId = (lessonNum < 10) ? idNum + 1 : null;
+      const prevLessonId = (lessonNum > 1) ? idNum - 1 : null;
 
       return {
         id: idNum,
         course_id: 1,
         course_slug: specSlug,
-        course_title: 'Информационные системы и программирование',
+        course_title: courseTitle,
         module_id: 1,
-        module_title: `Модуль 1. Основы архитектуры и практики`,
+        module_title: moduleTitle,
+        order_num: lessonNum,
+        next_lesson_id: nextLessonId,
+        prev_lesson_id: prevLessonId,
         title: title,
         lesson_type: 'visual',
         xp_reward: 60,
-        unlock_day: 1,
+        unlock_day: lessonNum,
         is_published: 1,
         block_progress: JSON.parse(localStorage.getItem(`eduspace_lp_progress_${idNum}`) || '{}'),
         blocks: [
@@ -309,7 +369,9 @@
             title: 'Экспресс-проверка понимания',
             question: (catLesson && catLesson.quiz && catLesson.quiz[0]) ? catLesson.quiz[0].q : 'Какой формат или стандарт является актуальным для этого модуля?',
             options: (catLesson && catLesson.quiz && catLesson.quiz[0]) ? catLesson.quiz[0].options : ['Стандарт АМК', 'Устаревший метод', 'Черновой вариант'],
+            correct_index: (catLesson && catLesson.quiz && catLesson.quiz[0]) ? catLesson.quiz[0].correct : 0,
             correct: (catLesson && catLesson.quiz && catLesson.quiz[0]) ? catLesson.quiz[0].correct : 0,
+            explanation: (catLesson && catLesson.quiz && catLesson.quiz[0]) ? catLesson.quiz[0].explain : 'Верный ответ подтверждён стандартами программы.',
             explain: (catLesson && catLesson.quiz && catLesson.quiz[0]) ? catLesson.quiz[0].explain : 'Верный ответ подтверждён стандартами программы.'
           },
           {
@@ -378,11 +440,20 @@
       }
 
       currentLesson = lessonData;
+      savedProgress = {};
+      const srvProg = currentLesson.block_progress || {};
+      let locProg = {};
       try {
-        const localProg = JSON.parse(localStorage.getItem(`eduspace_lp_progress_${currentLesson.id}`) || '{}');
-        savedProgress = Object.assign({}, currentLesson.block_progress || {}, localProg);
-      } catch(e) {
-        savedProgress = currentLesson.block_progress || {};
+        locProg = JSON.parse(localStorage.getItem(`eduspace_lp_progress_${currentLesson.id}`) || '{}');
+      } catch(e) {}
+      const allProgIds = new Set([...Object.keys(srvProg), ...Object.keys(locProg)]);
+      for (const bId of allProgIds) {
+        const srv = srvProg[bId] || {};
+        const loc = locProg[bId] || {};
+        savedProgress[bId] = {
+          completed: (loc.completed !== undefined) ? loc.completed : (srv.completed || false),
+          state: Object.assign({}, srv.state || {}, loc.state || {})
+        };
       }
 
       document.getElementById('lp-lesson-title').textContent = currentLesson.title;
@@ -418,7 +489,7 @@
         const btn = document.getElementById(`step-btn-${i}`);
         if (!btn) continue;
         if (i === currentBlockIdx) {
-          btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all bg-indigo-600 text-white shadow-glow-indigo';
+          btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all bg-indigo-600 text-white shadow-glow-indigo stepper-item-active';
         } else if (i < currentBlockIdx || savedProgress[blocks[i]?.id]?.completed) {
           btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all text-emerald-400 bg-emerald-500/10 border border-emerald-500/20';
         } else {
@@ -545,11 +616,11 @@
           </h3>
           <p class="text-slate-300 text-sm leading-relaxed whitespace-pre-line">${c.text}</p>
           ${c.callout ? `
-            <div class="p-4 rounded-2xl ${c.callout.type === 'tip' ? 'bg-indigo-500/10 border border-indigo-500/30 text-indigo-200' : 'bg-cyan-500/10 border border-cyan-500/30 text-cyan-200'} text-xs leading-relaxed flex items-start gap-3">
-              <span class="material-symbols-outlined text-[20px] flex-shrink-0">${c.callout.type === 'tip' ? 'tips_and_updates' : 'info'}</span>
+            <div class="${c.callout.type === 'tip' ? 'theory-card-tip' : (c.callout.type === 'warning' ? 'theory-card-warning' : 'theory-card-term')} text-xs leading-relaxed flex items-start gap-3 mt-3">
+              <span class="material-symbols-outlined text-[20px] flex-shrink-0">${c.callout.type === 'tip' ? 'tips_and_updates' : (c.callout.type === 'warning' ? 'warning' : 'auto_stories')}</span>
               <div>
-                <strong class="font-extrabold block mb-0.5">${c.callout.title}</strong>
-                <span>${c.callout.text}</span>
+                <strong class="font-extrabold block mb-0.5 text-sm">${c.callout.title}</strong>
+                <span class="opacity-95">${c.callout.text}</span>
               </div>
             </div>
           ` : ''}
@@ -819,7 +890,7 @@
     }
 
     function saveBlockProgress(blockId, isCompleted = true) {
-      return syncBlockState({}, isCompleted);
+      return syncBlockState(getCurrentBlockState(), isCompleted);
     }
 
     function setupLpVideoEventListeners() {
@@ -1013,12 +1084,35 @@
 
     function renderInlineCheckBlock(b) {
       const options = b.options || [];
-      const optsHtml = options.map((opt, idx) => `
+      const savedCheck = savedProgress[b.id]?.state || {};
+      const savedAnswer = savedCheck.answered;
+
+      const optsHtml = options.map((opt, idx) => {
+        const isChecked = (savedAnswer === idx) ? 'checked' : '';
+        return `
         <label class="flex items-center gap-3 p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-indigo-500/40 cursor-pointer transition-all option-label" id="check-opt-${idx}">
-          <input type="radio" name="inline_opt" value="${idx}" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-white/20 bg-dark-900" onchange="enableCheckSubmit()" />
+          <input type="radio" name="inline_opt" value="${idx}" ${isChecked} class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-white/20 bg-dark-900" onchange="enableCheckSubmit()" />
           <span class="text-xs sm:text-sm font-semibold text-slate-200">${opt}</span>
         </label>
-      `).join('');
+      `;
+      }).join('');
+
+      const expected = (b.correct_index !== undefined) ? b.correct_index : (b.correct !== undefined ? b.correct : 0);
+      const explanation = b.explanation || b.explain || '';
+      const isAnswered = savedAnswer !== undefined;
+      const isCorrect = (savedAnswer === expected);
+
+      let feedbackBoxCls = 'hidden p-4 rounded-2xl text-xs font-semibold';
+      let feedbackBoxContent = '';
+      if (isAnswered) {
+        if (isCorrect) {
+          feedbackBoxCls = 'p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-200 text-xs';
+          feedbackBoxContent = `<strong>✓ Абсолютно верно!</strong><p class="mt-1">${escapeHtml(explanation)}</p>`;
+        } else {
+          feedbackBoxCls = 'p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-200 text-xs';
+          feedbackBoxContent = `<strong>✗ Не совсем так.</strong><p class="mt-1">${escapeHtml(explanation)}</p>`;
+        }
+      }
 
       return `
         <div class="space-y-6 animate-fade-in">
@@ -1040,7 +1134,7 @@
                 <span class="material-symbols-outlined text-[16px]">help</span>
                 <span>Нужна подсказка?</span>
               </button>
-              <button type="button" id="btn-submit-check" onclick="submitInlineCheck()" disabled class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white font-bold text-xs shadow-glow-indigo transition-all">
+              <button type="button" id="btn-submit-check" onclick="submitInlineCheck()" ${isAnswered ? '' : 'disabled'} class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white font-bold text-xs shadow-glow-indigo transition-all">
                 Проверить ответ
               </button>
             </div>
@@ -1052,7 +1146,7 @@
             </div>
 
             <!-- Feedback Box -->
-            <div id="check-feedback-box" class="hidden p-4 rounded-2xl text-xs font-semibold"></div>
+            <div id="check-feedback-box" class="${feedbackBoxCls}">${feedbackBoxContent}</div>
           </div>
         </div>
       `;
@@ -1065,6 +1159,20 @@
           <span>${g}</span>
         </li>
       `).join('');
+
+      const savedState = savedProgress[b.id]?.state;
+      let initialCode = (savedState && savedState.code !== undefined && savedState.code !== null && savedState.code.trim() !== '')
+        ? savedState.code
+        : (b.starter_code || '');
+      if (!initialCode.trim() && b.starter_code) {
+        initialCode = b.starter_code;
+      }
+
+      const isCompleted = savedProgress[b.id]?.completed;
+      const statusMsg = isCompleted
+        ? '✓ Ваше решение сохранено в учебном профиле'
+        : 'Решение будет прикреплено к вашему учебному профилю';
+      const statusCls = isCompleted ? 'text-xs text-emerald-400 font-bold' : 'text-xs text-slate-400';
 
       return `
         <div class="space-y-6 animate-fade-in">
@@ -1087,12 +1195,35 @@
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-300 mb-2">Ваш ответ или рабочий код / спецификация</label>
-              <textarea id="practical-code-input" rows="5" placeholder="Вставьте ваш код или текстовое решение..." class="w-full px-4 py-3 rounded-2xl border border-white/15 bg-dark-950 font-mono text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"></textarea>
+              <div class="flex items-center justify-between mb-2">
+                <label class="block text-xs font-bold text-slate-300">Инженерный рабочий терминал / код решения</label>
+                <div class="flex items-center gap-1.5">
+                  <button type="button" onclick="copyPracticalCode()" class="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-semibold border border-white/10 transition-colors flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[13px]">content_copy</span>
+                    <span>Копировать</span>
+                  </button>
+                  <button type="button" onclick="resetPracticalCode()" class="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-semibold border border-white/10 transition-colors flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[13px]">restart_alt</span>
+                    <span>Шаблон</span>
+                  </button>
+                </div>
+              </div>
+              <div class="code-workbench-container">
+                <div class="code-workbench-header">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500/80"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500/80"></span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
+                    <span class="text-[11px] font-mono text-slate-400 ml-2">solution.src</span>
+                  </div>
+                  <span class="text-[10px] font-mono uppercase text-indigo-400 font-bold">Interactive Sandbox</span>
+                </div>
+                <textarea id="practical-code-input" rows="6" placeholder="Вставьте ваш код или текстовое решение..." class="w-full px-4 py-3 bg-dark-950 font-mono text-xs text-emerald-300 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 border-0 transition-all leading-relaxed">${escapeHtml(initialCode)}</textarea>
+              </div>
             </div>
 
             <div class="flex items-center justify-between pt-2">
-              <span id="practice-status" class="text-xs text-slate-400">Решение будет прикреплено к вашему учебному профилю</span>
+              <span id="practice-status" class="${statusCls}">${statusMsg}</span>
               <button type="button" onclick="savePracticeSolution()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-glow-emerald transition-all flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-[16px]">save</span>
                 <span>Зафиксировать решение</span>
@@ -1105,13 +1236,19 @@
 
     function renderAssessmentBlock(b) {
       const questions = b.questions || [];
+      const savedQuiz = savedProgress[b.id]?.state || {};
+      const savedAnswers = savedQuiz.answers || {};
+
       const qsHtml = questions.map((q, qIdx) => {
-        const opts = (q.options || []).map((opt, oIdx) => `
+        const opts = (q.options || []).map((opt, oIdx) => {
+          const isChecked = (savedAnswers[qIdx] === oIdx) ? 'checked' : '';
+          return `
           <label class="flex items-center gap-3 p-3.5 rounded-xl bg-white/5 border border-white/10 hover:border-indigo-500/40 cursor-pointer text-xs">
-            <input type="radio" name="quiz_q_${qIdx}" value="${oIdx}" class="text-indigo-600 focus:ring-indigo-500" />
+            <input type="radio" name="quiz_q_${qIdx}" value="${oIdx}" ${isChecked} class="text-indigo-600 focus:ring-indigo-500" />
             <span class="text-slate-200">${opt}</span>
           </label>
-        `).join('');
+        `;
+        }).join('');
 
         return `
           <div class="p-5 rounded-2xl bg-white/5 border border-white/10 space-y-3">
@@ -1121,6 +1258,14 @@
           </div>
         `;
       }).join('');
+
+      const hasSavedScore = (savedQuiz.score !== undefined);
+      const evalBoxCls = hasSavedScore
+        ? 'p-4 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-200 text-xs'
+        : 'hidden p-4 rounded-2xl text-xs font-semibold';
+      const evalBoxContent = hasSavedScore
+        ? `<strong>Результат: ${savedQuiz.score} из ${questions.length} верно!</strong><p class="mt-1">Итоговый тест принят. Нажмите «Далее» для перехода к результатам урока.</p>`
+        : '';
 
       return `
         <div class="space-y-6 animate-fade-in">
@@ -1137,7 +1282,7 @@
             <button type="button" onclick="submitAssessmentQuiz()" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-glow-indigo transition-all">
               Сдать итоговый тест
             </button>
-            <div id="quiz-eval-box" class="hidden p-4 rounded-2xl text-xs font-semibold"></div>
+            <div id="quiz-eval-box" class="${evalBoxCls}">${evalBoxContent}</div>
           </div>
         </div>
       `;
@@ -1225,13 +1370,15 @@
       const box = document.getElementById('check-feedback-box');
       box.classList.remove('hidden');
 
-      if (val === b.correct_index) {
+      const expected = (b.correct_index !== undefined) ? b.correct_index : (b.correct !== undefined ? b.correct : 0);
+      const explanation = b.explanation || b.explain || '';
+      if (val === expected) {
         box.className = 'p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-200 text-xs';
-        box.innerHTML = `<strong>✓ Абсолютно верно!</strong><p class="mt-1">${b.explanation}</p>`;
+        box.innerHTML = `<strong>✓ Абсолютно верно!</strong><p class="mt-1">${escapeHtml(explanation)}</p>`;
         await syncBlockState({ answered: val, correct: true }, true);
       } else {
         box.className = 'p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-200 text-xs';
-        box.innerHTML = `<strong>✗ Не совсем так.</strong><p class="mt-1">${b.explanation}</p>`;
+        box.innerHTML = `<strong>✗ Не совсем так.</strong><p class="mt-1">${escapeHtml(explanation)}</p>`;
       }
     }
 
@@ -1247,15 +1394,43 @@
       st.className = 'text-xs text-emerald-400 font-bold';
     }
 
+    function copyPracticalCode() {
+      const el = document.getElementById('practical-code-input');
+      if (el) {
+        navigator.clipboard.writeText(el.value).then(() => {
+          const st = document.getElementById('practice-status');
+          if (st) {
+            st.textContent = '✓ Код скопирован в буфер обмена!';
+            st.className = 'text-xs text-cyan-400 font-bold';
+          }
+        });
+      }
+    }
+
+    function resetPracticalCode() {
+      if (!currentLesson) return;
+      const b = currentLesson.blocks[currentBlockIdx];
+      const el = document.getElementById('practical-code-input');
+      if (b && el && confirm('Сбросить решение к исходному шаблону?')) {
+        el.value = b.starter_code || '';
+      }
+    }
+
     async function submitAssessmentQuiz() {
       const b = currentLesson.blocks[currentBlockIdx];
       const questions = b.questions || [];
       let correct = 0;
+      const answers = {};
 
       questions.forEach((q, idx) => {
         const sel = document.querySelector(`input[name="quiz_q_${idx}"]:checked`);
-        if (sel && parseInt(sel.value) === q.correct) {
-          correct++;
+        if (sel) {
+          const val = parseInt(sel.value);
+          answers[idx] = val;
+          const exp = (q.correct_index !== undefined) ? q.correct_index : q.correct;
+          if (val === exp) {
+            correct++;
+          }
         }
       });
 
@@ -1263,17 +1438,18 @@
       box.classList.remove('hidden');
       box.className = 'p-4 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-200 text-xs';
       box.innerHTML = `<strong>Результат: ${correct} из ${questions.length} верно!</strong><p class="mt-1">Итоговый тест принят. Нажмите «Далее» для перехода к результатам урока.</p>`;
-      await syncBlockState({ score: correct, total: questions.length }, true);
+      await syncBlockState({ score: correct, total: questions.length, answers: answers }, true);
     }
 
     async function finalizeLesson() {
       const xpVal = (currentLesson && currentLesson.xp_reward) ? currentLesson.xp_reward : 60;
+      let awardedXp = xpVal;
       try {
         const apiBase = window.location.hostname.includes('github.io') ? 'https://amk-skillhub.onrender.com' : '';
         const res = await fetch(`${apiBase}/api/lessons/${currentLesson.id}/complete`, { method: 'POST' });
         const data = await res.json();
         if (data.success) {
-          document.getElementById('celeb-xp-val').textContent = `+${data.xp_awarded || xpVal} XP`;
+          awardedXp = (data.xp_awarded !== undefined && data.xp_awarded !== null) ? data.xp_awarded : xpVal;
         }
       } catch (e) {
         // Offline / GitHub Pages local state persistence
@@ -1286,12 +1462,69 @@
           }
         } catch(err){}
       }
-      document.getElementById('celeb-xp-val').textContent = `+${xpVal} XP`;
+      const celebEl = document.getElementById('celeb-xp-val');
+      if (celebEl) {
+        celebEl.textContent = awardedXp > 0 ? `+${awardedXp} XP` : `${awardedXp} XP`;
+      }
+      
+      const nextBtn = document.getElementById('lp-next-lesson-btn');
+      const tasksBtn = document.getElementById('lp-tasks-btn');
+      const specSlug = currentLesson.course_slug || 'it';
+      if (tasksBtn) {
+        tasksBtn.href = `tasks.html?specialty=${specSlug}`;
+      }
+      if (nextBtn) {
+        const nextId = currentLesson.next_lesson_id;
+        if (nextId) {
+          const nextTaskNum = (currentLesson.order_num ? currentLesson.order_num + 1 : 1);
+          nextBtn.href = `lesson_player.html?lesson_id=${nextId}&specialty=${specSlug}&task=${nextTaskNum}`;
+          nextBtn.style.display = 'flex';
+        } else {
+          nextBtn.style.display = 'none';
+        }
+      }
+
       document.getElementById('lp-celebration-modal').classList.remove('hidden');
       document.getElementById('lp-celebration-modal').classList.add('flex');
     }
 
     // --- PROGRESS & NAVIGATION ---
+
+    function getCurrentBlockState() {
+      if (!currentLesson) return {};
+      const block = currentLesson.blocks[currentBlockIdx];
+      if (!block) return {};
+
+      const existing = (savedProgress[block.id] && savedProgress[block.id].state) ? Object.assign({}, savedProgress[block.id].state) : {};
+
+      if (block.type === 'practical') {
+        const input = document.getElementById('practical-code-input');
+        if (input) {
+          existing.code = input.value;
+        }
+        return existing;
+      }
+      if (block.type === 'inline_check') {
+        const sel = document.querySelector('input[name="inline_opt"]:checked');
+        if (sel) {
+          existing.answered = parseInt(sel.value);
+        }
+        return existing;
+      }
+      if (block.type === 'assessment') {
+        const answers = existing.answers ? Object.assign({}, existing.answers) : {};
+        (block.questions || []).forEach((q, idx) => {
+          const sel = document.querySelector(`input[name="quiz_q_${idx}"]:checked`);
+          if (sel) answers[idx] = parseInt(sel.value);
+        });
+        existing.answers = answers;
+        return existing;
+      }
+      if (!Object.keys(existing).length) {
+        existing.visited = true;
+      }
+      return existing;
+    }
 
     async function syncBlockState(state, completed = false) {
       if (!currentLesson) return;
@@ -1323,6 +1556,8 @@
 
     function prevBlock() {
       if (currentBlockIdx > 0) {
+        const state = getCurrentBlockState();
+        syncBlockState(state, savedProgress[currentLesson?.blocks[currentBlockIdx]?.id]?.completed || false);
         currentBlockIdx--;
         renderCurrentBlock();
       }
@@ -1331,8 +1566,9 @@
     async function nextBlock() {
       if (!currentLesson) return;
       const blocks = currentLesson.blocks;
-      // Mark current block completed when moving forward
-      await syncBlockState({}, true);
+      // Mark current block completed when moving forward with actual state
+      const currentState = getCurrentBlockState();
+      await syncBlockState(currentState, true);
 
       if (currentBlockIdx < blocks.length - 1) {
         currentBlockIdx++;
@@ -1343,6 +1579,10 @@
     }
 
     function jumpToBlock(idx) {
+      if (currentLesson && currentLesson.blocks[currentBlockIdx]) {
+        const state = getCurrentBlockState();
+        syncBlockState(state, savedProgress[currentLesson?.blocks[currentBlockIdx]?.id]?.completed || false);
+      }
       currentBlockIdx = idx;
       renderCurrentBlock();
     }

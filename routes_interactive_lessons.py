@@ -169,18 +169,29 @@ def create_course_module(course_id):
 # 2. LESSONS CRUD & 8-BLOCK ENGINE
 # ==========================================
 
+SPECIALTY_ALIASES = {
+    'logistics': 'graphic_design',
+    'accounting': 'hvac',
+    'power': 'autoelectric',
+    'mechanics': 'automechanic',
+    'design': 'graphic_design',
+    'auto': 'autoelectric',
+    'marketing': 'automechanic'
+}
+
 @interactive_lessons_bp.route('/api/lessons', methods=['GET'])
 def list_lessons():
     """Lists lessons filtered by course_id, module_id, or specialty slug."""
     course_id = request.args.get('course_id', type=int)
     module_id = request.args.get('module_id', type=int)
-    slug = request.args.get('specialty_slug')
+    slug = request.args.get('specialty_slug') or request.args.get('specialty')
 
     conn = _get_db()
     cursor = conn.cursor()
 
     if slug and not course_id:
-        cursor.execute("SELECT id FROM courses WHERE slug = ?", (slug,))
+        norm_slug = SPECIALTY_ALIASES.get(slug.lower().strip(), slug.lower().strip())
+        cursor.execute("SELECT id FROM courses WHERE slug = ? OR slug = ?", (norm_slug, slug))
         row = cursor.fetchone()
         if row:
             course_id = row['id']
@@ -266,6 +277,25 @@ def get_lesson_detail(lesson_id):
             }
         is_completed = block_progress.get('b8_summary', {}).get('completed', False)
 
+    # Compute adjacent lesson navigation within the same course
+    cursor.execute("""
+    SELECT id, order_num FROM lessons
+    WHERE course_id = ? AND is_published = 1
+    ORDER BY order_num ASC, id ASC
+    """, (lesson['course_id'],))
+    sibling_lessons = cursor.fetchall()
+    next_lesson_id = None
+    prev_lesson_id = None
+    for idx, s in enumerate(sibling_lessons):
+        if s['id'] == lesson_id:
+            if idx > 0:
+                prev_lesson_id = sibling_lessons[idx - 1]['id']
+            if idx < len(sibling_lessons) - 1:
+                next_lesson_id = sibling_lessons[idx + 1]['id']
+            break
+
+    lesson['next_lesson_id'] = next_lesson_id
+    lesson['prev_lesson_id'] = prev_lesson_id
     lesson['block_progress'] = block_progress
     lesson['is_completed'] = is_completed
     return jsonify({"success": True, "lesson": lesson})
@@ -426,7 +456,7 @@ def complete_lesson(lesson_id):
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT l.id, l.title, l.xp_reward, l.course_id, c.slug AS course_slug
+    SELECT l.id, l.title, l.xp_reward, l.course_id, l.order_num, c.slug AS course_slug
     FROM lessons l
     JOIN courses c ON c.id = l.course_id
     WHERE l.id = ?
@@ -437,6 +467,7 @@ def complete_lesson(lesson_id):
 
     xp_reward = les_row['xp_reward'] or 60
     course_slug = les_row['course_slug']
+    order_num = les_row['order_num'] or 1
 
     # Mark b8_summary completed
     cursor.execute("""
@@ -450,11 +481,11 @@ def complete_lesson(lesson_id):
     # Also update legacy lesson_progress table for backwards compatibility
     cursor.execute("""
     INSERT INTO lesson_progress (user_id, specialty_slug, task_number, status, updated_at)
-    VALUES (?, ?, 1, 'completed', CURRENT_TIMESTAMP)
+    VALUES (?, ?, ?, 'completed', CURRENT_TIMESTAMP)
     ON CONFLICT(user_id, specialty_slug, task_number) DO UPDATE SET
         status = 'completed',
         updated_at = CURRENT_TIMESTAMP
-    """, (user['id'], course_slug))
+    """, (user['id'], course_slug, order_num))
     conn.commit()
 
     # Idempotent XP Awarding

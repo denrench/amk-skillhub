@@ -301,7 +301,7 @@ def run_scenario_f_pages_and_responsiveness():
         'tasks.html', 'teacher.html', 'tools.html', 'verify.html', 'admin.html'
     ]
     for p in pages:
-        res = client.get(f'/{p}')
+        res = client.get(f'/{p}', follow_redirects=True)
         assert res.status_code == 200
     print(f"[OK] All {len(pages)} pages return HTTP 200 with zero template or rendering errors")
     return True

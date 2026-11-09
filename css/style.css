@@ -53,10 +53,10 @@
   --gradient-amber: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   --gradient-emerald: linear-gradient(135deg, #34A853 0%, #0F9D58 100%);
 
-  /* Google Typography */
-  --font-main: 'Google Sans', 'Google Sans Text', system-ui, -apple-system, sans-serif;
-  --font-display: 'Google Sans Display', 'Google Sans', sans-serif;
-  --font-mono: 'Google Sans Mono', 'JetBrains Mono', monospace;
+  /* Core Typography Stack */
+  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
   /* Geometry & Elevation */
   --radius-xs: 6px;
@@ -644,4 +644,208 @@ button {
   background: linear-gradient(90deg, #4f46e5 0%, #06b6d4 50%, #4f46e5 100%);
   background-size: 200% 100%;
   animation: shimmerWave 3.5s infinite linear;
+}
+
+/* ========================================================
+   WORLD-CLASS YOUTH / GEN-Z DESIGN SYSTEM ENHANCEMENTS
+   Electric Neon Accents, Glassmorphism 2.0, Ambient Orbs,
+   Gamified Streaks, Rich Theory Callouts, Stepper & Mobile Drawer
+   ======================================================== */
+
+:root {
+  --neon-indigo: #6366f1;
+  --neon-cyan: #06b6d4;
+  --neon-purple: #a855f7;
+  --neon-emerald: #10b981;
+  --neon-amber: #f59e0b;
+  --neon-rose: #f43f5e;
+  --dark-canvas: #090d16;
+  --dark-panel: rgba(15, 23, 42, 0.65);
+}
+
+/* Ambient Glowing Background Orbs */
+.ambient-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  pointer-events: none;
+  opacity: 0.28;
+  z-index: 0;
+  animation: floatOrb 12s ease-in-out infinite alternate;
+}
+
+.ambient-orb-indigo {
+  background: radial-gradient(circle, #6366f1 0%, rgba(99, 102, 241, 0) 70%);
+}
+
+.ambient-orb-cyan {
+  background: radial-gradient(circle, #06b6d4 0%, rgba(6, 182, 212, 0) 70%);
+}
+
+.ambient-orb-purple {
+  background: radial-gradient(circle, #a855f7 0%, rgba(168, 85, 247, 0) 70%);
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0px, 0px) scale(1); }
+  50% { transform: translate(30px, -20px) scale(1.08); }
+  100% { transform: translate(-20px, 25px) scale(0.95); }
+}
+
+/* Glassmorphism 2.0 Panels */
+.glass-panel-genz {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel-genz:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 20px 48px -10px rgba(99, 102, 241, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Gamified Streak & XP Badges */
+.streak-badge-genz {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(239, 68, 68, 0.25));
+  border: 1px solid rgba(249, 115, 22, 0.5);
+  box-shadow: 0 0 18px rgba(249, 115, 22, 0.35);
+  color: #fdba74;
+  animation: streakFirePulse 2.2s infinite ease-in-out;
+}
+
+@keyframes streakFirePulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(249, 115, 22, 0.3); }
+  50% { box-shadow: 0 0 24px rgba(249, 115, 22, 0.6); }
+}
+
+.xp-badge-neon {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.25));
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.3);
+  color: #e0e7ff;
+}
+
+/* Modern Step Stepper with Pulsing Current Block */
+.stepper-item-active {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #ffffff;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+  animation: stepperPulse 2s infinite ease-in-out;
+}
+
+@keyframes stepperPulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(99, 102, 241, 0.5); }
+  50% { box-shadow: 0 0 28px rgba(99, 102, 241, 0.85); }
+}
+
+/* Rich Theory Callout Cards */
+.theory-card-tip {
+  background: rgba(6, 182, 212, 0.08);
+  border-left: 4px solid #06b6d4;
+  border-top: 1px solid rgba(6, 182, 212, 0.2);
+  border-right: 1px solid rgba(6, 182, 212, 0.2);
+  border-bottom: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  color: #cffafe;
+}
+
+.theory-card-term {
+  background: rgba(168, 85, 247, 0.08);
+  border-left: 4px solid #a855f7;
+  border-top: 1px solid rgba(168, 85, 247, 0.2);
+  border-right: 1px solid rgba(168, 85, 247, 0.2);
+  border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  color: #f3e8ff;
+}
+
+.theory-card-warning {
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 4px solid #f59e0b;
+  border-top: 1px solid rgba(245, 158, 11, 0.2);
+  border-right: 1px solid rgba(245, 158, 11, 0.2);
+  border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  color: #fef3c7;
+}
+
+/* Syntax-Styled Code Workbench */
+.code-workbench-container {
+  background: #090d16;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+.code-workbench-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Confetti Celebratory Effects */
+@keyframes confettiFall {
+  0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(600px) rotate(720deg); opacity: 0; }
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 14px;
+  opacity: 0.9;
+  border-radius: 3px;
+  animation: confettiFall 3.5s ease-out infinite;
+}
+
+/* Off-canvas Mobile Menu */
+.mobile-nav-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 85vw;
+  background: rgba(9, 13, 22, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 20px 0 50px rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-nav-drawer.open {
+  transform: translateX(0);
+}
+
+.mobile-nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 9998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.mobile-nav-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
 }

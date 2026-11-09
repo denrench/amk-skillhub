@@ -18,6 +18,7 @@ from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, send_from_directory, g, session, redirect, url_for, make_response
 from functools import wraps
+from werkzeug.security import generate_password_hash, check_password_hash
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_DIR = BASE_DIR
@@ -78,13 +79,68 @@ def get_teacher_assigned_groups(teacher_id):
     cursor = conn.cursor()
     cursor.execute("SELECT group_name FROM teacher_groups WHERE teacher_id = ?", (teacher_id,))
     rows = cursor.fetchall()
-    return [r[0] for r in rows]
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'amk-eduspace-lms-secret-2026')
+    assigned = [r[0] for r in rows]
+    if assigned:
+        return assigned
+    # Fallback to teacher's department / specialty groups if not explicitly configured in teacher_groups
+    cursor.execute("SELECT specialty_slug, group_name FROM users WHERE id = ?", (teacher_id,))
+    u = cursor.fetchone()
+    if u:
+        spec = u['specialty_slug'] or 'it'
+        if spec == 'it':
+            return ['ИС-21', 'ИС-22']
+        elif spec == 'design':
+            return ['ДГ-21', 'ДГ-22']
+        elif spec == 'accountant':
+            return ['УА-21', 'УА-22']
+        elif spec == 'marketing':
+            return ['МК-21', 'МК-22']
+        elif spec == 'hospitality':
+            return ['ГД-21', 'ГД-22']
+    return []
+app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET') or os.environ.get('SECRET_KEY') or 'amk-eduspace-lms-secret-2026'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = (os.environ.get('RENDER') is not None or os.environ.get('HTTPS') == 'on')
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=14)
 DATABASE_URL = os.environ.get('DATABASE_URL')
+
+SUPPORT_PHONE = os.environ.get('SUPPORT_PHONE', '+7 707 907 97 64')
+SUPPORT_EMAIL = os.environ.get('SUPPORT_EMAIL', 'support@amk.kz')
+
+
+def verify_and_migrate_password(conn, user_row, candidate_password: str) -> bool:
+    """
+    Verifies candidate_password against stored password_hash.
+    If stored hash was plain SHA-256 (64 hex characters), transparently migrates
+    it to werkzeug.security generate_password_hash.
+    """
+    try:
+        stored_hash = user_row['password_hash'] if hasattr(user_row, '__getitem__') else ''
+    except Exception:
+        stored_hash = ''
+    if not stored_hash or not candidate_password:
+        return False
+
+    is_sha256 = len(stored_hash) == 64 and all(c in '0123456789abcdefABCDEF' for c in stored_hash)
+    if is_sha256:
+        legacy_hash = hashlib.sha256(candidate_password.encode('utf-8')).hexdigest()
+        if legacy_hash.lower() == stored_hash.lower():
+            try:
+                new_hash = generate_password_hash(candidate_password)
+                c = conn.cursor()
+                c.execute("UPDATE users SET password_hash = ? WHERE id = ?", (new_hash, user_row['id']))
+                conn.commit()
+            except Exception as e:
+                print(f"[AUTH WARN] Password migration failed: {e}")
+            return True
+        return False
+
+    try:
+        return check_password_hash(stored_hash, candidate_password)
+    except Exception:
+        return False
 
 def normalize_teacher_code(code_str):
     if not code_str:
@@ -97,10 +153,12 @@ def normalize_teacher_code(code_str):
     })
     return re.sub(r'[\s\-_]', '', str(code_str)).translate(tr).upper()
 
-TEACHER_ACCESS_CODES = {
+_RAW_TEACHER_ACCESS_CODES = {
     'AMK2026', 'TEACHER2026', 'EDU2026', 'AMK', 'TEACHER', 'EDU', '2026',
     'AMKCOLLEGE', 'AMKEDUSPACE', 'ПРЕПОДАВАТЕЛЬ', 'ПРЕПОД'
 }
+TEACHER_ACCESS_CODES = {normalize_teacher_code(c) for c in _RAW_TEACHER_ACCESS_CODES}
+
 
 NAME_WORD_RE = re.compile(r'^[А-Яа-яЁёӘәІіҢңҒғҮүҰұҚқӨөҺһA-Za-z\-]{2,40}$')
 EMAIL_RE = re.compile(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,12}$')
@@ -175,6 +233,7 @@ COURSES_BY_SLUG = {c["slug"]: c for c in COURSES_META}
 import collections.abc
 import urllib.parse
 import ssl
+import threading
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
@@ -219,8 +278,12 @@ class PostgresRow(collections.abc.Mapping):
 
 class PostgresCursorWrapper:
     def __init__(self, raw_cursor, conn):
-        self._cur = raw_cursor
-        self._conn = conn
+        if isinstance(raw_cursor, PostgresCursorWrapper):
+            self._cur = raw_cursor._cur
+            self._conn = raw_cursor._conn
+        else:
+            self._cur = raw_cursor
+            self._conn = conn
         self.lastrowid = None
 
     @property
@@ -293,8 +356,9 @@ class PostgresCursorWrapper:
 
 
 class PostgresConnectionWrapper:
-    def __init__(self, raw_conn):
+    def __init__(self, raw_conn, pool=None):
         self._conn = raw_conn
+        self._pool = pool
 
     def cursor(self):
         return PostgresCursorWrapper(self._conn.cursor(), self._conn)
@@ -306,18 +370,181 @@ class PostgresConnectionWrapper:
         self._conn.rollback()
 
     def close(self):
-        self._conn.close()
+        if self._pool is not None:
+            try:
+                # Reset any pending transaction before returning connection to pool
+                if getattr(self._conn, 'closed', 0) == 0:
+                    try:
+                        self._conn.rollback()
+                    except Exception:
+                        # Broken connection: remove it from pool permanently
+                        try:
+                            self._pool.putconn(self._conn, close=True)
+                        except Exception:
+                            pass
+                        return
+                self._pool.putconn(self._conn)
+            except Exception:
+                try:
+                    self._conn.close()
+                except Exception:
+                    pass
+        else:
+            try:
+                self._conn.close()
+            except Exception:
+                pass
 
 
 _LAST_DB_ERROR = None
+_PG_POOL = None
+_PG_POOL_LOCK = threading.Lock()
+_PG8000_POOL = None
+_PG8000_POOL_LOCK = threading.Lock()
 
-def create_postgres_conn(pg_url):
+
+class Pg8000ConnectionPool:
+    """Thread-safe connection pool for pg8000 driver when psycopg2 is not installed."""
+    def __init__(self, pg_url, minconn=1, maxconn=20):
+        self._url = pg_url
+        self._maxconn = maxconn
+        self._pool = []
+        self._lock = threading.Lock()
+
+    def _create_conn(self):
+        import pg8000.dbapi
+        u = urllib.parse.urlparse(self._url)
+        is_internal = "render.com" not in (u.hostname or "")
+        ssl_ctx = None if is_internal else ssl.create_default_context()
+        return pg8000.dbapi.connect(
+            user=u.username,
+            password=u.password,
+            host=u.hostname,
+            port=u.port or 5432,
+            database=u.path.lstrip('/'),
+            ssl_context=ssl_ctx
+        )
+
+    def _is_closed(self, conn):
+        if conn is None:
+            return True
+        if hasattr(conn, '_sock') or hasattr(conn, '_usock'):
+            is_live = (getattr(conn, '_sock', None) is not None) or (getattr(conn, '_usock', None) is not None)
+            return not is_live or bool(getattr(conn, 'closed', False))
+        if hasattr(conn, 'closed'):
+            return bool(conn.closed)
+        return False
+
+    def getconn(self):
+        with self._lock:
+            while self._pool:
+                conn = self._pool.pop()
+                if not self._is_closed(conn):
+                    return conn
+        # None available in pool; create new connection
+        return self._create_conn()
+
+    def putconn(self, conn, close=False):
+        if close or self._is_closed(conn):
+            try:
+                conn.close()
+            except Exception:
+                pass
+            return
+        with self._lock:
+            if len(self._pool) < self._maxconn:
+                self._pool.append(conn)
+            else:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
+
+
+def get_pg8000_pool(pg_url):
+    global _PG8000_POOL
+    if _PG8000_POOL is not None:
+        return _PG8000_POOL
+    with _PG8000_POOL_LOCK:
+        if _PG8000_POOL is not None:
+            return _PG8000_POOL
+        pool = Pg8000ConnectionPool(pg_url, minconn=1, maxconn=20)
+        _PG8000_POOL = pool
+        return _PG8000_POOL
+
+
+def get_pg_pool(pg_url):
+    global _PG_POOL
+    if _PG_POOL is not None and not getattr(_PG_POOL, 'closed', False):
+        return _PG_POOL
+    with _PG_POOL_LOCK:
+        if _PG_POOL is not None and not getattr(_PG_POOL, 'closed', False):
+            return _PG_POOL
+        if pg_url.startswith("postgres://"):
+            pg_url = pg_url.replace("postgres://", "postgresql://", 1)
+
+        import psycopg2.pool
+        last_err = None
+        dsn = pg_url
+        if "connect_timeout=" not in dsn:
+            sep = "&" if "?" in dsn else "?"
+            dsn = f"{dsn}{sep}connect_timeout=5"
+
+        for attempt in range(1, 4):
+            try:
+                pool = psycopg2.pool.ThreadedConnectionPool(
+                    minconn=1,
+                    maxconn=20,
+                    dsn=dsn
+                )
+                _PG_POOL = pool
+                print(f"[INFO] Initialized PostgreSQL ThreadedConnectionPool (min=1, max=20) on attempt {attempt}")
+                return _PG_POOL
+            except Exception as e:
+                last_err = e
+                print(f"[WARN] Postgres connection pool attempt {attempt}/3 failed: {e}")
+                if attempt < 3:
+                    time.sleep(0.5)
+        raise RuntimeError(f"Failed to initialize PostgreSQL pool after 3 attempts: {last_err}")
+
+
+def create_postgres_conn(pg_url, pooled=True):
     global _LAST_DB_ERROR
     if pg_url.startswith("postgres://"):
         pg_url = pg_url.replace("postgres://", "postgresql://", 1)
 
     errors = []
-    # 1. Try psycopg2
+    # 1. Try ThreadedConnectionPool with psycopg2 (high concurrency)
+    if pooled:
+        try:
+            pool = get_pg_pool(pg_url)
+            # Resilient connection acquisition under concurrency burst
+            raw_conn = None
+            start_wait = time.time()
+            while time.time() - start_wait < 3.0:
+                try:
+                    raw_conn = pool.getconn()
+                    break
+                except Exception as p_err:
+                    if "exhausted" in str(p_err).lower():
+                        time.sleep(0.05)
+                    else:
+                        raise
+            if raw_conn is None:
+                raw_conn = pool.getconn()
+
+            if getattr(raw_conn, 'closed', 0) != 0:
+                pool.putconn(raw_conn, close=True)
+                raw_conn = pool.getconn()
+            try:
+                raw_conn.rollback()
+            except Exception:
+                pass
+            return PostgresConnectionWrapper(raw_conn, pool=pool)
+        except Exception as e:
+            errors.append(f"psycopg2 pool: {e}")
+
+    # 2. Try raw psycopg2 connection
     try:
         import psycopg2
         raw_conn = psycopg2.connect(pg_url)
@@ -325,7 +552,20 @@ def create_postgres_conn(pg_url):
     except Exception as e:
         errors.append(f"psycopg2: {e}")
 
-    # 2. Try pg8000 with appropriate SSL
+    # 3. Try pooled pg8000 connection pool
+    if pooled:
+        try:
+            pool8 = get_pg8000_pool(pg_url)
+            raw_conn = pool8.getconn()
+            try:
+                raw_conn.rollback()
+            except Exception:
+                pass
+            return PostgresConnectionWrapper(raw_conn, pool=pool8)
+        except Exception as e:
+            errors.append(f"pg8000 pool: {e}")
+
+    # 4. Try raw pg8000 fallback
     try:
         import pg8000.dbapi
         u = urllib.parse.urlparse(pg_url)
@@ -341,7 +581,7 @@ def create_postgres_conn(pg_url):
         )
         return PostgresConnectionWrapper(raw_conn)
     except Exception as e:
-        errors.append(f"pg8000: {e}")
+        errors.append(f"pg8000 raw: {e}")
 
     _LAST_DB_ERROR = " | ".join(errors)
     raise RuntimeError(_LAST_DB_ERROR)
@@ -353,12 +593,15 @@ def get_db():
         pg_url = os.environ.get('DATABASE_URL')
         if pg_url:
             try:
-                g.db = create_postgres_conn(pg_url)
+                g.db = create_postgres_conn(pg_url, pooled=True)
                 return g.db
             except Exception as e:
                 _LAST_DB_ERROR = str(e)
                 print(f"[WARN] Failed to connect to DATABASE_URL: {e}. Falling back to SQLite.")
-        g.db = sqlite3.connect(DB_PATH)
+        g.db = sqlite3.connect(DB_PATH, timeout=30.0)
+        g.db.execute("PRAGMA journal_mode = WAL;")
+        g.db.execute("PRAGMA busy_timeout = 30000;")
+        g.db.execute("PRAGMA foreign_keys = ON;")
         g.db.row_factory = sqlite3.Row
     return g.db
 
@@ -411,11 +654,177 @@ def _load_catalog_lessons():
 
 def init_db():
     if os.environ.get('DATABASE_URL'):
-        print("[INFO] DATABASE_URL detected. PostgreSQL database is active.")
+        print("[INFO] DATABASE_URL detected. Synchronizing PostgreSQL schema...")
         try:
             pg_conn = create_postgres_conn(os.environ.get('DATABASE_URL'))
             pg_cur = pg_conn.cursor()
-            for pg_ddl in [
+            pg_ddl_statements = [
+                """CREATE TABLE IF NOT EXISTS users (
+                    id SERIAL PRIMARY KEY,
+                    email VARCHAR(255) UNIQUE NOT NULL,
+                    password_hash VARCHAR(255) NOT NULL,
+                    full_name VARCHAR(255) NOT NULL,
+                    last_name VARCHAR(100) DEFAULT '',
+                    first_name VARCHAR(100) DEFAULT '',
+                    middle_name VARCHAR(100) DEFAULT '',
+                    role VARCHAR(50) NOT NULL CHECK(role IN ('student', 'teacher', 'admin')),
+                    group_name VARCHAR(100) DEFAULT 'ИС-21',
+                    specialty_slug VARCHAR(100) DEFAULT 'it',
+                    department VARCHAR(150) DEFAULT '',
+                    student_id VARCHAR(100) UNIQUE,
+                    email_verified INTEGER DEFAULT 0,
+                    is_demo INTEGER DEFAULT 0,
+                    subscription_tier VARCHAR(50) DEFAULT 'free',
+                    pro_expires_at TIMESTAMP NULL,
+                    bonus_xp INTEGER DEFAULT 0,
+                    streak_days INTEGER DEFAULT 1,
+                    achievements_json TEXT DEFAULT '[]',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );""",
+                """CREATE TABLE IF NOT EXISTS email_verifications (
+                    email VARCHAR(255) PRIMARY KEY,
+                    code VARCHAR(20) NOT NULL,
+                    expires_at BIGINT NOT NULL,
+                    verified INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );""",
+                """CREATE TABLE IF NOT EXISTS enrollments (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL REFERENCES users(id),
+                    specialty_slug VARCHAR(100) NOT NULL,
+                    enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT uq_enrollments_user_spec UNIQUE(user_id, specialty_slug)
+                );""",
+                """CREATE TABLE IF NOT EXISTS lesson_progress (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL REFERENCES users(id),
+                    specialty_slug VARCHAR(100) NOT NULL,
+                    task_number INTEGER NOT NULL,
+                    status VARCHAR(50) DEFAULT 'in_progress',
+                    quiz_score INTEGER DEFAULT 0,
+                    quiz_total INTEGER DEFAULT 3,
+                    draft_code TEXT DEFAULT '',
+                    current_stage INTEGER DEFAULT 1,
+                    mission_state_json TEXT DEFAULT '{}',
+                    mission_xp INTEGER DEFAULT 0,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT uq_lesson_prog_user_spec_num UNIQUE(user_id, specialty_slug, task_number)
+                );""",
+                """CREATE TABLE IF NOT EXISTS grades (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL REFERENCES users(id),
+                    student_id VARCHAR(100),
+                    specialty_slug VARCHAR(100),
+                    specialty_name VARCHAR(255),
+                    score INTEGER DEFAULT 0,
+                    status VARCHAR(50) DEFAULT 'graded',
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );""",
+                """CREATE TABLE IF NOT EXISTS tasks (
+                    id SERIAL PRIMARY KEY,
+                    specialty_slug VARCHAR(100) NOT NULL,
+                    task_number INTEGER NOT NULL,
+                    title VARCHAR(255) NOT NULL,
+                    difficulty VARCHAR(50) DEFAULT 'medium',
+                    time_limit VARCHAR(50) DEFAULT '45 мин',
+                    unlock_day INTEGER DEFAULT 1,
+                    unlock_date_text VARCHAR(100) DEFAULT '',
+                    deadline_text VARCHAR(100) DEFAULT '',
+                    description TEXT DEFAULT '',
+                    tools_required TEXT DEFAULT '',
+                    starter_code TEXT DEFAULT '',
+                    max_score INTEGER DEFAULT 100,
+                    mode VARCHAR(50) DEFAULT 'both',
+                    ticket_number INTEGER DEFAULT 1,
+                    CONSTRAINT uq_tasks_spec_num UNIQUE(specialty_slug, task_number)
+                );""",
+                """CREATE TABLE IF NOT EXISTS task_submissions (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL REFERENCES users(id),
+                    student_id VARCHAR(100),
+                    student_name VARCHAR(255),
+                    group_name VARCHAR(100),
+                    task_id INTEGER,
+                    specialty_slug VARCHAR(100),
+                    task_number INTEGER,
+                    task_title VARCHAR(255),
+                    score INTEGER DEFAULT 0,
+                    grade_letter VARCHAR(10) DEFAULT '—',
+                    status VARCHAR(50) DEFAULT 'submitted',
+                    time_spent_seconds INTEGER DEFAULT 0,
+                    submitted_code TEXT DEFAULT '',
+                    repo_url TEXT DEFAULT '',
+                    student_comment TEXT DEFAULT '',
+                    autotest_passed INTEGER DEFAULT 0,
+                    autotest_total INTEGER DEFAULT 0,
+                    quiz_score INTEGER DEFAULT 0,
+                    teacher_comment TEXT DEFAULT '',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );""",
+                """CREATE TABLE IF NOT EXISTS teacher_groups (
+                    id SERIAL PRIMARY KEY,
+                    teacher_id INTEGER NOT NULL,
+                    group_name VARCHAR(100) NOT NULL,
+                    specialty_slug VARCHAR(100) DEFAULT 'it',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    CONSTRAINT uq_teacher_groups_tid_grp UNIQUE(teacher_id, group_name)
+                );""",
+                """CREATE TABLE IF NOT EXISTS notifications (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER,
+                    target_role VARCHAR(50) DEFAULT 'student',
+                    target_group VARCHAR(100) DEFAULT '',
+                    title VARCHAR(255) NOT NULL,
+                    body TEXT NOT NULL,
+                    type VARCHAR(50) DEFAULT 'info',
+                    is_read INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );""",
+                """CREATE TABLE IF NOT EXISTS messages (
+                    id SERIAL PRIMARY KEY,
+                    sender_id INTEGER,
+                    sender_name VARCHAR(255) NOT NULL,
+                    sender_role VARCHAR(50) NOT NULL,
+                    recipient_key VARCHAR(100) DEFAULT 'general',
+                    body TEXT NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );""",
+                """CREATE TABLE IF NOT EXISTS platform_settings (
+                    key VARCHAR(100) PRIMARY KEY,
+                    value TEXT NOT NULL
+                );""",
+                """CREATE TABLE IF NOT EXISTS subscriptions (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL REFERENCES users(id),
+                    plan_code VARCHAR(50) NOT NULL DEFAULT 'free',
+                    billing_period VARCHAR(50) DEFAULT 'monthly',
+                    status VARCHAR(50) NOT NULL DEFAULT 'active',
+                    amount INTEGER DEFAULT 0,
+                    currency VARCHAR(10) DEFAULT 'KZT',
+                    payment_method VARCHAR(50) DEFAULT 'sandbox',
+                    starts_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    expires_at TIMESTAMP NULL
+                );""",
+                """CREATE TABLE IF NOT EXISTS transactions (
+                    id SERIAL PRIMARY KEY,
+                    user_id INTEGER NOT NULL REFERENCES users(id),
+                    plan_code VARCHAR(50) NOT NULL,
+                    amount INTEGER NOT NULL,
+                    currency VARCHAR(10) DEFAULT 'KZT',
+                    status VARCHAR(50) NOT NULL DEFAULT 'paid',
+                    payment_method VARCHAR(50) DEFAULT 'sandbox',
+                    receipt_number VARCHAR(100) UNIQUE NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );""",
+                "CREATE TABLE IF NOT EXISTS xp_transactions (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id), amount INTEGER NOT NULL, source_type VARCHAR(64) NOT NULL, source_id VARCHAR(128) NOT NULL, description VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_xp_user_source UNIQUE(user_id, source_type, source_id))",
+                "CREATE TABLE IF NOT EXISTS audit_logs (id SERIAL PRIMARY KEY, actor_id INTEGER, actor_email VARCHAR(128), actor_role VARCHAR(32), action VARCHAR(128) NOT NULL, target_type VARCHAR(64), target_id VARCHAR(128), details TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
+                "CREATE TABLE IF NOT EXISTS daily_quests_log (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id), quest_key VARCHAR(64) NOT NULL, quest_date VARCHAR(32) NOT NULL, completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_daily_user_quest UNIQUE(user_id, quest_key, quest_date))",
+                "CREATE TABLE IF NOT EXISTS courses (id SERIAL PRIMARY KEY, slug VARCHAR(64) UNIQUE NOT NULL, title VARCHAR(255) NOT NULL, code VARCHAR(64) DEFAULT '', description TEXT DEFAULT '', curator_id INTEGER, is_published INTEGER DEFAULT 1, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
+                "CREATE TABLE IF NOT EXISTS course_modules (id SERIAL PRIMARY KEY, course_id INTEGER NOT NULL REFERENCES courses(id), title VARCHAR(255) NOT NULL, order_num INTEGER DEFAULT 1, is_published INTEGER DEFAULT 1, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
+                "CREATE TABLE IF NOT EXISTS lessons (id SERIAL PRIMARY KEY, course_id INTEGER NOT NULL REFERENCES courses(id), module_id INTEGER REFERENCES course_modules(id), title VARCHAR(255) NOT NULL, lesson_type VARCHAR(64) DEFAULT 'theory', order_num INTEGER DEFAULT 1, xp_reward INTEGER DEFAULT 60, unlock_day INTEGER DEFAULT 1, is_published INTEGER DEFAULT 1, content_json TEXT DEFAULT '[]', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
+                "CREATE TABLE IF NOT EXISTS lesson_block_progress (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id), lesson_id INTEGER NOT NULL REFERENCES lessons(id), block_id VARCHAR(64) NOT NULL, completed INTEGER DEFAULT 0, state_json TEXT DEFAULT '{}', updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_block_prog UNIQUE(user_id, lesson_id, block_id))",
+                "CREATE TABLE IF NOT EXISTS ai_conversations (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id), context_type VARCHAR(64) NOT NULL, context_id VARCHAR(128) DEFAULT '', user_message TEXT NOT NULL, assistant_message TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS bonus_xp INTEGER DEFAULT 0",
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS streak_days INTEGER DEFAULT 1",
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS achievements_json TEXT DEFAULT '[]'",
@@ -428,23 +837,53 @@ def init_db():
                 "CREATE UNIQUE INDEX IF NOT EXISTS idx_lesson_prog_user_spec_num ON lesson_progress (user_id, specialty_slug, task_number)",
                 "CREATE UNIQUE INDEX IF NOT EXISTS idx_platform_settings_key ON platform_settings (key)",
                 "CREATE UNIQUE INDEX IF NOT EXISTS idx_enrollments_user_spec ON enrollments (user_id, specialty_slug)",
-                "CREATE UNIQUE INDEX IF NOT EXISTS idx_teacher_groups_tid_grp ON teacher_groups (teacher_id, group_name)",
-                "CREATE TABLE IF NOT EXISTS xp_transactions (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, amount INTEGER NOT NULL, source_type VARCHAR(64) NOT NULL, source_id VARCHAR(128) NOT NULL, description VARCHAR(255) NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_xp_user_source UNIQUE(user_id, source_type, source_id))",
-                "CREATE TABLE IF NOT EXISTS audit_logs (id SERIAL PRIMARY KEY, actor_id INTEGER, actor_email VARCHAR(128), actor_role VARCHAR(32), action VARCHAR(128) NOT NULL, target_type VARCHAR(64), target_id VARCHAR(128), details TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
-                "CREATE TABLE IF NOT EXISTS daily_quests_log (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, quest_key VARCHAR(64) NOT NULL, quest_date VARCHAR(32) NOT NULL, completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_daily_user_quest UNIQUE(user_id, quest_key, quest_date))",
-                "CREATE TABLE IF NOT EXISTS courses (id SERIAL PRIMARY KEY, slug VARCHAR(64) UNIQUE NOT NULL, title VARCHAR(255) NOT NULL, code VARCHAR(64) DEFAULT '', description TEXT DEFAULT '', curator_id INTEGER, is_published INTEGER DEFAULT 1, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
-                "CREATE TABLE IF NOT EXISTS course_modules (id SERIAL PRIMARY KEY, course_id INTEGER NOT NULL, title VARCHAR(255) NOT NULL, order_num INTEGER DEFAULT 1, is_published INTEGER DEFAULT 1, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
-                "CREATE TABLE IF NOT EXISTS lessons (id SERIAL PRIMARY KEY, course_id INTEGER NOT NULL, module_id INTEGER, title VARCHAR(255) NOT NULL, lesson_type VARCHAR(64) DEFAULT 'theory', order_num INTEGER DEFAULT 1, xp_reward INTEGER DEFAULT 60, unlock_day INTEGER DEFAULT 1, is_published INTEGER DEFAULT 1, content_json TEXT DEFAULT '[]', created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)",
-                "CREATE TABLE IF NOT EXISTS lesson_block_progress (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, lesson_id INTEGER NOT NULL, block_id VARCHAR(64) NOT NULL, completed INTEGER DEFAULT 0, state_json TEXT DEFAULT '{}', updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT uq_block_prog UNIQUE(user_id, lesson_id, block_id))",
-                "CREATE TABLE IF NOT EXISTS ai_conversations (id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL, context_type VARCHAR(64) NOT NULL, context_id VARCHAR(128) DEFAULT '', user_message TEXT NOT NULL, assistant_message TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"
-            ]:
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_teacher_groups_tid_grp ON teacher_groups (teacher_id, group_name)"
+            ]
+            for pg_ddl in pg_ddl_statements:
                 pg_cur.execute(pg_ddl)
+
+            # Seed default platform settings and demo accounts into PostgreSQL
+            pg_cur.execute("INSERT INTO platform_settings (key, value) VALUES ('current_study_day', '1') ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value")
+            
+            pg_demo_pwd_student = generate_password_hash("student123")
+            pg_demo_pwd_teacher = generate_password_hash("teacher123")
+            pg_demo_pwd_admin = generate_password_hash("admin123")
+            
+            pg_demo_accounts = [
+                ("student@amk.kz", pg_demo_pwd_student, "Асылхан Бауыржанұлы", "Бауыржанұлы", "Асылхан", "", "student", "ИС-21", "it", "", "KZ-AMK-2026-10001", 1, 1),
+                ("voronov@student.amk.kz", pg_demo_pwd_student, "Константин Воронов", "Воронов", "Константин", "", "student", "ИС-21", "it", "", "KZ-AMK-2026-98421", 1, 1),
+                ("teacher@amk.kz", pg_demo_pwd_teacher, "Иванов Сергей Павлович", "Иванов", "Сергей", "Павлович", "teacher", "Кафедра IT", "it", "Кафедра профильных дисциплин", None, 1, 1),
+                ("admin@amk.kz", pg_demo_pwd_admin, "Администратор Системы", "Администратор", "Системы", "", "admin", "Администрация", "it", "Ректорат", "KZ-AMK-ADMIN-01", 1, 1),
+            ]
+            for acc in pg_demo_accounts:
+                pg_cur.execute("""
+                INSERT INTO users (
+                    email, password_hash, full_name, last_name, first_name, middle_name,
+                    role, group_name, specialty_slug, department, student_id, email_verified, is_demo
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT(email) DO UPDATE SET
+                    role = EXCLUDED.role,
+                    password_hash = EXCLUDED.password_hash,
+                    is_demo = 1,
+                    email_verified = 1
+                """, acc)
+
+            try:
+                from curriculum_seeder import seed_interactive_curriculum
+                seed_interactive_curriculum(pg_cur)
+            except Exception as e_cur:
+                print(f"[WARN] PostgreSQL curriculum seeder warning: {e_cur}")
+
             pg_conn.commit()
             pg_conn.close()
+            print("[INFO] PostgreSQL DDL and seeding complete.")
         except Exception as e:
             print(f"[WARN] PostgreSQL DDL sync warning: {e}")
-        return
-    conn = sqlite3.connect(DB_PATH)
+
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
+    conn.execute("PRAGMA journal_mode = WAL;")
+    conn.execute("PRAGMA busy_timeout = 30000;")
+    conn.execute("PRAGMA foreign_keys = ON;")
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -838,13 +1277,15 @@ def init_db():
                 ))
 
     # Seed isolated demo accounts
-    demo_pwd_student = hashlib.sha256("student123".encode()).hexdigest()
-    demo_pwd_teacher = hashlib.sha256("teacher123".encode()).hexdigest()
+    demo_pwd_student = generate_password_hash("student123")
+    demo_pwd_teacher = generate_password_hash("teacher123")
+    demo_pwd_admin = generate_password_hash("admin123")
 
     demo_accounts = [
         ("student@amk.kz", demo_pwd_student, "Оспанов Адилет Серикович", "Оспанов", "Адилет", "Серикович", "student", "ИС-21", "it", "", "KZ-AMK-2026-10001", 1, 1),
         ("voronov@student.amk.kz", demo_pwd_student, "Воронов Константин Сергеевич", "Воронов", "Константин", "Сергеевич", "student", "ИС-21", "it", "", "KZ-AMK-2026-98421", 1, 1),
         ("teacher@amk.kz", demo_pwd_teacher, "Иванов Сергей Павлович", "Иванов", "Сергей", "Павлович", "teacher", "Кафедра ИТ", "it", "Кафедра информационных технологий", None, 1, 1),
+        ("admin@amk.kz", demo_pwd_admin, "Администратор Системы", "Администратор", "Системы", "", "admin", "Администрация", "it", "Ректорат", "KZ-AMK-ADMIN-01", 1, 1),
     ]
     for acc in demo_accounts:
         cursor.execute("""
@@ -853,6 +1294,8 @@ def init_db():
             role, group_name, specialty_slug, department, student_id, email_verified, is_demo
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(email) DO UPDATE SET
+            role = excluded.role,
+            password_hash = excluded.password_hash,
             is_demo = 1,
             email_verified = 1,
             last_name = CASE WHEN users.last_name = '' THEN excluded.last_name ELSE users.last_name END,
@@ -1277,29 +1720,26 @@ def send_verification_code():
     """, (email, code, expires_at))
     conn.commit()
 
-    wa_phone = "77079079764"
-    wa_msg = f"Здравствуйте! Подтверждаю регистрацию в EDU SPACE (АМК). Мой код: [{code}], Email: {email}"
+    wa_phone = re.sub(r'[^\d]', '', SUPPORT_PHONE)
+    wa_msg = f"Здравствуйте! Подтверждаю регистрацию в EDU SPACE (АМК). Email: {email}"
     import urllib.parse
     wa_url = f"https://wa.me/{wa_phone}?text={urllib.parse.quote(wa_msg)}"
+
+    # In dev mode, log OTP to server console
+    print(f"[OTP DEV CONSOLE] To: {email} | Code: {code}")
 
     # Optional background attempt via SMTP if configured
     sent_real, status_smtp = send_smtp_email(email, code)
 
     return jsonify({
         "success": True,
-        "message": f"Код [{code}] готов для отправки в WhatsApp (+7 707 907 97 64)",
-        "code": code,
-        "whatsapp_phone": "+7 707 907 97 64",
+        "message": f"Код подтверждения отправлен на {email}. Проверьте почтовый ящик или мессенджер.",
+        "whatsapp_phone": SUPPORT_PHONE,
         "whatsapp_url": wa_url,
+        "support_email": SUPPORT_EMAIL,
+        "support_phone": SUPPORT_PHONE,
         "sent_via_smtp": sent_real,
-        "expires_in_seconds": 600,
-        "mail_preview": {
-            "to": email,
-            "from": "+7 707 907 97 64 (WhatsApp)",
-            "subject": f"{code} — Код подтверждения EDU SPACE (АМК)",
-            "code": code,
-            "whatsapp_url": wa_url
-        }
+        "expires_in_seconds": 600
     })
 
 
@@ -1368,20 +1808,10 @@ def register():
     if role == 'teacher':
         raw_code = (data.get('teacher_code') or '').strip()
         norm_code = normalize_teacher_code(raw_code)
-        is_valid_code = (
-            not raw_code or
-            norm_code in TEACHER_ACCESS_CODES or
-            'AMK' in norm_code or
-            'TEACHER' in norm_code or
-            'ПРЕПОД' in norm_code or
-            norm_code.startswith('AMK') or
-            norm_code == '2026' or
-            '2026' in norm_code
-        )
-        if not is_valid_code:
+        if not raw_code or norm_code not in TEACHER_ACCESS_CODES:
             return jsonify({
                 "success": False,
-                "message": "Неверный служебный код преподавателя. Код кафедры: AMK2026 (можно вводить русскими или латинскими буквами)."
+                "message": "Неверный служебный код преподавателя. Обратитесь к администратору или в учебную часть для получения кода доступа кафедры."
             }), 403
         if not department:
             department = "Кафедра профильных дисциплин АМК"
@@ -1416,7 +1846,7 @@ def register():
                 "message": "Электронная почта не подтверждена или введён неверный код."
             }), 400
 
-    pwd_hash = hashlib.sha256(password.encode()).hexdigest()
+    pwd_hash = generate_password_hash(password)
     temp_student_id = f"KZ-AMK-2026-{random.randint(10000, 99999)}" if role == 'student' else None
 
     try:
@@ -1443,6 +1873,13 @@ def register():
                 f"Добро пожаловать на курс «{course_obj['short_title']}»!",
                 f"{fio['first_name']}, ваш аккаунт и почта подтверждены. Вам открыт Урок №1 — изучите конспект, пройдите квиз и отправьте первую работу."
             ))
+        elif role == 'teacher':
+            # Assign initial department / specialty group for newly registered teacher
+            default_grp = 'ИС-21' if specialty_slug == 'it' else f"{specialty_slug.upper()}-21"
+            cursor.execute("""
+            INSERT OR IGNORE INTO teacher_groups (teacher_id, group_name, specialty_slug)
+            VALUES (?, ?, ?)
+            """, (user_id, default_grp, specialty_slug))
         conn.commit()
     except sqlite3.IntegrityError:
         return jsonify({"success": False, "message": "Пользователь с таким email уже зарегистрирован."}), 409
@@ -1505,10 +1942,14 @@ def auth_reset_password():
     ver = cursor.fetchone()
 
     if not ver or str(ver['code']) != code:
-        return jsonify({"success": False, "message": "Неверный или устаревший код подтверждения"}), 400
+        return jsonify({"success": False, "message": "Неверный проверочный код."}), 400
 
-    new_hash = hashlib.sha256(new_password.encode()).hexdigest()
+    if int(time.time()) > int(ver['expires_at']):
+        return jsonify({"success": False, "message": "Срок действия проверочного кода истёк. Запросите новый код."}), 400
+
+    new_hash = generate_password_hash(new_password)
     cursor.execute("UPDATE users SET password_hash = ? WHERE email = ?", (new_hash, email))
+    cursor.execute("DELETE FROM email_verifications WHERE email = ?", (email,))
     conn.commit()
 
     return jsonify({"success": True, "message": "Пароль успешно обновлён. Теперь вы можете войти."}), 200
@@ -1523,14 +1964,12 @@ def login():
     if not email or not password:
         return jsonify({"success": False, "message": "Введите email и пароль."}), 400
 
-    pwd_hash = hashlib.sha256(password.encode()).hexdigest()
-
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM users WHERE email = ? AND password_hash = ?", (email, pwd_hash))
+    cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
     user = cursor.fetchone()
 
-    if not user:
+    if not user or not verify_and_migrate_password(conn, user, password):
         return jsonify({"success": False, "message": "Неверный email или пароль. Проверьте раскладку клавиатуры."}), 401
 
     user_out = serialize_user(user)
@@ -1610,10 +2049,11 @@ def enroll_course():
 
 
 @app.route('/api/user/profile/<int:user_id>', methods=['GET'])
+@login_required()
 def get_profile(user_id):
     session_uid = session.get('user_id')
     session_role = session.get('user_role')
-    if session_uid and session_role == 'student' and int(user_id) != int(session_uid):
+    if session_role == 'student' and int(user_id) != int(session_uid):
         return jsonify({
             "success": False,
             "message": "Доступ к чужому профилю запрещён.",
@@ -1625,6 +2065,17 @@ def get_profile(user_id):
     user = cursor.fetchone()
     if not user:
         return jsonify({"success": False, "message": "Пользователь не найден"}), 404
+
+    # Teacher Group Isolation
+    if session_role == 'teacher' and int(user_id) != int(session_uid):
+        t_groups = get_teacher_assigned_groups(session_uid)
+        st_group = user['group_name']
+        if not t_groups or st_group not in t_groups:
+            return jsonify({
+                "success": False,
+                "message": f"Студент группы '{st_group}' не относится к вашим закреплённым группам.",
+                "code": "GROUP_ACCESS_DENIED"
+            }), 403
 
     user_dict = serialize_user(user)
     spec_slug = request.args.get('specialty') or user_dict['specialty_slug'] or 'it'
@@ -1657,7 +2108,14 @@ def get_profile(user_id):
     tx_xp_row = cursor.fetchone()
     tx_xp = tx_xp_row[0] if tx_xp_row else 0
     final_bonus = max(bonus_xp, tx_xp)
-    xp_total = sum(v["score"] * 3 for v in latest_by_task.values() if v["score"] >= 60) + final_bonus
+    cursor.execute("SELECT COUNT(*) FROM xp_transactions WHERE user_id = ? AND source_type = 'task_completion'", (user_id,))
+    has_ledger_tasks = (cursor.fetchone()[0] or 0) > 0
+    if has_ledger_tasks:
+        xp_total = final_bonus
+    else:
+        # Legacy fallback if transactions were not recorded in ledger
+        legacy_task_xp = sum(v["score"] * 3 for v in latest_by_task.values() if v["score"] >= 60)
+        xp_total = legacy_task_xp + final_bonus
     level_meta = get_level_info(xp_total)
     level = level_meta["level"]
     check_and_unlock_achievements(conn, user_id)
@@ -1756,7 +2214,7 @@ def update_profile():
     if new_password:
         if len(new_password) < 6 or not re.search(r'[A-Za-zА-Яа-яЁё]', new_password) or not re.search(r'\d', new_password):
             return jsonify({"success": False, "message": "Новый пароль должен быть не короче 6 символов и содержать буквы и цифры."}), 400
-        pwd_hash = hashlib.sha256(new_password.encode()).hexdigest()
+        pwd_hash = generate_password_hash(new_password)
         cursor.execute("UPDATE users SET password_hash = ? WHERE id = ?", (pwd_hash, user_id))
 
     cursor.execute("""
@@ -1779,9 +2237,21 @@ def update_profile():
 # TASKS & GRADUAL DRIP-FEED SCHEDULE API
 # ==========================================
 
+SPECIALTY_ALIASES = {
+    'logistics': 'graphic_design',
+    'accounting': 'hvac',
+    'power': 'autoelectric',
+    'mechanics': 'automechanic',
+    'design': 'graphic_design',
+    'auto': 'autoelectric',
+    'marketing': 'automechanic'
+}
+
 @app.route('/api/tasks', methods=['GET'])
 def get_tasks():
     specialty = request.args.get('specialty')
+    if specialty:
+        specialty = SPECIALTY_ALIASES.get(specialty.lower().strip(), specialty)
     mode = request.args.get('mode')
     ticket = request.args.get('ticket')
     user_id = request.args.get('user_id', type=int)
@@ -1835,6 +2305,19 @@ def get_tasks():
         u_tier_row = cursor.fetchone()
         if u_tier_row and (u_tier_row['subscription_tier'] or '').lower() == 'pro':
             user_is_pro = True
+
+    interactive_lessons_map = {}
+    try:
+        cursor.execute("""
+        SELECT l.id, l.order_num, c.slug 
+        FROM lessons l 
+        JOIN courses c ON c.id = l.course_id 
+        WHERE l.is_published = 1
+        """)
+        for r in cursor.fetchall():
+            interactive_lessons_map[(r['slug'], int(r['order_num']))] = r['id']
+    except Exception:
+        pass
 
     tasks_out = []
     for t in raw_tasks:
@@ -1896,6 +2379,9 @@ def get_tasks():
         t_data['current_stage'] = prog_info.get('current_stage', 1) if prog_info else 1
         t_data['mission_xp'] = prog_info.get('mission_xp', 0) if prog_info else 0
         t_data['is_interactive_mission'] = (t['specialty_slug'] == 'graphic_design' and int(t['task_number']) == 1)
+        les_id = interactive_lessons_map.get((t['specialty_slug'], task_num))
+        t_data['interactive_lesson_id'] = les_id
+        t_data['has_interactive_lesson'] = bool(les_id or t_data['is_interactive_mission'])
         tasks_out.append(t_data)
 
     return jsonify({
@@ -1937,18 +2423,24 @@ def get_task(task_id):
 
 
 @app.route('/api/tasks/progress', methods=['POST'])
+@login_required()
 def save_lesson_progress():
     data = request.get_json() or {}
     user_id = data.get('user_id')
-    session_uid = session.get('user_id')
-    session_role = session.get('user_role')
-    if session_uid and session_role == 'student':
+    cur_user = g.get('current_user') or get_current_user()
+    session_uid = cur_user['id']
+    session_role = cur_user['role']
+    if session_role == 'student':
         if user_id and int(user_id) != int(session_uid):
             return jsonify({
                 "success": False,
                 "message": "Сохранение прогресса для чужого аккаунта запрещено.",
                 "code": "TAMPERING_DETECTED"
             }), 403
+        user_id = session_uid
+    elif session_role in ('teacher', 'admin'):
+        user_id = int(user_id or session_uid)
+    else:
         user_id = session_uid
     specialty_slug = (data.get('specialty_slug') or 'it').strip().lower()
     task_number = int(data.get('task_number') or 1)
@@ -1996,13 +2488,14 @@ def save_lesson_progress():
 
 
 @app.route('/api/tasks/submit', methods=['POST'])
+@login_required()
 def submit_task():
     data = request.get_json() or {}
-    # Anti-tampering: enforce server session user_id for students
-    session_user_id = session.get('user_id')
-    session_user_role = session.get('user_role')
+    cur_user = g.get('current_user') or get_current_user()
+    session_user_id = cur_user['id']
+    session_user_role = cur_user['role']
 
-    if session_user_id and session_user_role == 'student':
+    if session_user_role == 'student':
         if 'user_id' in data and int(data['user_id']) != session_user_id:
             return jsonify({
                 "success": False,
@@ -2010,10 +2503,11 @@ def submit_task():
                 "code": "TAMPERING_DETECTED"
             }), 403
         user_id = session_user_id
-    elif session_user_id and session_user_role in ('teacher', 'admin'):
+    elif session_user_role in ('teacher', 'admin'):
         user_id = int(data.get('user_id') or session_user_id)
     else:
-        user_id = int(data.get('user_id') or 1)
+        user_id = session_user_id
+
     specialty_slug = (data.get('specialty_slug') or 'it').strip().lower()
     task_number = int(data.get('task_number') or 1)
     task_title = data.get('task_title') or f"Задание №{task_number}"
@@ -2021,11 +2515,31 @@ def submit_task():
     time_spent = int(data.get('time_spent_seconds') or 0)
     submitted_code = data.get('submitted_code') or ''
     repo_url = (data.get('repo_url') or '').strip()
+
+    if repo_url:
+        import urllib.parse
+        parsed = urllib.parse.urlparse(repo_url)
+        if parsed.scheme.lower() not in ('http', 'https') or not parsed.netloc:
+            return jsonify({
+                "success": False,
+                "code": "INVALID_REPO_URL",
+                "message": "Недопустимый URL репозитория. Разрешены только протоколы http:// и https://"
+            }), 400
     student_comment = (data.get('student_comment') or '').strip()
-    autotest_passed = int(data.get('autotest_passed') or 0)
-    autotest_total = int(data.get('autotest_total') or 0)
-    quiz_score = int(data.get('quiz_score') or 0)
+    autotest_passed = max(0, int(data.get('autotest_passed') or 0))
+    autotest_total = max(0, int(data.get('autotest_total') or 0))
+    quiz_score = max(0, int(data.get('quiz_score') or 0))
     await_teacher = bool(data.get('await_teacher', False))
+
+    # SEC-03: Backend validation to prevent client score tampering
+    if autotest_total > 0:
+        autotest_passed = min(autotest_passed, autotest_total)
+        autotest_cap = int(round((autotest_passed / autotest_total) * 100))
+        score = min(score, autotest_cap)
+    else:
+        # Subjective work without automated tests requires teacher evaluation
+        if not await_teacher and (submitted_code or repo_url):
+            await_teacher = True
 
     current_day = get_current_day()
     conn = get_db()
@@ -2205,6 +2719,7 @@ def get_demo_status():
 
 
 @app.route('/api/demo/reset', methods=['POST'])
+@login_required()
 def reset_demo():
     data = request.get_json(silent=True) or {}
     target_user_id = data.get('user_id')
@@ -2224,7 +2739,10 @@ def reset_demo():
         c.execute(f"DELETE FROM task_submissions WHERE user_id IN ({placeholders});", demo_uids)
         c.execute(f"DELETE FROM grades WHERE user_id IN ({placeholders});", demo_uids)
         c.execute(f"DELETE FROM lesson_progress WHERE user_id IN ({placeholders});", demo_uids)
-        c.execute(f"UPDATE users SET bonus_xp = 0, achievements_json = '[]' WHERE id IN ({placeholders});", demo_uids)
+        c.execute(f"DELETE FROM xp_transactions WHERE user_id IN ({placeholders});", demo_uids)
+        c.execute(f"DELETE FROM lesson_block_progress WHERE user_id IN ({placeholders});", demo_uids)
+        c.execute(f"DELETE FROM daily_quests_log WHERE user_id IN ({placeholders});", demo_uids)
+        c.execute(f"UPDATE users SET bonus_xp = 0, streak_days = 1, achievements_json = '[]' WHERE id IN ({placeholders});", demo_uids)
 
     c.execute("INSERT OR REPLACE INTO platform_settings (key, value) VALUES ('current_study_day', '1');")
     conn.commit()
@@ -2292,14 +2810,25 @@ def get_teacher_students():
     teacher_assigned = []
     if caller_id and caller_role == 'teacher':
         teacher_assigned = get_teacher_assigned_groups(caller_id)
-
-    # If teacher explicitly requested a group outside their assignment, block tampering
-    if teacher_assigned and group_filter and group_filter not in teacher_assigned:
-        return jsonify({
-            "success": False,
-            "message": f"У вас нет доступа к учебной группе '{group_filter}'",
-            "code": "GROUP_ACCESS_DENIED"
-        }), 403
+        if not teacher_assigned:
+            if group_filter:
+                return jsonify({
+                    "success": False,
+                    "message": f"У вас нет доступа к учебной группе '{group_filter}'",
+                    "code": "GROUP_ACCESS_DENIED"
+                }), 403
+            return jsonify({
+                "success": True,
+                "students": [],
+                "groups": [],
+                "count": 0
+            })
+        if group_filter and group_filter not in teacher_assigned:
+            return jsonify({
+                "success": False,
+                "message": f"У вас нет доступа к учебной группе '{group_filter}'",
+                "code": "GROUP_ACCESS_DENIED"
+            }), 403
 
     q = """
     SELECT id, full_name, last_name, first_name, middle_name, email, role,
@@ -2386,7 +2915,7 @@ def sync_user():
     first_name = fio_parts[1] if len(fio_parts) > 1 else ""
     middle_name = " ".join(fio_parts[2:]) if len(fio_parts) > 2 else ""
 
-    pwd_hash = hashlib.sha256("student123".encode()).hexdigest()
+    pwd_hash = generate_password_hash("student123")
     if not student_id and role == 'student':
         student_id = f"KZ-AMK-2026-{random.randint(10000, 99999)}"
 
@@ -2502,12 +3031,25 @@ def get_teacher_journal():
     teacher_assigned = []
     if caller_id and caller_role == 'teacher':
         teacher_assigned = get_teacher_assigned_groups(caller_id)
-    if teacher_assigned and group_filter and group_filter not in teacher_assigned:
-        return jsonify({
-            "success": False,
-            "message": f"У вас нет доступа к учебной группе '{group_filter}'",
-            "code": "GROUP_ACCESS_DENIED"
-        }), 403
+        if not teacher_assigned:
+            if group_filter:
+                return jsonify({
+                    "success": False,
+                    "message": f"У вас нет доступа к учебной группе '{group_filter}'",
+                    "code": "GROUP_ACCESS_DENIED"
+                }), 403
+            return jsonify({
+                "success": True,
+                "count": 0,
+                "current_study_day": get_current_day(),
+                "journal": []
+            })
+        if group_filter and group_filter not in teacher_assigned:
+            return jsonify({
+                "success": False,
+                "message": f"У вас нет доступа к учебной группе '{group_filter}'",
+                "code": "GROUP_ACCESS_DENIED"
+            }), 403
 
     q = """
     SELECT s.id, s.user_id, s.student_id, s.student_name, s.group_name, s.specialty_slug,
@@ -2637,10 +3179,11 @@ def grade_submission():
     # Verify that teacher is assigned to this student's group
     if caller_id and caller_role == 'teacher':
         t_groups = get_teacher_assigned_groups(caller_id)
-        if t_groups and sub_row and sub_row['group_name'] not in t_groups:
+        target_grp = sub_row['group_name'] if sub_row else ''
+        if not t_groups or (sub_row and target_grp not in t_groups):
             return jsonify({
                 "success": False,
-                "message": f"Студент группы '{sub_row['group_name']}' не относится к вашим закреплённым группам.",
+                "message": f"Студент группы '{target_grp}' не относится к вашим закреплённым группам.",
                 "code": "GROUP_ACCESS_DENIED"
             }), 403
     cursor.execute("""
@@ -2957,9 +3500,46 @@ def career_page():
 def tools_page():
     return send_from_directory(APP_DIR, 'tools.html')
 
+@app.route('/gradebook')
+@app.route('/gradebook.html')
+def gradebook_page():
+    return redirect('/teacher.html?tab=matrix', code=301)
+
+# SEC-01: Static Asset Serving Whitelist & Sensitive File Protection
+ALLOWED_STATIC_EXTENSIONS = {
+    '.html', '.css', '.js', '.svg', '.png', '.jpg', '.jpeg',
+    '.webp', '.mp4', '.webm', '.ico', '.woff', '.woff2', '.ttf',
+    '.json', '.map'
+}
+BLOCKED_STATIC_EXTENSIONS = {
+    '.db', '.py', '.pyc', '.git', '.env', '.yml', '.yaml', '.sh',
+    '.bat', '.cmd', '.sqlite', '.sqlite3', '.ini', '.cfg', '.conf',
+    '.bak', '.log'
+}
+
 @app.route('/<path:path>')
 def static_proxy(path):
-    return send_from_directory(APP_DIR, path)
+    norm_path = os.path.normpath(path).replace('\\', '/')
+    if norm_path.startswith('/') or norm_path.startswith('../') or '/..' in norm_path or norm_path == '..':
+        return jsonify({"error": "Forbidden: Path traversal detected"}), 403
+    
+    parts = norm_path.split('/')
+    if any(p.startswith('.') for p in parts):
+        return jsonify({"error": "Forbidden: Access to hidden files or directories is denied"}), 403
+
+    _, ext = os.path.splitext(norm_path.lower())
+
+    if ext in BLOCKED_STATIC_EXTENSIONS or any(b in norm_path.lower() for b in ['.git', 'database.db', 'server.py', 'docker-compose']):
+        return jsonify({"error": "Forbidden: Access to restricted server file is denied"}), 403
+
+    if ext not in ALLOWED_STATIC_EXTENSIONS:
+        return jsonify({"error": "Not Found: File type not permitted"}), 404
+
+    target_abs = os.path.abspath(os.path.join(APP_DIR, norm_path))
+    if not target_abs.startswith(os.path.abspath(APP_DIR)) or not os.path.isfile(target_abs):
+        return jsonify({"error": "File not found"}), 404
+
+    return send_from_directory(APP_DIR, norm_path)
 
 
 # ==========================================
@@ -3156,12 +3736,20 @@ def process_checkout():
 
 UPLOAD_DIR = os.path.join(BASE_DIR, 'static', 'uploads', 'submissions')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'svg', 'psd', 'fig', 'pdf', 'zip', 'txt', 'json', 'csv'}
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'psd', 'fig', 'pdf', 'zip', 'txt', 'json', 'csv'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@app.errorhandler(413)
+def file_too_large(e):
+    return jsonify({
+        "success": False,
+        "message": "Размер файла превышает допустимый лимит 16 МБ."
+    }), 413
+
 @app.route('/api/tasks/upload', methods=['POST'])
+@login_required()
 def upload_task_file():
     if 'file' not in request.files:
         return jsonify({"success": False, "message": "Файл не прикреплён"}), 400
@@ -3170,7 +3758,8 @@ def upload_task_file():
         return jsonify({"success": False, "message": "Имя файла пустое"}), 400
 
     if file and allowed_file(file.filename):
-        user_id = request.form.get('user_id', '0')
+        cur_user = g.get('current_user') or get_current_user()
+        user_id = cur_user['id']
         specialty = request.form.get('specialty_slug', 'general')
         task_num = request.form.get('task_number', '1')
         orig_name = re.sub(r'[^a-zA-Z0-9_\.-]', '_', file.filename)
@@ -3192,6 +3781,7 @@ def upload_task_file():
     else:
         return jsonify({
             "success": False,
+            "code": "EXTENSION_NOT_ALLOWED",
             "message": "Недопустимый формат файла. Разрешены: PNG, JPG, PSD, FIG, PDF, ZIP, TXT, JSON, CSV."
         }), 400
 
@@ -4087,6 +4677,7 @@ def get_leaderboard():
     query = """
     SELECT u.id, u.full_name, u.email, u.group_name, u.specialty_slug, u.bonus_xp, u.achievements_json, u.is_demo,
            COALESCE((SELECT SUM(amount) FROM xp_transactions WHERE user_id = u.id), 0) as ledger_xp,
+           COALESCE((SELECT COUNT(*) FROM xp_transactions WHERE user_id = u.id AND source_type = 'task_completion'), 0) as ledger_task_cnt,
            COALESCE((SELECT SUM(score * 3) FROM task_submissions WHERE user_id = u.id AND score >= 60), 0) as task_xp,
            (SELECT count(*) FROM task_submissions WHERE user_id = u.id AND score >= 60) as passed_tasks,
            COALESCE((SELECT AVG(score) FROM task_submissions WHERE user_id = u.id AND score > 0), 0) as avg_score
@@ -4105,7 +4696,10 @@ def get_leaderboard():
 
     leaderboard = []
     for rank, r in enumerate(rows, 1):
-        total_xp = max(r['ledger_xp'], r['bonus_xp']) + r['task_xp']
+        if r['ledger_task_cnt'] > 0:
+            total_xp = max(r['ledger_xp'], r['bonus_xp'])
+        else:
+            total_xp = max(r['ledger_xp'], r['bonus_xp']) + r['task_xp']
         lvl_info = get_level_info(total_xp)
         achs = []
         if r['achievements_json']:
