@@ -2272,30 +2272,30 @@
     gate.id = 'edu-auth-guard';
     gate.className = 'fixed inset-0 z-[9000] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4';
     gate.innerHTML = `
-      <div class="bg-dark-850/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/10 text-center space-y-5 text-white">
+      <div class="bg-dark-850/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/10 text-center space-y-5 text-white relative">
+        <button type="button" onclick="window.EduSpace.startIsolatedDemo('${targetRole}')" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors" title="Продолжить как гость">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
         <div class="w-16 h-16 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center mx-auto shadow-glow-indigo">
           <span class="material-symbols-outlined text-[34px]">lock_person</span>
         </div>
         <div class="space-y-2">
           <h2 class="font-display font-extrabold text-xl text-white">Вход в образовательную платформу</h2>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Чтобы сохранять личный прогресс уроков, результаты тестов и оценки в зачётной ведомости под вашим ФИО, войдите или зарегистрируйтесь.
+            Чтобы сохранять личный прогресс уроков, результаты тестов и оценки в зачётной ведомости под вашим ФИО, войдите или начните в демо-режиме.
           </p>
         </div>
         <div class="space-y-2.5 pt-1">
-          <a href="auth.html?mode=register${targetRole === 'teacher' ? '&role=teacher' : ''}" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined text-[18px]">person_add</span>
-            <span>Создать личный аккаунт (с подтверждением почты)</span>
-          </a>
+          <button type="button" onclick="window.EduSpace.startIsolatedDemo('${targetRole}')" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-slate-950 font-black text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">play_circle</span>
+            <span>Войти в демо-режим (Мгновенный просмотр)</span>
+          </button>
           <a href="auth.html?mode=login" class="w-full py-2.5 px-4 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 font-bold text-xs transition-colors block">
             У меня уже есть аккаунт — Войти
           </a>
-          <div class="pt-2 border-t border-white/10">
-            <button type="button" onclick="window.EduSpace.startIsolatedDemo('${targetRole}')" class="w-full py-2.5 px-4 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 font-bold text-xs transition-all flex items-center justify-center gap-1.5 shadow-sm">
-              <span class="material-symbols-outlined text-[16px]">play_circle</span>
-              <span>Ознакомительный демо-режим (${targetRole === 'teacher' ? 'Преподаватель' : 'Студент с 0%'})</span>
-            </button>
-          </div>
+          <a href="auth.html?mode=register${targetRole === 'teacher' ? '&role=teacher' : ''}" class="w-full py-2 px-4 rounded-xl text-slate-400 hover:text-white font-semibold text-xs transition-colors block">
+            Создать личный аккаунт (Регистрация)
+          </a>
         </div>
       </div>
     `;
