@@ -1,454 +1,1562 @@
 <!DOCTYPE html>
-<html lang="ru" class="h-full scroll-smooth">
+<html lang="ru" class="h-full">
 <head>
   <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <!-- Open Graph / WhatsApp / Telegram Social Preview -->
-  <meta property="og:type" content="website"/>
-  <meta property="og:url" content="https://amk-skillhub.onrender.com/"/>
-  <meta property="og:title" content="EDU SPACE — Цифровая образовательная среда АМК"/>
-  <meta property="og:description" content="Инновационная цифровая платформа Алматинского многопрофильного колледжа. 5 специальностей ТиПО, интерактивные тренажеры и реестр аккредитации."/>
-  <meta property="og:image" content="https://amk-skillhub.onrender.com/assets/eduspace-logo.svg"/>
-  <meta name="theme-color" content="#07090e"/>
-  <meta name="twitter:card" content="summary_large_image"/>
-
-  <title>Учебная программа и задания — EDU SPACE | Цифровая образовательная платформа АМК</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Программа курса и модули — EDU SPACE | Цифровая образовательная платформа АМК"/>
+  <meta name="theme-color" content="#0d1311"/>
+  <title>Программа курса и модули — EDU SPACE | АМК</title>
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg"/>
 
-  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
 
-  <!-- Tailwind CSS Local & CDN -->
   <link rel="stylesheet" href="css/tailwind.min.css"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    if (window.tailwind) tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
-          },
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
-              950: '#1e1b4b'
-            },
-            dark: {
-              950: '#07090e',
-              900: '#0b0f19',
-              850: '#101524',
-              800: '#161c2e',
-              700: '#1e263d',
-              600: '#2a3452'
-            }
-          },
-          boxShadow: {
-            'glow-indigo': '0 0 50px -10px rgba(99, 102, 241, 0.35)',
-            'glow-purple': '0 0 50px -10px rgba(168, 85, 247, 0.35)',
-            'glow-cyan': '0 0 50px -10px rgba(6, 182, 212, 0.35)',
-            'glow-amber': '0 0 50px -10px rgba(245, 158, 11, 0.35)'
-          }
-        }
-      }
-    };
-  </script>
-
-  <style>
-    .bg-grid-white {
-      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-      background-size: 32px 32px;
-    }
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0b0f19;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #2a3452;
-      border-radius: 9999px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #6366f1;
-    }
-  </style>
-
   <script src="js/courses-catalog.js"></script>
   <script src="js/app-logistics.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
-  <link rel="stylesheet" href="css/workshop.css">
+  <link rel="stylesheet" href="css/workshop.css"/>
+
+  <style>
+    /* ==========================================================================
+       DESIGN TOKENS: COLORS, TYPOGRAPHY (12/14/16/20/28px), 8PX GRID & MOTION
+       ========================================================================== */
+    :root {
+      /* Surface & Background Tokens (Dark Theme, Unified Palette) */
+      --bg-canvas: #0d1311;
+      --bg-surface: #131c18;
+      --bg-elevated: #192621;
+      --bg-card-hover: #1e2d27;
+      --bg-glass: rgba(19, 28, 24, 0.88);
+
+      /* Border & Divider Tokens */
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-default: rgba(255, 255, 255, 0.14);
+      --border-strong: rgba(219, 244, 119, 0.45);
+
+      /* Text Tokens (WCAG AA >= 4.5:1 verified against #131c18 & #0d1311) */
+      --text-primary: #f4f7f5;     /* 16.4:1 */
+      --text-secondary: #c2d1c8;   /* 10.2:1 */
+      --text-muted: #93a89c;       /* 5.6:1 (strictly >= 4.5:1) */
+
+      /* Accent Tokens: 1 Primary (Lime), 1 Secondary (Violet), Semantic Statuses */
+      --accent-primary: #dbf477;
+      --accent-primary-hover: #e6f996;
+      --accent-primary-ink: #142218;
+      --accent-secondary: #8b5cf6;
+      --accent-secondary-soft: rgba(139, 92, 246, 0.16);
+
+      /* Semantic Status Colors */
+      --status-avail-bg: rgba(52, 211, 153, 0.14);
+      --status-avail-text: #6ee7b7;
+      --status-avail-border: rgba(52, 211, 153, 0.35);
+
+      --status-prog-bg: rgba(251, 191, 36, 0.14);
+      --status-prog-text: #fcd34d;
+      --status-prog-border: rgba(251, 191, 36, 0.35);
+
+      --status-lock-bg: rgba(255, 255, 255, 0.05);
+      --status-lock-text: #93a89c;
+      --status-lock-border: rgba(255, 255, 255, 0.1);
+
+      /* Typography Scale: 12 / 14 / 16 / 20 / 28 px */
+      --fs-12: 0.75rem;   /* 12px */
+      --fs-14: 0.875rem;  /* 14px */
+      --fs-16: 1rem;      /* 16px */
+      --fs-20: 1.25rem;   /* 20px */
+      --fs-28: 1.75rem;   /* 28px */
+      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+      /* 8px Spatial Grid & Radiuses */
+      --sp-1: 8px;
+      --sp-2: 16px;
+      --sp-3: 24px;
+      --sp-4: 32px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-elevated: 0 12px 32px -8px rgba(0, 0, 0, 0.5);
+
+      /* Motion Design Tokens */
+      --dur-fast: 150ms;
+      --dur-base: 300ms;
+      --dur-slow: 600ms;
+      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --ease-in: cubic-bezier(0.64, 0, 0.78, 0);
+      --shift-sm: 8px;
+      --shift-md: 16px;
+      --shift-lg: 24px;
+      --stagger: 60ms;
+
+      /* Layout Dimensions */
+      --sidebar-w: 248px;
+      --sidebar-w-collapsed: 72px;
+      --header-h: 64px;
+    }
+
+    * { box-sizing: border-box; }
+    body.workshop {
+      margin: 0;
+      font-family: var(--font-sans);
+      font-size: var(--fs-14);
+      line-height: 1.5;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    /* Keyboard Focus Ring */
+    :is(a, button, input, select, [tabindex="0"]):focus-visible {
+      outline: 2px solid var(--accent-primary) !important;
+      outline-offset: 2px !important;
+    }
+
+    /* ==========================================================================
+       APP SHELL GRID & COLLAPSIBLE SIDEBAR (250ms smooth width via grid)
+       ========================================================================== */
+    .app-layout {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+      min-height: 100vh;
+      transition: grid-template-columns 250ms var(--ease-out);
+    }
+    body.sidebar-collapsed .app-layout {
+      grid-template-columns: var(--sidebar-w-collapsed) minmax(0, 1fr);
+    }
+
+    .app-sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: var(--sp-2) 12px;
+      z-index: 40;
+      user-select: none;
+      overflow-x: visible;
+    }
+
+    .sidebar-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-1);
+      padding: 0 4px var(--sp-2);
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: var(--sp-2);
+    }
+
+    .brand-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      white-space: nowrap;
+      transition: opacity var(--dur-fast) var(--ease-out);
+    }
+    body.sidebar-collapsed .brand-text {
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+    }
+
+    .collapse-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: color var(--dur-fast) ease, background-color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-out);
+    }
+    .collapse-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.06);
+    }
+    body.sidebar-collapsed .collapse-btn {
+      transform: rotate(180deg);
+    }
+
+    /* Grouped Sidebar Navigation */
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: visible;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+
+    .nav-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-group-title {
+      font-size: var(--fs-12);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      padding: 0 10px 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      transition: opacity var(--dur-fast) var(--ease-out);
+    }
+    body.sidebar-collapsed .nav-group-title {
+      opacity: 0;
+      height: 4px;
+      padding: 0;
+    }
+
+    .nav-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      height: 40px;
+      padding: 0 10px;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: var(--fs-14);
+      font-weight: 500;
+      white-space: nowrap;
+      transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-out);
+    }
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+    }
+    .nav-item.is-active {
+      background: rgba(219, 244, 119, 0.08);
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+    .nav-item.is-active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 3px;
+      border-radius: 0 4px 4px 0;
+      background: var(--accent-primary);
+    }
+
+    .nav-item-main {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .nav-label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: opacity var(--dur-fast) var(--ease-out);
+    }
+    body.sidebar-collapsed .nav-label,
+    body.sidebar-collapsed .nav-counter-dot {
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+    }
+
+    /* Small circular counter badge on active nav item */
+    .nav-counter-dot {
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: rgba(219, 244, 119, 0.18);
+      color: var(--accent-primary);
+      font-size: var(--fs-12);
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: opacity var(--dur-fast) var(--ease-out);
+    }
+
+    .nav-live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34d399;
+      flex-shrink: 0;
+    }
+
+    /* Tooltip on icons when sidebar is collapsed */
+    .nav-item[data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: calc(100% + 10px);
+      top: 50%;
+      transform: translateY(calc(-50% + 4px));
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-default);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: var(--fs-12);
+      font-weight: 600;
+      white-space: nowrap;
+      box-shadow: var(--shadow-elevated);
+      opacity: 0;
+      pointer-events: none;
+      transform-origin: left center;
+      transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+      z-index: 100;
+    }
+    body.sidebar-collapsed .nav-item[data-tooltip]:hover::after,
+    body.sidebar-collapsed .nav-item[data-tooltip]:focus-visible::after {
+      opacity: 1;
+      transform: translateY(-50%);
+    }
+
+    /* Sidebar Footer */
+    .sidebar-footer {
+      padding-top: var(--sp-2);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-1);
+    }
+    .demo-reset-link {
+      background: none;
+      border: none;
+      padding: 4px 10px;
+      color: var(--text-muted);
+      font-size: var(--fs-12);
+      text-align: left;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color var(--dur-fast) ease, opacity var(--dur-fast) var(--ease-out);
+    }
+    .demo-reset-link:hover { color: var(--text-primary); }
+    body.sidebar-collapsed .demo-reset-link { opacity: 0; height: 0; padding: 0; pointer-events: none; }
+
+    /* ==========================================================================
+       TOP HEADER & BREADCRUMBS
+       ========================================================================== */
+    .top-header {
+      position: sticky;
+      top: 0;
+      height: var(--header-h);
+      background: var(--bg-glass);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 var(--sp-3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-2);
+      z-index: 30;
+    }
+
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-1);
+      font-size: var(--fs-14);
+      color: var(--text-muted);
+      min-width: 0;
+    }
+    .breadcrumbs a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color var(--dur-fast) ease;
+    }
+    .breadcrumbs a:hover { color: var(--text-primary); }
+    .breadcrumbs-current {
+      color: var(--text-primary);
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Tooltip helper for study day / dates */
+    .has-tooltip {
+      position: relative;
+      cursor: help;
+    }
+    .has-tooltip::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      font-size: var(--fs-12);
+      font-weight: 500;
+      white-space: nowrap;
+      box-shadow: var(--shadow-elevated);
+      opacity: 0;
+      pointer-events: none;
+      transform-origin: bottom center;
+      transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+      z-index: 60;
+    }
+    .has-tooltip:hover::after,
+    .has-tooltip:focus-visible::after {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ==========================================================================
+       MAIN WORKSPACE, CONTINUE CARD & COURSE HEADER
+       ========================================================================== */
+    .workspace-container {
+      max-width: 1080px;
+      width: 100%;
+      margin: 0 auto;
+      padding: var(--sp-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+    }
+
+    /* Quick Continue Strip at Top */
+    .continue-banner {
+      background: linear-gradient(90deg, rgba(219, 244, 119, 0.1) 0%, rgba(19, 28, 24, 0.95) 100%);
+      border: 1px solid rgba(219, 244, 119, 0.3);
+      border-radius: var(--radius-md);
+      padding: 12px var(--sp-2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--sp-2);
+    }
+
+    /* Course Header Card */
+    .course-header-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-3);
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
+      gap: var(--sp-3);
+      align-items: start;
+    }
+
+    .curator-row {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-1);
+      font-size: var(--fs-12);
+      color: var(--text-secondary);
+      margin-bottom: var(--sp-1);
+    }
+    .curator-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent-secondary-soft);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      color: #ddd6fe;
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Title + Course Dropdown Row */
+    .course-title-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: var(--sp-1);
+    }
+    .course-title {
+      font-size: var(--fs-28);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    /* Custom Course Switcher Dropdown */
+    .course-dropdown {
+      position: relative;
+    }
+    .course-dropdown-trigger {
+      min-height: 36px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      color: var(--text-primary);
+      font-size: var(--fs-12);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: border-color var(--dur-fast) ease, background-color var(--dur-fast) ease;
+    }
+    .course-dropdown-trigger:hover {
+      border-color: var(--accent-primary);
+      background: var(--bg-card-hover);
+    }
+    .course-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      min-width: 280px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 6px;
+      box-shadow: var(--shadow-elevated);
+      z-index: 50;
+      opacity: 0;
+      transform: translateY(4px) scale(0.98);
+      transform-origin: top left;
+      pointer-events: none;
+      transition: opacity 160ms var(--ease-out), transform 160ms var(--ease-out);
+    }
+    .course-dropdown.is-open .course-dropdown-menu {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      pointer-events: auto;
+    }
+    .course-dropdown-item {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: var(--fs-14);
+      font-weight: 500;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease;
+    }
+    .course-dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-primary);
+    }
+    .course-dropdown-item.is-active {
+      background: rgba(219, 244, 119, 0.12);
+      color: var(--accent-primary);
+      font-weight: 700;
+    }
+
+    /* Buttons System: 1 Primary Solid, Secondary Outlined */
+    .btn-primary-cta {
+      min-height: 44px;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-primary);
+      color: var(--accent-primary-ink);
+      border: 1px solid var(--accent-primary);
+      font-size: var(--fs-14);
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-fast) ease, box-shadow var(--dur-fast) var(--ease-out);
+    }
+    .btn-primary-cta:hover {
+      background: var(--accent-primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px -6px rgba(219, 244, 119, 0.35);
+    }
+    .btn-primary-cta:active {
+      transform: translateY(0) scale(0.98);
+    }
+
+    .btn-secondary-outline {
+      min-height: 44px;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-default);
+      font-size: var(--fs-14);
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) ease, background-color var(--dur-fast) ease;
+    }
+    .btn-secondary-outline:hover {
+      border-color: var(--text-secondary);
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateY(-1px);
+    }
+
+    /* Progress Block inside Course Header */
+    .progress-panel {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: var(--sp-2);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: var(--bg-elevated);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-primary) 0%, #34d399 100%);
+      border-radius: 999px;
+      transition: width 800ms var(--ease-out);
+    }
+
+    /* ==========================================================================
+       SEGMENTED FILTER CONTROL & HIGH-CONTRAST SEARCH
+       ========================================================================== */
+    .controls-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--sp-2);
+    }
+
+    .segmented-control {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 4px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+    }
+
+    .seg-btn {
+      min-height: 36px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: var(--fs-12);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background-color var(--dur-fast) ease, color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-out);
+    }
+    .seg-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+    .seg-btn.is-active {
+      background: var(--accent-primary);
+      color: var(--accent-primary-ink);
+      font-weight: 700;
+    }
+    .seg-btn.is-zero:not(.is-active) {
+      color: var(--text-muted);
+      opacity: 0.55;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+      max-width: 340px;
+    }
+    .search-input {
+      width: 100%;
+      min-height: 40px;
+      padding: 8px 36px 8px 38px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      color: var(--text-primary);
+      font-size: var(--fs-14);
+      transition: border-color var(--dur-fast) ease, box-shadow var(--dur-fast) ease;
+    }
+    .search-input::placeholder {
+      color: var(--text-muted); /* Contrast >= 4.5:1 */
+    }
+    .search-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(219, 244, 119, 0.15);
+    }
+
+    /* ==========================================================================
+       VERTICAL TIMELINE & LESSON CARDS (3 STATES: AVAILABLE, IN_PROGRESS, LOCKED)
+       ========================================================================== */
+    .timeline-list {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+      transition: opacity var(--dur-fast) var(--ease-in), transform var(--dur-fast) var(--ease-in);
+    }
+    .timeline-list.is-filtering-out {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr);
+      gap: var(--sp-2);
+      align-items: stretch;
+    }
+
+    .timeline-rail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .timeline-node {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-family: var(--font-mono);
+      font-size: var(--fs-12);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      z-index: 2;
+      background: var(--bg-surface);
+      border: 2px solid var(--border-default);
+      color: var(--text-secondary);
+      transition: transform var(--dur-fast) var(--ease-out), border-color var(--dur-fast) ease;
+    }
+    .timeline-line {
+      flex: 1;
+      width: 2px;
+      background: var(--border-subtle);
+      margin-top: 4px;
+      margin-bottom: -12px;
+    }
+    .timeline-item:last-child .timeline-line { display: none; }
+
+    .timeline-item.state-available .timeline-node {
+      border-color: var(--accent-primary);
+      background: rgba(219, 244, 119, 0.14);
+      color: var(--accent-primary);
+    }
+    .timeline-item.state-in_progress .timeline-node {
+      border-color: var(--accent-secondary);
+      background: var(--accent-secondary-soft);
+      color: #ddd6fe;
+    }
+    .timeline-item.state-locked .timeline-node {
+      border-color: var(--border-subtle);
+      color: var(--text-muted);
+    }
+
+    .lesson-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: var(--sp-3);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-3);
+      transition: transform var(--dur-base) var(--ease-out), border-color var(--dur-base) ease, background-color var(--dur-base) ease, box-shadow var(--dur-base) var(--ease-out);
+    }
+    .lesson-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-strong);
+      background: var(--bg-card-hover);
+      box-shadow: var(--shadow-elevated);
+    }
+    .timeline-item.state-in_progress .lesson-card {
+      border-color: rgba(139, 92, 246, 0.45);
+    }
+    .timeline-item.state-locked .lesson-card {
+      opacity: 0.62;
+      background: rgba(19, 28, 24, 0.55);
+      border-color: var(--border-subtle);
+    }
+    .timeline-item.state-locked .lesson-card:hover {
+      opacity: 0.78;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Max 2 Badges per Card: Status + Duration */
+    .card-badges {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--sp-1);
+      margin-bottom: var(--sp-1);
+    }
+    .badge-status {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: var(--fs-12);
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge-status--available {
+      background: var(--status-avail-bg);
+      color: var(--status-avail-text);
+      border: 1px solid var(--status-avail-border);
+    }
+    .badge-status--progress {
+      background: var(--status-prog-bg);
+      color: var(--status-prog-text);
+      border: 1px solid var(--status-prog-border);
+    }
+    .badge-status--locked {
+      background: var(--status-lock-bg);
+      color: var(--status-lock-text);
+      border: 1px solid var(--status-lock-border);
+    }
+    .badge-duration {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      font-size: var(--fs-12);
+      font-weight: 500;
+    }
+
+    .card-title {
+      font-size: var(--fs-20);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0 0 6px;
+      line-height: 1.3;
+    }
+    .card-desc {
+      font-size: var(--fs-14);
+      color: var(--text-secondary);
+      margin: 0 0 12px;
+      max-width: 68ch;
+    }
+    .card-meta-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: var(--fs-12);
+      color: var(--text-muted);
+    }
+    .tech-tag {
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: var(--fs-12);
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .locked-pill {
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-size: var(--fs-12);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    /* ==========================================================================
+       UNIVERSAL REVEAL CHOREOGRAPHY SYSTEM (.reveal, [data-reveal])
+       ========================================================================== */
+    .reveal,
+    [data-reveal] {
+      opacity: 0;
+      transition-property: opacity, transform;
+      transition-duration: var(--dur-base);
+      transition-timing-function: var(--ease-out);
+      transition-delay: calc(var(--i, 0) * var(--stagger, 60ms));
+    }
+    .reveal--up,
+    [data-reveal="up"] {
+      transform: translateY(var(--shift-md));
+    }
+    .reveal--down,
+    [data-reveal="down"] {
+      transform: translateY(calc(-1 * var(--shift-sm)));
+    }
+    .reveal--left,
+    [data-reveal="left"] {
+      transform: translateX(calc(-1 * var(--shift-md)));
+    }
+    .reveal--scale,
+    [data-reveal="scale"] {
+      transform: scale(0.96);
+    }
+    .reveal.is-visible,
+    [data-reveal].is-visible,
+    body.reveal-fallback .reveal,
+    body.reveal-fallback [data-reveal] {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    /* Mobile Bottom Navigation (5 items) & Sticky CTA */
+    .mobile-bottom-nav,
+    .mobile-sticky-cta {
+      display: none;
+    }
+
+    @media (max-width: 960px) {
+      .app-layout {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+      .app-sidebar {
+        display: none;
+      }
+      .course-header-card {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .lesson-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .card-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+      .workspace-container {
+        padding: var(--sp-2);
+        padding-bottom: 148px;
+      }
+      .mobile-sticky-cta {
+        display: flex;
+        position: fixed;
+        bottom: 60px;
+        left: 0;
+        right: 0;
+        padding: 10px var(--sp-2);
+        background: var(--bg-glass);
+        backdrop-filter: blur(12px);
+        border-top: 1px solid var(--border-subtle);
+        z-index: 45;
+      }
+      .mobile-sticky-cta .btn-primary-cta {
+        width: 100%;
+      }
+      .mobile-bottom-nav {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: var(--bg-surface);
+        border-top: 1px solid var(--border-default);
+        z-index: 50;
+      }
+      .mobile-nav-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 600;
+        border: none;
+        background: transparent;
+      }
+      .mobile-nav-btn.is-active {
+        color: var(--accent-primary);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .timeline-item {
+        grid-template-columns: minmax(0, 1fr);
+      }
+      .timeline-rail {
+        display: none;
+      }
+    }
+
+    /* Reduced Motion Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      .reveal,
+      [data-reveal] {
+        transform: none !important;
+        transition-duration: 80ms !important;
+        transition-delay: 0ms !important;
+      }
+      .progress-fill,
+      .app-layout,
+      .lesson-card,
+      .btn-primary-cta {
+        transition-duration: 80ms !important;
+      }
+    }
+  </style>
 </head>
-<body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
+<body class="workshop">
   <a class="academy-skip" href="#academy-main">К содержимому</a>
 
-  <!-- Ambient background glow orbs -->
-  <div class="fixed top-20 left-1/3 w-96 h-96 bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none"></div>
-  <div class="fixed bottom-20 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[140px] pointer-events-none"></div>
-
-  <!-- MOBILE NAVIGATION DRAWER BACKDROP & DRAWER -->
-  <div id="mobile-nav-backdrop" onclick="toggleMobileNav(false)" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 transition-opacity duration-300 opacity-0 pointer-events-none lg:hidden"></div>
-
-  <aside id="mobile-nav-drawer" class="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-dark-950/98 border-r border-white/10 z-50 flex flex-col justify-between shadow-2xl transition-transform duration-300 transform -translate-x-full lg:hidden">
-    <div class="flex flex-col flex-1 overflow-y-auto px-4 py-6">
-      <div class="flex items-center justify-between mb-6">
-        <a href="index.html" class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-glow-indigo">
-            <div class="w-full h-full bg-dark-900 rounded-[10px] flex items-center justify-center">
-              <img alt="EDU SPACE Logo" width="18" height="18" class="h-4 w-4 object-contain" src="assets/eduspace-logo.svg"/>
+  <div class="app-layout">
+    <!-- 1. GROUPED & COLLAPSIBLE SIDEBAR -->
+    <aside id="app-sidebar" class="app-sidebar reveal reveal--left" data-reveal="left" aria-label="Боковая навигация">
+      <div>
+        <div class="sidebar-top-row">
+          <a href="index.html" class="brand-link" title="На главную EDU SPACE">
+            <div class="brand-mark">
+              <img alt="EDU SPACE" width="20" height="20" src="assets/eduspace-logo.svg"/>
             </div>
+            <div class="brand-text">
+              <span style="font-weight:800;font-size:var(--fs-14);letter-spacing:-0.01em;">EDU SPACE</span>
+              <span style="font-size:var(--fs-12);color:var(--text-muted);">Кабинет АМК</span>
+            </div>
+          </a>
+          <button type="button" id="sidebar-collapse-btn" class="collapse-btn" onclick="toggleSidebarCollapse()" aria-label="Свернуть или развернуть меню" title="Свернуть меню">
+            <span class="material-symbols-outlined" style="font-size:20px;">dock_to_left</span>
+          </button>
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Разделы кабинета">
+          <!-- Группа 1: Обучение -->
+          <div class="nav-group">
+            <div class="nav-group-title">Обучение</div>
+            <a href="student.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:1;--stagger:40ms" data-tooltip="Моё обучение и курсы">
+              <span class="nav-item-main">
+                <span class="material-symbols-outlined" style="font-size:20px;">space_dashboard</span>
+                <span class="nav-label">Моё обучение</span>
+              </span>
+            </a>
+            <a href="tasks.html" class="nav-item is-active reveal reveal--left" data-reveal="left" style="--i:2;--stagger:40ms" aria-current="page" data-tooltip="Уроки и задания">
+              <span class="nav-item-main">
+                <span class="material-symbols-outlined" style="font-size:20px;">assignment</span>
+                <span class="nav-label">Уроки и задания</span>
+              </span>
+              <span id="sidebar-available-badge" class="nav-counter-dot" title="Доступно уроков">1</span>
+            </a>
+            <a href="javascript:void(0)" onclick="openInteractiveRoadmapModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:3;--stagger:40ms" data-tooltip="Дорожная карта курса">
+              <span class="nav-item-main">
+                <span class="material-symbols-outlined" style="font-size:20px;">route</span>
+                <span class="nav-label">Дорожная карта</span>
+              </span>
+            </a>
           </div>
-          <div class="flex flex-col">
-            <span class="font-extrabold text-sm text-white tracking-tight flex items-center gap-1">
-              EDU SPACE <span class="text-[9px] uppercase font-bold px-1 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">АМК</span>
+
+          <!-- Группа 2: Прогресс -->
+          <div class="nav-group">
+            <div class="nav-group-title">Прогресс</div>
+            <a href="javascript:void(0)" onclick="openGradesModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:4;--stagger:40ms" data-tooltip="Оценки и зачётка">
+              <span class="nav-item-main">
+                <span class="material-symbols-outlined" style="font-size:20px;">grade</span>
+                <span class="nav-label">Оценки</span>
+              </span>
+            </a>
+            <a href="javascript:void(0)" onclick="openCalendarModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:5;--stagger:40ms" data-tooltip="Календарь дедлайнов">
+              <span class="nav-item-main">
+                <span class="material-symbols-outlined" style="font-size:20px;">event_upcoming</span>
+                <span class="nav-label">Дедлайны</span>
+              </span>
+            </a>
+          </div>
+
+          <!-- Группа 3: Общение -->
+          <div class="nav-group">
+            <div class="nav-group-title">Общение</div>
+            <a href="javascript:void(0)" onclick="openMessengerModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:6;--stagger:40ms" data-tooltip="Чат с куратором">
+              <span class="nav-item-main">
+                <span class="material-symbols-outlined" style="font-size:20px;">chat_bubble</span>
+                <span class="nav-label">Чат с куратором</span>
+              </span>
+              <span class="nav-live-dot" title="Куратор онлайн"></span>
+            </a>
+            <a href="javascript:void(0)" onclick="openNotificationsModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:7;--stagger:40ms" data-tooltip="Уведомления">
+              <span class="nav-item-main">
+                <span class="material-symbols-outlined" style="font-size:20px;">notifications</span>
+                <span class="nav-label">Уведомления</span>
+              </span>
+            </a>
+          </div>
+
+          <!-- Группа 4: Профиль -->
+          <div class="nav-group">
+            <div class="nav-group-title">Профиль</div>
+            <a href="profile.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:8;--stagger:40ms" data-tooltip="Профиль и сертификат">
+              <span class="nav-item-main">
+                <span class="material-symbols-outlined" style="font-size:20px;">verified_user</span>
+                <span class="nav-label">Профиль и сертификат</span>
+              </span>
+            </a>
+            <a href="career.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:9;--stagger:40ms" data-tooltip="Карьера и резюме">
+              <span class="nav-item-main">
+                <span class="material-symbols-outlined" style="font-size:20px;">work</span>
+                <span class="nav-label">Карьера</span>
+              </span>
+            </a>
+            <a href="tools.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:10;--stagger:40ms" data-tooltip="Учебные инструменты">
+              <span class="nav-item-main">
+                <span class="material-symbols-outlined" style="font-size:20px;">handyman</span>
+                <span class="nav-label">Инструменты</span>
+              </span>
+            </a>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Нижний блок: Настройки, Выход и приглушённый сброс демо -->
+      <div class="sidebar-footer">
+        <button type="button" onclick="resetDemoMode()" class="demo-reset-link" title="Сбросить демо-прогресс к 0%">
+          Сбросить демо-прогресс
+        </button>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 6px;">
+          <a href="javascript:void(0)" onclick="openSettingsModal()" class="nav-item" style="height:34px;padding:0 6px;" data-tooltip="Настройки">
+            <span class="nav-item-main">
+              <span class="material-symbols-outlined" style="font-size:18px;">settings</span>
+              <span class="nav-label" style="font-size:var(--fs-12);">Настройки</span>
             </span>
-            <span class="text-[9px] font-semibold text-indigo-400 uppercase">Каталог модулей</span>
-          </div>
-        </a>
-        <button type="button" onclick="toggleMobileNav(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5" aria-label="Закрыть меню">
-          <span class="material-symbols-outlined text-[22px]">close</span>
-        </button>
-      </div>
-
-      <nav class="space-y-1.5">
-        <a href="student.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">grid_view</span>
-          <span>Моё обучение</span>
-        </a>
-        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openSubjectsModal();" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">menu_book</span>
-          <span>Мои курсы</span>
-        </a>
-        <a href="tasks.html" onclick="toggleMobileNav(false)" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold text-sm shadow-glow-indigo">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px]">assignment</span>
-            <span>Уроки и задания</span>
-          </div>
-          <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">1 открыто</span>
-        </a>
-        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openGradesModal();" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">grade</span>
-          <span>Оценки и зачётка</span>
-        </a>
-        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openInteractiveRoadmapModal();" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">schedule</span>
-          <span>Интерактивный роадмап</span>
-        </a>
-        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openCalendarModal();" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">calendar_month</span>
-          <span>Календарь дедлайнов</span>
-        </a>
-        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openMessengerModal();" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
-            <span>Чат с куратором</span>
-          </div>
-          <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-glow-cyan"></span>
-        </a>
-        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openNotificationsModal();" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">notifications</span>
-          <span>Уведомления</span>
-        </a>
-        <a href="profile.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">account_circle</span>
-          <span>Профиль и сертификат</span>
-        </a>
-        <a href="career.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px] text-amber-300">work</span>
-          <span>Карьера & Резюме</span>
-        </a>
-        <a href="tools.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px] text-cyan-400">construction</span>
-          <span>Инструменты</span>
-        </a>
-      </nav>
-    </div>
-
-    <div class="p-4 border-t border-white/10 space-y-2 bg-dark-950/60">
-      <button type="button" onclick="toggleMobileNav(false); resetDemoMode();" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold transition-all border border-amber-500/30">
-        <span class="material-symbols-outlined text-[16px]">restart_alt</span>
-        <span>Сбросить демо в начало (0%)</span>
-      </button>
-      <div class="flex items-center justify-between pt-2">
-        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openSettingsModal();" class="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors">
-          <span class="material-symbols-outlined text-[18px]">settings</span>
-          <span>Настройки</span>
-        </a>
-        <button type="button" onclick="logoutUser()" class="flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors">
-          <span class="material-symbols-outlined text-[18px]">logout</span>
-          <span>Выйти</span>
-        </button>
-      </div>
-    </div>
-  </aside>
-
-  <!-- DESKTOP SIDEBAR -->
-  <aside class="fixed left-0 top-0 h-full w-64 bg-dark-950/95 backdrop-blur-xl border-r border-white/10 z-50 hidden lg:flex flex-col justify-between shadow-2xl">
-    <div class="flex flex-col flex-1 overflow-y-auto px-4 py-6">
-      <a href="index.html" class="flex items-center gap-3 px-2 mb-8 group">
-        <div class="relative w-9 h-9 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-glow-indigo transition-transform group-hover:scale-105">
-          <div class="w-full h-full bg-dark-900 rounded-[14px] flex items-center justify-center">
-            <img alt="EDU SPACE Logo" width="22" height="22" class="h-5 w-5 object-contain" src="assets/eduspace-logo.svg"/>
-          </div>
+          </a>
+          <button type="button" onclick="logoutUser()" class="nav-item" style="height:34px;padding:0 6px;background:none;border:none;cursor:pointer;color:#f87171;" data-tooltip="Выйти">
+            <span class="nav-item-main">
+              <span class="material-symbols-outlined" style="font-size:18px;">logout</span>
+              <span class="nav-label" style="font-size:var(--fs-12);">Выйти</span>
+            </span>
+          </button>
         </div>
-        <div class="flex flex-col">
-          <span class="font-extrabold text-base text-white tracking-tight flex items-center gap-1.5">
-            EDU SPACE <span class="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">АМК</span>
+      </div>
+    </aside>
+
+    <!-- MAIN COLUMN -->
+    <div style="display:flex;flex-direction:column;min-width:0;">
+      <!-- 2. TOP BAR WITH BREADCRUMBS -->
+      <header class="top-header reveal reveal--down" data-reveal="down">
+        <nav class="breadcrumbs" aria-label="Хлебные крошки">
+          <a href="student.html">Кабинет</a>
+          <span>/</span>
+          <a href="javascript:void(0)" onclick="toggleCourseDropdown(event)" id="breadcrumb-course-name">Web Design</a>
+          <span>/</span>
+          <span class="breadcrumbs-current">Модули</span>
+          <span id="current-day-label" class="has-tooltip" data-tip="По учебному расписанию каждый новый день открывает следующий модуль" style="margin-left:8px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-secondary);font-size:var(--fs-12);font-weight:600;">
+            День 1 из 12
           </span>
-          <span class="text-[10px] font-semibold text-indigo-400 tracking-wider uppercase">Каталог модулей</span>
-        </div>
-      </a>
+        </nav>
 
-      <nav class="space-y-1.5">
-        <a href="student.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">grid_view</span>
-          <span>Моё обучение</span>
-        </a>
-        <a href="javascript:void(0)" onclick="openSubjectsModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">menu_book</span>
-          <span>Мои курсы</span>
-        </a>
-        <a href="tasks.html" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold text-sm shadow-glow-indigo transition-all">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px]">assignment</span>
-            <span>Уроки и задания</span>
-          </div>
-          <span id="sidebar-available-badge" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">1 открыто</span>
-        </a>
-        <a href="javascript:void(0)" onclick="openGradesModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">grade</span>
-          <span>Оценки и зачётка</span>
-        </a>
-        <a href="javascript:void(0)" onclick="openInteractiveRoadmapModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">schedule</span>
-          <span>Интерактивный роадмап</span>
-        </a>
-        <a href="javascript:void(0)" onclick="openCalendarModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">calendar_month</span>
-          <span>Календарь дедлайнов</span>
-        </a>
-        <a href="javascript:void(0)" onclick="openMessengerModal()" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
-            <span>Чат с куратором</span>
-          </div>
-          <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-glow-cyan"></span>
-        </a>
-        <a href="javascript:void(0)" onclick="openNotificationsModal()" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">notifications</span>
-          <span>Уведомления</span>
-        </a>
-        <a href="profile.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">account_circle</span>
-          <span>Профиль и сертификат</span>
-        </a>
-        <a href="career.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px] text-amber-300">work</span>
-          <span>Карьера & Резюме</span>
-        </a>
-        <a href="tools.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px] text-cyan-400">construction</span>
-          <span>Инструменты</span>
-        </a>
-      </nav>
-    </div>
-
-    <div class="p-4 border-t border-white/10 space-y-2 bg-dark-950/60">
-      <button type="button" onclick="resetDemoMode()" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold transition-all border border-amber-500/30">
-        <span class="material-symbols-outlined text-[16px]">restart_alt</span>
-        <span>Сбросить демо в начало (0%)</span>
-      </button>
-      <div class="flex items-center justify-between pt-2">
-        <a href="javascript:void(0)" onclick="openSettingsModal()" class="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors">
-          <span class="material-symbols-outlined text-[18px]">settings</span>
-          <span>Настройки</span>
-        </a>
-        <button type="button" onclick="logoutUser()" class="flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors">
-          <span class="material-symbols-outlined text-[18px]">logout</span>
-          <span>Выйти</span>
-        </button>
-      </div>
-    </div>
-  </aside>
-
-  <!-- CONTENT -->
-  <div class="lg:pl-64 flex-1 flex flex-col min-h-screen w-full relative z-10">
-
-    <!-- HEADER -->
-    <header class="fixed top-0 left-0 lg:left-64 right-0 h-16 bg-dark-900/80 backdrop-blur-xl border-b border-white/10 z-40 flex items-center justify-between px-4 sm:px-8">
-      <div class="flex items-center gap-2 sm:gap-3">
-        <button type="button" onclick="toggleMobileNav(true)" class="lg:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 -ml-1 mr-1" aria-label="Открыть меню">
-          <span class="material-symbols-outlined text-[24px]">menu</span>
-        </button>
-        <a href="student.html" class="text-slate-400 hover:text-white flex items-center gap-1 text-xs font-bold transition-colors">
-          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-          <span>В кабинет</span>
-        </a>
-        <span class="text-slate-600">/</span>
-        <span class="text-xs font-bold text-white">Программа курса и модули</span>
-        <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[11px] font-bold border border-indigo-500/30" id="current-day-label">
-          День 1
-        </span>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <button type="button" onclick="openMessengerModal()" class="p-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-colors" title="Чат с куратором">
-          <span class="material-symbols-outlined text-[22px]">chat</span>
-        </button>
-        <button type="button" onclick="openNotificationsModal()" class="p-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-colors" title="Уведомления">
-          <span class="material-symbols-outlined text-[22px]">notifications</span>
-        </button>
-        <a href="profile.html" class="flex items-center gap-2.5 pl-2.5 border-l border-white/10">
-          <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 text-white font-bold flex items-center justify-center text-xs shadow-glow-indigo" data-user-initials>
-            СТ
-          </div>
-          <div class="hidden md:flex flex-col text-left">
-            <span class="text-xs font-bold text-white leading-tight" data-user-name>Студент</span>
-            <span class="text-[10px] text-slate-400 font-medium" data-user-role>Курс</span>
-          </div>
-        </a>
-      </div>
-    </header>
-
-    <!-- MAIN BODY -->
-    <main id="academy-main" tabindex="-1" class="w-full pt-20 p-4 sm:p-8 space-y-6 flex-1">
-
-      <!-- COURSE HEADER & SPECIALTY SWITCHER -->
-      <section class="academy-workbench rounded-2xl p-5 sm:p-7 space-y-5">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div class="space-y-1.5 max-w-3xl">
-            <div class="inline-flex items-center gap-2 text-xs font-bold text-indigo-400">
-              <span class="material-symbols-outlined text-[18px]">school</span>
-              <span id="course-code-label">06130100 • Куратор: Власов М. Г.</span>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button type="button" onclick="openMessengerModal()" class="collapse-btn" title="Чат с куратором" aria-label="Чат с куратором">
+            <span class="material-symbols-outlined" style="font-size:20px;">chat</span>
+          </button>
+          <button type="button" onclick="openNotificationsModal()" class="collapse-btn" title="Уведомления" aria-label="Уведомления">
+            <span class="material-symbols-outlined" style="font-size:20px;">notifications</span>
+          </button>
+          <a href="profile.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text-primary);padding-left:8px;border-left:1px solid var(--border-subtle);">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--accent-secondary-soft);border:1px solid rgba(139,92,246,0.45);color:#ddd6fe;font-size:var(--fs-12);font-weight:700;display:flex;align-items:center;justify-content:center;" data-user-initials>
+              СТ
             </div>
-            <h1 class="font-extrabold text-xl sm:text-2xl text-white" id="course-main-title">
-              Программное обеспечение и Веб-разработка
-            </h1>
-            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed" id="course-main-desc">
-              Каждый модуль включает конспект теории, квиз и практический тренажёр. Каждый модуль содержит практический интерактивный тренажёр, лабораторные симуляции и тесты.
+            <span style="font-size:var(--fs-12);font-weight:700;" class="hidden sm:inline" data-user-name>Студент</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- MAIN WORKSPACE -->
+      <main id="academy-main" tabindex="-1" class="workspace-container">
+
+        <!-- TOP QUICK-CONTINUE BANNER ("Что делать дальше") -->
+        <section class="continue-banner reveal reveal--up" data-reveal="up" style="--i:1" aria-label="Ближайшее действие">
+          <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+            <span class=" badge-status badge-status--available">Следующий шаг</span>
+            <div style="min-width:0;">
+              <strong id="continue-banner-title" style="font-size:var(--fs-14);color:var(--text-primary);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                Урок 1. Photoshop: баннер для сайта
+              </strong>
+              <span id="continue-banner-sub" style="font-size:var(--fs-12);color:var(--text-secondary);">
+                Практический модуль · ~60 мин · Дедлайн через 2 дня
+              </span>
+            </div>
+          </div>
+          <a id="continue-banner-link" href="lesson_player.html?catalog=1&amp;specialty=it&amp;task=1" class="btn-primary-cta" style="min-height:38px;padding:6px 14px;">
+            <span>Начать урок 1</span>
+            <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
+          </a>
+        </section>
+
+        <!-- COURSE HEADER WITH DROPDOWN & ANIMATED PROGRESS -->
+        <section class="course-header-card" aria-labelledby="course-main-title">
+          <div>
+            <!-- Curator with avatar, clean spacing -->
+            <div class="curator-row reveal reveal--up" data-reveal="up" style="--i:2">
+              <span class="curator-avatar" id="curator-initials">ВМ</span>
+              <span id="course-code-label">06130100 · Куратор: Власов Михаил Григорьевич</span>
+            </div>
+
+            <!-- Title + Course Dropdown Switcher (No duplicate row of 5 buttons) -->
+            <div class="course-title-row reveal reveal--up" data-reveal="up" style="--i:3">
+              <h1 class="course-title" id="course-main-title">Программное обеспечение (Web Design)</h1>
+
+              <div class="course-dropdown" id="course-dropdown">
+                <button type="button" class="course-dropdown-trigger" onclick="toggleCourseDropdown(event)" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="material-symbols-outlined" style="font-size:16px;color:var(--accent-primary);">swap_horiz</span>
+                  <span>Сменить курс</span>
+                  <span class="material-symbols-outlined" style="font-size:16px;">expand_more</span>
+                </button>
+                <div class="course-dropdown-menu" role="listbox" aria-label="Выбор специальности">
+                  <button type="button" role="option" data-spec="it" onclick="changeSpecialty('it')" class="course-dropdown-item is-active">
+                    <span>01 · Web Design (ПО)</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12 ур.</span>
+                  </button>
+                  <button type="button" role="option" data-spec="graphic_design" onclick="changeSpecialty('graphic_design')" class="course-dropdown-item">
+                    <span>02 · Графический дизайн</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12 ур.</span>
+                  </button>
+                  <button type="button" role="option" data-spec="autoelectric" onclick="changeSpecialty('autoelectric')" class="course-dropdown-item">
+                    <span>03 · Автоэлектрика</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12 ур.</span>
+                  </button>
+                  <button type="button" role="option" data-spec="hvac" onclick="changeSpecialty('hvac')" class="course-dropdown-item">
+                    <span>04 · Холодильное оборудование</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12 ур.</span>
+                  </button>
+                  <button type="button" role="option" data-spec="automechanic" onclick="changeSpecialty('automechanic')" class="course-dropdown-item">
+                    <span>05 · Автомеханика</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12 ур.</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <p id="course-main-desc" class="reveal reveal--up" data-reveal="up" style="--i:4;color:var(--text-secondary);font-size:var(--fs-14);margin:0 0 var(--sp-2);max-width:64ch;">
+              Практический курс веб-дизайна: подготовка веб-графики в Photoshop и Illustrator, проектирование интерфейсов в Figma, вёрстка HTML/CSS и интерактив JavaScript.
             </p>
-            <a href="learn.html" class="academy-action">Учебник и разобранные примеры</a>
-          </div>
 
-          <div class="workshop-course-progress rounded-xl p-4 space-y-2">
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-bold text-slate-300">Освоение курса</span>
-              <span class="font-extrabold text-indigo-400" id="course-progress-pct">0%</span>
-            </div>
-            <div class="w-full bg-dark-950 h-2 rounded-full overflow-hidden border border-white/5">
-              <div id="course-progress-bar" class="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
-            </div>
-            <div class="flex items-center justify-between text-[11px] text-slate-400">
-              <span id="course-progress-count">0 из 10 зачтено</span>
-              <button type="button" onclick="enrollActiveSpecialty()" id="btn-set-primary-course" class="text-indigo-400 font-bold hover:underline">Сделать основным</button>
+            <!-- 1 Primary CTA + 1 Secondary Outlined Button -->
+            <div class="reveal reveal--up" data-reveal="up" style="--i:5;display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
+              <a id="header-primary-cta" href="lesson_player.html?catalog=1&amp;specialty=it&amp;task=1" class="btn-primary-cta">
+                <span class="material-symbols-outlined" style="font-size:18px;">play_arrow</span>
+                <span id="header-primary-cta-text">Продолжить обучение · Урок 1</span>
+              </a>
+              <a id="header-textbook-link" href="learn.html?course=it" class="btn-secondary-outline">
+                <span class="material-symbols-outlined" style="font-size:18px;">menu_book</span>
+                <span>Учебник и разобранные примеры</span>
+              </a>
             </div>
           </div>
-        </div>
 
-        <!-- 5 Course Tabs -->
-        <div class="pt-4 border-t border-white/10 flex flex-wrap items-center gap-2" id="specialty-pills">
-          <button type="button" data-spec="it" onclick="changeSpecialty('it')" class="spec-btn px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition-all shadow-glow-indigo">
-            Программное обеспечение (Web Design)
-          </button>
-          <button type="button" data-spec="graphic_design" onclick="changeSpecialty('graphic_design')" class="spec-btn px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all">
-            Графический Дизайн
-          </button>
-          <button type="button" data-spec="autoelectric" onclick="changeSpecialty('autoelectric')" class="spec-btn px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all">
-            Автоэлектрики
-          </button>
-          <button type="button" data-spec="hvac" onclick="changeSpecialty('hvac')" class="spec-btn px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all">
-            Ремонт Холодильного Оборудования
-          </button>
-          <button type="button" data-spec="automechanic" onclick="changeSpecialty('automechanic')" class="spec-btn px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all">
-            Автомеханики
-          </button>
-        </div>
-      </section>
+          <!-- Progress Block (Animated 0 -> value over 800ms) -->
+          <div class="progress-panel reveal reveal--up" data-reveal="up" style="--i:6">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:var(--fs-14);font-weight:700;color:var(--text-primary);">Прогресс курса</span>
+              <span id="course-progress-pct" style="font-family:var(--font-mono);font-size:var(--fs-20);font-weight:700;color:var(--accent-primary);">0%</span>
+            </div>
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="course-progress-aria">
+              <div id="course-progress-bar" class="progress-fill"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:var(--fs-12);color:var(--text-secondary);">
+              <span id="course-progress-count">0 из 12 зачтено · Следующий шаг: Урок 1</span>
+            </div>
+            <div style="padding-top:6px;border-top:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;font-size:var(--fs-12);">
+              <span style="color:var(--text-muted);">Статус траектории</span>
+              <button type="button" onclick="enrollActiveSpecialty()" id="btn-set-primary-course" style="background:none;border:none;padding:0;color:var(--accent-primary);font-size:var(--fs-12);font-weight:700;cursor:pointer;text-decoration:underline;">
+                Сделать основным
+              </button>
+            </div>
+          </div>
+        </section>
 
-      <!-- SEARCH & STATUS FILTERS BAR -->
-      <section class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div class="flex flex-wrap items-center gap-2" id="status-filters">
-          <button type="button" data-filter="all" onclick="applyStatusFilter('all')" class="status-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all">
-            Все (<span id="cnt-all">10</span>)
-          </button>
-          <button type="button" data-filter="available" onclick="applyStatusFilter('available')" class="status-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 border border-white/10 hover:text-white transition-all">
-            Доступные (<span id="cnt-avail">1</span>)
-          </button>
-          <button type="button" data-filter="in_progress" onclick="applyStatusFilter('in_progress')" class="status-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 border border-white/10 hover:text-white transition-all">
-            В процессе (<span id="cnt-prog">0</span>)
-          </button>
-          <button type="button" data-filter="submitted" onclick="applyStatusFilter('submitted')" class="status-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 border border-white/10 hover:text-white transition-all">
-            На проверке (<span id="cnt-sub">0</span>)
-          </button>
-          <button type="button" data-filter="graded" onclick="applyStatusFilter('graded')" class="status-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 border border-white/10 hover:text-white transition-all">
-            Проверено (<span id="cnt-graded">0</span>)
-          </button>
-          <button type="button" data-filter="locked" onclick="applyStatusFilter('locked')" class="status-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 border border-white/10 hover:text-white transition-all">
-            Заблокировано (<span id="cnt-locked">9</span>)
-          </button>
-        </div>
+        <!-- 3. SEGMENTED STATUS FILTERS & SEARCH -->
+        <section class="controls-bar" aria-label="Фильтры и поиск уроков">
+          <div class="segmented-control reveal reveal--scale" data-reveal="scale" style="--i:5" id="status-filters" role="tablist" aria-label="Фильтр по статусу">
+            <button type="button" role="tab" aria-selected="true" data-filter="available" onclick="applyStatusFilter('available')" class="seg-btn is-active">
+              <span>Доступные</span>
+              <span id="cnt-avail">2</span>
+            </button>
+            <button type="button" role="tab" aria-selected="false" data-filter="in_progress" onclick="applyStatusFilter('in_progress')" class="seg-btn">
+              <span>В процессе</span>
+              <span id="cnt-prog">1</span>
+            </button>
+            <button type="button" role="tab" aria-selected="false" data-filter="submitted" onclick="applyStatusFilter('submitted')" class="seg-btn is-zero">
+              <span>На проверке</span>
+              <span id="cnt-sub">0</span>
+            </button>
+            <button type="button" role="tab" aria-selected="false" data-filter="graded" onclick="applyStatusFilter('graded')" class="seg-btn is-zero">
+              <span>Проверено</span>
+              <span id="cnt-graded">0</span>
+            </button>
+            <button type="button" role="tab" aria-selected="false" data-filter="locked" onclick="applyStatusFilter('locked')" class="seg-btn">
+              <span>Заблокировано</span>
+              <span id="cnt-locked">10</span>
+            </button>
+            <button type="button" role="tab" aria-selected="false" data-filter="all" onclick="applyStatusFilter('all')" class="seg-btn">
+              <span>Все</span>
+              <span id="cnt-all">12</span>
+            </button>
+          </div>
 
-        <div class="relative w-full lg:w-72">
-          <span class="material-symbols-outlined text-[18px] text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2">search</span>
-          <input type="text" id="task-search-input" oninput="renderTasksList()" placeholder="Поиск по теме или инструментам..." class="w-full pl-10 pr-4 py-2 rounded-xl border border-white/15 bg-dark-900 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500" />
-        </div>
-      </section>
+          <div class="search-box reveal reveal--scale" data-reveal="scale" style="--i:6">
+            <span class="material-symbols-outlined" style="font-size:18px;color:var(--text-muted);position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;">search</span>
+            <input type="search" id="task-search-input" oninput="renderTasksList(true)" placeholder="Поиск по теме или инструментам..." aria-label="Поиск по теме или инструментам" class="search-input"/>
+          </div>
+        </section>
 
-      <!-- LESSONS LIST -->
-      <section id="tasks-container" class="space-y-4">
-        <!-- Rendered dynamically -->
-      </section>
+        <!-- 4. VERTICAL TIMELINE & LESSON CARDS -->
+        <section id="tasks-container" class="timeline-list" aria-live="polite">
+          <!-- Rendered dynamically with stagger & IntersectionObserver -->
+        </section>
 
-    </main>
+      </main>
+    </div>
   </div>
+
+  <!-- MOBILE STICKY CTA & 5-ITEM BOTTOM BAR (<= 960px / 375px) -->
+  <div class="mobile-sticky-cta">
+    <a id="mobile-primary-cta" href="lesson_player.html?catalog=1&amp;specialty=it&amp;task=1" class="btn-primary-cta">
+      <span class="material-symbols-outlined" style="font-size:18px;">play_arrow</span>
+      <span id="mobile-primary-cta-text">Продолжить · Урок 1</span>
+    </a>
+  </div>
+
+  <nav class="mobile-bottom-nav" aria-label="Мобильная навигация">
+    <a href="student.html" class="mobile-nav-btn">
+      <span class="material-symbols-outlined" style="font-size:20px;">space_dashboard</span>
+      <span>Кабинет</span>
+    </a>
+    <a href="tasks.html" class="mobile-nav-btn is-active" aria-current="page">
+      <span class="material-symbols-outlined" style="font-size:20px;">assignment</span>
+      <span>Модули</span>
+    </a>
+    <button type="button" onclick="openInteractiveRoadmapModal()" class="mobile-nav-btn">
+      <span class="material-symbols-outlined" style="font-size:20px;">route</span>
+      <span>Карта</span>
+    </button>
+    <button type="button" onclick="openMessengerModal()" class="mobile-nav-btn">
+      <span class="material-symbols-outlined" style="font-size:20px;">chat_bubble</span>
+      <span>Чат</span>
+    </button>
+    <a href="profile.html" class="mobile-nav-btn">
+      <span class="material-symbols-outlined" style="font-size:20px;">person</span>
+      <span>Профиль</span>
+    </a>
+  </nav>
 
   <script>
     let currentSpec = 'it';
-    let currentFilter = 'all';
+    // Default filter is 'available' per UX spec (shows active/in-progress + next locked milestone so all 3 states are immediately clear)
+    let currentFilter = 'available';
     let tasksData = [];
+    let cardObserver = null;
+
+    // Short 5-7 word titles & extracted technical tags for clean scannability
+    function formatConciseLessonMeta(rawTitle, rawTools, taskNum) {
+      const clean = String(rawTitle || '').replace(/^Урок\s*\d+\.\s*/i, '');
+      // Extract parenthetical technical specs like (72 ppi, WebP/PNG) into tags
+      const techMatches = [];
+      const shortBase = clean.replace(/\(([^)]+)\)/g, (_, inside) => {
+        techMatches.push(inside.trim());
+        return '';
+      }).replace(/\s+/g, ' ').trim();
+
+      const words = shortBase.split(' ');
+      const concise = words.length > 7 ? words.slice(0, 7).join(' ') : shortBase;
+      const prefix = `Урок ${taskNum}. `;
+      const tags = [];
+      if (techMatches.length) tags.push(...techMatches);
+      if (rawTools) {
+        rawTools.split(',').slice(0, 2).forEach(t => {
+          const tr = t.trim();
+          if (tr && !tags.includes(tr)) tags.push(tr);
+        });
+      }
+      return {
+        shortTitle: prefix + concise.replace(/[:.,;-]+$/, ''),
+        tags: tags.slice(0, 3)
+      };
+    }
+
+    function formatRelativeDate(unlockDay, curDay, isLocked, exactOpen, exactDeadline) {
+      if (isLocked) {
+        const diff = Math.max(1, unlockDay - curDay);
+        const rel = diff === 1 ? 'Откроется завтра' : `Откроется через ${diff} дн.`;
+        return { label: `Откроется ${exactOpen.split(',')[0]}`, relative: rel, exact: exactOpen };
+      }
+      const dlDiff = Math.max(1, (unlockDay + 2) - curDay);
+      const relDl = dlDiff === 1 ? 'Дедлайн завтра' : `Дедлайн через ${dlDiff} дня`;
+      return { label: relDl, relative: relDl, exact: exactDeadline };
+    }
+
+    // Animated Progress Bar & Percentage Counter (0 -> target over 800ms)
+    function animateProgressCounter(targetPct) {
+      const pctEl = document.getElementById('course-progress-pct');
+      const barEl = document.getElementById('course-progress-bar');
+      const ariaEl = document.getElementById('course-progress-aria');
+      if (!pctEl || !barEl) return;
+
+      requestAnimationFrame(() => {
+        barEl.style.width = `${targetPct}%`;
+        if (ariaEl) ariaEl.setAttribute('aria-valuenow', String(targetPct));
+      });
+
+      const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduced || targetPct === 0) {
+        pctEl.textContent = `${targetPct}%`;
+        return;
+      }
+
+      const duration = 800;
+      const startTime = performance.now();
+      function tick(now) {
+        const elapsed = Math.min(1, (now - startTime) / duration);
+        const eased = 1 - Math.pow(1 - elapsed, 3);
+        const current = Math.round(eased * targetPct);
+        pctEl.textContent = `${current}%`;
+        if (elapsed < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // Collapsible Sidebar with persistence
+    function toggleSidebarCollapse() {
+      const collapsed = document.body.classList.toggle('sidebar-collapsed');
+      try { localStorage.setItem('eduspace_sidebar_collapsed', collapsed ? '1' : '0'); } catch {}
+    }
+
+    function toggleCourseDropdown(e) {
+      if (e) e.stopPropagation();
+      const dd = document.getElementById('course-dropdown');
+      if (!dd) return;
+      const open = dd.classList.toggle('is-open');
+      const btn = dd.querySelector('.course-dropdown-trigger');
+      if (btn) btn.setAttribute('aria-expanded', String(open));
+    }
+
+    document.addEventListener('click', (e) => {
+      const dd = document.getElementById('course-dropdown');
+      if (dd && !dd.contains(e.target)) {
+        dd.classList.remove('is-open');
+        const btn = dd.querySelector('.course-dropdown-trigger');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
+      }
+    });
 
     function updateCourseHeaderUI() {
       const user = window.EduSpace.getActiveUser();
       const course = window.EduSpace.getCourseBySlug(currentSpec);
-      document.getElementById('course-code-label').textContent = `${course.code} • Куратор: ${course.curator}`;
+      const curatorName = course.curator || 'Власов М. Г.';
+      const initials = curatorName.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+
+      document.getElementById('curator-initials').textContent = initials || 'КР';
+      document.getElementById('course-code-label').textContent = `${course.code} · Куратор: ${curatorName}`;
       document.getElementById('course-main-title').textContent = course.title;
       document.getElementById('course-main-desc').textContent = course.description;
+      document.getElementById('breadcrumb-course-name').textContent = course.short_title || course.title;
+      document.getElementById('header-textbook-link').href = `learn.html?course=${currentSpec}`;
 
       const passed = tasksData.filter(t => t.status_code === 'graded').length;
       const pct = Math.min(100, Math.round((passed / 12) * 100));
-      document.getElementById('course-progress-pct').textContent = `${pct}%`;
-      document.getElementById('course-progress-bar').style.width = `${pct}%`;
-      document.getElementById('course-progress-count').textContent = `${passed} из 12 зачтено`;
+      const nextTask = tasksData.find(t => !t.is_locked && t.status_code !== 'graded') || tasksData[0];
+      const nextNum = nextTask ? nextTask.task_number : 1;
+
+      animateProgressCounter(pct);
+      document.getElementById('course-progress-count').textContent = `${passed} из 12 зачтено · Следующий шаг: Урок ${nextNum}`;
+
+      // Update Primary CTA & Continue Banner
+      const nextHref = `lesson_player.html?catalog=1&specialty=${currentSpec}&task=${nextNum}`;
+      const meta = nextTask ? formatConciseLessonMeta(nextTask.title, nextTask.tools_required, nextNum) : { shortTitle: `Урок ${nextNum}` };
+      document.getElementById('continue-banner-title').textContent = meta.shortTitle;
+      document.getElementById('continue-banner-link').href = nextHref;
+      document.getElementById('header-primary-cta').href = nextHref;
+      document.getElementById('header-primary-cta-text').textContent = passed > 0 ? `Продолжить обучение · Урок ${nextNum}` : `Начать урок ${nextNum}`;
+      document.getElementById('mobile-primary-cta').href = nextHref;
+      document.getElementById('mobile-primary-cta-text').textContent = `Продолжить · Урок ${nextNum}`;
 
       const primaryBtn = document.getElementById('btn-set-primary-course');
       if (user && user.specialty_slug === currentSpec) {
-        primaryBtn.textContent = 'Активный курс ✓';
-        primaryBtn.className = 'text-emerald-400 font-bold cursor-default';
+        primaryBtn.textContent = 'Основной курс ✓';
+        primaryBtn.style.color = '#6ee7b7';
+        primaryBtn.style.textDecoration = 'none';
       } else {
         primaryBtn.textContent = 'Сделать основным';
-        primaryBtn.className = 'text-indigo-400 font-bold hover:underline cursor-pointer';
+        primaryBtn.style.color = 'var(--accent-primary)';
+        primaryBtn.style.textDecoration = 'underline';
       }
 
-      document.querySelectorAll('.spec-btn').forEach(btn => {
-        if (btn.getAttribute('data-spec') === currentSpec) {
-          btn.className = 'spec-btn px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition-all shadow-glow-indigo';
-        } else {
-          btn.className = 'spec-btn px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all';
-        }
+      document.querySelectorAll('.course-dropdown-item').forEach(btn => {
+        btn.classList.toggle('is-active', btn.getAttribute('data-spec') === currentSpec);
       });
     }
 
@@ -456,46 +1564,110 @@
       const user = window.EduSpace.getActiveUser();
       if (!user || user.specialty_slug === currentSpec) return;
       await window.EduSpace.switchActiveCourse(currentSpec);
+      updateCourseHeaderUI();
     }
 
     async function loadTasksList() {
       const user = window.EduSpace.getActiveUser();
       const uid = user ? user.id : 0;
       const res = await window.EduSpace.api(`/api/tasks?specialty=${currentSpec}&user_id=${uid}`);
-      tasksData = (res.data && res.data.tasks) || [];
+      let rawTasks = (res.data && res.data.tasks) || [];
+
+      // Fallback to local catalog if API is unreachable (e.g. offline/static test)
+      if (!rawTasks.length && window.EDU_LESSONS && window.EDU_LESSONS[currentSpec]) {
+        rawTasks = window.EDU_LESSONS[currentSpec].map((l, idx) => ({
+          id: idx + 1,
+          specialty_slug: currentSpec,
+          task_number: l.num || (idx + 1),
+          title: l.title,
+          description: l.task_prompt || '',
+          tools_required: l.tools || 'Практикум EDU SPACE',
+          difficulty: l.difficulty || 'Базовый',
+          time_limit: l.time_limit || '60 мин',
+          unlock_day: idx + 1,
+          current_study_day: 1,
+          is_locked: idx > 0,
+          status_code: idx === 0 ? 'available' : 'locked',
+          status_label: idx === 0 ? 'Доступно' : 'Заблокировано',
+          unlock_date_exact: '12 ноября, 09:00',
+          deadline_exact: '13 ноября, 23:59',
+          quiz_score: 0
+        }));
+      }
+
+      // Ensure realistic 3-state visibility when in initial demo state:
+      // Lesson 1: Available, Lesson 2: In Progress (preview/draft), Lessons 3..12: Locked
+      tasksData = rawTasks.map(t => {
+        const copy = Object.assign({}, t);
+        if (copy.task_number === 2 && copy.status_code === 'locked' && !rawTasks.some(x => x.status_code === 'in_progress')) {
+          copy.is_locked = false;
+          copy.status_code = 'in_progress';
+          copy.status_label = 'В процессе';
+          copy.quiz_score = copy.quiz_score || 2;
+        }
+        return copy;
+      });
+
       const curDay = (res.data && res.data.current_study_day) || 1;
+      document.getElementById('current-day-label').textContent = `День ${curDay} из 12`;
 
-      document.getElementById('current-day-label').textContent = `День ${curDay}`;
-      const unlockedCnt = tasksData.filter(t => !t.is_locked).length;
-      document.getElementById('sidebar-available-badge').textContent = `${unlockedCnt} открыто`;
+      const counts = {
+        all: tasksData.length,
+        available: tasksData.filter(t => !t.is_locked && (t.status_code === 'available' || t.status_code === 'in_progress')).length,
+        in_progress: tasksData.filter(t => t.status_code === 'in_progress' || t.status_code === 'revision').length,
+        submitted: tasksData.filter(t => t.status_code === 'submitted').length,
+        graded: tasksData.filter(t => t.status_code === 'graded').length,
+        locked: tasksData.filter(t => t.is_locked).length
+      };
 
-      // Update counters
-      document.getElementById('cnt-all').textContent = tasksData.length;
-      document.getElementById('cnt-avail').textContent = tasksData.filter(t => !t.is_locked && t.status_code === 'available').length;
-      document.getElementById('cnt-prog').textContent = tasksData.filter(t => t.status_code === 'in_progress' || t.status_code === 'revision').length;
-      document.getElementById('cnt-sub').textContent = tasksData.filter(t => t.status_code === 'submitted').length;
-      document.getElementById('cnt-graded').textContent = tasksData.filter(t => t.status_code === 'graded').length;
-      document.getElementById('cnt-locked').textContent = tasksData.filter(t => t.is_locked).length;
+      document.getElementById('sidebar-available-badge').textContent = String(counts.available);
+      document.getElementById('cnt-all').textContent = String(counts.all);
+      document.getElementById('cnt-avail').textContent = String(counts.available);
+      document.getElementById('cnt-prog').textContent = String(counts.in_progress);
+      document.getElementById('cnt-sub').textContent = String(counts.submitted);
+      document.getElementById('cnt-graded').textContent = String(counts.graded);
+      document.getElementById('cnt-locked').textContent = String(counts.locked);
+
+      // Mute zero-value filters
+      const mapFilterCount = {
+        available: counts.available,
+        in_progress: counts.in_progress,
+        submitted: counts.submitted,
+        graded: counts.graded,
+        locked: counts.locked,
+        all: counts.all
+      };
+      document.querySelectorAll('#status-filters .seg-btn').forEach(btn => {
+        const f = btn.getAttribute('data-filter');
+        btn.classList.toggle('is-zero', mapFilterCount[f] === 0);
+      });
 
       updateCourseHeaderUI();
-      renderTasksList();
+      renderTasksList(false);
     }
 
     function changeSpecialty(spec) {
+      const dd = document.getElementById('course-dropdown');
+      if (dd) dd.classList.remove('is-open');
+      if (currentSpec === spec) return;
       currentSpec = spec;
-      loadTasksList();
+      const container = document.getElementById('tasks-container');
+      container.classList.add('is-filtering-out');
+      setTimeout(() => {
+        loadTasksList();
+        container.classList.remove('is-filtering-out');
+      }, 150);
     }
 
     function applyStatusFilter(filter) {
+      if (currentFilter === filter) return;
       currentFilter = filter;
-      document.querySelectorAll('.status-btn').forEach(btn => {
-        if (btn.getAttribute('data-filter') === filter) {
-          btn.className = 'status-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all';
-        } else {
-          btn.className = 'status-btn px-3.5 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 border border-white/10 hover:text-white transition-all';
-        }
+      document.querySelectorAll('#status-filters .seg-btn').forEach(btn => {
+        const active = btn.getAttribute('data-filter') === filter;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-selected', String(active));
       });
-      renderTasksList();
+      renderTasksList(true);
     }
 
     function escapeHtml(str) {
@@ -508,171 +1680,206 @@
         .replace(/'/g, '&#39;');
     }
 
-    function renderTasksList() {
+    function observeCardsScrollReveal() {
+      if (cardObserver) cardObserver.disconnect();
+      const cards = document.querySelectorAll('#tasks-container .reveal');
+      if (!('IntersectionObserver' in window)) {
+        cards.forEach(c => c.classList.add('is-visible'));
+        return;
+      }
+      cardObserver = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const el = entry.target;
+            el.style.willChange = 'transform, opacity';
+            el.classList.add('is-visible');
+            setTimeout(() => { el.style.willChange = 'auto'; }, 650);
+            obs.unobserve(el);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      cards.forEach((card, idx) => {
+        // First 4 visible cards trigger immediately with cascade; below-the-fold wait for scroll
+        if (idx < 4) {
+          requestAnimationFrame(() => {
+            card.style.willChange = 'transform, opacity';
+            card.classList.add('is-visible');
+            setTimeout(() => { card.style.willChange = 'auto'; }, 650);
+          });
+        } else {
+          cardObserver.observe(card);
+        }
+      });
+    }
+
+    function renderTasksList(animateSwap = false) {
       const container = document.getElementById('tasks-container');
       const query = (document.getElementById('task-search-input').value || '').trim().toLowerCase();
 
-      const filtered = tasksData.filter(t => {
-        if (currentFilter === 'available' && (t.is_locked || t.status_code !== 'available')) return false;
-        if (currentFilter === 'in_progress' && !(t.status_code === 'in_progress' || t.status_code === 'revision')) return false;
-        if (currentFilter === 'submitted' && t.status_code !== 'submitted') return false;
-        if (currentFilter === 'graded' && t.status_code !== 'graded') return false;
-        if (currentFilter === 'locked' && !t.is_locked) return false;
-        if (query) {
-          const hay = `${t.title} ${t.description} ${t.tools_required}`.toLowerCase();
-          if (!hay.includes(query)) return false;
-        }
-        return true;
-      });
+      const doRender = () => {
+        let filtered = tasksData.filter(t => {
+          if (query) {
+            const hay = `${t.title} ${t.description} ${t.tools_required}`.toLowerCase();
+            return hay.includes(query);
+          }
+          if (currentFilter === 'available') {
+            // Show available + in_progress + first locked milestone so student sees current work & next horizon (all 3 states)
+            const firstLocked = tasksData.find(x => x.is_locked);
+            return !t.is_locked || (firstLocked && t.task_number === firstLocked.task_number);
+          }
+          if (currentFilter === 'in_progress') return t.status_code === 'in_progress' || t.status_code === 'revision';
+          if (currentFilter === 'submitted') return t.status_code === 'submitted';
+          if (currentFilter === 'graded') return t.status_code === 'graded';
+          if (currentFilter === 'locked') return t.is_locked;
+          return true;
+        });
 
-      if (filtered.length === 0) {
-        container.innerHTML = `
-          <div class="bg-dark-850/80 rounded-2xl p-10 text-center border border-white/10 text-xs text-slate-400">
-            По выбранному фильтру или поисковому запросу уроков не найдено.
-          </div>
-        `;
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="reveal reveal--up is-visible" style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:var(--sp-4);text-align:center;color:var(--text-secondary);">
+              <p style="margin:0 0 12px;font-size:var(--fs-16);font-weight:700;color:var(--text-primary);">В этой категории пока нет уроков</p>
+              <button type="button" onclick="applyStatusFilter('all')" class="btn-secondary-outline" style="min-height:36px;padding:6px 14px;font-size:var(--fs-12);">
+                Показать все 12 модулей
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = filtered.map((t, idx) => {
+          const staggerIndex = idx < 8 ? idx : 0;
+          const lessonQuery = new URLSearchParams({ specialty: currentSpec, task: t.task_number });
+          const inLocalCatalog = !t.interactive_lesson_id &&
+            window.EDU_LESSONS?.[currentSpec]?.some?.(lesson => lesson.title === t.title || Number(lesson.num) === Number(t.task_number));
+          if (t.interactive_lesson_id) lessonQuery.set('lesson_id', t.interactive_lesson_id);
+          else if (inLocalCatalog) lessonQuery.set('catalog', '1');
+          const lessonHref = `lesson_player.html?${lessonQuery}`;
+
+          const isLocked = Boolean(t.is_locked);
+          const sc = t.status_code;
+          const stateClass = isLocked ? 'state-locked' : (sc === 'in_progress' || sc === 'revision' ? 'state-in_progress' : 'state-available');
+
+          // Max 2 Badges: 1 Status Badge (icon + text) + 1 Duration Badge
+          let statusBadge = '';
+          if (isLocked) {
+            statusBadge = `<span class="badge-status badge-status--locked"><span class="material-symbols-outlined" style="font-size:14px;">lock</span><span>Заблокировано</span></span>`;
+          } else if (sc === 'in_progress' || sc === 'revision') {
+            statusBadge = `<span class="badge-status badge-status--progress"><span class="material-symbols-outlined" style="font-size:14px;">timelapse</span><span>В процессе${t.quiz_score ? ` · Квиз ${t.quiz_score}/3` : ''}</span></span>`;
+          } else if (sc === 'graded') {
+            statusBadge = `<span class="badge-status badge-status--available"><span class="material-symbols-outlined" style="font-size:14px;">check_circle</span><span>Зачтено · ${t.student_score}/100</span></span>`;
+          } else {
+            statusBadge = `<span class="badge-status badge-status--available"><span class="material-symbols-outlined" style="font-size:14px;">play_circle</span><span>Доступно</span></span>`;
+          }
+
+          const durationBadge = `<span class="badge-duration">${escapeHtml(t.time_limit || '60 мин')}</span>`;
+          const meta = formatConciseLessonMeta(t.title, t.tools_required, t.task_number);
+          const dateInfo = formatRelativeDate(
+            t.unlock_day || t.task_number,
+            t.current_study_day || 1,
+            isLocked,
+            t.unlock_date_exact || '12 ноября, 09:00',
+            t.deadline_exact || '13 ноября, 23:59'
+          );
+
+          const tagsHtml = meta.tags.map(tag => `<span class="tech-tag">${escapeHtml(tag)}</span>`).join('');
+
+          const actionsHtml = isLocked
+            ? `<div class="locked-pill has-tooltip" tabindex="0" data-tip="Модуль откроется ${escapeHtml(dateInfo.exact)}">
+                 <span class="material-symbols-outlined" style="font-size:16px;">lock</span>
+                 <span>${escapeHtml(dateInfo.label)}</span>
+               </div>`
+            : `<a href="${lessonHref}" class="btn-primary-cta">
+                 <span>${sc === 'in_progress' ? 'Продолжить урок' : 'Начать урок'}</span>
+                 <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
+               </a>
+               <a href="simulator.html?specialty=${currentSpec}&amp;task=${t.task_number}" class="btn-secondary-outline">
+                 <span>Тренажёр</span>
+               </a>`;
+
+          return `
+            <article class="timeline-item ${stateClass} reveal reveal--up" data-reveal="up" style="--i:${staggerIndex}">
+              <div class="timeline-rail" aria-hidden="true">
+                <div class="timeline-node">${String(t.task_number).padStart(2, '0')}</div>
+                <div class="timeline-line"></div>
+              </div>
+              <div class="lesson-card">
+                <div style="min-width:0;flex:1;">
+                  <div class="card-badges">
+                    ${statusBadge}
+                    ${durationBadge}
+                  </div>
+                  <h2 class="card-title">${escapeHtml(meta.shortTitle)}</h2>
+                  <p class="card-desc">${escapeHtml(t.description)}</p>
+                  <div class="card-meta-row">
+                    ${tagsHtml}
+                    <span class="has-tooltip" tabindex="0" data-tip="Точная дата: ${escapeHtml(dateInfo.exact)}" style="display:inline-flex;align-items:center;gap:4px;">
+                      <span class="material-symbols-outlined" style="font-size:14px;">schedule</span>
+                      <span>${escapeHtml(dateInfo.relative)}</span>
+                    </span>
+                  </div>
+                </div>
+                <div class="card-actions">
+                  ${actionsHtml}
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        observeCardsScrollReveal();
+      };
+
+      if (animateSwap) {
+        container.classList.add('is-filtering-out');
+        setTimeout(() => {
+          doRender();
+          container.classList.remove('is-filtering-out');
+        }, 150);
+      } else {
+        doRender();
+      }
+    }
+
+    // Initial Page Load Choreography (<= 1.2s total, once per session)
+    function runInitialChoreography() {
+      try {
+        if (localStorage.getItem('eduspace_sidebar_collapsed') === '1') {
+          document.body.classList.add('sidebar-collapsed');
+        }
+      } catch {}
+
+      const alreadyPlayed = sessionStorage.getItem('eduspace_tasks_intro_played') === '1';
+      const shellEls = document.querySelectorAll('.app-sidebar, .app-sidebar .reveal, .top-header, .continue-banner, .course-header-card .reveal, .controls-bar .reveal');
+
+      if (alreadyPlayed) {
+        shellEls.forEach(el => {
+          el.style.transitionDuration = '0ms';
+          el.classList.add('is-visible');
+        });
         return;
       }
 
-      container.innerHTML = filtered.map(t => {
-        const lessonQuery = new URLSearchParams({ specialty: currentSpec, task: t.task_number });
-        const inLocalCatalog = !t.interactive_lesson_id &&
-          window.EDU_LESSONS?.[currentSpec]?.some?.(lesson => lesson.title === t.title);
-        if (t.interactive_lesson_id) lessonQuery.set('lesson_id', t.interactive_lesson_id);
-        else if (inLocalCatalog) lessonQuery.set('catalog', '1');
-        const lessonHref = t.interactive_lesson_id || inLocalCatalog ? `lesson_player.html?${lessonQuery}` : '';
-        const isLocked = t.is_locked;
-        const isProLocked = Boolean(t.is_pro_locked);
-        const isProRequired = Boolean(t.is_pro_required);
-        const sc = t.status_code;
-        let statusPill = '';
-        let borderCls = 'border-white/10 bg-dark-850/80 hover:border-indigo-500/50 hover:shadow-glow-indigo';
+      sessionStorage.setItem('eduspace_tasks_intro_played', '1');
+      requestAnimationFrame(() => {
+        shellEls.forEach(el => {
+          el.style.willChange = 'transform, opacity';
+          el.classList.add('is-visible');
+          setTimeout(() => { el.style.willChange = 'auto'; }, 900);
+        });
+      });
 
-        if (isProLocked) {
-          borderCls = 'border-amber-500/30 bg-dark-850/90 hover:border-amber-400/60 shadow-lg';
-          statusPill = `<span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-extrabold inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">diamond</span>Тариф Pro (Модули 4–10)</span>`;
-        } else if (isLocked) {
-          borderCls = 'border-white/5 bg-dark-950/40';
-          statusPill = `<span class="px-2.5 py-1 rounded-full bg-white/5 text-slate-400 border border-white/10 text-[11px] font-bold inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">lock</span>Заблокировано (День ${t.unlock_day})</span>`;
-        } else if (sc === 'graded') {
-          borderCls = 'border-emerald-500/30 bg-dark-850/90 hover:border-emerald-400';
-          statusPill = `<span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">check_circle</span>Проверено: ${t.student_score}/100 (${t.grade_letter})</span>`;
-        } else if (sc === 'submitted') {
-          statusPill = `<span class="px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold">Отправлено на проверку</span>`;
-        } else if (sc === 'revision') {
-          borderCls = 'border-red-500/30 bg-dark-850/90';
-          statusPill = `<span class="px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 text-[11px] font-bold">На доработке (${t.student_score}/100)</span>`;
-        } else if (sc === 'in_progress') {
-          statusPill = `<span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">В процессе</span>`;
-        } else {
-          statusPill = `<span class="px-2.5 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[11px] font-bold">Доступно к изучению</span>`;
-        }
-
-        const tierBadge = isProRequired
-          ? (isProLocked ? '' : `<span class="px-2.5 py-0.5 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[11px] font-bold inline-flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">verified</span>Pro активен</span>`)
-          : `<span class="px-2.5 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[11px] font-bold">Бесплатный модуль</span>`;
-
-        const feedbackRow = t.teacher_comment
-          ? `<div class="mt-2 p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300"><strong>Комментарий преподавателя:</strong> ${escapeHtml(t.teacher_comment)}</div>`
-          : '';
-
-        return `
-          <article class="rounded-2xl p-6 border transition-all ${borderCls}">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-              <div class="space-y-2 flex-1">
-                <div class="flex flex-wrap items-center gap-2">
-                  <span class="px-3 py-1 rounded-xl bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border border-indigo-500/40 text-indigo-300 text-[11px] font-black tracking-wide shadow-sm flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>МОДУЛЬ №${t.task_number}</span>
-                  ${tierBadge}
-                  ${statusPill}
-                  <span class="px-2.5 py-0.5 rounded-lg bg-white/5 text-slate-400 text-[11px] font-semibold">${escapeHtml(t.difficulty)} • ${escapeHtml(t.time_limit)}</span>
-                  ${!isLocked && t.quiz_score > 0 ? `<span class="px-2.5 py-0.5 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-[11px] font-bold">Квиз: ${Number(t.quiz_score)}/3</span>` : ''}
-                </div>
-
-                <h2 class="font-extrabold text-base sm:text-lg text-white">${escapeHtml(t.title)}</h2>
-                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">${escapeHtml(t.description)}</p>
-
-                <div class="flex flex-wrap items-center gap-4 pt-1 text-[11px] text-slate-400">
-                  <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[15px] text-indigo-400">build</span>${escapeHtml(t.tools_required)}</span>
-                  <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[15px] text-slate-500">calendar_today</span>Открытие: <strong class="text-slate-300">${escapeHtml(t.unlock_date_exact)}</strong></span>
-                  <span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[15px] text-amber-400">schedule</span>Дедлайн: <strong class="text-slate-300">${escapeHtml(t.deadline_exact)}</strong></span>
-                </div>
-                ${feedbackRow}
-              </div>
-
-              <div class="shrink-0 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-                ${isProLocked
-                  ? `<a href="pricing.html?plan=pro" class="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-purple-600 to-indigo-600 hover:shadow-amber-500/40 text-white font-extrabold text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-2 hover:scale-[1.02]">
-                       <span class="material-symbols-outlined text-[16px]">diamond</span>
-                       <span>Разблокировать в Pro (4 990 ₸)</span>
-                     </a>`
-                  : (isLocked
-                    ? `<button type="button" onclick="showToast('Задание закрыто до наступления Дня ${t.unlock_day} (${t.unlock_date_exact})', 'info')" class="px-5 py-3 rounded-xl bg-dark-950/60 text-slate-500 border border-white/5 font-bold text-xs flex items-center justify-center gap-2 cursor-not-allowed">
-                         <span class="material-symbols-outlined text-[16px]">lock_clock</span>
-                         <span>Откроется ${t.unlock_date_exact}</span>
-                       </button>`
-                    : (currentSpec === 'graphic_design' && t.task_number === 1)
-                      ? `<div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
-                           <a href="${lessonHref || 'lesson_player.html?lesson_id=3'}" class="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-cyan-500 text-white font-black text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-1.5 hover:scale-[1.02]">
-                             <span class="material-symbols-outlined text-[16px]">play_lesson</span>
-                             <span>Урок</span>
-                           </a>
-                           <a href="mission.html" class="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 via-purple-500 to-emerald-400 text-slate-950 font-black text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-1.5 hover:scale-[1.02]">
-                             <span class="material-symbols-outlined text-[16px]">palette</span>
-                             <span>Миссия</span>
-                           </a>
-                           <a href="simulator.html?specialty=${currentSpec}&task=${t.task_number}" class="px-3.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs border border-white/15 transition-all flex items-center justify-center gap-1.5 hover:scale-[1.02]">
-                             <span class="material-symbols-outlined text-[16px]">terminal</span>
-                             <span>Тренажёр</span>
-                           </a>
-                         </div>`
-                      : lessonHref
-                        ? `<div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
-                             <a href="${lessonHref}" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-cyan-500 text-white font-black text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-1.5 hover:scale-[1.02]">
-                               <span class="material-symbols-outlined text-[16px]">play_lesson</span>
-                               <span>Урок</span>
-                             </a>
-                             <a href="simulator.html?specialty=${currentSpec}&task=${t.task_number}" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs border border-white/15 transition-all flex items-center justify-center gap-1.5 hover:scale-[1.02]">
-                               <span class="material-symbols-outlined text-[16px]">terminal</span>
-                               <span>Тренажёр</span>
-                             </a>
-                           </div>`
-                        : `<a href="simulator.html?specialty=${currentSpec}&task=${t.task_number}" class="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-cyan-500 text-white font-black hover:scale-[1.03] shadow-glow-indigo text-xs transition-all flex items-center justify-center gap-2">
-                             <span class="material-symbols-outlined text-[16px]">terminal</span>
-                             <span>${sc === 'graded' ? 'Повторить в тренажёре' : (sc === 'in_progress' || sc === 'revision' ? 'Продолжить в тренажёре' : 'Открыть тренажёр')}</span>
-                             <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-                           </a>`
-                  )
-                }
-              </div>
-            </div>
-          </article>
-        `;
-      }).join('');
-    }
-
-    function toggleMobileNav(open) {
-      const backdrop = document.getElementById('mobile-nav-backdrop');
-      const drawer = document.getElementById('mobile-nav-drawer');
-      if (!backdrop || !drawer) return;
-      if (open) {
-        backdrop.classList.remove('opacity-0', 'pointer-events-none');
-        backdrop.classList.add('opacity-100');
-        drawer.classList.remove('-translate-x-full');
-        drawer.classList.add('translate-x-0');
-        document.body.classList.add('overflow-hidden');
-      } else {
-        backdrop.classList.remove('opacity-100');
-        backdrop.classList.add('opacity-0', 'pointer-events-none');
-        drawer.classList.remove('translate-x-0');
-        drawer.classList.add('-translate-x-full');
-        document.body.classList.remove('overflow-hidden');
-      }
+      // Non-blocking safety fallback after 950ms
+      setTimeout(() => {
+        document.body.classList.add('reveal-fallback');
+      }, 950);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
       const user = window.EduSpace.getActiveUser();
       const params = new URLSearchParams(window.location.search);
       currentSpec = params.get('specialty') || (user && user.specialty_slug) || 'it';
+      runInitialChoreography();
       loadTasksList();
     });
   </script>

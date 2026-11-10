@@ -1715,17 +1715,24 @@
   }
 
   function openModal(title, htmlContent, maxWidthClass = 'max-w-2xl') {
-    closeModal();
+    const prev = document.getElementById('edu-modal-overlay');
+    if (prev) prev.remove();
 
     const overlay = document.createElement('div');
     overlay.id = 'edu-modal-overlay';
-    overlay.className = 'fixed inset-0 z-[9999] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 transition-opacity duration-200 overflow-y-auto';
+    overlay.className = 'fixed inset-0 z-[9999] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto';
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 200ms cubic-bezier(0.22, 1, 0.36, 1)';
     overlay.onclick = (e) => {
       if (e.target === overlay) closeModal();
     };
 
     const modal = document.createElement('div');
-    modal.className = `bg-dark-850/95 backdrop-blur-2xl rounded-2xl shadow-2xl ${maxWidthClass} w-full max-h-[88vh] flex flex-col overflow-hidden border border-white/10 my-auto transform scale-95 transition-transform duration-200 text-white`;
+    modal.id = 'edu-modal-dialog';
+    modal.className = `bg-dark-850/95 backdrop-blur-2xl rounded-2xl shadow-2xl ${maxWidthClass} w-full max-h-[88vh] flex flex-col overflow-hidden border border-white/10 my-auto text-white`;
+    modal.style.opacity = '0';
+    modal.style.transform = 'scale(0.95) translateY(8px)';
+    modal.style.transition = 'opacity 220ms cubic-bezier(0.22, 1, 0.36, 1), transform 220ms cubic-bezier(0.22, 1, 0.36, 1)';
     modal.innerHTML = `
       <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-dark-900/80 shrink-0">
         <h3 class="font-bold text-base text-white flex items-center gap-2">${title}</h3>
@@ -1740,7 +1747,6 @@
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
     document.body.style.overflow = 'hidden';
-    // Keyboard navigation: Escape key closes modal cleanly
 
     const escListener = (evt) => {
       if (evt.key === 'Escape') {
@@ -1750,16 +1756,30 @@
     };
     window.addEventListener('keydown', escListener);
     requestAnimationFrame(() => {
-      modal.classList.remove('scale-95');
-      modal.classList.add('scale-100');
+      overlay.style.opacity = '1';
+      modal.style.opacity = '1';
+      modal.style.transform = 'scale(1) translateY(0)';
     });
   }
 
   function closeModal() {
     const existing = document.getElementById('edu-modal-overlay');
-
-    if (existing) existing.remove();
+    if (!existing) {
+      document.body.style.overflow = '';
+      return;
+    }
+    const dialog = existing.querySelector('#edu-modal-dialog');
+    existing.style.transition = 'opacity 150ms cubic-bezier(0.64, 0, 0.78, 0)';
+    existing.style.opacity = '0';
+    if (dialog) {
+      dialog.style.transition = 'opacity 150ms cubic-bezier(0.64, 0, 0.78, 0), transform 150ms cubic-bezier(0.64, 0, 0.78, 0)';
+      dialog.style.opacity = '0';
+      dialog.style.transform = 'scale(0.95) translateY(4px)';
+    }
     document.body.style.overflow = '';
+    setTimeout(() => {
+      if (existing.parentNode) existing.remove();
+    }, 150);
   }
 
   // ==========================================
@@ -2917,17 +2937,38 @@
   // ==========================================
   function initSmoothRevealEngine() {
     if (typeof window === 'undefined' || typeof document === 'undefined') return;
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduced) {
+      document.body.classList.add('reveal-fallback');
+      return;
+    }
 
     const markReveal = (el, index = 0) => {
       if (!el || el.nodeType !== 1 || el.dataset.shRevealed === '1') return;
       el.dataset.shRevealed = '1';
-      el.style.setProperty('--reveal-delay', `${Math.min(index * 35, 240)}ms`);
-      el.classList.add('sh-reveal-enter');
+      const staggerIdx = index < 8 ? index : 0;
+      el.style.setProperty('--i', String(staggerIdx));
+      if (!el.classList.contains('reveal') && !el.hasAttribute('data-reveal')) {
+        el.classList.add('sh-reveal-enter');
+      } else {
+        requestAnimationFrame(() => el.classList.add('is-visible'));
+      }
     };
 
-    const selector = 'main section, main article, #tasks-grid > *, #lp-blocks-viewport > *, .glass-card, .card, .workshop-course';
-    document.querySelectorAll(selector).forEach((el, idx) => markReveal(el, idx % 6));
+    const selector = 'main section, main article, #tasks-grid > *, #lp-block-canvas > *, .glass-card, .card, .workshop-course';
+    const io = 'IntersectionObserver' in window ? new IntersectionObserver((entries, obs) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          markReveal(entry.target, 0);
+          obs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 }) : null;
+
+    document.querySelectorAll(selector).forEach((el, idx) => {
+      if (idx < 6 || !io) markReveal(el, idx);
+      else io.observe(el);
+    });
 
     if ('MutationObserver' in window && document.body) {
       const mo = new MutationObserver(mutations => {
