@@ -1752,8 +1752,12 @@ def require_hosted_auth_configuration():
         abort(404)
     if request.path.startswith('/api/auth/') and request.path != '/api/auth/readiness' and not SESSION_SECRET:
         return jsonify({"success": False, "message": "Сервер аккаунтов временно недоступен."}), 503
-    if session.get('user_id') and not get_current_user():
-        session.clear()
+    if session.get('user_id'):
+        user = get_current_user()
+        if not user:
+            session.clear()
+        elif session.get('user_role') != user['role']:
+            session['user_role'] = user['role']
 
 
 @app.get('/api/auth/readiness')

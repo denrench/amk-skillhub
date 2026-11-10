@@ -2281,36 +2281,47 @@
 
     const gate = document.createElement('div');
     gate.id = 'edu-auth-guard';
+    gate.setAttribute('role', 'dialog');
+    gate.setAttribute('aria-modal', 'true');
+    gate.setAttribute('aria-labelledby', 'edu-auth-guard-title');
     gate.className = 'fixed inset-0 z-[9000] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4';
     gate.innerHTML = `
       <div class="bg-dark-850/95 backdrop-blur-2xl rounded-3xl shadow-2xl max-w-md w-full p-8 border border-white/10 text-center space-y-5 text-white relative">
-        <button type="button" onclick="window.EduSpace.startIsolatedDemo('${targetRole}')" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-xl hover:bg-white/10 transition-colors" title="Продолжить как гость">
-          <span class="material-symbols-outlined text-[20px]">close</span>
-        </button>
         <div class="w-16 h-16 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center mx-auto shadow-glow-indigo">
-          <span class="material-symbols-outlined text-[34px]">lock_person</span>
+          <span class="material-symbols-outlined text-[34px]" aria-hidden="true">lock_person</span>
         </div>
         <div class="space-y-2">
-          <h2 class="font-display font-extrabold text-xl text-white">Вход в образовательную платформу</h2>
+          <h2 id="edu-auth-guard-title" class="font-display font-extrabold text-xl text-white">Войдите в личный кабинет</h2>
           <p class="text-xs text-slate-300 leading-relaxed">
-            Чтобы сохранять личный прогресс уроков, результаты тестов и оценки в зачётной ведомости под вашим ФИО, войдите или начните в демо-режиме.
+            Для доступа к личным результатам и оценкам нужен аккаунт. Учебник открыт для всех.
           </p>
         </div>
         <div class="space-y-2.5 pt-1">
-          <button type="button" onclick="window.EduSpace.startIsolatedDemo('${targetRole}')" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-600 hover:to-cyan-600 text-slate-950 font-black text-xs shadow-glow-indigo transition-all flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined text-[18px]">play_circle</span>
-            <span>Войти в демо-режим (Мгновенный просмотр)</span>
-          </button>
           <a href="auth.html?mode=login" class="w-full py-2.5 px-4 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 font-bold text-xs transition-colors block">
-            У меня уже есть аккаунт — Войти
+            Войти в аккаунт
           </a>
           <a href="auth.html?mode=register${targetRole === 'teacher' ? '&role=teacher' : ''}" class="w-full py-2 px-4 rounded-xl text-slate-400 hover:text-white font-semibold text-xs transition-colors block">
-            Создать личный аккаунт (Регистрация)
+            Создать аккаунт
           </a>
+          <a href="learn.html" class="academy-action">Открыть учебник без аккаунта</a>
         </div>
       </div>
     `;
     document.body.appendChild(gate);
+    const links = gate.querySelectorAll('a');
+    const first = links[0];
+    const last = links[links.length - 1];
+    first.focus();
+    gate.addEventListener('keydown', event => {
+      if (event.key !== 'Tab') return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
   }
 
   function hydratePageIdentity() {
@@ -2322,7 +2333,8 @@
       path.endsWith('profile.html') || path.endsWith('/profile');
     const isProtectedTeacher = path.endsWith('teacher.html') || path.endsWith('/teacher') || path.endsWith('gradebook.html') || path.endsWith('/gradebook');
 
-    if (isProtectedStudent && !user) {
+    const isPublicCatalog = path.endsWith('tasks.html') || path.endsWith('/tasks');
+    if (isProtectedStudent && !isPublicCatalog && !user) {
       showAuthRequiredOverlay('student');
       return;
     }

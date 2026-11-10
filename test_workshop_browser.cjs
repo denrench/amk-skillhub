@@ -10,6 +10,15 @@ async function openLesson(page, lesson) {
   await page.waitForFunction(() => typeof currentLesson !== 'undefined' && currentLesson);
 }
 
+async function auditAccessibility(page) {
+  if (!process.env.SKILLHUB_AXE) return;
+  await page.addScriptTag({path:process.env.SKILLHUB_AXE});
+  const violations = await page.evaluate(async () => (await axe.run()).violations.map(({id, nodes}) => ({
+    id, elements: nodes.map(node => node.target),
+  })));
+  assert.deepEqual(violations, []);
+}
+
 (async () => {
   const browser = await chromium.launch({
     executablePath: process.env.SKILLHUB_CHROME,
@@ -34,8 +43,10 @@ async function openLesson(page, lesson) {
     await page.goto(origin + '/index.html', {waitUntil: 'domcontentloaded'});
     await page.getByRole('heading', {name:'Знания, которые можно применить'}).waitFor();
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth), 0);
+    await auditAccessibility(page);
     await page.getByRole('link', {name:'Открыть учебник', exact:true}).click();
     await page.locator('.lesson-row').first().click();
+    await auditAccessibility(page);
     await page.locator('.answer').first().click();
     assert.equal(await page.locator('.answer-result').getAttribute('data-correct'), 'false');
     await page.locator('.answer').last().click();
@@ -106,6 +117,9 @@ async function openLesson(page, lesson) {
     const preview = editor.locator('video');
     await preview.waitFor();
     assert.match(await preview.getAttribute('src'), /\/assets\/lesson-intros\/it-1\.mp4$/);
+    await page.goto(origin + '/auth.html?mode=register', {waitUntil:'domcontentloaded'});
+    await page.locator('#account-register').waitFor();
+    await auditAccessibility(page);
     assert.deepEqual(errors, []);
     console.log('Catalog navigation, 49 intro sources, five playback and model samples, pilot progress, and teacher preview passed.');
   } finally {

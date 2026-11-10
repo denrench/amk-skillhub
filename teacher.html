@@ -530,7 +530,7 @@
             <h2 class="font-extrabold text-lg text-white">Электронный журнал успеваемости по модулям 1–10</h2>
             <p class="text-xs text-slate-400 mt-0.5">Отображаются все зарегистрированные студенты и их актуальные баллы по выбранному направлению.</p>
           </div>
-          <select id="matrix-course-select" onchange="loadGradebookMatrix()" class="px-3.5 py-2 rounded-xl border border-white/15 text-xs font-bold bg-dark-900 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
+          <select id="matrix-course-select" aria-label="Курс для ведомости" onchange="loadGradebookMatrix()" class="px-3.5 py-2 rounded-xl border border-white/15 text-xs font-bold bg-dark-900 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
             <option value="it">06130100 — Программное обеспечение (Web Design)</option>
             <option value="graphic_design">02130100 — Графический Дизайн</option>
             <option value="autoelectric">07161301 — Автоэлектрики</option>
@@ -539,7 +539,7 @@
           </select>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Ведомость по урокам">
           <table class="w-full text-xs text-left">
             <thead class="bg-dark-950 text-slate-400 font-bold text-[10px] uppercase border-b border-white/10">
               <tr>
