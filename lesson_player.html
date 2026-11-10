@@ -280,19 +280,19 @@
       let rawSlug = (urlParams.get('specialty') || '').toLowerCase().trim();
       let specSlug = specAliases[rawSlug] || rawSlug;
       let taskParam = parseInt(urlParams.get('task'), 10);
-      let lessonNum = (!isNaN(taskParam) && taskParam >= 1 && taskParam <= 10) ? taskParam : idNum;
+      let lessonNum = (!isNaN(taskParam) && taskParam >= 1 && taskParam <= 12) ? taskParam : idNum;
 
       if (!specSlug || !specs.includes(specSlug)) {
-        if (idNum > 10) {
-          const specIdx = Math.min(specs.length - 1, Math.floor((idNum - 1) / 10));
+        if (idNum > 12) {
+          const specIdx = Math.min(specs.length - 1, Math.floor((idNum - 1) / 12));
           specSlug = specs[specIdx];
-          lessonNum = ((idNum - 1) % 10) + 1;
+          lessonNum = ((idNum - 1) % 12) + 1;
         } else {
           specSlug = 'it';
-          lessonNum = Math.min(10, Math.max(1, idNum));
+          lessonNum = Math.min(12, Math.max(1, idNum));
         }
-      } else if (lessonNum > 10) {
-        lessonNum = ((lessonNum - 1) % 10) + 1;
+      } else if (lessonNum > 12) {
+        lessonNum = ((lessonNum - 1) % 12) + 1;
       }
 
       const courseInfo = (window.EDU_COURSES || []).find(c => c.slug === specSlug);
@@ -307,7 +307,7 @@
       const title = catLesson ? catLesson.title : `Урок ${lessonNum}. Интерактивный модуль: ${courseTitle}`;
       const starter = catLesson ? catLesson.starter_code : '// Ваше решение';
 
-      const nextLessonId = (lessonNum < 10) ? idNum + 1 : null;
+      const nextLessonId = (lessonNum < 12) ? idNum + 1 : null;
       const prevLessonId = (lessonNum > 1) ? idNum - 1 : null;
 
       return {

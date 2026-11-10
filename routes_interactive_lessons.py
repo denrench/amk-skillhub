@@ -428,7 +428,7 @@ def academy_progress():
     if not isinstance(data, dict):
         return jsonify({'success': False, 'message': 'Укажите урок.'}), 400
     specialty, number = data.get('specialty'), data.get('lesson')
-    if specialty not in ('it', 'graphic_design', 'autoelectric', 'hvac', 'automechanic') or type(number) is not int or not 1 <= number <= 10:
+    if specialty not in ('it', 'graphic_design', 'autoelectric', 'hvac', 'automechanic') or type(number) is not int or not 1 <= number <= 12:
         return jsonify({'success': False, 'message': 'Укажите урок из учебника.'}), 400
     cursor.execute("""
         SELECT l.id FROM lessons l JOIN courses c ON c.id = l.course_id

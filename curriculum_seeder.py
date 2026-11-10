@@ -274,8 +274,8 @@ def _build_8_block_lesson(item, spec, num):
             "correct": first_q["correct"]
         })
         
-    xp = 60 if num < 5 else (75 if num < 10 else 100)
-    lesson_type = "visual" if num in (1, 2) else ("practical" if num < 8 else ("simulation" if num < 10 else "exam"))
+    xp = 60 if num < 5 else (75 if num < 12 else 100)
+    lesson_type = "visual" if num in (1, 2) else ("practical" if num < 9 else ("simulation" if num < 12 else "exam"))
     
     blocks = [
         {
@@ -358,7 +358,7 @@ def generate_default_courses():
         slug = meta["slug"]
         items = raw_catalog.get(slug, [])
         lessons = []
-        for idx in range(1, 11):
+        for idx in range(1, 13):
             item = next((it for it in items if it.get("num") == idx), None)
             if not item:
                 item = {
@@ -483,5 +483,5 @@ if __name__ == '__main__':
     seed_interactive_curriculum(cur)
     conn.commit()
     conn.close()
-    print("[SEED SUCCESS] Successfully seeded all 50 lessons with video lectures and dynamic timecodes into database.db!")
+    print("[SEED SUCCESS] Successfully seeded all 60 lessons with video lectures and dynamic timecodes into database.db!")
 

@@ -200,7 +200,7 @@ COURSES_META = [
             {"key": "ps_ai", "name": "Photoshop & Illustrator для веба (баннеры, SVG-иконки)", "tasks": [1, 2]},
             {"key": "figma_ui", "name": "Figma: Сетки 8px, Auto Layout, Компоненты и Прототипы", "tasks": [3, 4, 5]},
             {"key": "html_css", "name": "Основы верстки: теги HTML, стили CSS и Flexbox", "tasks": [6, 7, 8]},
-            {"key": "basic_js", "name": "Простой интерактив (клик JS) и дипломная карточка", "tasks": [9, 10]}
+            {"key": "basic_js", "name": "Интерактив JS, доступность A11y и дипломный проект", "tasks": [9, 10, 11, 12]}
         ]
     },
     {
@@ -212,7 +212,7 @@ COURSES_META = [
         "skills": [
             {"key": "composition", "name": "Композиция, колористика RGB/CMYK и типографика", "tasks": [1, 2, 3]},
             {"key": "branding", "name": "Векторная графика, логотипы и разработка Brandbook", "tasks": [4, 5, 7]},
-            {"key": "prepress", "name": "Вёрстка InDesign, упаковка и допечатная подготовка Prepress", "tasks": [6, 8, 9, 10]}
+            {"key": "prepress", "name": "Вёрстка InDesign, упаковка, Prepress и защита брендбука", "tasks": [6, 8, 9, 10, 11, 12]}
         ]
     },
     {
@@ -224,7 +224,7 @@ COURSES_META = [
         "skills": [
             {"key": "power_net", "name": "Бортовая сеть 12/24В, АКБ, стартеры и генераторы", "tasks": [1, 2, 3, 4]},
             {"key": "wiring_obd", "name": "Электросхемы DIN 72552 и диагностика ЭБУ OBD-II", "tasks": [5, 6, 9]},
-            {"key": "can_osc", "name": "Осциллография датчиков и мультиплексные шины CAN/LIN", "tasks": [7, 8, 10]}
+            {"key": "can_osc", "name": "Осциллография, шины CAN/LIN, BCM и комплексный аудит", "tasks": [7, 8, 10, 11, 12]}
         ]
     },
     {
@@ -236,7 +236,7 @@ COURSES_META = [
         "skills": [
             {"key": "thermo", "name": "Термодинамика цикла, фреоны, перегрев и переохлаждение", "tasks": [1, 2, 3, 4]},
             {"key": "brazing", "name": "Пайка меди, опрессовка азотом, вакуумирование и заправка", "tasks": [6, 7, 8]},
-            {"key": "electro_cold", "name": "Диагностика компрессоров, No Frost и контроллеров Eliwell", "tasks": [5, 9, 10]}
+            {"key": "electro_cold", "name": "Диагностика компрессоров, No Frost, инверторов и ПНР", "tasks": [5, 9, 10, 11, 12]}
         ]
     },
     {
@@ -248,7 +248,7 @@ COURSES_META = [
         "skills": [
             {"key": "engine", "name": "Дефектовка и ремонт ДВС, ГРМ, смазки и охлаждения", "tasks": [1, 2, 3, 4]},
             {"key": "chassis", "name": "Трансмиссия, подвеска и 3D развал-схождение колёс", "tasks": [5, 6, 7]},
-            {"key": "brakes_to", "name": "Тормозные системы, шиномонтаж и регламентное ТО", "tasks": [8, 9, 10]}
+            {"key": "brakes_to", "name": "Тормозные системы, ШРУС, шиномонтаж и комплексное ТО", "tasks": [8, 9, 10, 11, 12]}
         ]
     }
 ]
@@ -1368,7 +1368,7 @@ def get_current_day():
     row = c.fetchone()
     if row:
         try:
-            return max(1, min(10, int(row['value'])))
+            return max(1, min(12, int(row['value'])))
         except Exception:
             return 1
     return 1
@@ -1544,7 +1544,7 @@ PLATFORM_ACHIEVEMENTS = [
     {
         "id": "course_champion",
         "title": "Покоритель курса",
-        "desc": "Успешно сданы все 10 заданий специализации",
+        "desc": "Успешно сданы все 12 заданий специализации",
         "icon": "workspace_premium",
         "xp": 300,
         "color": "#a855f7"
@@ -1594,7 +1594,7 @@ def check_and_unlock_achievements(conn, user_id):
         ("high_five", passed_count >= 5),
         ("perfect_score", max_score >= 100),
         ("streak_master", streak >= 3),
-        ("course_champion", passed_count >= 10),
+        ("course_champion", passed_count >= 12),
     ]
 
     for ach_id, condition in checks:
@@ -2185,8 +2185,8 @@ def list_courses():
         item = dict(c)
         item["enrolled"] = slug in enrolled
         item["completed_lessons"] = done
-        item["total_lessons"] = 10
-        item["progress_percent"] = min(100, int(round((done / 10.0) * 100)))
+        item["total_lessons"] = 12
+        item["progress_percent"] = min(100, int(round((done / 12.0) * 100)))
         out.append(item)
 
     return jsonify({"success": True, "courses": out, "current_study_day": get_current_day()})
@@ -2327,7 +2327,7 @@ def get_profile(user_id):
         "statistics": {
             "total_submitted": len(spec_subs),
             "passed_count": len(passed_nums),
-            "progress_percent": min(100, int(round((len(passed_nums) / 10.0) * 100))),
+            "progress_percent": min(100, int(round((len(passed_nums) / 12.0) * 100))),
             "avg_score": avg_score,
             "gpa": gpa_4,
             "xp": xp_total,
@@ -2722,8 +2722,8 @@ def submit_task():
         return jsonify({
             "success": False,
             "is_pro_locked": True,
-            "error": "Модули с 4 по 10 доступны только на тарифе Pro. Активируйте подписку в разделе «Тарифы» для сдачи практических модулей и получения сертификата.",
-            "message": "Требуется тариф Pro для сдачи модулей 4–10."
+            "error": "Модули с 4 по 12 доступны только на тарифе Pro. Активируйте подписку в разделе «Тарифы» для сдачи практических модулей и получения сертификата.",
+            "message": "Требуется тариф Pro для сдачи модулей 4–12."
         }), 403
 
     cursor.execute('SELECT id, title, unlock_day, unlock_date_text FROM tasks WHERE specialty_slug = ? AND task_number = ?', (specialty_slug, task_number))
@@ -2874,7 +2874,7 @@ def get_demo_status():
     completed_count = res['cnt'] or 0
     avg_score = round(res['avg_sc'] or 0.0, 1)
 
-    progress_percent = min(100, int(round((completed_count / 10.0) * 100)))
+    progress_percent = min(100, int(round((completed_count / 12.0) * 100)))
 
     return jsonify({
         "success": True,
@@ -2882,8 +2882,8 @@ def get_demo_status():
         "progress_percent": progress_percent,
         "completed_count": completed_count,
         "avg_score": avg_score,
-        "tasks_available": min(10, current_day),
-        "tasks_locked": max(0, 10 - current_day),
+        "tasks_available": min(12, current_day),
+        "tasks_locked": max(0, 12 - current_day),
         "is_fresh_start": (completed_count == 0 and current_day == 1)
     })
 
@@ -2946,7 +2946,7 @@ def advance_study_day():
     else:
         target_day = get_current_day() + 1
 
-    target_day = max(1, min(10, target_day))
+    target_day = max(1, min(12, target_day))
     c.execute("INSERT OR REPLACE INTO platform_settings (key, value) VALUES ('current_study_day', ?);", (str(target_day),))
     conn.commit()
 
@@ -3286,7 +3286,7 @@ def get_gradebook_matrix():
     for st in students:
         cells = {}
         scores = []
-        for num in range(1, 11):
+        for num in range(1, 13):
             c_info = cell_map.get((st['id'], num))
             if c_info:
                 cells[str(num)] = c_info
@@ -3403,7 +3403,7 @@ def create_or_update_task():
     title = (data.get('title') or '').strip()
     description = (data.get('description') or '').strip()
     difficulty = (data.get('difficulty') or 'Средний').strip()
-    unlock_day = max(1, min(10, int(data.get('unlock_day') or task_number)))
+    unlock_day = max(1, min(12, int(data.get('unlock_day') or task_number)))
     tools_required = (data.get('tools_required') or 'Практикум EDU SPACE').strip()
     starter_code = data.get('starter_code') or '// Введите ваше решение\n'
 
@@ -3638,9 +3638,9 @@ def health():
         "status": "healthy",
         "service": "EDU SPACE LMS Platform",
         "institution": "Алматинский многопрофильный колледж (АМК)",
-        "database": "PostgreSQL (50 lessons catalog synced)" if is_pg else "SQLite3 (50 lessons catalog synced)",
+        "database": "PostgreSQL (60 lessons catalog synced)" if is_pg else "SQLite3 (60 lessons catalog synced)",
         "database_type": "postgresql" if is_pg else "sqlite",
-        "tasks_total": 50,
+        "tasks_total": 60,
         "current_study_day": get_current_day(),
         "timestamp": datetime.now().isoformat()
     })
@@ -3783,9 +3783,9 @@ PLANS_CATALOG = [
         "badge": "Выбор 85% студентов",
         "price_monthly": 4990,
         "price_yearly": 39900,
-        "description": "Полный доступ ко всем 50 практическим модулям и сертификация",
+        "description": "Полный доступ ко всем 60 практическим модулям и сертификация",
         "features": [
-            "Все 10 практических модулей по всем 5 направлениям",
+            "Все 12 практических модулей по всем 5 направлениям",
             "Неограниченный запуск автотестов и симуляторов",
             "Официальный именной цифровой сертификат с QR-кодом колледжа",
             "Выгрузка расширенной ведомости успеваемости в Excel (CSV)",
@@ -3805,7 +3805,7 @@ PLANS_CATALOG = [
         "features": [
             "Безлимитный доступ для потока до 30 студентов",
             "Сводные академические ведомости успеваемости по ТиПО",
-            "Все 50 модулей по 5 аккредитованным профессиям",
+            "Все 60 модулей по 5 аккредитованным профессиям",
             "Годовая отчетность для деканата и аттестационной комиссии"
         ],
         "is_popular": False,
@@ -3916,7 +3916,7 @@ def process_checkout():
     """, (user_id, plan_code, amount, payment_method, receipt_no))
 
     # Create notification for student
-    notif_body = f"Тариф {plan_obj['name']} успешно активирован на {duration_days} дней. Все 50 модулей, тренажёры и получение официального сертификата открыты!"
+    notif_body = f"Тариф {plan_obj['name']} успешно активирован на {duration_days} дней. Все 60 модулей, тренажёры и получение официального сертификата открыты!"
     cursor.execute("""
     INSERT INTO notifications (user_id, target_role, title, body, type)
     VALUES (?, 'student', 'Оплата принята: Тариф Pro активен! 💎', ?, 'success')
@@ -4081,7 +4081,7 @@ def verify_certificate():
             "curator": course['curator'],
             "director": "Бейсетбаев Асылхан Косылханович",
             "passed_modules": passed_count,
-            "total_modules": 10,
+            "total_modules": 12,
             "average_score": avg_score,
             "gpa": gpa,
             "is_pro": (u.get('subscription_tier') == 'pro'),
@@ -4896,7 +4896,7 @@ def get_leaderboard():
            (SELECT count(*) FROM task_submissions WHERE user_id = u.id AND score >= 60) as passed_tasks,
            COALESCE((SELECT AVG(score) FROM task_submissions WHERE user_id = u.id AND score > 0), 0) as avg_score
     FROM users u
-    WHERE u.role = 'student' AND u.is_demo = 0
+    WHERE u.role = 'student' AND (u.is_demo = 0 OR (SELECT COUNT(*) FROM users WHERE role = 'student' AND is_demo = 0) = 0)
     """
     params = []
     if group_filter and group_filter != 'all':

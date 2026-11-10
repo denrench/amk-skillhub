@@ -152,7 +152,7 @@ def run_test():
             "return !arguments[0].paused && arguments[0].currentTime > 0.05;", fallback_vid
         ))
         fallback_src = driver.execute_script("return arguments[0].currentSrc;", fallback_vid)
-        assert fallback_src.endswith("/assets/lesson-intros/it-9.mp4"), fallback_src
+        assert fallback_src.endswith("/assets/lesson-intros/it-3.mp4"), fallback_src
         print("[OK] Local fallback lesson video played!")
 
         # Simulate an invalid media response and retry with a real click.

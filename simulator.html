@@ -665,7 +665,7 @@
 
       const params = new URLSearchParams(window.location.search);
       activeSpecialty = params.get('specialty') || user.specialty_slug || 'it';
-      activeTaskNumber = Math.max(1, Math.min(10, parseInt(params.get('task') || params.get('task_id') || '1', 10) || 1));
+      activeTaskNumber = Math.max(1, Math.min(12, parseInt(params.get('task') || params.get('task_id') || '1', 10) || 1));
 
       const course = window.EduSpace.getCourseBySlug(activeSpecialty);
       document.getElementById('sidebar-course-title').textContent = `${course.code} — ${course.short_title}`;
@@ -680,7 +680,7 @@
 
       // Render Sidebar Outline
       const passedCount = tasks.filter(t => t.status_code === 'graded').length;
-      document.getElementById('sidebar-progress-label').textContent = `${passedCount} / 10 зачтено`;
+      document.getElementById('sidebar-progress-label').textContent = `${passedCount} / 12 зачтено`;
 
       const outlineEl = document.getElementById('sidebar-lessons-outline');
       outlineEl.innerHTML = tasks.map(t => {

@@ -81,7 +81,7 @@ class TestFullLmsSuite(unittest.TestCase):
     def test_01_health_and_catalog(self):
         r = self.app.get('/api/health')
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.get_json()['tasks_total'], 50)
+        self.assertEqual(r.get_json()['tasks_total'], 60)
 
     def test_02_courses_catalog(self):
         r = self.app.get('/api/courses')
@@ -91,7 +91,7 @@ class TestFullLmsSuite(unittest.TestCase):
         for slug in ('it', 'graphic_design', 'autoelectric', 'hvac', 'automechanic'):
             rt = self.app.get(f'/api/tasks?specialty={slug}')
             self.assertEqual(rt.status_code, 200)
-            self.assertEqual(rt.get_json()['count'], 10, f"Course {slug} must have 10 lessons")
+            self.assertEqual(rt.get_json()['count'], 12, f"Course {slug} must have 12 lessons")
 
     def test_03_strict_fio_validation(self):
         r_bad_fio1 = self.app.post('/api/auth/register', json={
@@ -294,7 +294,7 @@ class TestFullLmsSuite(unittest.TestCase):
         r_prof1 = self.app.get(f"/api/user/profile/{student_id}")
         stats1 = r_prof1.get_json()['statistics']
         self.assertEqual(stats1['passed_count'], 1)
-        self.assertEqual(stats1['progress_percent'], 10)
+        self.assertEqual(stats1['progress_percent'], 8)
         self.assertEqual(stats1['avg_score'], 98.0)
 
     def test_13_gradebook_matrix(self):

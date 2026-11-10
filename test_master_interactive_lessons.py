@@ -154,7 +154,7 @@ def run_scenario_b_teacher_journey():
     with app.app_context():
         conn = get_db()
         cur = conn.cursor()
-        cur.execute("DELETE FROM course_modules WHERE id = ?", (module_id,))
+        cur.execute("DELETE FROM course_modules WHERE course_id = ?", (course_id,))
         cur.execute("DELETE FROM courses WHERE id = ?", (course_id,))
         conn.commit()
     print("[OK] Step 6: Test course & lesson cleaned up from database")

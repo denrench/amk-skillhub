@@ -69,7 +69,7 @@
         <strong>${title}</strong><small data-lesson-key="${slug}:${number}">${done ? 'Пройдено' : 'Текст и практика'}</small></a>`;
     }).join('');
     root.innerHTML = `
-      <div class="container catalog-head stack"><p class="eyebrow">5 специальностей / 50 уроков</p><h1>Учебник</h1>
+      <div class="container catalog-head stack"><p class="eyebrow">5 специальностей / 60 уроков</p><h1>Учебник</h1>
       <p class="muted">Выберите направление. В каждом уроке есть объяснение, разобранный пример и задача с обратной связью.</p></div>
       <div class="container section catalog-layout">
         <nav class="catalog-menu" aria-label="Специальности">${Object.entries(courses).map(([id, entry]) =>

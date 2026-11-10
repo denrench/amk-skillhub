@@ -429,10 +429,10 @@
       document.getElementById('course-main-desc').textContent = course.description;
 
       const passed = tasksData.filter(t => t.status_code === 'graded').length;
-      const pct = Math.min(100, Math.round((passed / 10) * 100));
+      const pct = Math.min(100, Math.round((passed / 12) * 100));
       document.getElementById('course-progress-pct').textContent = `${pct}%`;
       document.getElementById('course-progress-bar').style.width = `${pct}%`;
-      document.getElementById('course-progress-count').textContent = `${passed} из 10 зачтено`;
+      document.getElementById('course-progress-count').textContent = `${passed} из 12 зачтено`;
 
       const primaryBtn = document.getElementById('btn-set-primary-course');
       if (user && user.specialty_slug === currentSpec) {

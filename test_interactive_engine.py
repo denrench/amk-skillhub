@@ -20,8 +20,8 @@ assert res.status_code == 200
 lessons_data = res.get_json()
 assert lessons_data.get('success') is True
 lessons = lessons_data.get('lessons', [])
-assert len(lessons) == 50, f"Expected exactly 50 seeded lessons across 5 courses, got {len(lessons)}"
-print(f"[OK] Test 2: Lessons API returns {len(lessons)} interactive lessons (10 per specialty)")
+assert len(lessons) == 60, f"Expected exactly 60 seeded lessons across 5 courses, got {len(lessons)}"
+print(f"[OK] Test 2: Lessons API returns {len(lessons)} interactive lessons (12 per specialty)")
 
 # 3. Check All 50 Lessons Have Valid 8 Blocks, Sequential Traversal & Verify Specialty Aliases
 expected_types = ['hook', 'objectives', 'theory', 'interactive', 'inline_check', 'practical', 'assessment', 'summary']
@@ -39,7 +39,7 @@ for les_item in lessons:
 
     # Verify sequential traversal pointers
     order_num = les.get('order_num', 1)
-    if order_num < 10:
+    if order_num < 12:
         assert les.get('next_lesson_id') is not None, f"Lesson {lid} (order {order_num}) must have next_lesson_id"
     else:
         assert les.get('next_lesson_id') is None, f"Lesson {lid} (order {order_num}) is last in course, next_lesson_id must be None"
@@ -54,10 +54,10 @@ for cid in range(1, 6):
     assert r_mods.status_code == 200
     mods = r_mods.get_json().get('modules', [])
     assert len(mods) == 1, f"Course {cid} should have exactly 1 module, got {len(mods)}"
-    assert len(mods[0].get('lessons', [])) == 10, f"Course {cid} module 1 should have 10 lessons"
+    assert len(mods[0].get('lessons', [])) == 12, f"Course {cid} module 1 should have 12 lessons"
 
 # Verify specialty alias endpoints
-for alias, expected_count in [('power', 10), ('mechanics', 10), ('logistics', 10), ('accounting', 10)]:
+for alias, expected_count in [('power', 12), ('mechanics', 12), ('logistics', 12), ('accounting', 12)]:
     r_alias = client.get(f'/api/lessons?specialty={alias}')
     assert r_alias.status_code == 200
     assert len(r_alias.get_json().get('lessons', [])) == expected_count, f"Alias {alias} expected {expected_count} lessons"
@@ -66,7 +66,7 @@ for alias, expected_count in [('power', 10), ('mechanics', 10), ('logistics', 10
     assert len(r_task_alias.get_json().get('tasks', [])) == expected_count, f"Alias {alias} expected {expected_count} tasks"
 
 lesson_id = lessons[0]['id']
-print(f"[OK] Test 3: Verified all 50 lessons contain 8 modular blocks, valid next/prev traversal pointers, and clean modules")
+print(f"[OK] Test 3: Verified all 60 lessons contain 8 modular blocks, valid next/prev traversal pointers, and clean modules")
 
 # Get real student and teacher users from DB
 with app.app_context():

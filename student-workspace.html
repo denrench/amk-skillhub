@@ -391,7 +391,7 @@
             </a>
             <a href="tasks.html" class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-xs sm:text-sm border border-white/15 transition-all flex items-center gap-2">
               <span class="material-symbols-outlined text-[18px] text-indigo-400">view_list</span>
-              <span>Программа всех 10 модулей</span>
+              <span>Программа всех 12 модулей</span>
             </a>
             <button type="button" onclick="openSubjectsModal()" class="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-bold text-xs sm:text-sm border border-white/10 transition-all">
               Выбрать другой курс
@@ -448,7 +448,7 @@
             <div class="w-full bg-dark-950 h-2 rounded-full mt-2 overflow-hidden border border-white/5">
               <div id="stat-progress-bar" class="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
-            <span class="text-[11px] text-slate-400 block mt-2" id="stat-progress-sub">0 из 10 уроков зачтено</span>
+            <span class="text-[11px] text-slate-400 block mt-2" id="stat-progress-sub">0 из 12 уроков зачтено</span>
           </div>
         </div>
 
@@ -473,8 +473,8 @@
             </div>
           </div>
           <div>
-            <div class="font-extrabold text-2xl text-white" id="stat-unlocked-val">1 из 10</div>
-            <span class="text-[11px] text-slate-400 block mt-2" id="stat-unlocked-sub">9 уроков откроются по дням</span>
+            <div class="font-extrabold text-2xl text-white" id="stat-unlocked-val">1 из 12</div>
+            <span class="text-[11px] text-slate-400 block mt-2" id="stat-unlocked-sub">11 уроков откроются по дням</span>
           </div>
         </div>
 
@@ -572,7 +572,7 @@
           <div class="bg-dark-850/80 backdrop-blur-xl rounded-3xl p-6 sm:p-7 border border-white/10 shadow-xl space-y-5">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
-                <h3 class="font-extrabold text-lg text-white">Интерактивный график открытия уроков (Дни 1–10)</h3>
+                <h3 class="font-extrabold text-lg text-white">Интерактивный график открытия уроков (Дни 1–12)</h3>
                 <p class="text-xs text-slate-400 mt-0.5">Нажмите на любой открытый день, чтобы перейти к уроку. Заблокированные модули показывают дату открытия.</p>
               </div>
               <a href="tasks.html" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 hover:underline shrink-0">Все задания списком →</a>
@@ -679,7 +679,7 @@
       // 4 KPI Cards
       document.getElementById('stat-progress-val').textContent = `${stats.progress_percent}%`;
       document.getElementById('stat-progress-bar').style.width = `${stats.progress_percent}%`;
-      document.getElementById('stat-progress-sub').textContent = `${stats.passed_count} из 10 уроков зачтено`;
+      document.getElementById('stat-progress-sub').textContent = `${stats.passed_count} из 12 уроков зачтено`;
 
       if (stats.avg_score > 0) {
         document.getElementById('stat-grade-val').textContent = `${stats.avg_score} / 100`;
@@ -689,8 +689,8 @@
         document.getElementById('stat-grade-sub').textContent = 'Оценок пока нет (старт с нуля)';
       }
 
-      document.getElementById('stat-unlocked-val').textContent = `${unlockedCnt} из 10`;
-      document.getElementById('stat-unlocked-sub').textContent = lockedCnt > 0 ? `Ещё ${lockedCnt} откроются по графику` : 'Все 10 уроков курса открыты!';
+      document.getElementById('stat-unlocked-val').textContent = `${unlockedCnt} из 12`;
+      document.getElementById('stat-unlocked-sub').textContent = lockedCnt > 0 ? `Ещё ${lockedCnt} откроются по графику` : 'Все 12 уроков курса открыты!';
 
       document.getElementById('stat-xp-val').textContent = `${stats.xp} XP`;
       document.getElementById('stat-xp-sub').textContent = `Уровень ${stats.level} • ${stats.passed_count >= 8 ? 'Дипломник курса' : (stats.passed_count >= 3 ? 'Уверенный практик' : 'Старт обучения')}`;

@@ -527,7 +527,7 @@
       <section id="teacher-panel-matrix" class="bg-dark-850/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
         <div class="p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-extrabold text-lg text-white">Электронный журнал успеваемости по модулям 1–10</h2>
+            <h2 class="font-extrabold text-lg text-white">Электронный журнал успеваемости по модулям 1–12</h2>
             <p class="text-xs text-slate-400 mt-0.5">Отображаются все зарегистрированные студенты и их актуальные баллы по выбранному направлению.</p>
           </div>
           <select id="matrix-course-select" aria-label="Курс для ведомости" onchange="loadGradebookMatrix()" class="px-3.5 py-2 rounded-xl border border-white/15 text-xs font-bold bg-dark-900 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
@@ -555,6 +555,8 @@
                 <th class="p-2.5 text-center">Ур.8</th>
                 <th class="p-2.5 text-center">Ур.9</th>
                 <th class="p-2.5 text-center">Ур.10</th>
+                <th class="p-2.5 text-center">Ур.11</th>
+                <th class="p-2.5 text-center">Ур.12</th>
                 <th class="p-3.5 text-right">Средний</th>
               </tr>
             </thead>
@@ -845,7 +847,7 @@
       const grid = document.getElementById('timeline-days-grid');
       if (!grid) return;
       let html = '';
-      for (let d = 1; d <= 10; d++) {
+      for (let d = 1; d <= 12; d++) {
         const isOpen = d <= day;
         const isCurrent = d === day;
         html += `
@@ -860,7 +862,7 @@
     }
 
     async function setPlatformStudyDay(targetDay) {
-      const clamped = Math.max(1, Math.min(10, targetDay));
+      const clamped = Math.max(1, Math.min(12, targetDay));
       const res = await window.EduSpace.api('/api/teacher/advance_day', {
         method: 'POST',
         body: { day: clamped }
@@ -988,7 +990,7 @@
               ${regDateStr}
             </td>
             <td class="p-4">
-              <div class="font-bold text-slate-200 text-xs">Сдано: ${submitted} / 10</div>
+              <div class="font-bold text-slate-200 text-xs">Сдано: ${submitted} / 12</div>
               <div class="text-[11px] text-slate-400 mt-0.5">Средний балл: <span class="font-bold text-emerald-400">${avg}</span></div>
             </td>
             <td class="p-4 text-right">
@@ -1171,7 +1173,7 @@
             </div>
             <div class="p-3 bg-dark-950/60 rounded-xl border border-white/10">
               <span class="text-slate-400 block text-[10px] uppercase font-bold">Сдано практических работ</span>
-              <span class="font-bold text-indigo-400 text-xs">${Number(st.submitted_count || 0)} из 10 модулей</span>
+              <span class="font-bold text-indigo-400 text-xs">${Number(st.submitted_count || 0)} из 12 модулей</span>
             </div>
             <div class="p-3 bg-dark-950/60 rounded-xl border border-white/10">
               <span class="text-slate-400 block text-[10px] uppercase font-bold">Средний балл GPA</span>
@@ -1294,14 +1296,14 @@
       if (!tbody) return;
 
       if (rows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="13" class="p-8 text-center text-slate-500">Нет зарегистрированных студентов по этому направлению.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="15" class="p-8 text-center text-slate-500">Нет зарегистрированных студентов по этому направлению.</td></tr>';
         return;
       }
 
       tbody.innerHTML = rows.map(r => {
         const st = r.student;
         let cellsHtml = '';
-        for (let n = 1; n <= 10; n++) {
+        for (let n = 1; n <= 12; n++) {
           const c = r.cells[String(n)];
           if (!c) {
             cellsHtml += `<td class="p-2.5 text-center text-slate-600">${n <= currentStudyDay ? '—' : '🔒'}</td>`;

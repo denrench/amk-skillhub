@@ -586,8 +586,8 @@
         return Object.assign({}, c, {
           enrolled: enrolledSet.has(c.slug),
           completed_lessons: passed,
-          total_lessons: 10,
-          progress_percent: Math.min(100, Math.round((passed / 10) * 100))
+          total_lessons: 12,
+          progress_percent: Math.min(100, Math.round((passed / 12) * 100))
         });
       });
 
@@ -659,7 +659,7 @@
         statistics: {
           total_submitted: specSubs.length,
           passed_count: passedNums.size,
-          progress_percent: Math.min(100, Math.round((passedNums.size / 10) * 100)),
+          progress_percent: Math.min(100, Math.round((passedNums.size / 12) * 100)),
           avg_score: avgScore,
           gpa,
           xp,
@@ -713,7 +713,7 @@
       let globalId = 1;
       for (const sSlug of slugs) {
         const catLessons = (window.EDU_LESSONS && window.EDU_LESSONS[sSlug]) || [];
-        for (let i = 1; i <= 10; i++) {
+        for (let i = 1; i <= 12; i++) {
           const customKey = `${sSlug}:${i}`;
           const custom = db.custom_tasks[customKey];
           const base = catLessons.find(x => Number(x.num) === i) || {
@@ -958,11 +958,11 @@
       return reply(200, {
         success: true,
         current_study_day: db.current_study_day,
-        progress_percent: Math.min(100, Math.round((done / 10) * 100)),
+        progress_percent: Math.min(100, Math.round((done / 12) * 100)),
         completed_count: done,
         avg_score: avg,
-        tasks_available: Math.min(10, db.current_study_day),
-        tasks_locked: Math.max(0, 10 - db.current_study_day),
+        tasks_available: Math.min(12, db.current_study_day),
+        tasks_locked: Math.max(0, 12 - db.current_study_day),
         is_fresh_start: done === 0 && db.current_study_day === 1
       });
     }
@@ -988,7 +988,7 @@
 
     if (path === '/api/teacher/advance_day' && method === 'POST') {
       const target = body.day !== undefined ? Number(body.day) : db.current_study_day + 1;
-      db.current_study_day = Math.max(1, Math.min(10, target));
+      db.current_study_day = Math.max(1, Math.min(12, target));
       saveLocalDB(db);
 
       return reply(200, {
@@ -1156,7 +1156,7 @@
       const rows = students.map(st => {
         const cells = {};
         const scores = [];
-        for (let n = 1; n <= 10; n++) {
+        for (let n = 1; n <= 12; n++) {
           const s = db.submissions.find(x => x.user_id === st.id && x.specialty_slug === spec && x.task_number === n);
 
           if (s) {
@@ -1219,7 +1219,7 @@
 
     if (path === '/api/teacher/create_task' && method === 'POST') {
       const spec = (body.specialty_slug || 'it').trim().toLowerCase();
-      const num = Math.max(1, Math.min(10, Number(body.task_number || 1)));
+      const num = Math.max(1, Math.min(12, Number(body.task_number || 1)));
 
       if (!body.title || !body.description) {
         return reply(400, { success: false, message: 'Заполните название и описание задания.' });
@@ -1228,7 +1228,7 @@
         title: body.title.trim(),
         description: body.description.trim(),
         difficulty: body.difficulty || 'Средний',
-        unlock_day: Math.max(1, Math.min(10, Number(body.unlock_day || num))),
+        unlock_day: Math.max(1, Math.min(12, Number(body.unlock_day || num))),
         tools_required: body.tools_required || 'Практикум EDU SPACE',
         starter_code: body.starter_code || '// Введите решение\n'
       };
@@ -1786,12 +1786,12 @@
               <span class="font-bold text-sm text-white">${c.title}</span>
               ${isCurrent ? '<span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[10px] font-bold shadow-glow-indigo">Активный курс</span>' : ''}
             </div>
-            <p class="text-xs text-slate-400">Куратор: ${c.curator} • 10 практических уроков</p>
+            <p class="text-xs text-slate-400">Куратор: ${c.curator} • 12 практических уроков</p>
             <div class="pt-1 flex items-center gap-3">
               <div class="flex-1 bg-dark-950/80 h-2 rounded-full overflow-hidden max-w-xs border border-white/5">
                 <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-full rounded-full" style="width:${pct}%"></div>
               </div>
-              <span class="text-[11px] font-bold text-slate-300">${done}/10 уроков (${pct}%)</span>
+              <span class="text-[11px] font-bold text-slate-300">${done}/12 уроков (${pct}%)</span>
             </div>
           </div>
           <button type="button" onclick="window.EduSpace.switchActiveCourse('${c.slug}')" class="px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 transition-all ${isCurrent ? 'bg-white/10 hover:bg-white/20 text-white border border-white/15' : 'bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-glow-indigo'}">
@@ -1868,7 +1868,7 @@
       <div class="grid grid-cols-3 gap-3 text-center">
         <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30">
           <div class="text-[11px] text-indigo-300 font-bold">Зачтено по курсу</div>
-          <div class="text-xl font-extrabold text-indigo-200 mt-0.5">${stats.passed_count} / 10</div>
+          <div class="text-xl font-extrabold text-indigo-200 mt-0.5">${stats.passed_count} / 12</div>
         </div>
         <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
           <div class="text-[11px] text-emerald-300 font-bold">Средний балл / GPA</div>
@@ -2446,7 +2446,7 @@
                 <div class="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5 flex-wrap">
                   <span style="color: ${st.rank_color}">${st.rank_name} (Ур. ${st.level})</span>
                   <span>•</span>
-                  <span>Заданий: ${st.passed_tasks}/10</span>
+                  <span>Заданий: ${st.passed_tasks}/12</span>
                   <span>•</span>
                   <span>🏆 Достижений: ${st.achievements_count}</span>
                 </div>
@@ -2583,7 +2583,7 @@
         { id: 'perfect_score', title: 'Высший балл (100/100)', desc: 'Идеальная оценка от куратора курса', xp: 100, icon: 'military_tech', color: '#f59e0b' },
         { id: 'streak_master', title: 'Хранитель серии', desc: 'Серия непрерывного обучения 3+ дня', xp: 100, icon: 'local_fire_department', color: '#ef4444' },
         { id: 'color_architect', title: 'Архитектор цвета', desc: 'Завершена интерактивная миссия колористики', xp: 200, icon: 'palette', color: '#ec4899' },
-        { id: 'course_champion', title: 'Покоритель курса', desc: 'Успешно сданы все 10 уроков курса', xp: 300, icon: 'workspace_premium', color: '#a855f7' }
+        { id: 'course_champion', title: 'Покоритель курса', desc: 'Успешно сданы все 12 уроков курса', xp: 300, icon: 'workspace_premium', color: '#a855f7' }
       ];
 
       const container = document.getElementById('achievements-modal-list');
@@ -2698,11 +2698,11 @@
   }
 
   const PALETTE_ITEMS = [
-    { title: 'Веб-дизайн и разработка ПО (10 модулей)', desc: 'HTML, CSS, JS, SQL, Docker', url: 'tasks.html?specialty=it', icon: 'code', category: 'Специальность' },
-    { title: 'Графический дизайн (10 модулей)', desc: 'Figma, брендинг, типографика, растровая графика', url: 'tasks.html?specialty=graphic_design', icon: 'palette', category: 'Специальность' },
-    { title: 'Автоэлектрика и диагностика (10 модулей)', desc: 'Мультиметр, осциллограф, CAN-шина, OBD-II', url: 'tasks.html?specialty=autoelectric', icon: 'electric_meter', category: 'Специальность' },
-    { title: 'Холодильное оборудование и HVAC (10 модулей)', desc: 'Фреоны R134a/R404a, вакуумирование, перегрев', url: 'tasks.html?specialty=hvac', icon: 'ac_unit', category: 'Специальность' },
-    { title: 'Автомеханика и ТО (10 модулей)', desc: 'ДВС, моменты затяжки ГБЦ, зазоры клапанов', url: 'tasks.html?specialty=automechanic', icon: 'build', category: 'Специальность' },
+    { title: 'Веб-дизайн и разработка ПО (12 модулей)', desc: 'HTML, CSS, JS, A11y, Дипломный проект', url: 'tasks.html?specialty=it', icon: 'code', category: 'Специальность' },
+    { title: 'Графический дизайн (12 модулей)', desc: 'Figma, брендинг, типографика, брендбук', url: 'tasks.html?specialty=graphic_design', icon: 'palette', category: 'Специальность' },
+    { title: 'Автоэлектрика и диагностика (12 модулей)', desc: 'Мультиметр, осциллограф, CAN-шина, OBD-II, BCM', url: 'tasks.html?specialty=autoelectric', icon: 'electric_meter', category: 'Специальность' },
+    { title: 'Холодильное оборудование и HVAC (12 модулей)', desc: 'Фреоны, вакуумирование, перегрев, инверторы, ПНР', url: 'tasks.html?specialty=hvac', icon: 'ac_unit', category: 'Специальность' },
+    { title: 'Автомеханика и ТО (12 модулей)', desc: 'ДВС, ГРМ, подвеска, ШРУС, регламентное ТО', url: 'tasks.html?specialty=automechanic', icon: 'build', category: 'Специальность' },
     { title: 'Электронная ведомость оценок', desc: 'Сводный академический журнал всех студентов', url: 'gradebook.html', icon: 'grid_on', category: 'Учебная часть' },
     { title: 'Реестр проверки сертификатов', desc: 'Государственная проверка подлинности с QR-кодом', url: 'verify.html', icon: 'verified_user', category: 'Сертификация' },
     { title: 'Тарифные планы и подписка Pro', desc: 'Kaspi QR, оплата картой, доступ к модулям 4–10', url: 'pricing.html', icon: 'diamond', category: 'Финансы' },
@@ -2847,7 +2847,7 @@
       {
         id: 'pro_tier',
         title: 'Тариф Pro 💎',
-        desc: 'Открыт полный доступ ко всем 10 модулям специальности',
+        desc: 'Открыт полный доступ ко всем 12 модулям специальности',
         icon: 'diamond',
         color: 'text-amber-400',
         unlocked: Boolean(isPro)
@@ -2863,10 +2863,10 @@
       {
         id: 'graduate',
         title: 'Аккредитованный специалист',
-        desc: 'Освоены все 10 модулей, выдан гос. сертификат',
+        desc: 'Освоены все 12 модулей, выдан гос. сертификат',
         icon: 'school',
         color: 'text-cyan-400',
-        unlocked: passedCount >= 10
+        unlocked: passedCount >= 12
       }
     ];
   }
@@ -2875,7 +2875,7 @@
     const user = getActiveUser();
     const course = getCourseBySlug((user && user.specialty_slug) || 'it');
     const tasks = (window._cachedTasks && window._cachedTasks[course.slug]) || [];
-    const nodesHtml = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => {
+    const nodesHtml = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => {
       const isPro = num > 3;
       const t = tasks.find(x => x.task_number === num);
       const title = t ? t.title : ('Модуль #' + num);

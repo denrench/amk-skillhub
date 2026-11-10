@@ -240,7 +240,7 @@ class TestStage1Security(unittest.TestCase):
         self.assertEqual(prof_resp.status_code, 200)
         stats = prof_resp.get_json()['statistics']
         self.assertEqual(stats['passed_count'], 1)
-        self.assertEqual(stats['progress_percent'], 10)
+        self.assertEqual(stats['progress_percent'], 8)
         self.assertEqual(stats['avg_score'], 95.0)
 
     def test_07_password_reset_workflow(self):

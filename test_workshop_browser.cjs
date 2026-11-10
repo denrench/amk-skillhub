@@ -38,7 +38,7 @@ async function auditAccessibility(page) {
     });
     const manifestResponse = await page.request.get(origin + '/api/lessons');
     const { lessons } = await manifestResponse.json();
-    assert.equal(lessons.length, 50);
+    assert.equal(lessons.length, 60);
 
     await page.goto(origin + '/index.html', {waitUntil: 'domcontentloaded'});
     await page.getByRole('heading', {name:'Знания, которые можно применить'}).waitFor();
@@ -104,7 +104,7 @@ async function auditAccessibility(page) {
       await point.click();
       assert.equal(await point.getAttribute('aria-pressed'), 'true');
     }
-    assert.equal(actual.size, 49);
+    assert.equal(actual.size, 59);
     await page.goto(origin + '/student.html', {waitUntil: 'domcontentloaded'});
     await page.getByText('Войдите, чтобы увидеть свой прогресс и задания.').waitFor();
     const student = await page.request.post(origin + '/api/auth/login', {
