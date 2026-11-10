@@ -1,0 +1,83 @@
+:root {
+  --workshop-bg: #131b17;
+  --workshop-surface: #202d26;
+  --workshop-shell: #153a2d;
+  --workshop-line: #496457;
+  --workshop-text: #f3f5ec;
+  --workshop-muted: #bbcec2;
+  --workshop-accent: #fbd275;
+}
+
+body.workshop {
+  font-family: system-ui, sans-serif;
+  background: var(--workshop-bg);
+  color: var(--workshop-text);
+}
+body.workshop:not(.starter-lesson) :is(header, footer) {
+  background-color: var(--workshop-shell);
+  border-color: var(--workshop-line);
+}
+body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
+  background-color: var(--workshop-shell);
+}
+.workshop main { min-width: 0; }
+.workshop .material-symbols-outlined { max-inline-size: 1.2em; overflow: hidden; white-space: nowrap; }
+.workshop main :is(h1, h2, h3) { text-wrap: pretty; overflow-wrap: anywhere; }
+.workshop :is(a, button, input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--workshop-accent);
+  outline-offset: 3px;
+}
+.workshop :where(main, aside) :is(.bg-dark-850, .bg-dark-900) {
+  background-color: var(--workshop-surface);
+}
+.workshop :where(main, aside) :is(.shadow-glow-indigo, .shadow-glow-cyan) {
+  box-shadow: none;
+}
+.workshop-home {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  padding: clamp(1.3rem, 4vw, 3rem);
+  border: 1px solid var(--workshop-line);
+  border-radius: 1.1rem;
+  background: var(--workshop-shell);
+}
+.workshop-home h1 {
+  margin: .6rem 0 1rem;
+  max-width: 16ch;
+  font-size: clamp(2rem, 5vw, 4.1rem);
+  font-weight: 750;
+  line-height: 1.05;
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+.workshop-home p { max-width: 49ch; color: var(--workshop-muted); }
+.workshop-eyebrow { color: var(--workshop-accent); font: 650 .75rem/1.35 ui-monospace, monospace; letter-spacing: .06em; }
+.workshop-actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1.35rem; }
+.workshop-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: .55rem .85rem;
+  border: 1px solid var(--workshop-line);
+  border-radius: .5rem;
+  color: var(--workshop-text);
+  background: var(--workshop-surface);
+  font-weight: 650;
+}
+.workshop-button-primary { color: #202820; background: var(--workshop-accent); border-color: var(--workshop-accent); }
+.workshop-button-primary:hover { color: #202820; background: #ffe6aa; }
+.workshop-example img { display: block; width: 100%; border-radius: .65rem; border: 1px solid var(--workshop-line); }
+.workshop-example h2 { font-size: 1.2rem; font-weight: 700; margin-top: .8rem; }
+.workshop-course { background: var(--workshop-shell); border: 1px solid var(--workshop-line); min-width: 0; }
+.workshop-course-progress { background: var(--workshop-surface); border: 1px solid var(--workshop-line); min-width: min(100%, 14rem); }
+.workshop #specialty-pills .spec-btn { min-height: 44px; }
+.workshop #specialty-pills .spec-btn.bg-indigo-600 { background: var(--workshop-accent); color: #202820; box-shadow: none; }
+.workshop .workshop-visual { display: block; width: 100%; aspect-ratio: 16 / 9; background: #153a2d; border-radius: .75rem; }
+.workshop-visual canvas { display: block; width: 100%; height: 100%; }
+.workshop .workshop-visual[hidden] { display: none; }
+@media (max-width: 700px) { .workshop-home { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) {
+  .workshop :is(.animate-float-slow, .animate-pulse, .btn-shimmer) { animation: none; }
+}

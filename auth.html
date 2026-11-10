@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="css/tailwind.min.css"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
+    if (window.tailwind) tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
@@ -91,8 +91,9 @@
   <script src="js/app-logistics.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/workshop.css">
 </head>
-<body class="font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
+<body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
 
   <!-- Ambient background glow orbs -->
   <div class="fixed -top-40 left-1/4 w-96 h-96 bg-indigo-600/15 rounded-full blur-[130px] pointer-events-none"></div>

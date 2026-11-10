@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="css/tailwind.min.css"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
+    if (window.tailwind) tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
@@ -101,13 +101,14 @@
   <link rel="stylesheet" href="css/components.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/eduspace-3d-engine.js"></script>
+  <link rel="stylesheet" href="css/workshop.css">
 </head>
 
   <!-- Futuristic Glowing Orbs -->
   <div class="fixed top-10 left-1/3 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[180px] pointer-events-none"></div>
   <div class="fixed bottom-10 right-10 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[180px] pointer-events-none"></div>
 
-<body class="font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative">
+<body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative">
 
   <!-- Ambient background glow orbs -->
   <div class="fixed top-20 left-1/3 w-96 h-96 bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none"></div>

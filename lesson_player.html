@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/starter-lesson.css">
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f19; color: #f8fafc; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
@@ -26,14 +27,18 @@
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/courses-catalog.js"></script>
+  <script src="js/lesson-media.js"></script>
   <script src="js/eduspace-3d-engine.js"></script>
+  <script src="js/starter-lesson.js"></script>
+  <script src="js/workshop-models.js"></script>
+  <link rel="stylesheet" href="css/workshop.css">
 </head>
-<body class="h-full flex flex-col overflow-x-hidden bg-slate-950 text-slate-100">
+<body class="workshop h-full flex flex-col overflow-x-hidden bg-slate-950 text-slate-100">
 
   <!-- TOP APP BAR -->
   <header class="h-16 flex-shrink-0 bg-dark-900/90 backdrop-blur-xl border-b border-white/10 px-3 sm:px-6 flex items-center justify-between z-30">
     <div class="flex items-center gap-2 sm:gap-4 min-w-0">
-      <a href="student.html" class="flex items-center gap-1 text-slate-400 hover:text-white p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-xs font-semibold shrink-0">
+      <a href="student.html" aria-label="Выйти из урока" class="flex items-center gap-1 text-slate-400 hover:text-white p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-xs font-semibold shrink-0">
         <span class="material-symbols-outlined text-[18px]">arrow_back</span>
         <span class="hidden sm:inline">Выйти</span>
       </a>
@@ -419,6 +424,40 @@
       await loadLesson(lessonId);
     });
 
+    let disposeLessonModel;
+    let isStarterLesson = false;
+
+    function pendingStarterPractice() {
+      if (!isStarterLesson || savedProgress.b4_interactive?.state.starterPassed) return -1;
+      return currentLesson.blocks?.findIndex(block => block.id === 'b4_interactive') ?? -1;
+    }
+
+    function withLessonIntro(lesson) {
+      const key = `${lesson.course_slug}-${lesson.order_num}`;
+      const intro = window.LessonMedia?.[key];
+      const title = lesson.title.replace(/^Урок\s+\d+\.\s*/i, '').trim();
+      if (!intro || title !== intro[0] || !Array.isArray(lesson.blocks)) return lesson;
+      const base = `assets/lesson-intros/${key}`;
+      return {
+        ...lesson,
+        blocks: lesson.blocks.map(block => {
+          if (block.type !== 'theory' || (block.video_url && block.video_url !== lpDemoVideoUrl)) return block;
+          return {
+            ...block,
+            video_url: base + '.mp4',
+            video_poster: base + '.jpg',
+            video_captions: base + '.vtt',
+            video_title: 'Введение · ' + title,
+            introductory_video: true,
+            timecodes: [
+              { sec: 0, title: 'Цель урока' },
+              { sec: intro[1], title: 'Ход работы' },
+            ],
+          };
+        }),
+      };
+    }
+
     async function loadLesson(lessonId) {
       let lessonData = null;
       try {
@@ -448,7 +487,9 @@
         lessonData = createFallbackLesson(lessonId);
       }
 
-      currentLesson = lessonData;
+      currentLesson = withLessonIntro(lessonData);
+      isStarterLesson = window.StarterLesson?.matches(currentLesson) ?? false;
+      document.body.classList.toggle('starter-lesson', isStarterLesson);
       savedProgress = {};
       const srvProg = currentLesson.block_progress || {};
       let locProg = {};
@@ -478,12 +519,15 @@
           resumeIdx = Math.min(i + 1, blocks.length - 1);
         }
       }
-      currentBlockIdx = resumeIdx;
+      const practiceIdx = pendingStarterPractice();
+      currentBlockIdx = practiceIdx < 0 ? resumeIdx : Math.min(resumeIdx, practiceIdx);
       renderCurrentBlock();
     }
 
     function renderCurrentBlock() {
       if (!currentLesson || !currentLesson.blocks || !currentLesson.blocks.length) return;
+      disposeLessonModel?.();
+      disposeLessonModel = null;
       const blocks = currentLesson.blocks;
       const block = blocks[currentBlockIdx];
 
@@ -510,6 +554,7 @@
       document.getElementById('lp-prev-btn').disabled = currentBlockIdx === 0;
       const nextBtn = document.getElementById('lp-next-btn');
       const nextText = document.getElementById('lp-next-text');
+      nextBtn.disabled = currentBlockIdx === pendingStarterPractice();
 
       if (currentBlockIdx === blocks.length - 1) {
         nextText.textContent = 'Завершить урок';
@@ -521,6 +566,26 @@
 
       const canvas = document.getElementById('lp-block-canvas');
       canvas.innerHTML = '';
+      if (isStarterLesson && block.id === 'b3_theory' && (!block.video_url || block.video_url === lpDemoVideoUrl)) {
+        window.StarterLesson.showTheory(canvas, () =>
+          syncBlockState({ ...getCurrentBlockState(), starterVideoWatched: true }, true));
+        return;
+      }
+      if (isStarterLesson && block.id === 'b4_interactive') {
+        disposeLessonModel = window.StarterLesson.showPractice(canvas, getCurrentBlockState(), async state => {
+          const saved = syncBlockState(state, true);
+          nextBtn.disabled = false;
+          return saved;
+        });
+        return;
+      }
+      if (block.id === 'b4_interactive') {
+        const model = window.WorkshopModels?.forLesson(currentLesson);
+        if (model) {
+          disposeLessonModel = window.WorkshopModels.show(canvas, model);
+          return;
+        }
+      }
 
       switch (block.type) {
         case 'hook':
@@ -531,6 +596,7 @@
           break;
         case 'theory':
           canvas.innerHTML = renderTheoryBlock(block);
+          setupLpVideoEventListeners(block.video_url || lpDemoVideoUrl, block.introductory_video);
           break;
         case 'interactive':
           canvas.innerHTML = renderInteractiveWidgetBlock(block);
@@ -615,6 +681,8 @@
       `;
     }
 
+    const lpDemoVideoUrl = 'assets/sample-lesson.mp4';
+
     function renderTheoryBlock(b) {
       const chunks = b.chunks || [];
       const chunksHtml = chunks.map(c => `
@@ -636,12 +704,9 @@
         </div>
       `).join('');
 
-      setTimeout(() => {
-        setupLpVideoEventListeners();
-      }, 100);
-
-      const videoUrl = b.video_url || 'assets/sample-lesson.mp4';
-      const videoTitle = b.video_title || (currentLesson ? currentLesson.title : 'Видео-разбор урока');
+      const isDemo = !b.video_url || b.video_url === lpDemoVideoUrl;
+      const videoTitle = isDemo ? 'Демонстрационный ролик' : (b.video_title || currentLesson.title);
+      const videoLabel = isDemo ? 'Демо' : b.introductory_video ? 'Вводное видео' : 'Видео';
       const timecodesList = (b.timecodes && Array.isArray(b.timecodes) && b.timecodes.length > 0) ? b.timecodes : [
         { sec: 0, time_str: '00:00', title: 'Введение и ключевые концепции темы' },
         { sec: 15, time_str: '00:15', title: 'Разбор стандартов и оборудования' },
@@ -680,8 +745,9 @@
           <!-- Video Sub-view -->
           <div id="lp-theory-video-box" class="space-y-4">
             <div class="rounded-3xl border border-white/15 bg-black overflow-hidden shadow-2xl relative group">
-              <video id="lp-lecture-video" class="w-full aspect-video object-contain bg-black" playsinline preload="metadata">
-                <source id="lp-lecture-video-src" src="${videoUrl}" type="video/mp4">
+              <video id="lp-lecture-video" class="w-full aspect-video object-contain bg-black" playsinline preload="metadata"
+                ${b.introductory_video ? `poster="${escapeHtml(b.video_poster)}"` : ''}>
+                ${b.video_captions ? `<track kind="captions" srclang="ru" label="Русский" src="${escapeHtml(b.video_captions)}">` : ''}
                 Ваш браузер не поддерживает HTML5 видео.
               </video>
 
@@ -691,12 +757,11 @@
                   <span id="lp-video-center-play-icon" class="material-symbols-outlined text-[40px]">play_arrow</span>
                 </div>
                 <div class="text-center px-4 max-w-lg">
-                  <div class="font-bold text-white text-base sm:text-lg drop-shadow" id="lp-video-overlay-title">${videoTitle}</div>
-                  <p class="text-xs text-slate-300 mt-1 drop-shadow">Интерактивный мультимедийный видео-разбор темы урока</p>
+                  <div class="font-bold text-white text-base sm:text-lg drop-shadow" id="lp-video-overlay-title">${escapeHtml(videoTitle)}</div>
+                  <p class="text-xs text-slate-300 mt-1 drop-shadow">${isDemo || b.introductory_video ? 'Материал урока доступен во вкладке «Конспект»' : 'Интерактивный видео-разбор темы урока'}</p>
                 </div>
                 <div class="mt-4 flex items-center gap-3">
-                  <span class="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] font-mono text-slate-200">Длительность: <span id="lp-video-time-total-overlay">00:52</span></span>
-                  <span class="px-3 py-1 rounded-full bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 text-[11px] text-emerald-300 font-bold">1080p Full HD</span>
+                  <span class="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] font-mono text-slate-200">Длительность: <span id="lp-video-time-total-overlay">00:00</span></span>
                 </div>
               </div>
 
@@ -731,7 +796,8 @@
                       <option value="1.5">1.5x</option>
                       <option value="2">2.0x</option>
                     </select>
-                    <span id="lp-video-badge-status" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono hidden sm:inline-block">1080p HD</span>
+                    ${b.video_captions ? '<button type="button" id="lp-video-captions" aria-pressed="false" aria-label="Русские субтитры" class="rounded-lg px-2 py-1 bg-white/10 text-xs font-semibold">CC</button>' : ''}
+                    <span id="lp-video-badge-status" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono hidden sm:inline-block">${videoLabel}</span>
                     <button type="button" onclick="toggleLpVideoFullscreen()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors" title="На весь экран">
                       <span class="material-symbols-outlined text-[18px]">fullscreen</span>
                     </button>
@@ -740,12 +806,14 @@
               </div>
             </div>
 
+            <p id="lp-video-status" role="status" class="text-sm text-amber-300"></p>
+
             <!-- Timecodes Bar -->
             <div class="p-4 rounded-2xl bg-dark-850/80 border border-white/10 space-y-2.5">
               <div class="text-xs font-bold text-white uppercase tracking-wider flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
                   <span class="material-symbols-outlined text-indigo-400 text-[16px]">schedule</span>
-                  <span>Таймкоды видео-лекции:</span>
+                  <span>${isDemo ? 'Таймкоды демонстрационного ролика:' : 'Таймкоды видео-лекции:'}</span>
                 </div>
                 <span class="text-[11px] text-indigo-400 font-mono">Кликните для перехода</span>
               </div>
@@ -800,21 +868,25 @@
       if (!vid) return;
 
       if (vid.paused) {
-        const p = vid.play();
-        if (p) {
-          p.then(() => syncLpVideoUi()).catch(err => {
-            console.warn('Lp Video play error:', err);
-            const curSrc = vid.currentSrc || '';
-            if (!curSrc.includes('interactive-examples')) {
-              vid.src = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
-              vid.play().then(() => syncLpVideoUi()).catch(() => {});
-            }
-          });
-        }
+        if (vid.error) vid.load();
+        playLpVideo(vid);
       } else {
         vid.pause();
         syncLpVideoUi();
       }
+    }
+
+    function showLpVideoError(vid) {
+      if (!vid.isConnected) return;
+      document.getElementById('lp-video-status').textContent =
+        'Не удалось запустить видео. Попробуйте ещё раз или откройте конспект.';
+      syncLpVideoUi();
+    }
+
+    function playLpVideo(vid) {
+      vid.play().catch(error => {
+        if (error.name !== 'AbortError') showLpVideoError(vid);
+      });
     }
 
     function syncLpVideoUi() {
@@ -846,7 +918,7 @@
         target = Math.min(sec, Math.max(0, dur - 0.5));
       }
       vid.currentTime = target;
-      vid.play().then(() => syncLpVideoUi()).catch(() => syncLpVideoUi());
+      playLpVideo(vid);
     }
 
     function onLpVideoScrubInput(val) {
@@ -899,17 +971,22 @@
       return syncBlockState(getCurrentBlockState(), isCompleted);
     }
 
-    function setupLpVideoEventListeners() {
+    function setupLpVideoEventListeners(videoUrl, introductoryVideo = false) {
       const vid = document.getElementById('lp-lecture-video');
-      if (!vid || vid.dataset.listenersAttached) return;
-      vid.dataset.listenersAttached = 'true';
+      const isDemo = videoUrl === lpDemoVideoUrl;
+      const videoLabel = isDemo ? 'Демо' : introductoryVideo ? 'Вводное видео' : 'Видео';
+      const captions = document.getElementById('lp-video-captions');
+      captions?.addEventListener('click', () => {
+        const track = vid.textTracks[0];
+        if (!track) return;
+        track.mode = track.mode === 'showing' ? 'disabled' : 'showing';
+        captions.setAttribute('aria-pressed', String(track.mode === 'showing'));
+      });
+      isLpVideoScrubbing = false;
 
-      vid.addEventListener('play', () => {
+      vid.addEventListener('playing', () => {
+        document.getElementById('lp-video-status').textContent = '';
         syncLpVideoUi();
-        if (currentLesson && currentLesson.blocks) {
-          const blk = currentLesson.blocks[currentBlockIdx];
-          if (blk) saveBlockProgress(blk.id, true);
-        }
       });
 
       vid.addEventListener('pause', () => syncLpVideoUi());
@@ -917,7 +994,7 @@
       vid.addEventListener('canplay', () => {
         const badge = document.getElementById('lp-video-badge-status');
         if (badge && !badge.textContent.includes('Просмотрено')) {
-          badge.textContent = '1080p HD';
+          badge.textContent = videoLabel;
           badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono hidden sm:inline-block';
         }
       });
@@ -930,15 +1007,7 @@
         }
       });
 
-      vid.addEventListener('error', (e) => {
-        console.warn('Lp Video error caught:', e);
-        const curSrc = vid.currentSrc || vid.src || '';
-        if (!curSrc.includes('interactive-examples') && !curSrc.includes('flower.mp4')) {
-          vid.src = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
-          vid.load();
-          vid.play().then(() => syncLpVideoUi()).catch(() => {});
-        }
-      });
+      vid.addEventListener('error', () => showLpVideoError(vid));
 
       vid.addEventListener('loadedmetadata', () => {
         const tot = document.getElementById('lp-video-time-total');
@@ -959,17 +1028,21 @@
       });
 
       vid.addEventListener('ended', () => {
+        if (!vid.isConnected) return;
         syncLpVideoUi();
+        if (isDemo) return;
         const badge = document.getElementById('lp-video-badge-status');
         if (badge) {
-          badge.textContent = '✓ Просмотрено (+20 XP)';
+          badge.textContent = introductoryVideo ? '✓ Введение просмотрено' : '✓ Просмотрено (+20 XP)';
           badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-mono';
         }
-        if (currentLesson && currentLesson.blocks) {
+        if (!introductoryVideo && currentLesson && currentLesson.blocks) {
           const blk = currentLesson.blocks[currentBlockIdx];
           if (blk) saveBlockProgress(blk.id, true);
         }
       });
+
+      vid.src = videoUrl;
     }
 
     function renderInteractiveWidgetBlock(b) {
@@ -1566,24 +1639,29 @@
       if (!savedProgress[block.id]) savedProgress[block.id] = {};
       savedProgress[block.id].completed = completed;
       savedProgress[block.id].state = state;
+      let savedLocally = false;
       try {
         localStorage.setItem(`eduspace_lp_progress_${currentLesson.id}`, JSON.stringify(savedProgress));
+        savedLocally = true;
       } catch(e){}
 
       try {
         const apiBase = window.location.hostname.includes('github.io') ? 'https://amk-skillhub.onrender.com' : '';
-        await fetch(`${apiBase}/api/lessons/${currentLesson.id}/block_progress`, {
+        const response = await fetch(`${apiBase}/api/lessons/${currentLesson.id}/block_progress`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          signal: isStarterLesson ? AbortSignal.timeout(3000) : undefined,
           body: JSON.stringify({
             block_id: block.id,
             completed: completed,
             state: state
           })
         });
+        if (response.ok) return 'server';
       } catch (e) {
         // Graceful fallback to localStorage
       }
+      return savedLocally ? 'local' : 'memory';
     }
 
     function prevBlock() {
@@ -1598,6 +1676,7 @@
     async function nextBlock() {
       if (!currentLesson) return;
       const blocks = currentLesson.blocks;
+      if (currentBlockIdx === pendingStarterPractice()) return;
       // Mark current block completed when moving forward with actual state
       const currentState = getCurrentBlockState();
       await syncBlockState(currentState, true);
@@ -1614,6 +1693,8 @@
       if (currentLesson && currentLesson.blocks[currentBlockIdx]) {
         const state = getCurrentBlockState();
         syncBlockState(state, savedProgress[currentLesson?.blocks[currentBlockIdx]?.id]?.completed || false);
+        const practiceIdx = pendingStarterPractice();
+        if (practiceIdx >= 0) idx = Math.min(idx, practiceIdx);
       }
       currentBlockIdx = idx;
       renderCurrentBlock();

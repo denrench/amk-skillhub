@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="css/tailwind.min.css"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
+    if (window.tailwind) tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
@@ -91,8 +91,9 @@
   <script src="js/app-logistics.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/workshop.css">
 </head>
-<body class="font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
+<body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
 
   <!-- Ambient background glow orbs -->
   <div class="fixed top-20 left-1/3 w-96 h-96 bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none"></div>
@@ -361,8 +362,7 @@
     <main class="w-full pt-20 p-4 sm:p-8 space-y-7 flex-1">
 
       <!-- WELCOME HERO BANNER -->
-      <section class="rounded-3xl bg-dark-850/90 border border-white/10 text-white p-6 sm:p-10 shadow-2xl relative overflow-hidden backdrop-blur-xl">
-        <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <section class="workshop-course rounded-2xl p-4 sm:p-7">
 
         <div class="max-w-3xl relative z-10 space-y-4">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-bold tracking-wide">
@@ -379,7 +379,7 @@
           </p>
 
           <div class="pt-2 flex flex-wrap items-center gap-3">
-            <a id="hero-next-lesson-btn" href="simulator.html?task=1" class="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/40 text-white font-bold text-xs sm:text-sm shadow-glow-indigo transition-all flex items-center gap-2 hover:scale-[1.02]">
+            <a id="hero-next-lesson-btn" href="simulator.html?task=1" class="workshop-button workshop-button-primary gap-2">
               <span id="hero-next-lesson-label">Приступить к Уроку №1</span>
               <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
             </a>

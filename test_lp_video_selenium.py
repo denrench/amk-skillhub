@@ -2,6 +2,32 @@ import time
 from selenium import webdriver
 from selenium.webdriver.edge.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+
+def check_starter_video(driver, wait):
+    lesson_id = driver.execute_async_script("""
+        const done = arguments[0];
+        fetch('/api/lessons?specialty_slug=autoelectric')
+            .then(response => response.json())
+            .then(data => done(data.lessons.find(lesson =>
+                lesson.order_num === 3 && lesson.title.includes('системы пуска')
+            )?.id ?? null))
+            .catch(() => done(null));
+    """)
+    assert isinstance(lesson_id, int), "Starter pilot is missing from the catalog"
+    driver.get(f"http://127.0.0.1:5000/lesson_player.html?lesson_id={lesson_id}&specialty=autoelectric&task=3")
+    wait.until(lambda browser: browser.find_element(By.CSS_SELECTOR, "body.starter-lesson"))
+    driver.find_element(By.ID, "step-btn-2").click()
+    video = driver.find_element(By.CSS_SELECTOR, ".starter-video")
+    driver.find_element(By.CSS_SELECTOR, "[data-play]").click()
+    wait.until(lambda browser: browser.execute_script(
+        "return !arguments[0].paused && arguments[0].currentTime > 0.1;", video
+    ))
+    assert driver.execute_script("return arguments[0].currentSrc;", video).endswith(
+        "/assets/starter-lesson/overview.mp4"
+    )
+    driver.find_element(By.CSS_SELECTOR, "[data-time='18']").click()
+    wait.until(lambda browser: browser.execute_script("return arguments[0].currentTime >= 18;", video))
 
 def run_test():
     options = Options()
@@ -9,12 +35,12 @@ def run_test():
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--window-size=1440,900")
-    options.add_argument("--autoplay-policy=no-user-gesture-required")
     options.add_argument("--guest")
     options.add_argument("--disable-dev-shm-usage")
 
     driver = webdriver.Edge(options=options)
     try:
+        wait = WebDriverWait(driver, 10)
         # 1. Establish session
         driver.get("http://127.0.0.1:5000/auth.html")
         time.sleep(1)
@@ -58,8 +84,11 @@ def run_test():
 
         # 4. Play video
         print("Playing lesson video...")
-        driver.execute_script("togglePlayLpVideo();")
-        time.sleep(1.5)
+        driver.find_element(By.ID, "lp-video-center-play-icon").click()
+        wait.until(lambda browser: browser.execute_script(
+            "return !arguments[0].paused && arguments[0].currentTime > 0.05;", vid
+        ))
+        assert driver.execute_script("return arguments[0].currentSrc;", vid) == src
 
         is_paused = driver.execute_script("return arguments[0].paused;", vid)
         cur_time = driver.execute_script("return arguments[0].currentTime;", vid)
@@ -75,17 +104,17 @@ def run_test():
         assert rate == 1.5, f"Expected 1.5x speed, got {rate}"
         print(f"[OK] Video rate: {rate}")
 
-        # 6. Seek timecode
-        print("Seeking timecode 15s...")
-        driver.execute_script("seekLpLectureTime(15);")
-        time.sleep(1)
+        # 6. Seek within the actual clip, which can be shorter than the old demo.
+        target = driver.execute_script("return arguments[0].duration / 2;", vid)
+        driver.execute_script("seekLpLectureTime(arguments[0]);", target)
+        wait.until(lambda browser: browser.execute_script(
+            "return arguments[0].currentTime >= arguments[1] - 0.5;", vid, target
+        ))
         cur_after_seek = driver.execute_script("return arguments[0].currentTime;", vid)
-        print(f"[OK] Time after seek(15): {cur_after_seek:.2f}s")
-        assert cur_after_seek >= 14.0, f"Seek did not reach ~15s: {cur_after_seek}"
+        print(f"[OK] Time after seek({target:.2f}): {cur_after_seek:.2f}s")
 
         # 7. Pause video
-        driver.execute_script("togglePlayLpVideo();")
-        time.sleep(0.5)
+        driver.find_element(By.ID, "lp-video-play-btn").click()
         is_paused_now = driver.execute_script("return arguments[0].paused;", vid)
         assert is_paused_now, "Video should be paused!"
         print("[OK] Video successfully paused")
@@ -118,7 +147,24 @@ def run_test():
         time.sleep(1)
         fallback_vid = driver.find_element(By.ID, "lp-lecture-video")
         assert fallback_vid is not None, "Fallback lesson video element not found!"
-        print("[OK] Fallback lesson video verified!")
+        driver.find_element(By.ID, "lp-video-play-btn").click()
+        wait.until(lambda browser: browser.execute_script(
+            "return !arguments[0].paused && arguments[0].currentTime > 0.05;", fallback_vid
+        ))
+        fallback_src = driver.execute_script("return arguments[0].currentSrc;", fallback_vid)
+        assert fallback_src.endswith("/assets/lesson-intros/it-9.mp4"), fallback_src
+        print("[OK] Local fallback lesson video played!")
+
+        # Simulate an invalid media response and retry with a real click.
+        driver.execute_script("arguments[0].src = 'data:video/mp4,invalid';", fallback_vid)
+        status = driver.find_element(By.ID, "lp-video-status")
+        wait.until(lambda _: "Не удалось запустить видео" in status.text)
+        driver.find_element(By.ID, "lp-video-play-btn").click()
+        wait.until(lambda browser: browser.execute_script(
+            "return Boolean(arguments[0].error);", fallback_vid
+        ))
+        assert "Не удалось запустить видео" in status.text
+        assert fallback_vid.get_dom_attribute("src") == "data:video/mp4,invalid"
 
         # 10. Verify severe JS console errors
         logs = driver.get_log("browser")
@@ -128,6 +174,7 @@ def run_test():
             print("  [ERROR]", err['message'])
         assert len(severe_errors) == 0, f"Found severe errors: {severe_errors}"
 
+        check_starter_video(driver, wait)
         print("\n=== [SUCCESS] LESSON_PLAYER VIDEO & FALLBACK TESTS PASSED 100%! ===")
 
     finally:

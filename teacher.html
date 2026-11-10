@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="css/tailwind.min.css"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
+    if (window.tailwind) tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
@@ -82,8 +82,9 @@
   <script src="js/app-logistics.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/workshop.css">
 </head>
-<body class="font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
+<body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
 
   <!-- Ambient background glow orbs -->
   <div class="fixed top-10 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none"></div>
@@ -1539,9 +1540,54 @@
             ${b.question !== undefined ? `
               <input type="text" value="${b.question || ''}" onchange="updateBlockField(${idx}, 'question', this.value)" placeholder="Формулировка вопроса..." class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-amber-300 font-semibold" />
             ` : ''}
+            ${b.type === 'theory' ? `
+              <fieldset data-video-block="${idx}" class="space-y-2">
+                <legend class="text-slate-200 font-bold">Материалы видео</legend>
+                <label class="block">MP4 или WebM
+                  <input data-media-field="video_url" type="text" class="w-full px-3 py-2 rounded-lg border border-white/10 bg-dark-900" placeholder="assets/урок.mp4">
+                </label>
+                <label class="block">Субтитры WebVTT
+                  <input data-media-field="video_captions" type="text" class="w-full px-3 py-2 rounded-lg border border-white/10 bg-dark-900" placeholder="assets/субтитры.vtt">
+                </label>
+                <button type="button" data-preview-video class="workshop-button">Посмотреть видео</button>
+                <p data-media-status role="status"></p>
+                <video controls playsinline preload="none" class="w-full max-w-md" hidden></video>
+              </fieldset>
+            ` : ''}
           </div>
         </div>
       `).join('');
+      container.querySelectorAll('[data-video-block]').forEach(panel => {
+        const idx = Number(panel.dataset.videoBlock);
+        const video = panel.querySelector('video');
+        const status = panel.querySelector('[data-media-status]');
+        panel.querySelectorAll('[data-media-field]').forEach(input => {
+          const field = input.dataset.mediaField;
+          input.value = currentBuilderBlocks[idx][field] || '';
+          input.addEventListener('input', () => updateBlockField(idx, field, input.value.trim()));
+        });
+        panel.querySelector('[data-preview-video]').addEventListener('click', () => {
+          const value = currentBuilderBlocks[idx].video_url;
+          const url = builderMediaUrl(value, /\.(mp4|webm)$/i);
+          status.textContent = url ? '' : 'Укажите HTTPS-адрес видео или путь внутри assets/.';
+          video.hidden = !url;
+          if (url) video.src = url;
+          else video.removeAttribute('src');
+          video.load();
+        });
+        video.addEventListener('error', () => { status.textContent = 'Не удалось загрузить видео для предпросмотра.'; });
+      });
+    }
+
+    function builderMediaUrl(value, extension) {
+      if (!value) return '';
+      try {
+        const url = new URL(value, location.href);
+        const localAssets = value.startsWith('assets/') && url.pathname.startsWith(new URL('assets/', location.href).pathname);
+        return (localAssets || value.startsWith('https://')) && extension.test(url.pathname) ? url.href : '';
+      } catch {
+        return '';
+      }
     }
 
     function moveBlock(idx, dir) {
@@ -1584,6 +1630,13 @@
       if (!title) {
         alert('Укажите название урока!');
         return;
+      }
+      for (const block of currentBuilderBlocks.filter(item => item.type === 'theory')) {
+        if ((block.video_url && !builderMediaUrl(block.video_url, /\.(mp4|webm)$/i)) ||
+            (block.video_captions && !builderMediaUrl(block.video_captions, /\.vtt$/i))) {
+          alert('Проверьте адрес видео и субтитров. Поддерживаются HTTPS и локальные файлы внутри assets/.');
+          return;
+        }
       }
       const courseId = parseInt(document.getElementById('b-course-select').value);
       const moduleId = parseInt(document.getElementById('b-module-select').value);

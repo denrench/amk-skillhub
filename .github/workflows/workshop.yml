@@ -1,0 +1,40 @@
+name: SkillHub browser checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser and application dependencies
+        run: |
+          python -m pip install -r requirements.txt
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Start test server
+        run: |
+          python server.py > /tmp/skillhub-server.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:5000/healthz; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/skillhub-server.log
+          exit 1
+      - name: Check learning path and assets
+        run: |
+          curl --fail --silent --show-error --retry 3 https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js -o /tmp/skillhub-three.min.js
+          SKILLHUB_THREE=/tmp/skillhub-three.min.js node test_workshop_browser.cjs

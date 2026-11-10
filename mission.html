@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet" />
 
   <script>
-    tailwind.config = {
+    if (window.tailwind) tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
@@ -164,9 +164,10 @@
   <script src="js/app-logistics.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/workshop.css">
 </head>
 
-<body class="selection:bg-neo-cyan selection:text-neo-bg">
+<body class="workshop selection:bg-neo-cyan selection:text-neo-bg">
 
   <!-- Ambient Sci-Fi Grid & Glows -->
   <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
