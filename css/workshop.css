@@ -1,11 +1,11 @@
 :root {
-  --workshop-bg: #131b17;
-  --workshop-surface: #202d26;
-  --workshop-shell: #153a2d;
-  --workshop-line: #496457;
-  --workshop-text: #f3f5ec;
-  --workshop-muted: #bbcec2;
-  --workshop-accent: #fbd275;
+  --workshop-bg: #101a16;
+  --workshop-surface: #1b2a23;
+  --workshop-shell: #142d24;
+  --workshop-line: #526d5e;
+  --workshop-text: #f6f7ef;
+  --workshop-muted: #c3d4c7;
+  --workshop-accent: #dbf477;
 }
 
 body.workshop {
@@ -13,6 +13,7 @@ body.workshop {
   background: var(--workshop-bg);
   color: var(--workshop-text);
 }
+body.workshop :is(main, aside) { scrollbar-color: #698071 var(--workshop-bg); }
 body.workshop:not(.starter-lesson) :is(header, footer) {
   background-color: var(--workshop-shell);
   border-color: var(--workshop-line);
@@ -21,6 +22,10 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
   background-color: var(--workshop-shell);
 }
 .workshop main { min-width: 0; }
+.workshop main :where(section, article, form, fieldset) { min-width: 0; }
+.workshop main :where(h1, h2, h3) { letter-spacing: -.025em; }
+.workshop main :where(input, textarea, select) { max-width: 100%; }
+.workshop main :where(button, input, select):not([type="radio"], [type="checkbox"], [type="range"]) { min-height: 38px; }
 .workshop .material-symbols-outlined { max-inline-size: 1.2em; overflow: hidden; white-space: nowrap; }
 .workshop main :is(h1, h2, h3) { text-wrap: pretty; overflow-wrap: anywhere; }
 .workshop :is(a, button, input, select, textarea, summary):focus-visible {
@@ -32,6 +37,47 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
 }
 .workshop :where(main, aside) :is(.shadow-glow-indigo, .shadow-glow-cyan) {
   box-shadow: none;
+}
+.workshop :is(.academy-workbench, .academy-panel) {
+  display: grid;
+  gap: .7rem;
+  background: var(--workshop-shell);
+  border: 1px solid var(--workshop-line);
+}
+.academy-kicker {
+  color: var(--workshop-accent);
+  font: 680 .75rem/1.4 ui-monospace, monospace;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.academy-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: .45rem .8rem;
+  border: 1px solid #aec95c;
+  border-radius: .5rem;
+  color: #202a15;
+  background: var(--workshop-accent);
+  font-weight: 690;
+  text-decoration: none;
+}
+.academy-action:hover { color: #202a15; background: #e9f7a7; }
+.academy-skip {
+  position: fixed;
+  z-index: 100;
+  inset: 8px auto auto 8px;
+  padding: .65rem 1rem;
+  background: var(--workshop-accent);
+  color: #202a15;
+  border-radius: .5rem;
+  transform: translateY(calc(-100% - 10px));
+}
+.academy-skip:focus { transform: none; }
+.workshop :is(#sidebar-available-badge, #course-code-label) { color: var(--workshop-accent); }
+@media (max-width: 520px) {
+  .workshop main :where(.rounded-3xl) { border-radius: .9rem; }
+  .workshop main :where([class*="min-w-"]) { max-width: 100%; }
 }
 .workshop-home {
   display: grid;

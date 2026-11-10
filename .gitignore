@@ -7,3 +7,6 @@ env/
 venv/
 *.sqlite3-journal
 database.db-journal
+/database.db
+/database.db-wal
+/database.db-shm

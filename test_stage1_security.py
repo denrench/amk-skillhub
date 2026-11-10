@@ -27,6 +27,9 @@ import server
 class TestStage1Security(unittest.TestCase):
 
     def setUp(self):
+        previous_testing = server.app.testing
+        server.app.testing = True
+        self.addCleanup(setattr, server.app, 'testing', previous_testing)
         self.app = server.app.test_client()
         self.cleanup_test_records()
 
@@ -247,7 +250,7 @@ class TestStage1Security(unittest.TestCase):
         # Expired OTP code must be rejected with 400
         conn = sqlite3.connect(server.DB_PATH)
         expired_code = "112233"
-        conn.execute("INSERT OR REPLACE INTO email_verifications (email, code, expires_at, verified) VALUES (?, ?, ?, 0)",
+        conn.execute("INSERT OR REPLACE INTO email_verifications (email, code, expires_at, verified, purpose) VALUES (?, ?, ?, 0, 'reset')",
                      (st_email, expired_code, int(time.time()) - 300))
         conn.commit()
         conn.close()
@@ -262,7 +265,7 @@ class TestStage1Security(unittest.TestCase):
         # Now insert valid unexpired OTP
         conn = sqlite3.connect(server.DB_PATH)
         reset_code = "778899"
-        conn.execute("INSERT OR REPLACE INTO email_verifications (email, code, expires_at, verified) VALUES (?, ?, ?, 0)",
+        conn.execute("INSERT OR REPLACE INTO email_verifications (email, code, expires_at, verified, purpose) VALUES (?, ?, ?, 0, 'reset')",
                      (st_email, reset_code, int(time.time()) + 900))
         conn.commit()
         conn.close()

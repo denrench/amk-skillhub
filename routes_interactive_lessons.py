@@ -408,6 +408,45 @@ def delete_lesson(lesson_id):
 # 3. STUDENT INTERACTION & PROGRESS SAVING
 # ==========================================
 
+@interactive_lessons_bp.route('/api/academy/progress', methods=['GET', 'POST'])
+def academy_progress():
+    user = _get_current_user()
+    if not user:
+        return jsonify({'success': False, 'message': 'Войдите для синхронизации прогресса.'}), 401
+    conn = _get_db()
+    cursor = conn.cursor()
+    if request.method == 'GET':
+        cursor.execute("""
+            SELECT c.slug, l.order_num
+            FROM lesson_block_progress p
+            JOIN lessons l ON l.id = p.lesson_id
+            JOIN courses c ON c.id = l.course_id
+            WHERE p.user_id = ? AND p.block_id = 'academy_reading' AND p.completed = 1
+        """, (user['id'],))
+        return jsonify({'success': True, 'completed': [f"{row['slug']}:{row['order_num']}" for row in cursor.fetchall()]})
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({'success': False, 'message': 'Укажите урок.'}), 400
+    specialty, number = data.get('specialty'), data.get('lesson')
+    if specialty not in ('it', 'graphic_design', 'autoelectric', 'hvac', 'automechanic') or type(number) is not int or not 1 <= number <= 10:
+        return jsonify({'success': False, 'message': 'Укажите урок из учебника.'}), 400
+    cursor.execute("""
+        SELECT l.id FROM lessons l JOIN courses c ON c.id = l.course_id
+        WHERE c.slug = ? AND l.order_num = ? AND l.is_published = 1
+        ORDER BY l.id LIMIT 1
+    """, (specialty, number))
+    row = cursor.fetchone()
+    if not row:
+        return jsonify({'success': False, 'message': 'Урок не найден.'}), 404
+    cursor.execute("""
+        INSERT INTO lesson_block_progress (user_id, lesson_id, block_id, completed, state_json)
+        VALUES (?, ?, 'academy_reading', 1, '{}')
+        ON CONFLICT(user_id, lesson_id, block_id) DO UPDATE SET completed = 1
+    """, (user['id'], row['id']))
+    conn.commit()
+    return jsonify({'success': True})
+
+
 @interactive_lessons_bp.route('/api/lessons/<int:lesson_id>/block_progress', methods=['POST'])
 def save_block_progress(lesson_id):
     """

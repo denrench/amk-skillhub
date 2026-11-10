@@ -40,6 +40,8 @@ class TestFullLmsSuite(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.previous_testing = server.app.testing
+        server.app.testing = True
         cls.app = server.app.test_client()
         cls.cleanup_test_records()
         # Reset demo to clean initial state
@@ -51,6 +53,7 @@ class TestFullLmsSuite(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.cleanup_test_records()
+        server.app.testing = cls.previous_testing
 
     @classmethod
     def cleanup_test_records(cls):

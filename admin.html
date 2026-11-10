@@ -44,6 +44,7 @@
   <link rel="stylesheet" href="css/workshop.css">
 </head>
 <body class="workshop bg-dark-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+  <a class="academy-skip" href="#academy-main">К содержимому</a>
 
   <!-- Admin Header -->
   <header class="fixed top-0 left-0 right-0 z-50 bg-dark-900/85 backdrop-blur-xl border-b border-white/10 h-16 flex items-center justify-between px-6">
@@ -111,7 +112,12 @@
   </aside>
 
   <!-- Main Container -->
-  <main class="flex-1 pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-6">
+  <main id="academy-main" tabindex="-1" class="flex-1 pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-6">
+    <section class="academy-workbench rounded-2xl p-5 sm:p-7">
+      <p class="academy-kicker">Управление платформой</p>
+      <h1 class="text-2xl font-extrabold">Аккаунты, роли и группы</h1>
+      <p class="text-slate-300">Найдите аккаунт, чтобы проверить его роль и назначение учебных групп.</p>
+    </section>
     
     <!-- Top KPI Grid -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -32,9 +32,17 @@ async function openLesson(page, lesson) {
     assert.equal(lessons.length, 50);
 
     await page.goto(origin + '/index.html', {waitUntil: 'domcontentloaded'});
-    assert.equal(await page.locator('body.workshop').count(), 1);
+    await page.getByRole('heading', {name:'Знания, которые можно применить'}).waitFor();
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth), 0);
-    await page.getByRole('link', {name:'Выбрать специальность', exact:true}).click();
+    await page.getByRole('link', {name:'Открыть учебник', exact:true}).click();
+    await page.locator('.lesson-row').first().click();
+    await page.locator('.answer').first().click();
+    assert.equal(await page.locator('.answer-result').getAttribute('data-correct'), 'false');
+    await page.locator('.answer').last().click();
+    assert.equal(await page.locator('.answer-result').getAttribute('data-correct'), 'true');
+    await page.reload({waitUntil:'domcontentloaded'});
+    await page.getByRole('link', {name:'Следующий урок →'}).waitFor();
+    await page.getByRole('link', {name:'Практикум', exact:true}).click();
     await page.waitForURL('**/tasks.html');
     await page.locator('main a[href*="lesson_player.html"]').first().click();
     await page.waitForURL('**/lesson_player.html?*');

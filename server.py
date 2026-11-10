@@ -12,19 +12,26 @@ import json
 import random
 import sqlite3
 import hashlib
+import hmac
+import secrets
 import smtplib
+import sys
+from urllib.request import Request, urlopen
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
-from flask import Flask, request, jsonify, send_from_directory, g, session, redirect, url_for, make_response
+from flask import Flask, request, jsonify, send_from_directory, g, session, redirect, url_for, make_response, abort
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
+
+if __name__ == '__main__':
+    sys.modules.setdefault('server', sys.modules[__name__])
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_DIR = BASE_DIR
 DB_PATH = os.path.join(BASE_DIR, "database.db")
 
-app = Flask(__name__, static_folder=APP_DIR)
+app = Flask(__name__, static_folder=None)
 
 # =========================================================================
 # SERVER-SIDE SESSION SECURITY & ROLE ENFORCEMENT
@@ -38,13 +45,24 @@ def get_current_user():
     try:
         conn = get_db()
         cursor = conn.cursor()
-        cursor.execute("SELECT id, email, full_name, role, group_name, specialty_slug, student_id FROM users WHERE id = ?", (user_id,))
+        cursor.execute("SELECT id, email, full_name, role, group_name, specialty_slug, student_id, password_hash, is_demo FROM users WHERE id = ?", (user_id,))
         row = cursor.fetchone()
         if row:
-            return dict(row)
+            user = dict(row)
+            stamp = account_session_stamp(user.pop('password_hash'))
+            demo = user.pop('is_demo', False)
+            current_stamp = session.get('password_stamp')
+            if (current_stamp and not hmac.compare_digest(current_stamp, stamp)) or (HOSTED and (not current_stamp or demo)):
+                session.clear()
+                return None
+            return user
     except Exception as e:
         print(f"[AUTH ERROR] get_current_user error: {e}")
     return None
+
+
+def account_session_stamp(password_hash):
+    return hmac.new(app.secret_key.encode('utf-8'), str(password_hash).encode('utf-8'), hashlib.sha256).hexdigest()
 
 def login_required(roles=None):
     """Decorator to enforce server-side session authentication & role checks."""
@@ -98,11 +116,15 @@ def get_teacher_assigned_groups(teacher_id):
         elif spec == 'hospitality':
             return ['ГД-21', 'ГД-22']
     return []
-app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET') or os.environ.get('SECRET_KEY') or 'amk-eduspace-lms-secret-2026'
+HOSTED = bool(os.environ.get('RENDER')) or os.environ.get('APP_ENV') == 'production'
+SESSION_SECRET = os.environ.get('SESSION_SECRET') or os.environ.get('SECRET_KEY')
+if HOSTED and SESSION_SECRET and len(SESSION_SECRET) < 32:
+    SESSION_SECRET = None
+app.config['SECRET_KEY'] = SESSION_SECRET or secrets.token_hex(32)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = (os.environ.get('RENDER') is not None or os.environ.get('HTTPS') == 'on')
+app.config['SESSION_COOKIE_SECURE'] = HOSTED or os.environ.get('HTTPS') == 'on'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=14)
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
@@ -158,6 +180,10 @@ _RAW_TEACHER_ACCESS_CODES = {
     'AMKCOLLEGE', 'AMKEDUSPACE', 'ПРЕПОДАВАТЕЛЬ', 'ПРЕПОД'
 }
 TEACHER_ACCESS_CODES = {normalize_teacher_code(c) for c in _RAW_TEACHER_ACCESS_CODES}
+if HOSTED:
+    TEACHER_ACCESS_CODES = {
+        normalize_teacher_code(code) for code in os.environ.get('TEACHER_ACCESS_CODES', '').split(',') if code.strip()
+    }
 
 
 NAME_WORD_RE = re.compile(r'^[А-Яа-яЁёӘәІіҢңҒғҮүҰұҚқӨөҺһA-Za-z\-]{2,40}$')
@@ -597,7 +623,11 @@ def get_db():
                 return g.db
             except Exception as e:
                 _LAST_DB_ERROR = str(e)
-                print(f"[WARN] Failed to connect to DATABASE_URL: {e}. Falling back to SQLite.")
+                if HOSTED:
+                    abort(503, description="Хранилище аккаунтов временно недоступно.")
+                print("[WARN] PostgreSQL is unavailable. Using local SQLite.")
+        if HOSTED:
+            abort(503, description="Хранилище аккаунтов не настроено.")
         g.db = sqlite3.connect(DB_PATH, timeout=30.0)
         g.db.execute("PRAGMA journal_mode = WAL;")
         g.db.execute("PRAGMA busy_timeout = 30000;")
@@ -608,6 +638,8 @@ def get_db():
 
 @app.route('/api/debug/db_status', methods=['GET'])
 def get_db_status():
+    if HOSTED:
+        abort(404)
     db = get_db()
     is_pg = isinstance(db, PostgresConnectionWrapper)
     pg_url = os.environ.get('DATABASE_URL')
@@ -828,6 +860,8 @@ def init_db():
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS bonus_xp INTEGER DEFAULT 0",
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS streak_days INTEGER DEFAULT 1",
                 "ALTER TABLE users ADD COLUMN IF NOT EXISTS achievements_json TEXT DEFAULT '[]'",
+                "ALTER TABLE email_verifications ADD COLUMN IF NOT EXISTS purpose TEXT DEFAULT 'legacy'",
+                "ALTER TABLE email_verifications ADD COLUMN IF NOT EXISTS attempts INTEGER DEFAULT 0",
                 "ALTER TABLE lesson_progress ADD COLUMN IF NOT EXISTS current_stage INTEGER DEFAULT 1",
                 "ALTER TABLE lesson_progress ADD COLUMN IF NOT EXISTS mission_state_json TEXT DEFAULT '{}'",
                 "ALTER TABLE lesson_progress ADD COLUMN IF NOT EXISTS mission_xp INTEGER DEFAULT 0",
@@ -931,6 +965,8 @@ def init_db():
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """)
+    _safe_add_column(cursor, "email_verifications", "purpose TEXT DEFAULT 'legacy'")
+    _safe_add_column(cursor, "email_verifications", "attempts INTEGER DEFAULT 0")
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS enrollments (
@@ -1628,10 +1664,116 @@ SMTP_HOST = os.environ.get('SMTP_HOST', 'smtp.gmail.com')
 SMTP_PORT = int(os.environ.get('SMTP_PORT', 587))
 SMTP_USER = os.environ.get('SMTP_USER', 'd03509181@gmail.com')
 SMTP_PASSWORD = os.environ.get('SMTP_PASSWORD', '')
+MAIL_API_KEY = os.environ.get('MAIL_API_KEY', '')
+MAIL_FROM = os.environ.get('MAIL_FROM', '')
+
+
+def deliver_auth_code(email, code, purpose):
+    if app.testing and not HOSTED:
+        return True
+    if MAIL_API_KEY and MAIL_FROM:
+        action = 'восстановления доступа' if purpose == 'reset' else 'подтверждения регистрации'
+        payload = {
+            'from': MAIL_FROM, 'to': [email],
+            'subject': 'Проверочный код AMK SkillHub',
+            'text': f'Ваш код для {action}: {code}. Код действует 10 минут.',
+        }
+        message = Request(
+            'https://api.resend.com/emails', data=json.dumps(payload).encode('utf-8'),
+            headers={'Authorization': f'Bearer {MAIL_API_KEY}', 'Content-Type': 'application/json'},
+            method='POST',
+        )
+        try:
+            with urlopen(message, timeout=10) as response:
+                return 200 <= response.status < 300
+        except OSError:
+            app.logger.warning("Account email provider request failed")
+            return False
+    if SMTP_PASSWORD:
+        delivered, _ = send_smtp_email(email, code)
+        return delivered
+    return False
+
+
+def auth_code_value(email, purpose, code):
+    if app.testing and not HOSTED:
+        return code
+    value = f"{purpose}:{email}:{code}".encode('utf-8')
+    return hmac.new(app.secret_key.encode('utf-8'), value, hashlib.sha256).hexdigest()[:20]
+
+
+def read_auth_code(conn, email, purpose, code):
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT code, expires_at, attempts FROM email_verifications WHERE email = ? AND purpose = ?",
+        (email, purpose)
+    )
+    row = cursor.fetchone()
+    if not row or int(row['expires_at']) < int(time.time()) or int(row['attempts']) >= 5:
+        return None
+    expected = auth_code_value(email, purpose, code)
+    if not hmac.compare_digest(str(row['code']), expected):
+        cursor.execute(
+            "UPDATE email_verifications SET attempts = attempts + 1 WHERE email = ? AND purpose = ? AND code = ?",
+            (email, purpose, row['code'])
+        )
+        conn.commit()
+        return None
+    return expected
+
+
+def consume_auth_code(cursor, email, purpose, code):
+    cursor.execute(
+        "DELETE FROM email_verifications WHERE email = ? AND purpose = ? AND code = ? AND expires_at >= ? AND attempts < 5",
+        (email, purpose, code, int(time.time()))
+    )
+    return cursor.rowcount == 1
+
+
+def password_is_valid(password):
+    minimum = 6 if app.testing and not HOSTED else 8
+    return minimum <= len(password) <= 128 and re.search(r'[^\W\d_]', password) and re.search(r'\d', password)
+
+
+def auth_payload():
+    raw = request.get_json(silent=True)
+    if not isinstance(raw, dict):
+        return {}
+    fields = {name: value for name, value in raw.items() if isinstance(value, str)}
+    fields['no_middle_name'] = raw.get('no_middle_name') is True
+    return fields
+
+
+@app.before_request
+def require_hosted_auth_configuration():
+    if not HOSTED or not request.path.startswith('/api/'):
+        return None
+    if request.path in ('/api/demo/reset', '/api/teacher/simulate_submission', '/api/teacher/sync_user'):
+        abort(404)
+    if request.path.startswith('/api/auth/') and request.path != '/api/auth/readiness' and not SESSION_SECRET:
+        return jsonify({"success": False, "message": "Сервер аккаунтов временно недоступен."}), 503
+    if session.get('user_id') and not get_current_user():
+        session.clear()
+
+
+@app.get('/api/auth/readiness')
+def auth_readiness():
+    ready = not HOSTED or bool(SESSION_SECRET and os.environ.get('DATABASE_URL'))
+    if ready and HOSTED:
+        try:
+            get_db().cursor().execute('SELECT 1')
+        except Exception:
+            ready = False
+    registration = ready and bool((MAIL_API_KEY and MAIL_FROM) or SMTP_PASSWORD)
+    response = jsonify({"login": ready, "registration": registration})
+    if request.headers.get('Origin') == 'https://denrench.github.io':
+        response.headers['Access-Control-Allow-Origin'] = 'https://denrench.github.io'
+        response.headers['Vary'] = 'Origin'
+    response.headers['Cache-Control'] = 'no-store'
+    return response
 
 def send_smtp_email(to_email, code):
     if not SMTP_PASSWORD:
-        print(f"[OTP DEV PREVIEW] To: {to_email} | Code: {code} | SMTP_PASSWORD not set (Gmail App Password needed for live sending)")
         return False, "SMTP_PASSWORD_NOT_SET"
     try:
         msg = MIMEMultipart('alternative')
@@ -1674,17 +1816,18 @@ def send_smtp_email(to_email, code):
             s.login(SMTP_USER, SMTP_PASSWORD)
             s.sendmail(SMTP_USER, [to_email], msg.as_string())
 
-        print(f"[OTP SUCCESS] Real email delivered to {to_email} via {SMTP_USER}")
         return True, "SUCCESS"
     except Exception as e:
-        print(f"[OTP ERROR] SMTP Dispatch failed: {e}")
-        return False, str(e)
+        app.logger.warning("Account SMTP delivery failed (%s)", type(e).__name__)
+        return False, "SMTP_DELIVERY_FAILED"
 
 @app.route('/api/auth/send_code', methods=['POST'])
 def send_verification_code():
-    data = request.get_json() or {}
+    data = auth_payload()
     email = (data.get('email') or '').strip().lower()
     purpose = (data.get('purpose') or 'register').strip().lower()
+    if purpose not in ('register', 'reset'):
+        return jsonify({"success": False, "message": "Неизвестное назначение кода."}), 400
 
     ok, err = validate_email_addr(email)
     if not ok:
@@ -1706,46 +1849,43 @@ def send_verification_code():
             "message": "Пользователь с таким email уже зарегистрирован. Перейдите на вкладку «Вход»."
         }), 409
 
-    code = f"{random.randint(100000, 999999)}"
-    expires_at = int(time.time()) + 600
+    code = f"{secrets.randbelow(1000000):06d}"
+    now = int(time.time())
+    expires_at = now + 600
+    stored_code = auth_code_value(email, purpose, code)
 
     cursor.execute("""
-    INSERT INTO email_verifications (email, code, expires_at, verified)
-    VALUES (?, ?, ?, 0)
+    INSERT INTO email_verifications (email, code, expires_at, verified, purpose, attempts)
+    VALUES (?, ?, ?, 0, ?, 0)
     ON CONFLICT(email) DO UPDATE SET
         code = excluded.code,
         expires_at = excluded.expires_at,
+        purpose = excluded.purpose,
+        attempts = 0,
         verified = 0,
         created_at = CURRENT_TIMESTAMP
-    """, (email, code, expires_at))
+    WHERE email_verifications.expires_at <= ?
+    """, (email, stored_code, expires_at, purpose, now + 540))
+    if cursor.rowcount == 0:
+        conn.rollback()
+        return jsonify({"success": False, "message": "Повторный код можно запросить через минуту."}), 429
     conn.commit()
 
-    wa_phone = re.sub(r'[^\d]', '', SUPPORT_PHONE)
-    wa_msg = f"Здравствуйте! Подтверждаю регистрацию в EDU SPACE (АМК). Email: {email}"
-    import urllib.parse
-    wa_url = f"https://wa.me/{wa_phone}?text={urllib.parse.quote(wa_msg)}"
-
-    # In dev mode, log OTP to server console
-    print(f"[OTP DEV CONSOLE] To: {email} | Code: {code}")
-
-    # Optional background attempt via SMTP if configured
-    sent_real, status_smtp = send_smtp_email(email, code)
+    if not deliver_auth_code(email, code, purpose):
+        cursor.execute("DELETE FROM email_verifications WHERE email = ? AND code = ?", (email, stored_code))
+        conn.commit()
+        return jsonify({"success": False, "message": "Письмо не удалось отправить. Попробуйте позже."}), 503
 
     return jsonify({
         "success": True,
-        "message": f"Код подтверждения отправлен на {email}. Проверьте почтовый ящик или мессенджер.",
-        "whatsapp_phone": SUPPORT_PHONE,
-        "whatsapp_url": wa_url,
-        "support_email": SUPPORT_EMAIL,
-        "support_phone": SUPPORT_PHONE,
-        "sent_via_smtp": sent_real,
+        "message": "Код отправлен на электронную почту. Если письмо не видно, проверьте папку «Спам».",
         "expires_in_seconds": 600
     })
 
 
 @app.route('/api/auth/verify_code', methods=['POST'])
 def verify_email_code():
-    data = request.get_json() or {}
+    data = auth_payload()
     email = (data.get('email') or '').strip().lower()
     code = (data.get('code') or '').strip()
 
@@ -1753,21 +1893,10 @@ def verify_email_code():
         return jsonify({"success": False, "message": "Введите email и 6-значный код подтверждения."}), 400
 
     conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT code, expires_at FROM email_verifications WHERE email = ?", (email,))
-    row = cursor.fetchone()
-
-    if not row:
-        return jsonify({"success": False, "message": "Сначала запросите код подтверждения на почту."}), 400
-
-    if int(time.time()) > int(row["expires_at"]):
-        return jsonify({"success": False, "message": "Срок действия кода истёк. Отправьте новый код."}), 400
-
-    if str(row["code"]) != code:
-        return jsonify({"success": False, "message": "Неверный код подтверждения. Проверьте письмо и попробуйте снова."}), 400
-
-    cursor.execute("UPDATE email_verifications SET verified = 1 WHERE email = ?", (email,))
-    conn.commit()
+    stored_code = read_auth_code(conn, email, 'register', code)
+    if not stored_code:
+        return jsonify({"success": False, "message": "Код неверен, истёк или исчерпан лимит попыток."}), 400
+    session['verified_registration'] = [email, stored_code]
 
     return jsonify({
         "success": True,
@@ -1778,7 +1907,7 @@ def verify_email_code():
 
 @app.route('/api/auth/register', methods=['POST'])
 def register():
-    data = request.get_json() or {}
+    data = auth_payload()
     email = (data.get('email') or '').strip().lower()
     password = (data.get('password') or '').strip()
     role = (data.get('role') or 'student').strip().lower()
@@ -1790,6 +1919,8 @@ def register():
 
     if role not in ('student', 'teacher'):
         return jsonify({"success": False, "message": "Недопустимая роль пользователя."}), 400
+    if len(group_name) > 100 or len(department) > 100 or len(data.get('middle_name', '')) > 100:
+        return jsonify({"success": False, "message": "Сократите название группы, кафедры или отчество."}), 400
 
     fio, fio_err = validate_fio(data)
     if fio_err:
@@ -1799,10 +1930,10 @@ def register():
     if not ok_email:
         return jsonify({"success": False, "message": email_err}), 400
 
-    if len(password) < 6 or not re.search(r'[A-Za-zА-Яа-яЁё]', password) or not re.search(r'\d', password):
+    if not password_is_valid(password):
         return jsonify({
             "success": False,
-            "message": "Пароль должен содержать минимум 6 символов, включая хотя бы одну букву и одну цифру."
+            "message": "Используйте от 8 до 128 символов, включая хотя бы одну букву и одну цифру."
         }), 400
 
     if role == 'teacher':
@@ -1827,29 +1958,24 @@ def register():
     if cursor.fetchone():
         return jsonify({"success": False, "message": "Пользователь с таким email уже зарегистрирован."}), 409
 
-    cursor.execute("SELECT code, expires_at, verified FROM email_verifications WHERE email = ?", (email,))
-    ver_row = cursor.fetchone()
-    if not ver_row:
+    proof = session.get('verified_registration')
+    stored_code = read_auth_code(conn, email, 'register', verification_code) if verification_code else (
+        proof[1] if isinstance(proof, list) and len(proof) == 2 and proof[0] == email else None
+    )
+    if not stored_code:
         return jsonify({
             "success": False,
             "require_verification": True,
             "message": "Пожалуйста, подтвердите адрес электронной почты 6-значным кодом."
         }), 400
 
-    if not ver_row["verified"]:
-        if verification_code and str(ver_row["code"]) == verification_code and int(time.time()) <= int(ver_row["expires_at"]):
-            cursor.execute("UPDATE email_verifications SET verified = 1 WHERE email = ?", (email,))
-        else:
-            return jsonify({
-                "success": False,
-                "require_verification": True,
-                "message": "Электронная почта не подтверждена или введён неверный код."
-            }), 400
-
     pwd_hash = generate_password_hash(password)
     temp_student_id = f"KZ-AMK-2026-{random.randint(10000, 99999)}" if role == 'student' else None
 
     try:
+        if not consume_auth_code(cursor, email, 'register', stored_code):
+            conn.rollback()
+            return jsonify({"success": False, "require_verification": True, "message": "Запросите новый проверочный код."}), 400
         cursor.execute("""
         INSERT INTO users (
             email, password_hash, full_name, last_name, first_name, middle_name,
@@ -1882,6 +2008,7 @@ def register():
             """, (user_id, default_grp, specialty_slug))
         conn.commit()
     except sqlite3.IntegrityError:
+        conn.rollback()
         return jsonify({"success": False, "message": "Пользователь с таким email уже зарегистрирован."}), 409
 
     cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
@@ -1891,6 +2018,7 @@ def register():
     session['user_id'] = user_out['id']
     session['user_email'] = user_out['email']
     session['user_role'] = user_out['role']
+    session['password_stamp'] = account_session_stamp(pwd_hash)
     session.permanent = True
 
     return jsonify({
@@ -1916,7 +2044,7 @@ def get_auth_session():
         })
     return jsonify({"authenticated": False}), 200
 
-@app.route('/api/auth/logout', methods=['POST', 'GET'])
+@app.route('/api/auth/logout', methods=['POST'])
 def auth_logout():
     """Safely terminates the server-side session."""
     session.clear()
@@ -1925,7 +2053,7 @@ def auth_logout():
 @app.route('/api/auth/reset_password', methods=['POST'])
 def auth_reset_password():
     """Secure password reset via OTP verification."""
-    data = request.get_json() or {}
+    data = auth_payload()
     email = (data.get('email') or '').strip().lower()
     code = (data.get('code') or '').strip()
     new_password = (data.get('new_password') or '').strip()
@@ -1933,35 +2061,33 @@ def auth_reset_password():
     if not email or not code or not new_password:
         return jsonify({"success": False, "message": "Заполните email, проверочный код и новый пароль"}), 400
 
-    if len(new_password) < 6:
-        return jsonify({"success": False, "message": "Новый пароль должен содержать минимум 6 символов"}), 400
+    if not password_is_valid(new_password):
+        return jsonify({"success": False, "message": "Используйте от 8 до 128 символов, включая букву и цифру."}), 400
 
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT code, expires_at FROM email_verifications WHERE email = ?", (email,))
-    ver = cursor.fetchone()
-
-    if not ver or str(ver['code']) != code:
-        return jsonify({"success": False, "message": "Неверный проверочный код."}), 400
-
-    if int(time.time()) > int(ver['expires_at']):
-        return jsonify({"success": False, "message": "Срок действия проверочного кода истёк. Запросите новый код."}), 400
+    stored_code = read_auth_code(conn, email, 'reset', code)
+    if not stored_code:
+        return jsonify({"success": False, "message": "Код неверен, истёк или исчерпан лимит попыток."}), 400
 
     new_hash = generate_password_hash(new_password)
+    if not consume_auth_code(cursor, email, 'reset', stored_code):
+        conn.rollback()
+        return jsonify({"success": False, "message": "Запросите новый проверочный код."}), 400
     cursor.execute("UPDATE users SET password_hash = ? WHERE email = ?", (new_hash, email))
-    cursor.execute("DELETE FROM email_verifications WHERE email = ?", (email,))
     conn.commit()
+    session.clear()
 
     return jsonify({"success": True, "message": "Пароль успешно обновлён. Теперь вы можете войти."}), 200
 
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
-    data = request.get_json() or {}
+    data = auth_payload()
     email = (data.get('email') or '').strip().lower()
     password = (data.get('password') or '').strip()
 
-    if not email or not password:
+    if not email or not password or len(password) > 128:
         return jsonify({"success": False, "message": "Введите email и пароль."}), 400
 
     conn = get_db()
@@ -1969,14 +2095,17 @@ def login():
     cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
     user = cursor.fetchone()
 
-    if not user or not verify_and_migrate_password(conn, user, password):
+    if not user or (HOSTED and user['is_demo']) or not verify_and_migrate_password(conn, user, password):
         return jsonify({"success": False, "message": "Неверный email или пароль. Проверьте раскладку клавиатуры."}), 401
 
+    cursor.execute("SELECT * FROM users WHERE id = ?", (user['id'],))
+    user = cursor.fetchone()
     user_out = serialize_user(user)
     session.clear()
     session['user_id'] = user_out['id']
     session['user_email'] = user_out['email']
     session['user_role'] = user_out['role']
+    session['password_stamp'] = account_session_stamp(user['password_hash'])
     session.permanent = True
 
     return jsonify({

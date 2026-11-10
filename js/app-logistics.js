@@ -1573,7 +1573,18 @@
     return clean;
   }
 
-  function logoutUser() {
+  async function logoutUser() {
+    if (!location.hostname.endsWith('.github.io')) {
+      try {
+        const response = await fetch('/api/auth/logout', {
+          method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(5000),
+        });
+        if (!response.ok) throw new Error('logout failed');
+      } catch {
+        showToast('Не удалось закрыть серверную сессию. Повторите выход.', 'error');
+        return;
+      }
+    }
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem('currentUser');
     document.cookie = 'user_id=; path=/; max-age=0';

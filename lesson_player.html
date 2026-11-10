@@ -34,6 +34,7 @@
   <link rel="stylesheet" href="css/workshop.css">
 </head>
 <body class="workshop h-full flex flex-col overflow-x-hidden bg-slate-950 text-slate-100">
+  <a class="academy-skip" href="#academy-main">К содержимому</a>
 
   <!-- TOP APP BAR -->
   <header class="h-16 flex-shrink-0 bg-dark-900/90 backdrop-blur-xl border-b border-white/10 px-3 sm:px-6 flex items-center justify-between z-30">
@@ -112,7 +113,7 @@
   </nav>
 
   <!-- MAIN LESSON WORKSPACE -->
-  <main class="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center bg-radial-dark relative">
+  <main id="academy-main" tabindex="-1" class="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center bg-radial-dark relative">
     <div class="w-full max-w-4xl space-y-6 pb-20">
 
       <!-- DYNAMIC BLOCK CONTAINER -->
@@ -536,7 +537,9 @@
         }
       }
       const practiceIdx = pendingStarterPractice();
-      currentBlockIdx = practiceIdx < 0 ? resumeIdx : Math.min(resumeIdx, practiceIdx);
+      const modelIndex = currentLesson.local_catalog && params.get('view') === 'model'
+        ? blocks.findIndex(block => block.id === 'b4_interactive') : -1;
+      currentBlockIdx = modelIndex >= 0 ? modelIndex : practiceIdx < 0 ? resumeIdx : Math.min(resumeIdx, practiceIdx);
       renderCurrentBlock();
     }
 

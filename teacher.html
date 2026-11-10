@@ -85,6 +85,7 @@
   <link rel="stylesheet" href="css/workshop.css">
 </head>
 <body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
+  <a class="academy-skip" href="#academy-main">К содержимому</a>
 
   <!-- Ambient background glow orbs -->
   <div class="fixed top-10 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none"></div>
@@ -305,31 +306,27 @@
     </header>
 
     <!-- BODY -->
-    <main class="w-full pt-20 p-4 sm:p-8 space-y-7 flex-1">
+    <main id="academy-main" tabindex="-1" class="w-full pt-20 p-4 sm:p-8 space-y-7 flex-1">
 
       <!-- HERO: TEACHER'S ESSENTIAL MISSION BANNER -->
-      <section class="bg-dark-850/90 backdrop-blur-xl rounded-3xl p-6 sm:p-7 text-white shadow-2xl relative overflow-hidden border border-white/10">
-        <div class="absolute -right-10 -bottom-10 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <section class="academy-workbench rounded-2xl p-5 sm:p-7">
 
         <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
           <div class="space-y-2 max-w-3xl">
             <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-400/30">
               <span class="material-symbols-outlined text-[16px] text-amber-400">verified</span>
-              <span>Ключевая роль преподавателя в системе EDU SPACE</span>
+              <span>Рабочее место преподавателя</span>
             </div>
             <h1 class="font-extrabold text-xl sm:text-2xl text-white">
-              Пульт академического управления и <span class="bg-gradient-to-r from-indigo-400 via-purple-300 to-cyan-300 bg-clip-text text-transparent">рецензирования</span>
+              Курсы и работы студентов
             </h1>
             <p class="text-xs text-slate-300 leading-relaxed">
-              Без подтверждения преподавателя студент не может получить официальный зачёт. Вы проверяете и рецензируете практические задания, регулируете график потока (открываете уроки по дням), выставляете итоговые оценки в журнал и утверждаете допуск к сертификации.
+              Откройте очередь, чтобы проверить работу, или перейдите к редактору, чтобы подготовить следующий урок.
             </p>
           </div>
 
           <div class="flex flex-wrap items-center gap-2.5 shrink-0">
-            <button type="button" onclick="quickSimulateAnyStudentSubmission()" class="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xs flex items-center gap-1.5 shadow-glow-amber transition-all">
-              <span class="material-symbols-outlined text-[18px]">bolt</span>
-              <span>Сдать тест-работу от студента</span>
-            </button>
+            <button type="button" onclick="switchTeacherTab('builder')" class="academy-action">Редактор уроков</button>
             <button type="button" onclick="switchTeacherTab('queue')" class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1.5 border border-white/20 transition-all">
               <span class="material-symbols-outlined text-[18px] text-indigo-300">rate_review</span>
               <span>Очередь проверки</span>

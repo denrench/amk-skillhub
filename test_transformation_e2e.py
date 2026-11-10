@@ -26,6 +26,7 @@ from server import app as flask_app, get_db, init_db, award_xp, check_and_unlock
 # Initialize fresh database schema
 init_db()
 
+flask_app.testing = True
 client = flask_app.test_client()
 
 print("=" * 65)
