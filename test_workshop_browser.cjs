@@ -39,6 +39,15 @@ async function openLesson(page, lesson) {
     await page.locator('main a[href*="lesson_player.html"]').first().click();
     await page.waitForURL('**/lesson_player.html?*');
 
+    await page.route('**/api/tasks?*', route => route.fulfill({status:404, contentType:'text/html', body:'Not found'}));
+    await page.goto(origin + '/tasks.html?specialty=it', {waitUntil:'domcontentloaded'});
+    await page.locator('main a[href*="catalog=1"]').first().click();
+    await page.waitForFunction(() => typeof currentLesson !== 'undefined' && currentLesson?.id === 'catalog-it-1');
+    await page.locator('#step-btn-2').click();
+    await page.locator('#lp-video-play-btn').click();
+    await page.waitForFunction(() => document.querySelector('#lp-lecture-video')?.currentTime > .1);
+    await page.unroute('**/api/tasks?*');
+
     const pilot = lessons.find(lesson => lesson.course_slug === 'autoelectric' && lesson.order_num === 3);
     await openLesson(page, pilot);
     await page.locator('#step-btn-2').click();

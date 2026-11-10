@@ -458,7 +458,7 @@
       };
     }
 
-    async function loadLesson(lessonId) {
+    async function fetchLesson(lessonId) {
       let lessonData = null;
       try {
         const controller = new AbortController();
@@ -486,6 +486,22 @@
       if (!lessonData) {
         lessonData = createFallbackLesson(lessonId);
       }
+      return lessonData;
+    }
+
+    async function loadLesson(lessonId) {
+      const params = new URLSearchParams(window.location.search);
+      const specialty = params.get('specialty');
+      const task = Number(params.get('task'));
+      const fromCatalog = params.get('catalog') === '1' &&
+        window.EDU_LESSONS?.[specialty]?.some?.(lesson => lesson.num === task);
+      const lessonData = fromCatalog ? {
+        ...createFallbackLesson(task),
+        id: `catalog-${specialty}-${task}`,
+        block_progress: {},
+        next_lesson_id: null,
+        local_catalog: true,
+      } : await fetchLesson(lessonId);
 
       currentLesson = withLessonIntro(lessonData);
       isStarterLesson = window.StarterLesson?.matches(currentLesson) ?? false;
@@ -1548,25 +1564,7 @@
 
     async function finalizeLesson() {
       const xpVal = (currentLesson && currentLesson.xp_reward) ? currentLesson.xp_reward : 60;
-      let awardedXp = xpVal;
-      try {
-        const apiBase = window.location.hostname.includes('github.io') ? 'https://amk-skillhub.onrender.com' : '';
-        const res = await fetch(`${apiBase}/api/lessons/${currentLesson.id}/complete`, { method: 'POST' });
-        const data = await res.json();
-        if (data.success) {
-          awardedXp = (data.xp_awarded !== undefined && data.xp_awarded !== null) ? data.xp_awarded : xpVal;
-        }
-      } catch (e) {
-        // Offline / GitHub Pages local state persistence
-        try {
-          const userRaw = localStorage.getItem('eduspace_active_session_v3');
-          if (userRaw) {
-            const u = JSON.parse(userRaw);
-            u.xp = (u.xp || 0) + xpVal;
-            localStorage.setItem('eduspace_active_session_v3', JSON.stringify(u));
-          }
-        } catch(err){}
-      }
+      const awardedXp = currentLesson.local_catalog ? 0 : await awardLessonXp(xpVal);
       const celebEl = document.getElementById('celeb-xp-val');
       if (celebEl) {
         celebEl.textContent = awardedXp > 0 ? `+${awardedXp} XP` : `${awardedXp} XP`;
@@ -1591,6 +1589,29 @@
 
       document.getElementById('lp-celebration-modal').classList.remove('hidden');
       document.getElementById('lp-celebration-modal').classList.add('flex');
+    }
+
+    async function awardLessonXp(xpVal) {
+      let awardedXp = xpVal;
+      try {
+        const apiBase = window.location.hostname.includes('github.io') ? 'https://amk-skillhub.onrender.com' : '';
+        const res = await fetch(`${apiBase}/api/lessons/${currentLesson.id}/complete`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          awardedXp = (data.xp_awarded !== undefined && data.xp_awarded !== null) ? data.xp_awarded : xpVal;
+        }
+      } catch (e) {
+        // Offline / GitHub Pages local state persistence
+        try {
+          const userRaw = localStorage.getItem('eduspace_active_session_v3');
+          if (userRaw) {
+            const u = JSON.parse(userRaw);
+            u.xp = (u.xp || 0) + xpVal;
+            localStorage.setItem('eduspace_active_session_v3', JSON.stringify(u));
+          }
+        } catch(err){}
+      }
+      return awardedXp;
     }
 
     // --- PROGRESS & NAVIGATION ---
@@ -1645,6 +1666,7 @@
         savedLocally = true;
       } catch(e){}
 
+      if (currentLesson.local_catalog) return savedLocally ? 'local' : 'memory';
       try {
         const apiBase = window.location.hostname.includes('github.io') ? 'https://amk-skillhub.onrender.com' : '';
         const response = await fetch(`${apiBase}/api/lessons/${currentLesson.id}/block_progress`, {
