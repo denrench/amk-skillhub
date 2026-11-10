@@ -341,9 +341,18 @@
           {
             id: 'b3_theory',
             type: 'theory',
-            title: 'Теория и Видео-разбор',
-            video_url: 'assets/sample-lesson.mp4',
-            video_title: `Видео-разбор: ${title}`,
+            title: (catLesson && catLesson.video_title) || `Теория и Видео-разбор: ${title}`,
+            video_url: (catLesson && catLesson.video_url) || 'assets/sample-lesson.mp4',
+            video_title: (catLesson && catLesson.video_title) || `Видео-разбор: ${title}`,
+            video_duration: (catLesson && catLesson.video_duration) || '00:52',
+            video_poster: (catLesson && catLesson.video_poster) || 'assets/eduspace-logo.svg',
+            embed_url: (catLesson && catLesson.embed_url) || '',
+            timecodes: (catLesson && catLesson.timecodes) || [
+              { sec: 0, time_str: '00:00', title: `Введение: ${title.replace(/^Урок\s*\d+\.\s*/i, '').slice(0, 35)}` },
+              { sec: 15, time_str: '00:15', title: 'Разбор стандартов и оборудования' },
+              { sec: 30, time_str: '00:30', title: 'Пошаговая демонстрация выполнения' },
+              { sec: 45, time_str: '00:45', title: 'Чек-лист качества и критерии сдачи' }
+            ],
             chunks: [
               {
                 heading: 'Ключевые понятия и практические стандарты',
@@ -633,6 +642,18 @@
 
       const videoUrl = b.video_url || 'assets/sample-lesson.mp4';
       const videoTitle = b.video_title || (currentLesson ? currentLesson.title : 'Видео-разбор урока');
+      const timecodesList = (b.timecodes && Array.isArray(b.timecodes) && b.timecodes.length > 0) ? b.timecodes : [
+        { sec: 0, time_str: '00:00', title: 'Введение и ключевые концепции темы' },
+        { sec: 15, time_str: '00:15', title: 'Разбор стандартов и оборудования' },
+        { sec: 30, time_str: '00:30', title: 'Пошаговая демонстрация алгоритма' },
+        { sec: 45, time_str: '00:45', title: 'Чек-лист качества и критерии сдачи' }
+      ];
+      const timecodesHtml = timecodesList.map(tc => `
+        <div onclick="seekLpLectureTime(${tc.sec})" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
+          <span><strong class="text-indigo-300 font-mono">${escapeHtml(tc.time_str || formatLpTime(tc.sec))}</strong> — ${escapeHtml(tc.title)}</span>
+          <span class="material-symbols-outlined text-[16px] text-indigo-400">arrow_forward</span>
+        </div>
+      `).join('');
 
       return `
         <div class="space-y-6 animate-fade-in">
@@ -729,22 +750,7 @@
                 <span class="text-[11px] text-indigo-400 font-mono">Кликните для перехода</span>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                <div onclick="seekLpLectureTime(0)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
-                  <span><strong class="text-indigo-300 font-mono">00:00</strong> — Введение и ключевые концепции</span>
-                  <span class="material-symbols-outlined text-[16px] text-indigo-400">arrow_forward</span>
-                </div>
-                <div onclick="seekLpLectureTime(15)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
-                  <span><strong class="text-indigo-300 font-mono">00:15</strong> — Разбор стандартов и примеров</span>
-                  <span class="material-symbols-outlined text-[16px] text-indigo-400">arrow_forward</span>
-                </div>
-                <div onclick="seekLpLectureTime(30)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
-                  <span><strong class="text-indigo-300 font-mono">00:30</strong> — Практическая демонстрация</span>
-                  <span class="material-symbols-outlined text-[16px] text-indigo-400">arrow_forward</span>
-                </div>
-                <div onclick="seekLpLectureTime(45)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
-                  <span><strong class="text-indigo-300 font-mono">00:45</strong> — Чек-лист готовности к тесту</span>
-                  <span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>
-                </div>
+                ${timecodesHtml}
               </div>
             </div>
           </div>
@@ -907,6 +913,32 @@
       });
 
       vid.addEventListener('pause', () => syncLpVideoUi());
+
+      vid.addEventListener('canplay', () => {
+        const badge = document.getElementById('lp-video-badge-status');
+        if (badge && !badge.textContent.includes('Просмотрено')) {
+          badge.textContent = '1080p HD';
+          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono hidden sm:inline-block';
+        }
+      });
+
+      vid.addEventListener('waiting', () => {
+        const badge = document.getElementById('lp-video-badge-status');
+        if (badge && !badge.textContent.includes('Просмотрено')) {
+          badge.textContent = 'Загрузка...';
+          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono hidden sm:inline-block';
+        }
+      });
+
+      vid.addEventListener('error', (e) => {
+        console.warn('Lp Video error caught:', e);
+        const curSrc = vid.currentSrc || vid.src || '';
+        if (!curSrc.includes('interactive-examples') && !curSrc.includes('flower.mp4')) {
+          vid.src = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+          vid.load();
+          vid.play().then(() => syncLpVideoUi()).catch(() => {});
+        }
+      });
 
       vid.addEventListener('loadedmetadata', () => {
         const tot = document.getElementById('lp-video-time-total');

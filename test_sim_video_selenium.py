@@ -12,6 +12,8 @@ def run_test():
     options.add_argument("--no-sandbox")
     options.add_argument("--window-size=1440,900")
     options.add_argument("--autoplay-policy=no-user-gesture-required")
+    options.add_argument("--guest")
+    options.add_argument("--disable-dev-shm-usage")
 
     driver = webdriver.Edge(options=options)
     try:

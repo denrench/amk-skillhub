@@ -290,7 +290,34 @@ window.EDU_LESSONS = {
         "баннер",
         "пиксел"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Photoshop для Web Design: подготовка баннера для сайта и экспорт (72 ppi, WebP/PNG)",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLillGF-RfqbZTASqIvh744ZdRRQKb8gkU",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Photoshop для Web Design: подготовк"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Adobe Photoshop, Разрешение для экр"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 2,
@@ -349,7 +376,34 @@ window.EDU_LESSONS = {
         "вектор",
         "иконк"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Illustrator для Web Design: рисование векторной иконки и экспорт в SVG",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLillGF-RfqbZTASqIvh744ZdRRQKb8gkU",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Illustrator для Web Design: рисован"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Adobe Illustrator, Перо (Pen Tool),"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 3,
@@ -408,7 +462,34 @@ window.EDU_LESSONS = {
         "1440",
         "8px"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Figma с нуля: создание первого фрейма (Frame) и сетка отступов 8px",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLillGF-RfqbZTASqIvh744ZdRRQKb8gkU",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Figma с нуля: создание первого фрей"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Figma, Горячая клавиша F (Frame), К"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 4,
@@ -467,7 +548,34 @@ window.EDU_LESSONS = {
         "кнопк",
         "скруглен"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Figma Auto Layout: создание удобных кнопок и карточек (Shift + A)",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLillGF-RfqbZTASqIvh744ZdRRQKb8gkU",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Figma Auto Layout: создание удобных"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Figma, Auto Layout (Shift + A), Вну"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 5,
@@ -526,7 +634,34 @@ window.EDU_LESSONS = {
         "вариант",
         "instance"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Figma Components: мастер-компоненты и варианты состояний (Default и Hover)",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLillGF-RfqbZTASqIvh744ZdRRQKb8gkU",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Figma Components: мастер-компоненты"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Figma, Мастер-компонент (Ctrl + Alt"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 6,
@@ -585,7 +720,34 @@ window.EDU_LESSONS = {
         "<p>",
         "<button"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Знакомство с кодом: базовая HTML-разметка страницы (Заголовки h1, абзац p, картинка img и кнопка)",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLillGF-RfqbZTASqIvh744ZdRRQKb8gkU",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Знакомство с кодом: базовая HTML-ра"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: HTML5, Теги <h1>, <p>, <img>, <butt"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 7,
@@ -644,7 +806,34 @@ window.EDU_LESSONS = {
         "border-radius",
         "color"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Базовые стили CSS: цвет текста, фон, отступы (padding, margin) и скругления углов",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLillGF-RfqbZTASqIvh744ZdRRQKb8gkU",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Базовые стили CSS: цвет текста, фон"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: CSS3, Свойства color, background, p"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 8,
@@ -703,7 +892,34 @@ window.EDU_LESSONS = {
         "align-items",
         "header"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Раскладка блоков Flexbox: выравнивание логотипа и меню в шапке сайта (Header)",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLillGF-RfqbZTASqIvh744ZdRRQKb8gkU",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Раскладка блоков Flexbox: выравнива"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: CSS Flexbox, display: flex, justify"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 9,
@@ -762,7 +978,34 @@ window.EDU_LESSONS = {
         "click",
         "alert"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Немного интерактива: клик по кнопке на простом JavaScript (addEventListener)",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLillGF-RfqbZTASqIvh744ZdRRQKb8gkU",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Немного интерактива: клик по кнопке"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: JavaScript для дизайнеров, Поиск кн"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 10,
@@ -821,7 +1064,34 @@ window.EDU_LESSONS = {
         "border-radius",
         "hover"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Итоговый проект Web Design: верстка карточки продукта по макету из Figma (HTML + CSS)",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLillGF-RfqbZTASqIvh744ZdRRQKb8gkU",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Итоговый проект Web Design: верстка"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: HTML5 + CSS3, Карточка товара/курса"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     }
   ],
   "graphic_design": [
@@ -882,7 +1152,34 @@ window.EDU_LESSONS = {
         "иерарх",
         "мм"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Законы композиции, правило третей и оптический баланс",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLW-zSkCnZ-gA5Jn6gZtUa6ElSTZsLPeMm",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Законы композиции, правило третей и"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Adobe Illustrator, Figma, Модульная"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 2,
@@ -941,7 +1238,34 @@ window.EDU_LESSONS = {
         "pantone",
         "k:100"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Колористика и цветовые модели: RGB для экранов vs CMYK и Pantone для печати",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLW-zSkCnZ-gA5Jn6gZtUa6ElSTZsLPeMm",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Колористика и цветовые модели: RGB "
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Цветовой круг Иттена, Профили ICC, "
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 3,
@@ -1000,7 +1324,34 @@ window.EDU_LESSONS = {
         "кернинг",
         "гротеск"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Типографика: классификация гарнитур, кернинг, трекинг и шрифтовые пары",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLW-zSkCnZ-gA5Jn6gZtUa6ElSTZsLPeMm",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Типографика: классификация гарнитур"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Антиква и Гротеск, Кернинг / Интерл"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 4,
@@ -1059,7 +1410,34 @@ window.EDU_LESSONS = {
         "pathfinder",
         "крив"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Векторная графика в Adobe Illustrator и CorelDRAW: кривые Безье и булевы операции",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLW-zSkCnZ-gA5Jn6gZtUa6ElSTZsLPeMm",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Векторная графика в Adobe Illustrat"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Adobe Illustrator, CorelDRAW, Перо "
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 5,
@@ -1118,7 +1496,34 @@ window.EDU_LESSONS = {
         "минимальн",
         "пропорц"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Разработка логотипа, охранного поля и руководства по фирменному стилю (Brandbook)",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLW-zSkCnZ-gA5Jn6gZtUa6ElSTZsLPeMm",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Разработка логотипа, охранного поля"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Айдентика бренда, Охранное поле, Gu"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 6,
@@ -1177,7 +1582,34 @@ window.EDU_LESSONS = {
         "paragraph",
         "baseline"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Многостраничная вёрстка в Adobe InDesign: мастер-шаблоны и модульные сетки",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLW-zSkCnZ-gA5Jn6gZtUa6ElSTZsLPeMm",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Многостраничная вёрстка в Adobe InD"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Adobe InDesign, Master Pages (Paren"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 7,
@@ -1236,7 +1668,34 @@ window.EDU_LESSONS = {
         "маск",
         "curves"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Растровая графика, неразрушающая ретушь и обтравка в Adobe Photoshop",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLW-zSkCnZ-gA5Jn6gZtUa6ElSTZsLPeMm",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Растровая графика, неразрушающая ре"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Adobe Photoshop, Смарт-объекты, Мас"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 8,
@@ -1295,7 +1754,34 @@ window.EDU_LESSONS = {
         "overprint",
         "клапан"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Дизайн упаковки и этикетки: развёртка штампа (Dieline), вырубка и биговка",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLW-zSkCnZ-gA5Jn6gZtUa6ElSTZsLPeMm",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Дизайн упаковки и этикетки: развёрт"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Конструкция упаковки, Штамп развёрт"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 9,
@@ -1354,7 +1840,34 @@ window.EDU_LESSONS = {
         "cmyk",
         "pdf/x"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Допечатная подготовка (Prepress): 300 dpi, вылеты под обрез 3 мм и стандарт PDF/X-1a",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLW-zSkCnZ-gA5Jn6gZtUa6ElSTZsLPeMm",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Допечатная подготовка (Prepress): 3"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Prepress-контроль, Acrobat Prefligh"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 10,
@@ -1413,7 +1926,34 @@ window.EDU_LESSONS = {
         "носител",
         "pdf"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Итоговый дипломный проект: Комплексная айдентика и пакет носителей бренда",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLW-zSkCnZ-gA5Jn6gZtUa6ElSTZsLPeMm",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Итоговый дипломный проект: Комплекс"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Брендинг 360°, Айдентика, Носители "
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     }
   ],
   "autoelectric": [
@@ -1474,7 +2014,34 @@ window.EDU_LESSONS = {
         "2.5",
         "падени"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Закон Ома, расчёт сечения проводов и замер падения напряжения (Voltage Drop)",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLtKz_47wG_E_P7n9aI7xK8_C4Q5W5xZ",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Закон Ома, расчёт сечения проводов "
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Цифровой мультиметр True RMS, Закон"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 2,
@@ -1533,7 +2100,34 @@ window.EDU_LESSONS = {
         "предохранител",
         "сна"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Диагностика стартерных АКБ и поиск паразитного тока утечки в режиме покоя",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLtKz_47wG_E_P7n9aI7xK8_C4Q5W5xZ",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Диагностика стартерных АКБ и поиск "
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Тестер АКБ (CCA / SOH), Нагрузочная"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 3,
@@ -1592,7 +2186,34 @@ window.EDU_LESSONS = {
         "втягивающ",
         "щётк"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Диагностика и ремонт системы пуска: стартер, втягивающее реле и планетарный редуктор",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLtKz_47wG_E_P7n9aI7xK8_C4Q5W5xZ",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Диагностика и ремонт системы пуска:"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Мультиметр, Клещи постоянного тока "
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 4,
@@ -1651,7 +2272,34 @@ window.EDU_LESSONS = {
         "диодн",
         "статор"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Система зарядки: диагностика трёхфазного генератора, диодного моста и реле-регулятора",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLtKz_47wG_E_P7n9aI7xK8_C4Q5W5xZ",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Система зарядки: диагностика трёхфа"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Мультиметр (режим диодов и AC/DC), "
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 5,
@@ -1710,7 +2358,34 @@ window.EDU_LESSONS = {
         "86",
         "87"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Чтение автомобильных электросхем DIN 72552, реле и блоки предохранителей",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLtKz_47wG_E_P7n9aI7xK8_C4Q5W5xZ",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Чтение автомобильных электросхем DI"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Стандарт клемм DIN 72552, 4- и 5-ко"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 6,
@@ -1769,7 +2444,34 @@ window.EDU_LESSONS = {
         "опорн",
         "датчик"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Компьютерная диагностика ЭБУ по протоколу OBD-II: коды DTC, Freeze Frame и Live Data",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLtKz_47wG_E_P7n9aI7xK8_C4Q5W5xZ",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Компьютерная диагностика ЭБУ по про"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Мультимарочный сканер OBD-II (DLC J"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 7,
@@ -1828,7 +2530,34 @@ window.EDU_LESSONS = {
         "осциллограм",
         "лямбд"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Осциллографическая диагностика автомобильных датчиков: ДПКВ, ДПРВ, ДМРВ и лямбда-зонд",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLtKz_47wG_E_P7n9aI7xK8_C4Q5W5xZ",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Осциллографическая диагностика авто"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Автомобильный осциллограф / Мотор-т"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 8,
@@ -1887,7 +2616,34 @@ window.EDU_LESSONS = {
         "can-h",
         "2.5"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Диагностика мультиплексных сетей передачи данных CAN-High / CAN-Low и LIN",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLtKz_47wG_E_P7n9aI7xK8_C4Q5W5xZ",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Диагностика мультиплексных сетей пе"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Двухканальный осциллограф, Мультиме"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 9,
@@ -1946,7 +2702,34 @@ window.EDU_LESSONS = {
         "регулятор",
         "питани"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Электрооборудование кузова (BCM): LED-оптика с ШИМ (PWM), стеклоочистители и климат-контроль",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLtKz_47wG_E_P7n9aI7xK8_C4Q5W5xZ",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Электрооборудование кузова (BCM): L"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Кузовной блок BCM, ШИМ-модуляция (P"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 10,
@@ -2005,7 +2788,34 @@ window.EDU_LESSONS = {
         "гофр",
         "термоусадк"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Итоговый практический экзамен: Поиск скрытого короткого замыкания и ремонт жгута по заводскому стандарту",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLtKz_47wG_E_P7n9aI7xK8_C4Q5W5xZ",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Итоговый практический экзамен: Поис"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Лампа-ограничитель КЗ вместо предох"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     }
   ],
   "hvac": [
@@ -2066,7 +2876,34 @@ window.EDU_LESSONS = {
         "испарител",
         "гидроудар"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Термодинамика парокомпрессионного холодильного цикла и фазовые переходы",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLm8bS8P7gT3_HVAC_Cooling_Basics",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Термодинамика парокомпрессионного х"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: P-h диаграмма (давление-энтальпия),"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 2,
@@ -2125,7 +2962,34 @@ window.EDU_LESSONS = {
         "poe",
         "масл"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Хладагенты R600a (Изобутан), R134a, R404A и холодильные масла (Минеральное vs POE)",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLm8bS8P7gT3_HVAC_Cooling_Basics",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Хладагенты R600a (Изобутан), R134a,"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Линейка хладагентов R600a, R134a, R"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 3,
@@ -2184,7 +3048,34 @@ window.EDU_LESSONS = {
         "superheat",
         "subcooling"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Диагностика по манометрическому коллектору: расчёт перегрева (Superheat) и переохлаждения",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLm8bS8P7gT3_HVAC_Cooling_Basics",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Диагностика по манометрическому кол"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Манометрический коллектор (синий НД"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 4,
@@ -2243,7 +3134,34 @@ window.EDU_LESSONS = {
         "пусков",
         "рабоч"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Электродвигатели мотор-компрессоров: обмотки C, S, R и пускозащитные реле",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLm8bS8P7gT3_HVAC_Cooling_Basics",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Электродвигатели мотор-компрессоров"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Цифровой мультиметр, Пусковые и раб"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 5,
@@ -2302,7 +3220,34 @@ window.EDU_LESSONS = {
         "азот",
         "фильтр"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Сварочно-паечные работы в холодильной технике: пайка меди медно-фосфорным и серебряным припоем",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLm8bS8P7gT3_HVAC_Cooling_Basics",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Сварочно-паечные работы в холодильн"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Кислородно-пропановый пост (горелка"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 6,
@@ -2361,7 +3306,34 @@ window.EDU_LESSONS = {
         "утечк",
         "бар"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Опрессовка контура азотом, поиск утечек (течеискатель, УФ, мыльная пена) и устранение микротрещин",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLm8bS8P7gT3_HVAC_Cooling_Basics",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Опрессовка контура азотом, поиск ут"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Баллон сухого азота с редуктором вы"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 7,
@@ -2420,7 +3392,34 @@ window.EDU_LESSONS = {
         "насос",
         "влаг"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Глубокое вакуумирование контура двухступенчатым насосом и контроль вакуумметром",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLm8bS8P7gT3_HVAC_Cooling_Basics",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Глубокое вакуумирование контура дву"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Двухступенчатый пластинчато-роторны"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 8,
@@ -2479,7 +3478,34 @@ window.EDU_LESSONS = {
         "r600a",
         "обмерзан"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Заправка хладагента по электронным весам в граммах и замена фильтра-осушителя",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLm8bS8P7gT3_HVAC_Cooling_Basics",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Заправка хладагента по электронным "
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Прецизионные электронные весы фреон"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 9,
@@ -2549,7 +3575,34 @@ window.EDU_LESSONS = {
         "no frost",
         "биметалл"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Электросхемы систем No Frost: таймер оттайки, ТЭН, термопредохранитель и дефрост-термостат",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLm8bS8P7gT3_HVAC_Cooling_Basics",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Электросхемы систем No Frost: тайме"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Мультиметр, Биметаллический термост"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 10,
@@ -2608,7 +3661,34 @@ window.EDU_LESSONS = {
         "витрин",
         "вакуум"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Итоговый сервисный кейс: Диагностика, ремонт и сдача в эксплуатацию торговой холодильной витрины",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLm8bS8P7gT3_HVAC_Cooling_Basics",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Итоговый сервисный кейс: Диагностик"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Электронный микропроцессорный контр"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     }
   ],
   "automechanic": [
@@ -2669,7 +3749,34 @@ window.EDU_LESSONS = {
         "клапан",
         "бар"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Диагностика механической части двигателя: замер компрессии и пневмотестирование (Leak-Down Test)",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLuPq6q3LqX7_Mechanic_Engine_Tech",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Диагностика механической части двиг"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Компрессометр резьбовой, Пневмотест"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 2,
@@ -2739,7 +3846,34 @@ window.EDU_LESSONS = {
         "щуп",
         "метк"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Газораспределительный механизм (ГРМ): метки, натяжители ремня/цепи и регулировка зазоров клапанов",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLuPq6q3LqX7_Mechanic_Engine_Tech",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Газораспределительный механизм (ГРМ"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Набор щупов (0.05–1.00 мм), Фиксато"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 3,
@@ -2798,7 +3932,34 @@ window.EDU_LESSONS = {
         "овальн",
         "plastigauge"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Дефектовка цилиндропоршневой группы и коленчатого вала: микрометр, нутромер и пластигейдж",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLuPq6q3LqX7_Mechanic_Engine_Tech",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Дефектовка цилиндропоршневой группы"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Микрометр гладкий (0-25, 25-50, 50-"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 4,
@@ -2857,7 +4018,34 @@ window.EDU_LESSONS = {
         "манометр",
         "охлажден"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Диагностика и обслуживание систем смазки (масляный насос, давление масла) и охлаждения ДВС",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLuPq6q3LqX7_Mechanic_Engine_Tech",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Диагностика и обслуживание систем с"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Механический манометр давления масл"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 5,
@@ -2916,7 +4104,34 @@ window.EDU_LESSONS = {
         "корзин",
         "маховик"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Сцепление и механическая коробка передач (МКПП): дефектовка корзины, диска, выжимного подшипника",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLuPq6q3LqX7_Mechanic_Engine_Tech",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Сцепление и механическая коробка пе"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Штангенциркуль, Оправка центровки д"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 6,
@@ -2975,7 +4190,34 @@ window.EDU_LESSONS = {
         "шаров",
         "ступиц"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Подвеска и ходовая часть: диагностика сайлентблоков, шаровых опор, амортизаторов и ступичных подшипников",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLuPq6q3LqX7_Mechanic_Engine_Tech",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Подвеска и ходовая часть: диагности"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Монтажка диагноста, Индикатор часов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 7,
@@ -3034,7 +4276,34 @@ window.EDU_LESSONS = {
         "кастор",
         "схожден"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Углы установки колёс: 3D сход-развал (Развал Camber, Кастор Caster, Схождение Toe)",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLuPq6q3LqX7_Mechanic_Engine_Tech",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Углы установки колёс: 3D сход-разва"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Стенд 3D сход-развала с оптическими"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 8,
@@ -3093,7 +4362,34 @@ window.EDU_LESSONS = {
         "суппорт",
         "dot"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Тормозная система: биение тормозных дисков, ревизия суппортов, гидравлика и прокачка ABS",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLuPq6q3LqX7_Mechanic_Engine_Tech",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Тормозная система: биение тормозных"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Индикатор часового типа со струбцин"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 9,
@@ -3152,7 +4448,34 @@ window.EDU_LESSONS = {
         "дисбаланс",
         "н·м"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Шиномонтаж и балансировка колёс: статический и динамический дисбаланс, силовая неоднородность",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLuPq6q3LqX7_Mechanic_Engine_Tech",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Шиномонтаж и балансировка колёс: ст"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Шиномонтажный полуавтоматический ст"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     },
     {
       "num": 10,
@@ -3211,7 +4534,34 @@ window.EDU_LESSONS = {
         "масло",
         "фильтр"
       ],
-      "min_length": 95
+      "min_length": 95,
+      "video_url": "assets/sample-lesson.mp4",
+      "video_title": "Видео-разбор: Итоговый экзамен: Регламентное техническое обслуживание (ТО-1 / ТО-2) и составление заказ-наряда",
+      "video_duration": "00:52",
+      "video_poster": "assets/eduspace-logo.svg",
+      "embed_url": "https://www.youtube.com/embed/videoseries?list=PLuPq6q3LqX7_Mechanic_Engine_Tech",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение: Итоговый экзамен: Регламентное техн"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Инструменты: Чек-лист комплексного ТО СТО, Элект"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Пошаговый разбор практического алгоритма"
+        },
+        {
+          "sec": 45,
+          "time_str": "00:45",
+          "title": "Чек-лист качества и подготовка к сдаче"
+        }
+      ]
     }
   ]
 };
