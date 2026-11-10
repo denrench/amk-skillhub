@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ru" class="h-full scroll-smooth">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <!-- Open Graph / WhatsApp / Telegram Social Preview -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://amk-skillhub.onrender.com/"/>
+  <meta property="og:title" content="EDU SPACE — Цифровая образовательная среда АМК"/>
+  <meta property="og:description" content="Инновационная цифровая платформа Алматинского многопрофильного колледжа. 5 специальностей ТиПО, интерактивные тренажеры и реестр аккредитации."/>
+  <meta property="og:image" content="https://amk-skillhub.onrender.com/assets/eduspace-logo.svg"/>
+  <meta name="theme-color" content="#07090e"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+
+  <title>Личный кабинет студента — EDU SPACE | Цифровая образовательная платформа АМК</title>
+  <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg"/>
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
+
+  <!-- Tailwind CSS Local & CDN -->
+  <link rel="stylesheet" href="css/tailwind.min.css"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    if (window.tailwind) tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b'
+            },
+            dark: {
+              950: '#07090e',
+              900: '#0b0f19',
+              850: '#101524',
+              800: '#161c2e',
+              700: '#1e263d',
+              600: '#2a3452'
+            }
+          },
+          boxShadow: {
+            'glow-indigo': '0 0 50px -10px rgba(99, 102, 241, 0.35)',
+            'glow-purple': '0 0 50px -10px rgba(168, 85, 247, 0.35)',
+            'glow-cyan': '0 0 50px -10px rgba(6, 182, 212, 0.35)',
+            'glow-amber': '0 0 50px -10px rgba(245, 158, 11, 0.35)'
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    .bg-grid-white {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0f19;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a3452;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6366f1;
+    }
+  </style>
+
+  <script src="js/courses-catalog.js"></script>
+  <script src="js/app-logistics.js"></script>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/workshop.css">
+</head>
+<body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
+  <a class="academy-skip" href="#academy-main">К содержимому</a>
+
+  <!-- Ambient background glow orbs -->
+  <div class="fixed top-20 left-1/3 w-96 h-96 bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+  <div class="fixed bottom-20 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+  <!-- MOBILE NAVIGATION DRAWER BACKDROP & DRAWER -->
+  <div id="mobile-nav-backdrop" onclick="toggleMobileNav(false)" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 transition-opacity duration-300 opacity-0 pointer-events-none lg:hidden"></div>
+
+  <aside id="mobile-nav-drawer" class="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-dark-950/98 border-r border-white/10 z-50 flex flex-col justify-between shadow-2xl transition-transform duration-300 transform -translate-x-full lg:hidden">
+    <div class="flex flex-col flex-1 overflow-y-auto px-4 py-6">
+      <div class="flex items-center justify-between mb-6">
+        <a href="index.html" class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-glow-indigo">
+            <div class="w-full h-full bg-dark-900 rounded-[10px] flex items-center justify-center">
+              <img alt="EDU SPACE Logo" width="18" height="18" class="h-4 w-4 object-contain" src="assets/eduspace-logo.svg"/>
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-extrabold text-sm text-white tracking-tight flex items-center gap-1">
+              EDU SPACE <span class="text-[9px] uppercase font-bold px-1 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">АМК</span>
+            </span>
+            <span class="text-[9px] font-semibold text-indigo-400 uppercase">Личный кабинет</span>
+          </div>
+        </a>
+        <button type="button" onclick="toggleMobileNav(false)" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5" aria-label="Закрыть меню">
+          <span class="material-symbols-outlined text-[22px]">close</span>
+        </button>
+      </div>
+
+      <nav class="space-y-1 text-xs">
+        <a href="student.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3 py-2 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold shadow-glow-indigo">
+          <span class="material-symbols-outlined text-[19px]">home</span>
+          <span>Главная</span>
+        </a>
+        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openSubjectsModal();" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">school</span>
+          <span>Мои специальности</span>
+        </a>
+        <a href="tasks.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">event_note</span>
+          <span>Учебный план</span>
+        </a>
+        <a href="tasks.html" onclick="toggleMobileNav(false)" class="flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[19px]">menu_book</span>
+            <span>Уроки</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">1 открыт</span>
+        </a>
+        <a href="lesson_player.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-indigo-400">play_lesson</span>
+          <span>Интерактивный урок</span>
+        </a>
+        <a href="simulator.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-cyan-400">code</span>
+          <span>Практика</span>
+        </a>
+        <a href="tools.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-amber-300">construction</span>
+          <span>Тренажёры</span>
+        </a>
+        <a href="simulator.html#ai" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-indigo-400">smart_toy</span>
+          <span>AI-наставник</span>
+        </a>
+        <a href="tasks.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">assignment</span>
+          <span>Мои задания</span>
+        </a>
+        <a href="gradebook.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">grade</span>
+          <span>Оценки</span>
+        </a>
+        <a href="profile.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-amber-400">military_tech</span>
+          <span>Достижения</span>
+        </a>
+        <a href="verify.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-emerald-400">verified</span>
+          <span>Сертификаты</span>
+        </a>
+        <a href="career.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-purple-400">work</span>
+          <span>Карьера</span>
+        </a>
+        <a href="profile.html" onclick="toggleMobileNav(false)" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">account_circle</span>
+          <span>Профиль</span>
+        </a>
+        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openSettingsModal();" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">settings</span>
+          <span>Настройки</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-white/10 space-y-2 bg-dark-950/60">
+      <button type="button" onclick="toggleMobileNav(false); resetDemoMode();" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold transition-all border border-amber-500/30">
+        <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+        <span>Сбросить демо в начало (0%)</span>
+      </button>
+
+      <div class="flex items-center justify-between pt-2">
+        <a href="javascript:void(0)" onclick="toggleMobileNav(false); openSettingsModal();" class="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors">
+          <span class="material-symbols-outlined text-[18px]">settings</span>
+          <span>Настройки</span>
+        </a>
+        <button type="button" onclick="logoutUser()" class="flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors">
+          <span class="material-symbols-outlined text-[18px]">logout</span>
+          <span>Выйти</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 1. DESKTOP SIDEBAR -->
+  <aside class="fixed left-0 top-0 h-full w-64 bg-dark-950/95 backdrop-blur-xl border-r border-white/10 z-50 hidden lg:flex flex-col justify-between shadow-2xl">
+    <div class="flex flex-col flex-1 overflow-y-auto px-4 py-6">
+      <a href="index.html" class="flex items-center gap-3 px-2 mb-8 group">
+        <div class="relative w-9 h-9 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-glow-indigo transition-transform group-hover:scale-105">
+          <div class="w-full h-full bg-dark-900 rounded-[14px] flex items-center justify-center">
+            <img alt="EDU SPACE Logo" width="22" height="22" class="h-5 w-5 object-contain" src="assets/eduspace-logo.svg"/>
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-extrabold text-base text-white tracking-tight flex items-center gap-1.5">
+            EDU SPACE <span class="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">АМК</span>
+          </span>
+          <span class="text-[10px] font-semibold text-indigo-400 tracking-wider uppercase">Личный кабинет</span>
+        </div>
+      </a>
+
+      <nav class="space-y-1 text-xs">
+        <a href="student.html" class="flex items-center gap-3 px-3 py-2 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold shadow-glow-indigo transition-all">
+          <span class="material-symbols-outlined text-[19px]">home</span>
+          <span>Главная</span>
+        </a>
+        <a href="javascript:void(0)" onclick="openSubjectsModal()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">school</span>
+          <span>Мои специальности</span>
+        </a>
+        <a href="tasks.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">event_note</span>
+          <span>Учебный план</span>
+        </a>
+        <a href="tasks.html" class="flex items-center justify-between px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-[19px]">menu_book</span>
+            <span>Уроки</span>
+          </div>
+          <span id="sidebar-available-badge" class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">1 открыт</span>
+        </a>
+        <a href="lesson_player.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-indigo-400">play_lesson</span>
+          <span>Интерактивный урок</span>
+        </a>
+        <a href="simulator.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-cyan-400">code</span>
+          <span>Практика</span>
+        </a>
+        <a href="tools.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-amber-300">construction</span>
+          <span>Тренажёры</span>
+        </a>
+        <a href="simulator.html#ai" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-indigo-400">smart_toy</span>
+          <span>AI-наставник</span>
+        </a>
+        <a href="tasks.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">assignment</span>
+          <span>Мои задания</span>
+        </a>
+        <a href="gradebook.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">grade</span>
+          <span>Оценки</span>
+        </a>
+        <a href="profile.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-amber-400">military_tech</span>
+          <span>Достижения</span>
+        </a>
+        <a href="verify.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-emerald-400">verified</span>
+          <span>Сертификаты</span>
+        </a>
+        <a href="career.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px] text-purple-400">work</span>
+          <span>Карьера</span>
+        </a>
+        <a href="profile.html" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">account_circle</span>
+          <span>Профиль</span>
+        </a>
+        <a href="javascript:void(0)" onclick="openSettingsModal()" class="flex items-center gap-3 px-3 py-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold transition-colors">
+          <span class="material-symbols-outlined text-[19px]">settings</span>
+          <span>Настройки</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-white/10 space-y-2 bg-dark-950/60">
+      <button type="button" onclick="resetDemoMode()" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 text-xs font-bold transition-all border border-amber-500/30">
+        <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+        <span>Сбросить демо в начало (0%)</span>
+      </button>
+
+      <div class="flex items-center justify-between pt-2">
+        <a href="javascript:void(0)" onclick="openSettingsModal()" class="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors">
+          <span class="material-symbols-outlined text-[18px]">settings</span>
+          <span>Настройки</span>
+        </a>
+        <button type="button" onclick="logoutUser()" class="flex items-center gap-1 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors">
+          <span class="material-symbols-outlined text-[18px]">logout</span>
+          <span>Выйти</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 2. MAIN CONTENT WRAPPER -->
+  <div class="lg:pl-64 flex-1 flex flex-col min-h-screen w-full relative z-10">
+
+    <!-- TOP HEADER -->
+    <header class="fixed top-0 left-0 lg:left-64 right-0 h-16 bg-dark-900/80 backdrop-blur-xl border-b border-white/10 z-40 flex items-center justify-between px-4 sm:px-8">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button type="button" onclick="toggleMobileNav(true)" class="lg:hidden p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 -ml-1 mr-1" aria-label="Открыть меню">
+          <span class="material-symbols-outlined text-[24px]">menu</span>
+        </button>
+        <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30">
+          График курса: <span id="header-study-day">День 1</span>
+        </span>
+        <span class="text-xs text-slate-300 font-semibold hidden md:inline" data-user-course>
+          Курс загружается...
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div id="student-streak-badge" class="streak-badge-genz hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 font-extrabold text-xs shadow-glow-amber">
+          <span>🔥</span>
+          <span id="student-streak-text">1 день стрик</span>
+        </div>
+        <button type="button" onclick="openSubjectsModal()" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-xs font-bold text-slate-200 hover:text-white transition-all">
+          <span class="material-symbols-outlined text-[16px] text-indigo-400">swap_horiz</span>
+          <span>Сменить курс</span>
+        </button>
+        <button type="button" onclick="openMessengerModal()" class="p-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-colors relative" title="Обсуждение курса">
+          <span class="material-symbols-outlined text-[22px]">chat</span>
+        </button>
+        <button type="button" onclick="openNotificationsModal()" class="p-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-colors relative" title="Уведомления">
+          <span class="material-symbols-outlined text-[22px]">notifications</span>
+          <span data-notif-badge class="hidden absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full bg-indigo-500 ring-2 ring-dark-900"></span>
+        </button>
+
+        <a href="profile.html" class="flex items-center gap-2.5 pl-2.5 border-l border-white/10 hover:opacity-85 transition-opacity">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 text-white font-bold flex items-center justify-center text-xs shadow-glow-indigo" data-user-initials>
+            СТ
+          </div>
+          <div class="hidden md:flex flex-col text-left">
+            <span class="text-xs font-bold text-white leading-tight" data-user-name>Студент</span>
+            <span class="text-[10px] text-slate-400 font-medium" data-user-role>Личный кабинет</span>
+          </div>
+        </a>
+      </div>
+    </header>
+
+    <!-- MAIN BODY -->
+    <main id="academy-main" tabindex="-1" class="w-full pt-20 p-4 sm:p-8 space-y-7 flex-1">
+
+      <!-- WELCOME HERO BANNER -->
+      <section class="academy-workbench rounded-2xl p-5 sm:p-7">
+
+        <div class="max-w-3xl relative z-10 space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-bold tracking-wide">
+            <span class="material-symbols-outlined text-[16px] text-indigo-400">verified</span>
+            <span id="hero-course-badge">Моя программа</span>
+          </div>
+
+          <h1 class="font-extrabold text-2xl sm:text-3xl lg:text-4xl leading-tight text-white">
+            Здравствуйте, <span data-user-first-name class="bg-gradient-to-r from-indigo-400 via-purple-300 to-cyan-300 bg-clip-text text-transparent">Студент</span>!
+          </h1>
+
+          <p class="text-slate-300 text-xs sm:text-base leading-relaxed" id="hero-subtitle">
+            Продолжите с текущего урока или откройте учебник, чтобы повторить материал перед практикой.
+          </p>
+
+          <div class="pt-2 flex flex-wrap items-center gap-3">
+            <a href="learn.html" class="academy-action">Открыть учебник</a>
+            <a id="hero-next-lesson-btn" href="simulator.html?task=1" class="workshop-button workshop-button-primary gap-2">
+              <span id="hero-next-lesson-label">Приступить к Уроку №1</span>
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </a>
+            <a href="mission.html" class="px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-400 to-purple-500 text-slate-950 font-black text-xs sm:text-sm shadow-lg transition-all flex items-center gap-2 hover:scale-[1.02]">
+              <span class="material-symbols-outlined text-[18px]">palette</span>
+              <span>Миссия 01: Архитектор цвета (+500 XP)</span>
+            </a>
+            <a href="tasks.html" class="px-5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-bold text-xs sm:text-sm border border-white/15 transition-all flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px] text-indigo-400">view_list</span>
+              <span>Программа всех 10 модулей</span>
+            </a>
+            <button type="button" onclick="openSubjectsModal()" class="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white font-bold text-xs sm:text-sm border border-white/10 transition-all">
+              Выбрать другой курс
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ZERO-STATE ONBOARDING GUIDE (Shown only when completed === 0) -->
+      <section id="zero-state-onboarding" class="bg-dark-850/80 backdrop-blur-xl rounded-2xl p-6 border border-white/10 shadow-xl">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-indigo-400 text-[24px]">rocket_launch</span>
+            <h2 class="font-extrabold text-base text-white">Ваш старт с нуля: как проходит обучение на курсе</h2>
+          </div>
+          <span class="text-[11px] font-bold text-emerald-300 bg-emerald-500/20 border border-emerald-500/30 px-3 py-1 rounded-full">Прогресс 0% • Урок №1 открыт</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="p-4 rounded-xl bg-dark-950/60 border border-white/10 space-y-1.5">
+            <div class="font-extrabold text-indigo-400 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">menu_book</span>
+              <span>Шаг 1. Изучите теорию</span>
+            </div>
+            <p class="text-slate-400 leading-relaxed">В каждом открытом уроке вас ждёт структурированный конспект с практическими примерами и разбором типовых ошибок.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-dark-950/60 border border-white/10 space-y-1.5">
+            <div class="font-extrabold text-cyan-400 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">quiz</span>
+              <span>Шаг 2. Пройдите квиз (3 вопроса)</span>
+            </div>
+            <p class="text-slate-400 leading-relaxed">Закрепите прочитанный материал в интерактивном тесте с мгновенным объяснением правильных ответов.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-dark-950/60 border border-white/10 space-y-1.5">
+            <div class="font-extrabold text-emerald-400 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">terminal</span>
+              <span>Шаг 3. Сдайте практику в тренажёре</span>
+            </div>
+            <p class="text-slate-400 leading-relaxed">Запустите автотесты в браузере, проверьте критерии и отправьте работу преподавателю для занесения оценки в ведомость.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4 KEY METRICS -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="bg-dark-850/80 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-xl flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Прогресс курса</span>
+            <div class="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
+              <span class="material-symbols-outlined text-[18px]">trending_up</span>
+            </div>
+          </div>
+          <div>
+            <div class="font-extrabold text-2xl text-white" id="stat-progress-val">0%</div>
+            <div class="w-full bg-dark-950 h-2 rounded-full mt-2 overflow-hidden border border-white/5">
+              <div id="stat-progress-bar" class="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <span class="text-[11px] text-slate-400 block mt-2" id="stat-progress-sub">0 из 10 уроков зачтено</span>
+          </div>
+        </div>
+
+        <div class="bg-dark-850/80 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-xl flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Средний балл (GPA)</span>
+            <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+              <span class="material-symbols-outlined text-[18px]">grade</span>
+            </div>
+          </div>
+          <div>
+            <div class="font-extrabold text-2xl text-white" id="stat-grade-val">—</div>
+            <span class="text-[11px] text-slate-400 block mt-2" id="stat-grade-sub">Оценок пока нет (старт с нуля)</span>
+          </div>
+        </div>
+
+        <div class="bg-dark-850/80 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-xl flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Открыто по графику</span>
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+              <span class="material-symbols-outlined text-[18px]">event_available</span>
+            </div>
+          </div>
+          <div>
+            <div class="font-extrabold text-2xl text-white" id="stat-unlocked-val">1 из 10</div>
+            <span class="text-[11px] text-slate-400 block mt-2" id="stat-unlocked-sub">9 уроков откроются по дням</span>
+          </div>
+        </div>
+
+        <div class="bg-dark-850/80 backdrop-blur-xl p-6 rounded-2xl border border-white/10 shadow-xl flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Рейтинг и опыт</span>
+            <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/30">
+              <span class="material-symbols-outlined text-[18px]">workspace_premium</span>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-baseline justify-between">
+              <div class="font-extrabold text-2xl text-white" id="stat-xp-val">0 XP</div>
+              <span class="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-black border border-purple-500/30 uppercase" id="stat-level-badge">LVL 1</span>
+            </div>
+            <div class="w-full bg-dark-950 h-2 rounded-full mt-2 overflow-hidden border border-white/5">
+              <div id="stat-xp-bar" class="bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-400 h-full rounded-full transition-all duration-500" style="width: 15%"></div>
+            </div>
+            <span class="text-[11px] text-slate-400 block mt-2" id="stat-xp-sub">Уровень 1 • Начинающий специалист</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- GAMIFIED SKILL RADAR & YOUTH ENGAGEMENT BADGES -->
+      <section class="bg-dark-850/60 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-white/10 shadow-lg flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-500 text-white flex items-center justify-center font-black text-lg shadow-glow-amber">
+            🔥
+          </div>
+          <div>
+            <div class="text-xs font-black text-white flex items-center gap-1.5">
+              <span>УДАРНЫЙ СТУДЕНЧЕСКИЙ СТРИК</span>
+              <span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] border border-amber-500/30 font-bold">АКТИВЕН</span>
+            </div>
+            <p class="text-[11px] text-slate-400">Ежедневный прогресс ускоряет прокачку уровня и открывает сертификат отличия</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="px-3 py-1 rounded-xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-[15px] text-indigo-400">auto_awesome</span>
+            <span>AI-Ассистент 24/7</span>
+          </span>
+          <span class="px-3 py-1 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-[15px] text-cyan-400">terminal</span>
+            <span>Автопроверка кода</span>
+          </span>
+          <span class="px-3 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-[15px] text-emerald-400">verified</span>
+            <span>Диплом ТиПО АМК</span>
+          </span>
+          <span class="px-3 py-1 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-bold inline-flex items-center gap-1.5 shadow-sm">
+            <span class="material-symbols-outlined text-[15px] text-purple-400">bolt</span>
+            <span>+60 XP за модуль</span>
+          </span>
+        </div>
+      </section>
+
+      <!-- MAIN 2-COLUMN WORKSPACE -->
+      <section class="grid grid-cols-1 xl:grid-cols-12 gap-7">
+
+        <!-- LEFT 8 COLS: TODAY'S LESSON + 10-DAY CALENDAR -->
+        <div class="xl:col-span-8 space-y-7">
+
+          <!-- Current Focus Lesson -->
+          <div class="bg-dark-850/80 backdrop-blur-xl rounded-3xl p-6 sm:p-7 border border-white/10 shadow-xl space-y-4">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold border border-indigo-500/30" id="focus-badge">
+                Рекомендуемый модуль на сегодня
+              </span>
+              <span class="text-xs text-slate-400 font-medium" id="focus-deadline">Дедлайн: по графику</span>
+            </div>
+
+            <div>
+              <h2 class="font-extrabold text-xl text-white" id="focus-title">Загрузка текущего урока...</h2>
+              <p class="text-xs sm:text-sm text-slate-300 mt-1.5 leading-relaxed" id="focus-desc"></p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400 pt-1">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 font-semibold text-slate-300" id="focus-tools">Практикум</span>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 font-semibold text-slate-300" id="focus-time">60 мин</span>
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/30 font-semibold text-emerald-300">Теория + Квиз + Автотесты</span>
+            </div>
+
+            <div class="pt-3 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
+              <span class="text-xs text-slate-400" id="focus-status-hint">Статус: Доступно к выполнению</span>
+              <a id="focus-open-link" href="simulator.html?task=1" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-600 to-indigo-600 hover:shadow-indigo-500/40 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center gap-1.5 hover:scale-[1.02]">
+                <span>Открыть урок и тренажёр</span>
+                <span class="material-symbols-outlined text-[16px]">play_arrow</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Interactive 10-Day Drip-Feed Calendar -->
+          <div class="bg-dark-850/80 backdrop-blur-xl rounded-3xl p-6 sm:p-7 border border-white/10 shadow-xl space-y-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 class="font-extrabold text-lg text-white">Интерактивный график открытия уроков (Дни 1–10)</h3>
+                <p class="text-xs text-slate-400 mt-0.5">Нажмите на любой открытый день, чтобы перейти к уроку. Заблокированные модули показывают дату открытия.</p>
+              </div>
+              <a href="tasks.html" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 hover:underline shrink-0">Все задания списком →</a>
+            </div>
+
+            <div id="calendar-days-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT 4 COLS: RECENT REVIEWS & CURATOR -->
+        <div class="xl:col-span-4 space-y-7">
+
+          <!-- Curator Support Card -->
+          <div class="bg-dark-850/80 backdrop-blur-xl rounded-3xl p-6 border border-white/10 shadow-xl space-y-4">
+            <div class="flex items-center gap-3.5">
+              <div id="curator-avatar" class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white font-extrabold flex items-center justify-center text-base shadow-glow-indigo">
+                МВ
+              </div>
+              <div>
+                <div class="text-[11px] font-bold text-indigo-400 uppercase tracking-wider">Куратор вашего курса</div>
+                <div class="font-bold text-sm text-white" id="curator-name">Власов Михаил Григорьевич</div>
+                <div class="text-[11px] text-slate-400" id="curator-role">Проверка работ и консультации</div>
+              </div>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">
+              После отправки практического задания куратор видит ваш код и лог автотестов в электронном журнале и оставляет развёрнутый комментарий.
+            </p>
+            <button type="button" onclick="openMessengerModal()" class="w-full py-2.5 px-4 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 font-bold text-xs transition-colors flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-[18px]">forum</span>
+              <span>Открыть обсуждение курса</span>
+            </button>
+          </div>
+
+          <!-- Recent Submissions & Teacher Feedback -->
+          <div class="bg-dark-850/80 backdrop-blur-xl rounded-3xl p-6 border border-white/10 shadow-xl space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-extrabold text-base text-white">Последние оценки и рецензии</h3>
+              <button type="button" onclick="openGradesModal()" class="text-xs font-bold text-indigo-400 hover:text-indigo-300 hover:underline">Вся зачётка</button>
+            </div>
+            <div id="recent-grades-list" class="space-y-3">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    async function initStudentDashboard() {
+      const user = window.EduSpace.getActiveUser();
+      if (!user) return; // Handled by Auth Guard
+
+      const spec = user.specialty_slug || 'it';
+      const course = window.EduSpace.getCourseBySlug(spec);
+
+      // Update Curator Card & Hero Course Badge
+      document.getElementById('hero-course-badge').textContent = `Курс: ${course.code} — ${course.title}`;
+      document.getElementById('curator-name').textContent = course.curator;
+      document.getElementById('curator-avatar').textContent = course.curator_initials || window.EduSpace.getInitials(course.curator);
+      if (course.curator_role) document.getElementById('curator-role').textContent = course.curator_role;
+
+      // Load Profile Stats & Tasks
+      const [profRes, tasksRes, notifRes] = await Promise.all([
+        window.EduSpace.api(`/api/user/profile/${user.id}?specialty=${spec}`),
+        window.EduSpace.api(`/api/tasks?specialty=${spec}&user_id=${user.id}`),
+        window.EduSpace.api(`/api/notifications?user_id=${user.id}&group_name=${encodeURIComponent(user.group_name || '')}`)
+      ]);
+
+      const stats = (profRes.data && profRes.data.statistics) || { passed_count: 0, progress_percent: 0, avg_score: 0, gpa: 0, xp: 0, level: 1 };
+      const subs = ((profRes.data && profRes.data.submissions) || []).filter(s => s.specialty_slug === spec);
+      const tasks = (tasksRes.data && tasksRes.data.tasks) || [];
+      const curDay = (tasksRes.data && tasksRes.data.current_study_day) || 1;
+      const unreadCnt = (notifRes.data && notifRes.data.unread_count) || 0;
+
+      // Notifications badge
+      if (unreadCnt > 0) {
+        document.querySelectorAll('[data-notif-badge]').forEach(el => {
+          el.classList.remove('hidden');
+          if (el.id === 'sidebar-notif-count') el.textContent = String(unreadCnt);
+        });
+      }
+
+      // Header & Sidebar counters
+      document.getElementById('header-study-day').textContent = `День ${curDay}`;
+      const unlockedCnt = tasks.filter(t => !t.is_locked).length;
+      const lockedCnt = tasks.filter(t => t.is_locked).length;
+      document.getElementById('sidebar-available-badge').textContent = `${unlockedCnt} открыто`;
+
+      // Zero-state onboarding visibility
+      const zeroBox = document.getElementById('zero-state-onboarding');
+      if (stats.passed_count > 0 || subs.length > 0) {
+        zeroBox.classList.add('hidden');
+      } else {
+        zeroBox.classList.remove('hidden');
+      }
+
+      // 4 KPI Cards
+      document.getElementById('stat-progress-val').textContent = `${stats.progress_percent}%`;
+      document.getElementById('stat-progress-bar').style.width = `${stats.progress_percent}%`;
+      document.getElementById('stat-progress-sub').textContent = `${stats.passed_count} из 10 уроков зачтено`;
+
+      if (stats.avg_score > 0) {
+        document.getElementById('stat-grade-val').textContent = `${stats.avg_score} / 100`;
+        document.getElementById('stat-grade-sub').textContent = `Академический GPA: ${stats.gpa} из 4.00`;
+      } else {
+        document.getElementById('stat-grade-val').textContent = '—';
+        document.getElementById('stat-grade-sub').textContent = 'Оценок пока нет (старт с нуля)';
+      }
+
+      document.getElementById('stat-unlocked-val').textContent = `${unlockedCnt} из 10`;
+      document.getElementById('stat-unlocked-sub').textContent = lockedCnt > 0 ? `Ещё ${lockedCnt} откроются по графику` : 'Все 10 уроков курса открыты!';
+
+      document.getElementById('stat-xp-val').textContent = `${stats.xp} XP`;
+      document.getElementById('stat-xp-sub').textContent = `Уровень ${stats.level} • ${stats.passed_count >= 8 ? 'Дипломник курса' : (stats.passed_count >= 3 ? 'Уверенный практик' : 'Старт обучения')}`;
+      const lvlBadge = document.getElementById('stat-level-badge');
+      if (lvlBadge) lvlBadge.textContent = `LVL ${stats.level || 1}`;
+      const xpBar = document.getElementById('stat-xp-bar');
+      if (xpBar) {
+        const xpInLevel = (stats.xp || 0) % 100;
+        xpBar.style.width = `${Math.min(100, Math.max(12, xpInLevel))}%`;
+      }
+      const streakText = document.getElementById('student-streak-text');
+      if (streakText) {
+        const streakDays = Math.max(1, stats.passed_count || 1);
+        streakText.textContent = `${streakDays} ${streakDays === 1 ? 'день' : 'дня'} стрик`;
+      }
+
+      // Focus Lesson (first unlocked lesson not yet passed, else latest unlocked)
+      const nextLesson = tasks.find(t => !t.is_locked && t.status_code !== 'graded') || tasks.filter(t => !t.is_locked).pop() || tasks[0];
+      if (nextLesson) {
+        const href = `simulator.html?specialty=${spec}&task=${nextLesson.task_number}`;
+        document.getElementById('hero-next-lesson-btn').href = href;
+        document.getElementById('hero-next-lesson-label').textContent =
+          stats.passed_count === 0 ? `Приступить к Уроку №${nextLesson.task_number}` : `Продолжить: Урок №${nextLesson.task_number}`;
+
+        document.getElementById('focus-title').textContent = nextLesson.title;
+        document.getElementById('focus-desc').textContent = nextLesson.description;
+        document.getElementById('focus-tools').textContent = nextLesson.tools_required || 'Практикум';
+        document.getElementById('focus-time').textContent = nextLesson.time_limit || '60 мин';
+        document.getElementById('focus-deadline').textContent = `Дедлайн сдачи: ${nextLesson.deadline_exact || nextLesson.deadline_text}`;
+        document.getElementById('focus-status-hint').textContent = `Статус модуля: ${nextLesson.status_label}`;
+        document.getElementById('focus-open-link').href = href;
+      }
+
+      // Render 10-Day Interactive Calendar with Dark Cyber Styles
+      const calGrid = document.getElementById('calendar-days-grid');
+      calGrid.innerHTML = tasks.map(t => {
+        const isLocked = t.is_locked;
+        const sc = t.status_code;
+        let badgeHtml = '';
+        let cardCls = 'border-white/10 bg-dark-950/80 hover:border-indigo-400 hover:shadow-glow-indigo';
+
+        if (isLocked) {
+          cardCls = 'border-white/5 bg-dark-950/40 opacity-70';
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-400 text-[10px] font-bold flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">lock</span>День ${t.unlock_day}</span>`;
+        } else if (sc === 'graded') {
+          cardCls = 'border-emerald-500/30 bg-emerald-500/10 hover:border-emerald-400';
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold">Зачтено • ${t.student_score}/100</span>`;
+        } else if (sc === 'submitted') {
+          cardCls = 'border-indigo-500/30 bg-indigo-500/10 hover:border-indigo-400';
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-[10px] font-bold">На проверке</span>`;
+        } else if (sc === 'revision') {
+          cardCls = 'border-red-500/30 bg-red-500/10 hover:border-red-400';
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/30 text-red-300 text-[10px] font-bold">На доработке</span>`;
+        } else if (sc === 'in_progress') {
+          cardCls = 'border-amber-500/30 bg-amber-500/10 hover:border-amber-400';
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[10px] font-bold">В процессе</span>`;
+        } else {
+          badgeHtml = `<span class="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold shadow-glow-indigo">Доступно</span>`;
+        }
+
+        const actionAttr = isLocked
+          ? `onclick="showToast('Этот модуль откроется по графику: ${t.unlock_date_exact} (День ${t.unlock_day})', 'info')"`
+          : `onclick="window.location.href='simulator.html?specialty=${spec}&task=${t.task_number}'"`;
+
+        return `
+          <div ${actionAttr} class="cursor-pointer p-4 rounded-2xl border transition-all flex flex-col justify-between gap-2.5 ${cardCls}">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-[11px] font-extrabold text-slate-400 uppercase">Учебный день ${t.unlock_day}</span>
+              ${badgeHtml}
+            </div>
+            <div class="font-bold text-xs text-white line-clamp-2">${t.title}</div>
+            <div class="text-[10px] text-slate-400 flex items-center justify-between pt-1 border-t border-white/5">
+              <span>${isLocked ? `Открытие: ${t.unlock_date_exact}` : `Дедлайн: ${t.deadline_exact}`}</span>
+              <span class="font-bold ${isLocked ? 'text-slate-500' : 'text-indigo-400'}">${isLocked ? 'Закрыто' : 'Перейти →'}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Recent Grades & Teacher Feedback
+      const gradesBox = document.getElementById('recent-grades-list');
+      if (subs.length === 0) {
+        gradesBox.innerHTML = `
+          <div class="p-6 rounded-2xl bg-dark-950/60 border border-dashed border-white/10 text-center space-y-2">
+            <span class="material-symbols-outlined text-slate-500 text-[28px]">history_edu</span>
+            <div class="font-bold text-xs text-slate-300">История отправленных работ пуста</div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">Вы ещё не отправляли задания по этому курсу. Выполните Урок №1, чтобы получить первую оценку.</p>
+          </div>
+        `;
+      } else {
+        gradesBox.innerHTML = subs.slice(0, 5).map(s => {
+          const isPending = String(s.status).includes('проверк');
+          const isRev = String(s.status).includes('доработ');
+
+          let pillCls = 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+          let pillText = `${s.score}/100 (${s.grade_letter})`;
+          let commentHtml = '';
+
+          if (isPending) {
+            pillCls = 'bg-amber-500/20 text-amber-300 border border-amber-500/30';
+            pillText = '🟡 На проверке у куратора';
+            commentHtml = `<div class="text-[11px] text-amber-300 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20">
+              <strong>Статус куратора:</strong> Решение отправлено преподавателю. Преподаватель проверит код и выставит официальный балл.
+            </div>`;
+          } else if (isRev) {
+            pillCls = 'bg-red-500/20 text-red-300 border border-red-500/30';
+            pillText = `🔴 Доработка (${s.score}/100)`;
+            commentHtml = `<div class="text-[11px] text-red-300 bg-red-500/10 p-2.5 rounded-xl border border-red-500/20">
+              <strong>Замечание преподавателя:</strong> ${s.teacher_comment || 'Требуется исправить ошибки в коде и отправить работу повторно.'}
+            </div>`;
+          } else {
+            commentHtml = `<div class="text-[11px] text-indigo-300 bg-dark-950/60 p-2.5 rounded-xl border border-white/10">
+              <strong>Рецензия преподавателя:</strong> ${s.teacher_comment || 'Практическое решение успешно зачтено преподавателем.'}
+            </div>`;
+          }
+
+          return `
+            <div class="p-3.5 rounded-2xl bg-dark-950/60 border border-white/10 space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <span class="font-bold text-xs text-white">Урок №${s.task_number}. ${s.task_title}</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${pillCls}">${pillText}</span>
+              </div>
+              ${commentHtml}
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function toggleMobileNav(open) {
+      const backdrop = document.getElementById('mobile-nav-backdrop');
+      const drawer = document.getElementById('mobile-nav-drawer');
+      if (!backdrop || !drawer) return;
+      if (open) {
+        backdrop.classList.remove('opacity-0', 'pointer-events-none');
+        backdrop.classList.add('opacity-100');
+        drawer.classList.remove('-translate-x-full');
+        drawer.classList.add('translate-x-0');
+        document.body.classList.add('overflow-hidden');
+      } else {
+        backdrop.classList.remove('opacity-100');
+        backdrop.classList.add('opacity-0', 'pointer-events-none');
+        drawer.classList.remove('translate-x-0');
+        drawer.classList.add('-translate-x-full');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', initStudentDashboard);
+  </script>
+</body>
+</html>

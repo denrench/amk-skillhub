@@ -88,8 +88,24 @@ button.button { cursor: pointer; }
 .notice { border-left: 3px solid #8fa653; padding: .6rem .8rem; background: #eef3e9; }
 .notice:empty { display: none; }
 .notice[data-error=true] { border-color: #ac3e37; background: #fff0ee; }
+.skip-link { position: fixed; top: .5rem; left: .5rem; z-index: 10; padding: .6rem .8rem; background: var(--lime); color: var(--ink); border-radius: .5rem; transform: translateY(-150%); }
+.skip-link:focus { transform: none; }
+.dashboard-title { font-size: clamp(1.65rem, 4.7vw, 3rem); }
+.dashboard-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(235px, .43fr); gap: 1rem; align-items: start; }
+.dashboard-primary { grid-template-columns: minmax(0, 1fr) minmax(130px, .4fr); align-items: center; padding: clamp(1rem, 3vw, 2rem); background: var(--forest); color: #f9fbf5; }
+.dashboard-primary .eyebrow { color: var(--lime); }
+.dashboard-primary .muted { color: #d6e6db; }
+.dashboard-primary h2 { font-size: clamp(1.65rem, 4vw, 2.8rem); }
+.dashboard-progress { min-width: 0; display: grid; gap: .6rem; border-left: 1px solid #6a8375; padding-left: 1rem; color: #d6e6db; font-size: .9rem; }
+.dashboard-count { color: var(--lime); font-size: clamp(1.45rem, 3vw, 2.4rem); font-weight: 750; font-variant-numeric: tabular-nums; line-height: 1; }
+.dashboard-progress progress { width: 100%; accent-color: var(--lime); }
+.dashboard-panel h2 { font-size: clamp(1.25rem, 2.5vw, 1.65rem); }
+.dashboard-list { list-style: none; margin: 0; padding: 0; }
+.dashboard-list li { overflow-wrap: anywhere; border-top: 1px solid var(--line); padding: .65rem 0; }
+.dashboard-list li a { font-weight: 680; text-underline-offset: .2em; }
+.dashboard-notices li[data-unread] strong::before { display: inline-block; margin-right: .5rem; width: .6rem; height: .6rem; border-radius: 100%; background: #69834d; content: ''; }
 @media (max-width: 730px) {
-  .hero-grid, .catalog-layout, .lesson-layout, .auth-layout { grid-template-columns: minmax(0, 1fr); }
+  .hero-grid, .catalog-layout, .lesson-layout, .auth-layout, .dashboard-layout { grid-template-columns: minmax(0, 1fr); }
   .topbar .container { padding-block: .65rem; }
   .hero h1 { max-width: 15ch; }
   .catalog-menu { display: flex; flex-wrap: wrap; }
@@ -100,4 +116,6 @@ button.button { cursor: pointer; }
   .topbar nav a { padding-inline: .35rem; }
   .lesson-row { grid-template-columns: 2rem minmax(0, 1fr); }
   .lesson-row small { grid-column: 2; }
+  .dashboard-primary { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-progress { border-left: 0; border-top: 1px solid #6a8375; padding: .8rem 0 0; }
 }

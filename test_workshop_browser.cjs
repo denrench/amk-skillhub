@@ -105,6 +105,26 @@ async function auditAccessibility(page) {
       assert.equal(await point.getAttribute('aria-pressed'), 'true');
     }
     assert.equal(actual.size, 49);
+    await page.goto(origin + '/student.html', {waitUntil: 'domcontentloaded'});
+    await page.getByText('Войдите, чтобы увидеть свой прогресс и задания.').waitFor();
+    const student = await page.request.post(origin + '/api/auth/login', {
+      data: { email: 'student@amk.kz', password: 'student123' },
+    });
+    assert.equal((await student.json()).success, true);
+    const marked = await page.request.post(origin + '/api/academy/progress', {
+      data: { specialty: 'it', lesson: 1 },
+    });
+    assert.equal(marked.ok(), true);
+    await page.goto(origin + '/student.html', {waitUntil: 'domcontentloaded'});
+    await page.getByRole('heading', {name:/^Здравствуйте,/}).waitFor();
+    const nextLesson = page.getByRole('link', {name:'Продолжить урок'});
+    await nextLesson.waitFor();
+    assert.match(await nextLesson.getAttribute('href'), /course=it&lesson=2$/);
+    await auditAccessibility(page);
+    await page.getByRole('button', {name:'Выйти'}).click();
+    await page.waitForURL('**/auth.html?mode=login');
+    assert.equal((await (await page.request.get(origin + '/api/auth/session')).json()).authenticated, false);
+
     const auth = await page.request.post(origin + '/api/auth/login', {
       data: { email: 'teacher@amk.kz', password: 'teacher123' },
     });

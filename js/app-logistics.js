@@ -2011,98 +2011,82 @@
     openModal('🔔 Центр уведомлений', `<div class="space-y-2.5">${listHtml}</div>`);
   }
 
-  async function openMessengerModal(recipientLabel) {
-    const user = getActiveUser();
-    const course = getCourseBySlug((user && user.specialty_slug) || 'it');
-    const titleLabel = recipientLabel || `Куратор курса (${course.curator})`;
-    const channel = 'general';
-    const res = await apiRequest(`/api/messages?channel=${channel}`);
-    const msgs = (res.data && res.data.messages) || [];
-    const renderMsg = m => {
-      const isMe = user && (m.sender_id === user.id || m.sender_name === user.full_name);
-
-      return `
-        <div class="flex ${isMe ? 'justify-end' : 'items-start gap-2'}">
-          ${!isMe ? `<div class="w-7 h-7 rounded-full bg-indigo-500/20 text-indigo-300 font-bold flex items-center justify-center text-[10px] shrink-0 border border-indigo-500/30">${getInitials(m.sender_name)}</div>` : ''}
-          <div class="${isMe ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white shadow-glow-indigo' : 'bg-dark-900/80 text-slate-200 border border-white/10'} p-3 rounded-2xl max-w-[82%] shadow-sm text-xs">
-            <div class="font-bold text-[10px] ${isMe ? 'text-indigo-200' : 'text-indigo-400'} mb-0.5">${m.sender_name}</div>
-            <p class="leading-relaxed">${m.body.replace(/</g, '&lt;')}</p>
-            <span class="text-[9px] ${isMe ? 'text-indigo-200' : 'text-slate-500'} block mt-1 text-right font-mono">${m.created_at || 'Сейчас'}</span>
-          </div>
-        </div>
-      `;
-    };
-    openModal(`💬 Чат курса — ${titleLabel}`, `
-      <div class="flex flex-col h-80 border border-white/10 rounded-2xl overflow-hidden bg-dark-950/60">
-        <div id="edu-chat-box" class="flex-1 p-4 overflow-y-auto space-y-3">
-          ${msgs.map(renderMsg).join('')}
-        </div>
-        <form id="edu-chat-form" class="p-2.5 bg-dark-900/90 border-t border-white/10 flex gap-2">
-          <input type="text" id="edu-chat-input" placeholder="Напишите вопрос преподавателю или в группу..." class="flex-1 px-3.5 py-2 border border-white/15 bg-dark-800 text-white rounded-xl text-xs focus:outline-none focus:border-indigo-500 placeholder-slate-500" required />
-          <button type="submit" class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white rounded-xl text-xs font-bold shadow-glow-indigo flex items-center gap-1.5 transition-all">
-            <span>Отправить</span>
-            <span class="material-symbols-outlined text-[15px]">send</span>
-          </button>
+  async function openMessengerModal(recipient) {
+    const peerId = Number.isInteger(recipient) && recipient > 0 ? recipient : null;
+    openModal(peerId ? 'Личный диалог' : 'Обсуждение курса', `
+      <div class="flex flex-col h-80 border border-white/10 rounded-2xl bg-dark-950/60">
+        <p id="edu-chat-status" class="px-4 pt-3 text-sm text-slate-300" role="status">Загружаем сообщения…</p>
+        <div id="edu-chat-box" class="flex-1 p-4 overflow-y-auto space-y-3" role="log" aria-label="Сообщения чата"></div>
+        <form id="edu-chat-form" class="p-2.5 bg-dark-900/90 border-t border-white/10 flex flex-wrap gap-2" hidden>
+          <input type="text" id="edu-chat-input" aria-label="Сообщение" placeholder="Напишите сообщение" maxlength="1000" class="min-w-0 flex-1 px-3 py-2 border border-white/15 bg-dark-800 text-white rounded-xl text-sm" required>
+          <button type="submit" class="academy-action">Отправить</button>
         </form>
       </div>
     `);
-
+    const status = document.getElementById('edu-chat-status');
     const box = document.getElementById('edu-chat-box');
-
-    if (box) box.scrollTop = box.scrollHeight;
-
     const form = document.getElementById('edu-chat-form');
+    const input = document.getElementById('edu-chat-input');
+    let viewer;
 
-    if (form) {
-      form.onsubmit = async (e) => {
-        e.preventDefault();
-
-        const inp = document.getElementById('edu-chat-input');
-        const text = (inp && inp.value || '').trim();
-
-        if (!text) return;
-        inp.value = '';
-
-        const senderName = user ? user.full_name : 'Гость';
-        const senderRole = user ? user.role : 'student';
-        await apiRequest('/api/messages/send', {
-          method: 'POST',
-          body: { sender_id: user ? user.id : null, sender_name: senderName, sender_role: senderRole, channel, body: text }
-        });
-
-        if (box) {
-          box.insertAdjacentHTML('beforeend', renderMsg({
-            sender_id: user ? user.id : 999,
-            sender_name: senderName,
-            body: text,
-            created_at: 'Только что'
-          }));
-          box.scrollTop = box.scrollHeight;
-        }
-
-        if (!user || user.role === 'student') {
-          setTimeout(async () => {
-            const replyText = `Принято, ${user ? (user.first_name || user.full_name.split(' ')[1] || user.full_name) : 'студент'}! Проверьте критерии в вкладке «Практика» — если автотесты зелёные, нажимайте «Отправить работу», я сразу проверю.`;
-            await apiRequest('/api/messages/send', {
-              method: 'POST',
-              body: { sender_id: 3, sender_name: course.curator, sender_role: 'teacher', channel, body: replyText }
-            });
-
-            const liveBox = document.getElementById('edu-chat-box');
-
-            if (liveBox) {
-              liveBox.insertAdjacentHTML('beforeend', renderMsg({
-                sender_id: 3,
-                sender_name: course.curator,
-                body: replyText,
-                created_at: 'Только что'
-              }));
-              liveBox.scrollTop = liveBox.scrollHeight;
-            }
-          }, 900);
-        }
-      };
+    function appendMessage(message) {
+      const item = document.createElement('article');
+      item.className = 'rounded-xl border border-white/10 p-3 max-w-[88%] overflow-wrap-anywhere';
+      if (message.sender_id === viewer) item.classList.add('ml-auto', 'bg-indigo-900');
+      else item.classList.add('bg-dark-900');
+      const author = document.createElement('strong');
+      author.textContent = message.sender_name;
+      const body = document.createElement('p');
+      body.className = 'text-sm whitespace-pre-wrap break-words';
+      body.textContent = message.body;
+      item.append(author, body);
+      box.append(item);
+      box.scrollTop = box.scrollHeight;
     }
+
+    async function chatRequest(path, options = {}) {
+      const response = await fetch(path, { ...options, credentials: 'same-origin', signal: AbortSignal.timeout(6000) });
+      if (response.status === 401) throw new Error('Войдите в аккаунт, чтобы открыть чат.');
+      if (response.status === 403) throw new Error('Этот диалог недоступен вашему аккаунту.');
+      if (!response.ok) throw new Error('Сервер чата временно недоступен.');
+      return response.json();
+    }
+
+    try {
+      const query = peerId ? '?peer_id=' + peerId : '';
+      const data = await chatRequest('/api/messages' + query);
+      if (!box.isConnected) return;
+      viewer = data.viewer_id;
+      data.messages.forEach(appendMessage);
+      status.textContent = data.peer_name || (data.messages.length ? 'Сообщения участников курса' : 'Пока нет сообщений. Можно начать обсуждение.');
+      form.hidden = false;
+    } catch (error) {
+      status.textContent = error.message;
+      return;
+    }
+
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const body = input.value.trim();
+      const submit = form.querySelector('button');
+      if (!body || submit.disabled) return;
+      submit.disabled = true;
+      try {
+        const data = await chatRequest('/api/messages/send', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({body, peer_id: peerId}),
+        });
+        if (!box.isConnected) return;
+        appendMessage(data.message);
+        input.value = '';
+        status.textContent = 'Сообщение отправлено.';
+        input.focus();
+      } catch (error) {
+        status.textContent = error.message;
+      } finally {
+        submit.disabled = false;
+      }
+    });
   }
 
   function openSettingsModal() {
@@ -2327,7 +2311,7 @@
   function hydratePageIdentity() {
     const path = window.location.pathname.toLowerCase();
     const user = getActiveUser();
-    const isProtectedStudent = path.endsWith('student.html') || path.endsWith('/student') ||
+    const isProtectedStudent = path.endsWith('student.html') || path.endsWith('/student') || path.endsWith('student-workspace.html') ||
       path.endsWith('tasks.html') || path.endsWith('/tasks') ||
       path.endsWith('simulator.html') || path.endsWith('/simulator') ||
       path.endsWith('profile.html') || path.endsWith('/profile');

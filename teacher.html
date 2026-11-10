@@ -1000,7 +1000,7 @@
                 <button type="button" onclick="openStudentProfileModal(${Number(st.id)})" title="Просмотреть карточку студента" class="p-1.5 rounded-lg border border-white/10 hover:bg-white/10 text-slate-300">
                   <span class="material-symbols-outlined text-[18px]">visibility</span>
                 </button>
-                <button type="button" onclick="openMessengerModal('Чат со студентом: ${fullNameEsc.replace(/'/g, '')}')" title="Написать студенту" class="p-1.5 rounded-lg border border-white/10 hover:bg-white/10 text-indigo-400">
+                <button type="button" onclick="openMessengerModal(${Number(st.id)})" title="Написать студенту" class="p-1.5 rounded-lg border border-white/10 hover:bg-white/10 text-indigo-400">
                   <span class="material-symbols-outlined text-[18px]">chat</span>
                 </button>
               </div>

@@ -340,7 +340,7 @@ class PostgresCursorWrapper:
         has_returning = "RETURNING" in pg_query.upper()
         
         # Tables without 'id' column
-        tables_without_id = ("email_verifications", "platform_settings")
+        tables_without_id = ("email_verifications", "platform_settings", "notification_reads")
         table_has_no_id = any(tbl in pg_query.lower() for tbl in tables_without_id)
 
         if is_insert and not has_returning and not table_has_no_id:
@@ -813,6 +813,11 @@ def init_db():
                     is_read INTEGER DEFAULT 0,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );""",
+                """CREATE TABLE IF NOT EXISTS notification_reads (
+                    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                    notification_id INTEGER NOT NULL REFERENCES notifications(id) ON DELETE CASCADE,
+                    PRIMARY KEY (user_id, notification_id)
+                );""",
                 """CREATE TABLE IF NOT EXISTS messages (
                     id SERIAL PRIMARY KEY,
                     sender_id INTEGER,
@@ -1101,6 +1106,13 @@ def init_db():
         type TEXT DEFAULT 'info',
         is_read INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS notification_reads (
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        notification_id INTEGER NOT NULL REFERENCES notifications(id) ON DELETE CASCADE,
+        PRIMARY KEY (user_id, notification_id)
     );
     """)
 
@@ -2124,9 +2136,32 @@ def login():
 # USER PROFILE, COURSES & DASHBOARD API
 # ==========================================
 
+def private_catalog_user():
+    requested = request.args.get('user_id', type=int)
+    if not requested:
+        return None, None
+    user = get_current_user()
+    if not user:
+        return None, (jsonify({"success": False, "message": "Войдите, чтобы увидеть личный прогресс."}), 401)
+    if requested != user['id']:
+        return None, (jsonify({"success": False, "message": "Чужой прогресс недоступен."}), 403)
+    return user['id'], None
+
+
+@app.after_request
+def prevent_private_api_caching(response):
+    if request.path.startswith(('/api/auth/', '/api/academy/', '/api/user/profile', '/api/notifications', '/api/messages')) or (
+        request.path in ('/api/tasks', '/api/courses') and request.args.get('user_id')
+    ):
+        response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
 @app.route('/api/courses', methods=['GET'])
 def list_courses():
-    user_id = request.args.get('user_id', type=int)
+    user_id, error = private_catalog_user()
+    if error:
+        return error
     conn = get_db()
     cursor = conn.cursor()
 
@@ -2387,7 +2422,9 @@ def get_tasks():
         specialty = SPECIALTY_ALIASES.get(specialty.lower().strip(), specialty)
     mode = request.args.get('mode')
     ticket = request.args.get('ticket')
-    user_id = request.args.get('user_id', type=int)
+    user_id, error = private_catalog_user()
+    if error:
+        return error
 
     current_day = get_current_day()
     conn = get_db()
@@ -3476,72 +3513,116 @@ def get_teacher_stats():
 # ==========================================
 
 @app.route('/api/notifications', methods=['GET'])
+@login_required()
 def get_notifications():
-    user_id = request.args.get('user_id', type=int)
-    group_name = request.args.get('group_name', '')
+    user = g.current_user
+    user_id = user['id']
     conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute("""
-    SELECT id, user_id, target_group, title, body, type, is_read, created_at
-    FROM notifications
-    WHERE (user_id = ? OR (user_id IS NULL AND (target_group = '' OR target_group = ?)))
-    ORDER BY id DESC
+    SELECT n.id, n.user_id, n.target_group, n.title, n.body, n.type, n.created_at,
+           CASE WHEN n.user_id IS NOT NULL THEN n.is_read
+                WHEN r.notification_id IS NOT NULL THEN 1 ELSE 0 END AS is_read
+    FROM notifications n
+    LEFT JOIN notification_reads r ON r.notification_id = n.id AND r.user_id = ?
+    WHERE n.user_id = ? OR (n.user_id IS NULL AND (n.target_role = '' OR n.target_role = ?)
+        AND (n.target_group = '' OR n.target_group = ?))
+    ORDER BY n.id DESC
     LIMIT 30
-    """, (user_id or -1, group_name))
+    """, (user_id, user_id, user['role'], user['group_name'] or ''))
     items = [dict(r) for r in cursor.fetchall()]
     unread = sum(1 for x in items if not x['is_read'])
     return jsonify({"success": True, "unread_count": unread, "notifications": items})
 
 
 @app.route('/api/notifications/read', methods=['POST'])
+@login_required()
 def mark_notifications_read():
-    data = request.get_json() or {}
-    user_id = data.get('user_id')
+    user = g.current_user
+    user_id = user['id']
     conn = get_db()
     cursor = conn.cursor()
-    if user_id:
-        cursor.execute("UPDATE notifications SET is_read = 1 WHERE user_id = ? OR user_id IS NULL", (user_id,))
-        conn.commit()
+    cursor.execute("UPDATE notifications SET is_read = 1 WHERE user_id = ?", (user_id,))
+    cursor.execute("""
+        INSERT INTO notification_reads (user_id, notification_id)
+        SELECT ?, id FROM notifications
+        WHERE user_id IS NULL AND (target_role = '' OR target_role = ?)
+            AND (target_group = '' OR target_group = ?)
+        ON CONFLICT(user_id, notification_id) DO NOTHING
+    """, (user_id, user['role'], user['group_name'] or ''))
+    conn.commit()
     return jsonify({"success": True})
 
 
+def message_channel(user, peer_id):
+    if peer_id is None:
+        specialty = user['specialty_slug'] or 'it'
+        return (f'course:{specialty}', None) if specialty in COURSES_BY_SLUG else (None, None)
+    if type(peer_id) is not int or peer_id == user['id']:
+        return None, None
+    cursor = get_db().cursor()
+    cursor.execute("SELECT id, role, group_name, full_name, is_demo FROM users WHERE id = ?", (peer_id,))
+    peer = cursor.fetchone()
+    if not peer or (HOSTED and peer['is_demo']) or {user['role'], peer['role']} != {'student', 'teacher'}:
+        return None, None
+    student, teacher = (user, peer) if user['role'] == 'student' else (peer, user)
+    if student['group_name'] not in get_teacher_assigned_groups(teacher['id']):
+        return None, None
+    lower, higher = sorted((user['id'], peer_id))
+    return f'direct:{lower}:{higher}', peer['full_name']
+
+
 @app.route('/api/messages', methods=['GET'])
+@login_required()
 def list_messages():
-    channel = request.args.get('channel', 'general')
+    user = g.current_user
+    peer_id = request.args.get('peer_id', type=int)
+    if 'peer_id' in request.args and peer_id is None:
+        return jsonify({"success": False, "message": "Укажите собеседника."}), 400
+    channel, peer_name = message_channel(user, peer_id)
+    if not channel:
+        return jsonify({"success": False, "message": "Этот чат недоступен."}), 403
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("""
     SELECT id, sender_id, sender_name, sender_role, recipient_key, body, created_at
     FROM messages
     WHERE recipient_key = ?
-    ORDER BY id ASC
+    ORDER BY id DESC
     LIMIT 50
     """, (channel,))
-    return jsonify({"success": True, "messages": [dict(r) for r in cursor.fetchall()]})
+    return jsonify({
+        "success": True, "viewer_id": user['id'], "peer_name": peer_name,
+        "messages": [dict(row) for row in reversed(cursor.fetchall())],
+    })
 
 
 @app.route('/api/messages/send', methods=['POST'])
+@login_required()
 def send_message_api():
-    data = request.get_json() or {}
-    sender_id = data.get('sender_id')
-    sender_name = (data.get('sender_name') or 'Пользователь').strip()
-    sender_role = (data.get('sender_role') or 'student').strip()
-    channel = (data.get('channel') or 'general').strip()
-    body = re.sub(r'<script[^>]*>.*?</script>', '', (data.get('body') or ''), flags=re.IGNORECASE | re.DOTALL).strip()
-    body = body.replace('<script', '&lt;script').replace('</script>', '&lt;/script&gt;')
-
-    if not body:
-        return jsonify({"success": False, "message": "Сообщение не может быть пустым."}), 400
+    user = g.current_user
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"success": False, "message": "Введите сообщение."}), 400
+    body = data.get('body')
+    if not isinstance(body, str) or not 1 <= len(body.strip()) <= 1000:
+        return jsonify({"success": False, "message": "Сообщение должно содержать от 1 до 1000 символов."}), 400
+    channel, _ = message_channel(user, data.get('peer_id'))
+    if not channel:
+        return jsonify({"success": False, "message": "Этот чат недоступен."}), 403
 
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute("""
     INSERT INTO messages (sender_id, sender_name, sender_role, recipient_key, body)
     VALUES (?, ?, ?, ?, ?)
-    """, (sender_id, sender_name, sender_role, channel, body))
+    """, (user['id'], user['full_name'], user['role'], channel, body.strip()))
     conn.commit()
-    return jsonify({"success": True, "id": cursor.lastrowid})
+    return jsonify({"success": True, "message": {
+        "id": cursor.lastrowid, "sender_id": user['id'], "sender_name": user['full_name'],
+        "sender_role": user['role'], "body": body.strip(),
+    }})
 
 
 @app.route('/api/grades/save', methods=['POST'])
