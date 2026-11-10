@@ -1,0 +1,262 @@
+{
+  "meta": {
+    "locale": "ru",
+    "languageName": "Русский",
+    "shortCode": "РУС",
+    "script": "Cyrl",
+    "pageTitle": "Программа курса и модули — EDU SPACE | АМК",
+    "pageDescription": "Программа курса и модули — EDU SPACE | Цифровая образовательная платформа АМК"
+  },
+  "a11y": {
+    "skipToContent": "К содержимому",
+    "sidebarNav": "Боковая навигация",
+    "sidebarSections": "Разделы кабинета",
+    "collapseSidebar": "Свернуть или развернуть меню",
+    "collapseSidebarTitle": "Свернуть меню",
+    "breadcrumbs": "Хлебные крошки",
+    "langSwitcher": "Выбор языка интерфейса",
+    "nextActionRegion": "Ближайшее действие",
+    "courseHeaderRegion": "О курсе и ваш прогресс",
+    "courseProgressLabel": "Освоение курса",
+    "controlsRegion": "Фильтры и поиск уроков",
+    "statusFilterGroup": "Фильтр по статусу уроков",
+    "searchLabel": "Поиск по теме или инструментам",
+    "lessonsListRegion": "Список модулей курса",
+    "mobileNav": "Мобильная навигация",
+    "closeModal": "Закрыть окно"
+  },
+  "brand": {
+    "homeTitle": "На главную EDU SPACE",
+    "cabinetSubtitle": "Кабинет АМК"
+  },
+  "lang": {
+    "switcherLabel": "Язык интерфейса",
+    "ru": "Русский",
+    "kk": "Қазақша",
+    "ruShort": "РУС",
+    "kkShort": "ҚАЗ",
+    "fallbackBadge": "На русском",
+    "fallbackTooltip": "Материал временно доступен на русском языке"
+  },
+  "nav": {
+    "group": {
+      "learning": "Обучение",
+      "progress": "Прогресс",
+      "communication": "Общение",
+      "profile": "Профиль"
+    },
+    "myLearning": "Моё обучение",
+    "myLearningTooltip": "Моё обучение и курсы",
+    "lessonsAndTasks": "Уроки и задания",
+    "lessonsAndTasksTooltip": "Уроки и задания",
+    "availableCountTitle": "Доступно уроков",
+    "roadmap": "Дорожная карта",
+    "roadmapTooltip": "Дорожная карта курса",
+    "grades": "Оценки",
+    "gradesTooltip": "Оценки и зачётка",
+    "deadlines": "Дедлайны",
+    "deadlinesTooltip": "Календарь дедлайнов",
+    "curatorChat": "Чат с куратором",
+    "curatorChatTooltip": "Чат с куратором",
+    "curatorOnlineTitle": "Куратор онлайн",
+    "notifications": "Уведомления",
+    "notificationsTooltip": "Уведомления",
+    "profileAndCert": "Профиль и сертификат",
+    "profileAndCertTooltip": "Профиль и сертификат",
+    "career": "Карьера",
+    "careerTooltip": "Карьера и резюме",
+    "tools": "Инструменты",
+    "toolsTooltip": "Учебные инструменты",
+    "resetDemo": "Сбросить демо-прогресс",
+    "resetDemoTitle": "Сбросить демо-прогресс к 0%",
+    "settings": "Настройки",
+    "settingsTooltip": "Настройки",
+    "logout": "Выйти",
+    "logoutTooltip": "Выйти",
+    "mobile": {
+      "cabinet": "Кабинет",
+      "modules": "Модули",
+      "roadmap": "Карта",
+      "chat": "Чат",
+      "profile": "Профиль"
+    }
+  },
+  "header": {
+    "breadcrumbCabinet": "Кабинет",
+    "breadcrumbModules": "Модули",
+    "studyDayBadge": "День {day} из {total}",
+    "studyDayTooltip": "По учебному расписанию каждый новый день открывает следующий модуль",
+    "studentDefaultName": "Студент",
+    "studentDefaultInitials": "СТ"
+  },
+  "continueBanner": {
+    "badge": "Следующий шаг",
+    "subtitle": "Практический модуль · ~{duration} · {deadline}",
+    "startBtn": "Начать урок {num}",
+    "continueBtn": "Продолжить урок {num}",
+    "mobileBtn": "Продолжить · Урок {num}"
+  },
+  "course": {
+    "curatorLine": "{code} · Куратор: {curator}",
+    "switchCourseBtn": "Сменить курс",
+    "switchCourseAria": "Сменить курс обучения",
+    "primaryCtaStart": "Начать урок {num}",
+    "primaryCtaContinue": "Продолжить обучение · Урок {num}",
+    "textbookBtn": "Учебник и разобранные примеры",
+    "progress": {
+      "label": "Освоение курса",
+      "summary": "{done} из {total} зачтено · Следующий шаг: Урок {next}",
+      "setPrimary": "Сделать основным",
+      "isPrimary": "Основной курс ✓"
+    },
+    "catalog": {
+      "it": {
+        "title": "Программное обеспечение (Web Design)",
+        "shortTitle": "Web Design",
+        "description": "Практический курс веб-дизайна: подготовка графики в Photoshop и Illustrator, проектирование интерфейсов, Auto Layout и компонентов в Figma, вёрстка HTML/CSS и интерактив."
+      },
+      "graphic_design": {
+        "title": "Графический дизайн и брендинг",
+        "shortTitle": "Графический дизайн",
+        "description": "Создание айдентики, векторной графики, рекламных постеров и многостраничных макетов в Illustrator, Photoshop и Figma."
+      },
+      "autoelectric": {
+        "title": "Автоэлектрика и компьютерная диагностика",
+        "shortTitle": "Автоэлектрика",
+        "description": "Диагностика цепей мультиметром и осциллографом, проверка системы пуска, датчиков ЭСУД, шин CAN/LIN и чтение кодов OBD-II."
+      },
+      "hvac": {
+        "title": "Холодильное оборудование и кондиционирование",
+        "shortTitle": "Холодильное оборудование",
+        "description": "Термодинамический цикл, диагностика герметичности, вакуумирование, заправка хладагентов и настройка автоматики."
+      },
+      "automechanic": {
+        "title": "Автомеханика и техническое обслуживание",
+        "shortTitle": "Автомеханика",
+        "description": "Дефектовка узлов ДВС, фазы ГРМ, обслуживание тормозной системы, подвески, трансмиссии и регламентное ТО."
+      }
+    }
+  },
+  "filter": {
+    "available": "Доступные",
+    "inProgress": "В процессе",
+    "submitted": "На проверке",
+    "graded": "Проверено",
+    "locked": "Заблокировано",
+    "all": "Все",
+    "emptyTitle": "В этой категории пока нет уроков",
+    "showAllBtn": "Показать все {total} модулей"
+  },
+  "search": {
+    "placeholder": "Поиск по теме, тегам или инструментам (Figma, SVG, 72 ppi)..."
+  },
+  "lesson": {
+    "prefix": "Урок {num}. ",
+    "moduleDuration": "{minutes} мин",
+    "status": {
+      "available": "Доступно",
+      "inProgress": "В процессе",
+      "inProgressQuiz": "В процессе · Квиз {score}/3",
+      "submitted": "На проверке",
+      "graded": "Зачтено · {score}/100",
+      "locked": "Заблокировано"
+    },
+    "action": {
+      "start": "Начать урок",
+      "continue": "Продолжить урок",
+      "simulator": "Тренажёр",
+      "open": "Открыть"
+    },
+    "dates": {
+      "opensOn": "Откроется: {date}",
+      "opensTomorrow": "Откроется завтра",
+      "opensInDays_one": "Откроется через {count} день",
+      "opensInDays_few": "Откроется через {count} дня",
+      "opensInDays_many": "Откроется через {count} дней",
+      "opensInDays_other": "Откроется через {count} дн.",
+      "deadlineTomorrow": "Дедлайн завтра",
+      "deadlineInDays_one": "Дедлайн через {count} день",
+      "deadlineInDays_few": "Дедлайн через {count} дня",
+      "deadlineInDays_many": "Дедлайн через {count} дней",
+      "deadlineInDays_other": "Дедлайн через {count} дн.",
+      "exactDateTooltip": "Точная дата: {date}",
+      "lockedTooltip": "Модуль откроется: {date}"
+    }
+  },
+  "modal": {
+    "close": "Закрыть",
+    "cancel": "Отмена",
+    "save": "Сохранить изменения",
+    "roadmap": {
+      "title": "🚀 Дорожная карта курса: {course}",
+      "subtitle": "Персональная траектория освоения профессии от базовой теории до дипломного проекта с поддержкой 3D-моделей и тренажёров.",
+      "moduleCompleted": "✓ Модуль зачтён",
+      "modulePro": "Профильный модуль · Сертификат",
+      "moduleBase": "Базовый модуль"
+    },
+    "grades": {
+      "title": "📊 Оценки и зачётка — {name}",
+      "passedLabel": "Зачтено по курсу",
+      "gpaLabel": "Средний балл / GPA",
+      "xpLabel": "Опыт обучения",
+      "colLesson": "Урок / Модуль",
+      "colCourse": "Курс",
+      "colScore": "Балл",
+      "colStatus": "Статус",
+      "colComment": "Комментарий куратора",
+      "emptyRow": "У вас пока нет сданных работ. Откройте Урок №1, пройдите автопроверку и отправьте первое решение!",
+      "downloadCsv": "Скачать выписку CSV"
+    },
+    "deadlines": {
+      "title": "🗓️ Календарь дедлайнов (Текущий день: День {day})",
+      "banner": "Задания открываются поэтапно согласно расписанию курса. Будущие уроки станут доступны в соответствующий учебный день.",
+      "dayLabel": "День {day}",
+      "doneBadge": "Выполнено ({score}/100)",
+      "lockedBadge": "Откроется: {date}",
+      "todayBadge": "Задание на сегодня",
+      "availableBadge": "Доступно",
+      "scheduleLine": "Открытие: {openDate} · Дедлайн: {deadlineDate}",
+      "openLessonBtn": "Открыть урок"
+    },
+    "chat": {
+      "title": "💬 Чат с куратором курса",
+      "loading": "Загружаем сообщения…",
+      "guestStatus": "Чат с куратором курса (Ознакомительный режим)",
+      "curatorRole": "Куратор курса · {curator}",
+      "welcomeMessage": "Здравствуйте! Добро пожаловать на курс «{course}». Здесь вы можете задать вопрос по текущему уроку, разбору ошибок или срокам сдачи.",
+      "inputPlaceholder": "Напишите сообщение куратору...",
+      "sendBtn": "Отправить",
+      "youLabel": "Вы (Студент)",
+      "sentStatus": "Сообщение доставлено куратору."
+    },
+    "notifications": {
+      "title": "🔔 Уведомления",
+      "empty": "Новых уведомлений пока нет.",
+      "welcomeTitle": "Открыт Урок №1 по курсу «{course}»",
+      "welcomeBody": "Вам доступны интерактивный конспект с видеоразбором, 3D-схема и практический тренажёр с автопроверкой.",
+      "curatorTitle": "Куратор курса: {curator}",
+      "curatorBody": "Ближайший дедлайн отправки первого практического задания — через 2 дня. Вопросы можно задать в чате."
+    },
+    "settings": {
+      "title": "⚙️ Настройки профиля и интерфейса",
+      "lastName": "Фамилия *",
+      "firstName": "Имя *",
+      "middleName": "Отчество",
+      "middleNamePlaceholder": "При наличии",
+      "email": "Подтверждённый Email",
+      "group": "Учебная группа",
+      "activeCourse": "Активный курс обучения",
+      "interfaceLanguage": "Язык интерфейса",
+      "newPassword": "Новый пароль (оставьте пустым, если не меняете)",
+      "newPasswordPlaceholder": "Минимум 6 символов, буквы и цифры"
+    }
+  },
+  "toast": {
+    "langSwitched": "Язык интерфейса переключён: Русский",
+    "courseSwitched": "Курс успешно переключён!",
+    "settingsSaved": "Настройки успешно сохранены!",
+    "demoResetConfirm": "Сбросить демо-прогресс к началу (0%, День 1)?",
+    "demoResetSuccess": "Демо-прогресс сброшен к началу!",
+    "csvExported": "Ведомость успеваемости выгружена в формате CSV!"
+  }
+}

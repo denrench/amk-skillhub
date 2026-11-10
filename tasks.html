@@ -8,14 +8,20 @@
   <title>Программа курса и модули — EDU SPACE | АМК</title>
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg"/>
 
-  <!-- Fonts & Icons -->
+  <!-- SEO hreflang & Alternate Locale Links -->
+  <link rel="alternate" hreflang="ru" href="/ru/tasks.html"/>
+  <link rel="alternate" hreflang="kk" href="/kk/tasks.html"/>
+  <link rel="alternate" hreflang="x-default" href="/tasks.html"/>
+
+  <!-- Fonts & Icons (Inter + Noto Sans with full Kazakh Cyrillic-ext glyph support: Ә, Ғ, Қ, Ң, Ө, Ұ, Ү, Һ, І) -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
 
   <link rel="stylesheet" href="css/tailwind.min.css"/>
   <script src="js/courses-catalog.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/app-logistics.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
@@ -69,7 +75,7 @@
       --fs-16: 1rem;      /* 16px */
       --fs-20: 1.25rem;   /* 20px */
       --fs-28: 1.75rem;   /* 28px */
-      --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-sans: 'Inter', 'Noto Sans', system-ui, -apple-system, sans-serif;
       --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
       /* 8px Spatial Grid & Radiuses */
@@ -93,8 +99,8 @@
       --shift-lg: 24px;
       --stagger: 60ms;
 
-      /* Layout Dimensions */
-      --sidebar-w: 248px;
+      /* Layout Dimensions (260px accommodates +25% longer Kazakh labels in 1 line) */
+      --sidebar-w: 260px;
       --sidebar-w-collapsed: 72px;
       --header-h: 64px;
     }
@@ -1073,109 +1079,176 @@
         transition-duration: 80ms !important;
       }
     }
+
+    /* ==========================================================================
+       I18N LANGUAGE SWITCHER (РУС | ҚАЗ), 150MS FADE & LONG-STRING RESILIENCE
+       ========================================================================== */
+    .lang-switcher {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      gap: 2px;
+    }
+    .lang-switch-btn {
+      min-height: 28px !important;
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-size: var(--fs-12);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: background-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+    }
+    .lang-switch-btn:hover {
+      color: var(--text-primary);
+    }
+    .lang-switch-btn.is-active {
+      background: rgba(219, 244, 119, 0.16);
+      color: var(--accent-primary);
+    }
+    .lang-switch-sep {
+      color: var(--border-default);
+      font-size: 11px;
+      user-select: none;
+    }
+    .workspace-container {
+      transition: opacity var(--dur-fast) var(--ease-out);
+    }
+    .workspace-container.i18n-fade-transition {
+      opacity: 0.35;
+    }
+    .badge-fallback {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: rgba(139, 92, 246, 0.14);
+      border: 1px solid rgba(139, 92, 246, 0.32);
+      color: #ddd6fe;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .breadcrumbs { min-width: 0; overflow: hidden; flex-wrap: nowrap; }
+    .top-header { gap: 8px; overflow: hidden; }
+    .continue-banner { flex-wrap: wrap; }
+    .locked-pill { max-width: 100%; white-space: normal; }
+    .card-actions { flex-wrap: wrap; }
+    .btn-primary-cta, .btn-secondary-outline { max-width: 100%; white-space: normal; text-align: center; }
+    #edu-toast-container { max-width: calc(100vw - 32px) !important; right: 16px !important; left: 16px !important; }
+    .mobile-nav-btn { min-width: 0; overflow: hidden; padding: 0 2px; }
+    .mobile-nav-btn > span:last-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .has-tooltip:not(:hover):not(:focus-visible)::after { display: none !important; }
+    .has-tooltip::after { max-width: min(240px, 80vw); white-space: normal; }
   </style>
 </head>
 <body class="workshop">
-  <a class="academy-skip" href="#academy-main">К содержимому</a>
+  <a class="academy-skip" href="#academy-main" data-i18n="a11y.skipToContent">К содержимому</a>
 
   <div class="app-layout">
     <!-- 1. GROUPED & COLLAPSIBLE SIDEBAR -->
-    <aside id="app-sidebar" class="app-sidebar reveal reveal--left" data-reveal="left" aria-label="Боковая навигация">
+    <aside id="app-sidebar" class="app-sidebar reveal reveal--left" data-reveal="left" aria-label="Боковая навигация" data-i18n-attr="aria-label:a11y.sidebarNav">
       <div>
         <div class="sidebar-top-row">
-          <a href="index.html" class="brand-link" title="На главную EDU SPACE">
+          <a href="index.html" class="brand-link" title="На главную EDU SPACE" data-i18n-attr="title:brand.homeTitle">
             <div class="brand-mark">
               <img alt="EDU SPACE" width="20" height="20" src="assets/eduspace-logo.svg"/>
             </div>
             <div class="brand-text">
               <span style="font-weight:800;font-size:var(--fs-14);letter-spacing:-0.01em;">EDU SPACE</span>
-              <span style="font-size:var(--fs-12);color:var(--text-muted);">Кабинет АМК</span>
+              <span style="font-size:var(--fs-12);color:var(--text-muted);" data-i18n="brand.cabinetSubtitle">Кабинет АМК</span>
             </div>
           </a>
-          <button type="button" id="sidebar-collapse-btn" class="collapse-btn" onclick="toggleSidebarCollapse()" aria-label="Свернуть или развернуть меню" title="Свернуть меню">
+          <button type="button" id="sidebar-collapse-btn" class="collapse-btn" onclick="toggleSidebarCollapse()" aria-label="Свернуть или развернуть меню" title="Свернуть меню" data-i18n-attr="aria-label:a11y.collapseSidebar;title:a11y.collapseSidebarTitle">
             <span class="material-symbols-outlined" style="font-size:20px;">dock_to_left</span>
           </button>
         </div>
 
-        <nav class="sidebar-nav" aria-label="Разделы кабинета">
-          <!-- Группа 1: Обучение -->
+        <nav class="sidebar-nav" aria-label="Разделы кабинета" data-i18n-attr="aria-label:a11y.sidebarSections">
+          <!-- Группа 1: Обучение / Оқу -->
           <div class="nav-group">
-            <div class="nav-group-title">Обучение</div>
-            <a href="student.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:1;--stagger:40ms" data-tooltip="Моё обучение и курсы">
+            <div class="nav-group-title" data-i18n="nav.group.learning">Обучение</div>
+            <a href="student.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:1;--stagger:40ms" data-tooltip="Моё обучение и курсы" data-i18n-attr="data-tooltip:nav.myLearningTooltip">
               <span class="nav-item-main">
                 <span class="material-symbols-outlined" style="font-size:20px;">space_dashboard</span>
-                <span class="nav-label">Моё обучение</span>
+                <span class="nav-label" data-i18n="nav.myLearning">Моё обучение</span>
               </span>
             </a>
-            <a href="tasks.html" class="nav-item is-active reveal reveal--left" data-reveal="left" style="--i:2;--stagger:40ms" aria-current="page" data-tooltip="Уроки и задания">
+            <a href="tasks.html" class="nav-item is-active reveal reveal--left" data-reveal="left" style="--i:2;--stagger:40ms" aria-current="page" data-tooltip="Уроки и задания" data-i18n-attr="data-tooltip:nav.lessonsAndTasksTooltip">
               <span class="nav-item-main">
                 <span class="material-symbols-outlined" style="font-size:20px;">assignment</span>
-                <span class="nav-label">Уроки и задания</span>
+                <span class="nav-label" data-i18n="nav.lessonsAndTasks">Уроки и задания</span>
               </span>
-              <span id="sidebar-available-badge" class="nav-counter-dot" title="Доступно уроков">1</span>
+              <span id="sidebar-available-badge" class="nav-counter-dot" title="Доступно уроков" data-i18n-attr="title:nav.availableCountTitle">1</span>
             </a>
-            <a href="javascript:void(0)" onclick="openInteractiveRoadmapModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:3;--stagger:40ms" data-tooltip="Дорожная карта курса">
+            <a href="javascript:void(0)" onclick="openInteractiveRoadmapModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:3;--stagger:40ms" data-tooltip="Дорожная карта курса" data-i18n-attr="data-tooltip:nav.roadmapTooltip">
               <span class="nav-item-main">
                 <span class="material-symbols-outlined" style="font-size:20px;">route</span>
-                <span class="nav-label">Дорожная карта</span>
+                <span class="nav-label" data-i18n="nav.roadmap">Дорожная карта</span>
               </span>
             </a>
           </div>
 
-          <!-- Группа 2: Прогресс -->
+          <!-- Группа 2: Прогресс / Үлгерім -->
           <div class="nav-group">
-            <div class="nav-group-title">Прогресс</div>
-            <a href="javascript:void(0)" onclick="openGradesModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:4;--stagger:40ms" data-tooltip="Оценки и зачётка">
+            <div class="nav-group-title" data-i18n="nav.group.progress">Прогресс</div>
+            <a href="javascript:void(0)" onclick="openGradesModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:4;--stagger:40ms" data-tooltip="Оценки и зачётка" data-i18n-attr="data-tooltip:nav.gradesTooltip">
               <span class="nav-item-main">
                 <span class="material-symbols-outlined" style="font-size:20px;">grade</span>
-                <span class="nav-label">Оценки</span>
+                <span class="nav-label" data-i18n="nav.grades">Оценки</span>
               </span>
             </a>
-            <a href="javascript:void(0)" onclick="openCalendarModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:5;--stagger:40ms" data-tooltip="Календарь дедлайнов">
+            <a href="javascript:void(0)" onclick="openCalendarModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:5;--stagger:40ms" data-tooltip="Календарь дедлайнов" data-i18n-attr="data-tooltip:nav.deadlinesTooltip">
               <span class="nav-item-main">
                 <span class="material-symbols-outlined" style="font-size:20px;">event_upcoming</span>
-                <span class="nav-label">Дедлайны</span>
+                <span class="nav-label" data-i18n="nav.deadlines">Дедлайны</span>
               </span>
             </a>
           </div>
 
-          <!-- Группа 3: Общение -->
+          <!-- Группа 3: Общение / Байланыс -->
           <div class="nav-group">
-            <div class="nav-group-title">Общение</div>
-            <a href="javascript:void(0)" onclick="openMessengerModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:6;--stagger:40ms" data-tooltip="Чат с куратором">
+            <div class="nav-group-title" data-i18n="nav.group.communication">Общение</div>
+            <a href="javascript:void(0)" onclick="openMessengerModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:6;--stagger:40ms" data-tooltip="Чат с куратором" data-i18n-attr="data-tooltip:nav.curatorChatTooltip">
               <span class="nav-item-main">
                 <span class="material-symbols-outlined" style="font-size:20px;">chat_bubble</span>
-                <span class="nav-label">Чат с куратором</span>
+                <span class="nav-label" data-i18n="nav.curatorChat">Чат с куратором</span>
               </span>
-              <span class="nav-live-dot" title="Куратор онлайн"></span>
+              <span class="nav-live-dot" title="Куратор онлайн" data-i18n-attr="title:nav.curatorOnlineTitle"></span>
             </a>
-            <a href="javascript:void(0)" onclick="openNotificationsModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:7;--stagger:40ms" data-tooltip="Уведомления">
+            <a href="javascript:void(0)" onclick="openNotificationsModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:7;--stagger:40ms" data-tooltip="Уведомления" data-i18n-attr="data-tooltip:nav.notificationsTooltip">
               <span class="nav-item-main">
                 <span class="material-symbols-outlined" style="font-size:20px;">notifications</span>
-                <span class="nav-label">Уведомления</span>
+                <span class="nav-label" data-i18n="nav.notifications">Уведомления</span>
               </span>
             </a>
           </div>
 
-          <!-- Группа 4: Профиль -->
+          <!-- Группа 4: Профиль / Профиль -->
           <div class="nav-group">
-            <div class="nav-group-title">Профиль</div>
-            <a href="profile.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:8;--stagger:40ms" data-tooltip="Профиль и сертификат">
+            <div class="nav-group-title" data-i18n="nav.group.profile">Профиль</div>
+            <a href="profile.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:8;--stagger:40ms" data-tooltip="Профиль и сертификат" data-i18n-attr="data-tooltip:nav.profileAndCertTooltip">
               <span class="nav-item-main">
                 <span class="material-symbols-outlined" style="font-size:20px;">verified_user</span>
-                <span class="nav-label">Профиль и сертификат</span>
+                <span class="nav-label" data-i18n="nav.profileAndCert">Профиль и сертификат</span>
               </span>
             </a>
-            <a href="career.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:9;--stagger:40ms" data-tooltip="Карьера и резюме">
+            <a href="career.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:9;--stagger:40ms" data-tooltip="Карьера и резюме" data-i18n-attr="data-tooltip:nav.careerTooltip">
               <span class="nav-item-main">
                 <span class="material-symbols-outlined" style="font-size:20px;">work</span>
-                <span class="nav-label">Карьера</span>
+                <span class="nav-label" data-i18n="nav.career">Карьера</span>
               </span>
             </a>
-            <a href="tools.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:10;--stagger:40ms" data-tooltip="Учебные инструменты">
+            <a href="tools.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:10;--stagger:40ms" data-tooltip="Учебные инструменты" data-i18n-attr="data-tooltip:nav.toolsTooltip">
               <span class="nav-item-main">
                 <span class="material-symbols-outlined" style="font-size:20px;">handyman</span>
-                <span class="nav-label">Инструменты</span>
+                <span class="nav-label" data-i18n="nav.tools">Инструменты</span>
               </span>
             </a>
           </div>
@@ -1184,20 +1257,20 @@
 
       <!-- Нижний блок: Настройки, Выход и приглушённый сброс демо -->
       <div class="sidebar-footer">
-        <button type="button" onclick="resetDemoMode()" class="demo-reset-link" title="Сбросить демо-прогресс к 0%">
+        <button type="button" onclick="resetDemoMode()" class="demo-reset-link" title="Сбросить демо-прогресс к 0%" data-i18n="nav.resetDemo" data-i18n-attr="title:nav.resetDemoTitle">
           Сбросить демо-прогресс
         </button>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 6px;">
-          <a href="javascript:void(0)" onclick="openSettingsModal()" class="nav-item" style="height:34px;padding:0 6px;" data-tooltip="Настройки">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:0 6px;gap:4px;flex-wrap:wrap;">
+          <a href="javascript:void(0)" onclick="openSettingsModal()" class="nav-item" style="height:34px;padding:0 6px;" data-tooltip="Настройки" data-i18n-attr="data-tooltip:nav.settingsTooltip">
             <span class="nav-item-main">
               <span class="material-symbols-outlined" style="font-size:18px;">settings</span>
-              <span class="nav-label" style="font-size:var(--fs-12);">Настройки</span>
+              <span class="nav-label" style="font-size:var(--fs-12);" data-i18n="nav.settings">Настройки</span>
             </span>
           </a>
-          <button type="button" onclick="logoutUser()" class="nav-item" style="height:34px;padding:0 6px;background:none;border:none;cursor:pointer;color:#f87171;" data-tooltip="Выйти">
+          <button type="button" onclick="logoutUser()" class="nav-item" style="height:34px;padding:0 6px;background:none;border:none;cursor:pointer;color:#f87171;" data-tooltip="Выйти" data-i18n-attr="data-tooltip:nav.logoutTooltip">
             <span class="nav-item-main">
               <span class="material-symbols-outlined" style="font-size:18px;">logout</span>
-              <span class="nav-label" style="font-size:var(--fs-12);">Выйти</span>
+              <span class="nav-label" style="font-size:var(--fs-12);" data-i18n="nav.logout">Выйти</span>
             </span>
           </button>
         </div>
@@ -1206,31 +1279,38 @@
 
     <!-- MAIN COLUMN -->
     <div style="display:flex;flex-direction:column;min-width:0;">
-      <!-- 2. TOP BAR WITH BREADCRUMBS -->
+      <!-- 2. TOP BAR WITH BREADCRUMBS & LANGUAGE SWITCHER (РУС | ҚАЗ) -->
       <header class="top-header reveal reveal--down" data-reveal="down">
-        <nav class="breadcrumbs" aria-label="Хлебные крошки">
-          <a href="student.html">Кабинет</a>
+        <nav class="breadcrumbs" aria-label="Хлебные крошки" data-i18n-attr="aria-label:a11y.breadcrumbs">
+          <a href="student.html" data-i18n="header.breadcrumbCabinet">Кабинет</a>
           <span>/</span>
           <a href="javascript:void(0)" onclick="toggleCourseDropdown(event)" id="breadcrumb-course-name">Web Design</a>
           <span>/</span>
-          <span class="breadcrumbs-current">Модули</span>
-          <span id="current-day-label" class="has-tooltip" data-tip="По учебному расписанию каждый новый день открывает следующий модуль" style="margin-left:8px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-secondary);font-size:var(--fs-12);font-weight:600;">
+          <span class="breadcrumbs-current" data-i18n="header.breadcrumbModules">Модули</span>
+          <span id="current-day-label" class="has-tooltip" data-tip="По учебному расписанию каждый новый день открывает следующий модуль" data-i18n-attr="data-tip:header.studyDayTooltip" style="margin-left:8px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-secondary);font-size:var(--fs-12);font-weight:600;">
             День 1 из 12
           </span>
         </nav>
 
-        <div style="display:flex;align-items:center;gap:12px;">
-          <button type="button" onclick="openMessengerModal()" class="collapse-btn" title="Чат с куратором" aria-label="Чат с куратором">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <!-- Переключатель языка РУС | ҚАЗ -->
+          <div class="lang-switcher" role="group" aria-label="Выбор языка интерфейса" data-i18n-attr="aria-label:a11y.langSwitcher">
+            <button type="button" class="lang-switch-btn is-active" data-lang-switch="ru" onclick="window.I18n.setLocale('ru')" aria-pressed="true" title="Русский" lang="ru">РУС</button>
+            <span class="lang-switch-sep" aria-hidden="true">|</span>
+            <button type="button" class="lang-switch-btn" data-lang-switch="kk" onclick="window.I18n.setLocale('kk')" aria-pressed="false" title="Қазақша" lang="kk">ҚАЗ</button>
+          </div>
+
+          <button type="button" onclick="openMessengerModal()" class="collapse-btn" title="Чат с куратором" aria-label="Чат с куратором" data-i18n-attr="title:nav.curatorChatTooltip;aria-label:nav.curatorChatTooltip">
             <span class="material-symbols-outlined" style="font-size:20px;">chat</span>
           </button>
-          <button type="button" onclick="openNotificationsModal()" class="collapse-btn" title="Уведомления" aria-label="Уведомления">
+          <button type="button" onclick="openNotificationsModal()" class="collapse-btn" title="Уведомления" aria-label="Уведомления" data-i18n-attr="title:nav.notificationsTooltip;aria-label:nav.notificationsTooltip">
             <span class="material-symbols-outlined" style="font-size:20px;">notifications</span>
           </button>
           <a href="profile.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text-primary);padding-left:8px;border-left:1px solid var(--border-subtle);">
             <div style="width:32px;height:32px;border-radius:50%;background:var(--accent-secondary-soft);border:1px solid rgba(139,92,246,0.45);color:#ddd6fe;font-size:var(--fs-12);font-weight:700;display:flex;align-items:center;justify-content:center;" data-user-initials>
               СТ
             </div>
-            <span style="font-size:var(--fs-12);font-weight:700;" class="hidden sm:inline" data-user-name>Студент</span>
+            <span style="font-size:var(--fs-12);font-weight:700;" class="hidden sm:inline" data-user-name data-i18n="header.studentDefaultName">Студент</span>
           </a>
         </div>
       </header>
@@ -1239,9 +1319,9 @@
       <main id="academy-main" tabindex="-1" class="workspace-container">
 
         <!-- TOP QUICK-CONTINUE BANNER ("Что делать дальше") -->
-        <section class="continue-banner reveal reveal--up" data-reveal="up" style="--i:1" aria-label="Ближайшее действие">
+        <section class="continue-banner reveal reveal--up" data-reveal="up" style="--i:1" aria-label="Ближайшее действие" data-i18n-attr="aria-label:a11y.nextActionRegion">
           <div style="display:flex;align-items:center;gap:12px;min-width:0;">
-            <span class=" badge-status badge-status--available">Следующий шаг</span>
+            <span class="badge-status badge-status--available" data-i18n="continueBanner.badge">Следующий шаг</span>
             <div style="min-width:0;">
               <strong id="continue-banner-title" style="font-size:var(--fs-14);color:var(--text-primary);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                 Урок 1. Photoshop: баннер для сайта
@@ -1252,7 +1332,7 @@
             </div>
           </div>
           <a id="continue-banner-link" href="lesson_player.html?catalog=1&amp;specialty=it&amp;task=1" class="btn-primary-cta" style="min-height:38px;padding:6px 14px;">
-            <span>Начать урок 1</span>
+            <span id="continue-banner-btn-text">Начать урок 1</span>
             <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
           </a>
         </section>
@@ -1271,31 +1351,31 @@
               <h1 class="course-title" id="course-main-title">Программное обеспечение (Web Design)</h1>
 
               <div class="course-dropdown" id="course-dropdown">
-                <button type="button" class="course-dropdown-trigger" onclick="toggleCourseDropdown(event)" aria-haspopup="listbox" aria-expanded="false">
+                <button type="button" class="course-dropdown-trigger" onclick="toggleCourseDropdown(event)" aria-haspopup="listbox" aria-expanded="false" data-i18n-attr="aria-label:course.switchCourseAria">
                   <span class="material-symbols-outlined" style="font-size:16px;color:var(--accent-primary);">swap_horiz</span>
-                  <span>Сменить курс</span>
+                  <span data-i18n="course.switchCourseBtn">Сменить курс</span>
                   <span class="material-symbols-outlined" style="font-size:16px;">expand_more</span>
                 </button>
                 <div class="course-dropdown-menu" role="listbox" aria-label="Выбор специальности">
                   <button type="button" role="option" data-spec="it" onclick="changeSpecialty('it')" class="course-dropdown-item is-active">
-                    <span>01 · Web Design (ПО)</span>
-                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12 ур.</span>
+                    <span data-i18n="course.catalog.it.shortTitle">Web Design</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12</span>
                   </button>
                   <button type="button" role="option" data-spec="graphic_design" onclick="changeSpecialty('graphic_design')" class="course-dropdown-item">
-                    <span>02 · Графический дизайн</span>
-                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12 ур.</span>
+                    <span data-i18n="course.catalog.graphic_design.shortTitle">Графический дизайн</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12</span>
                   </button>
                   <button type="button" role="option" data-spec="autoelectric" onclick="changeSpecialty('autoelectric')" class="course-dropdown-item">
-                    <span>03 · Автоэлектрика</span>
-                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12 ур.</span>
+                    <span data-i18n="course.catalog.autoelectric.shortTitle">Автоэлектрика</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12</span>
                   </button>
                   <button type="button" role="option" data-spec="hvac" onclick="changeSpecialty('hvac')" class="course-dropdown-item">
-                    <span>04 · Холодильное оборудование</span>
-                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12 ур.</span>
+                    <span data-i18n="course.catalog.hvac.shortTitle">Холодильное оборудование</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12</span>
                   </button>
                   <button type="button" role="option" data-spec="automechanic" onclick="changeSpecialty('automechanic')" class="course-dropdown-item">
-                    <span>05 · Автомеханика</span>
-                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12 ур.</span>
+                    <span data-i18n="course.catalog.automechanic.shortTitle">Автомеханика</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12</span>
                   </button>
                 </div>
               </div>
@@ -1313,25 +1393,25 @@
               </a>
               <a id="header-textbook-link" href="learn.html?course=it" class="btn-secondary-outline">
                 <span class="material-symbols-outlined" style="font-size:18px;">menu_book</span>
-                <span>Учебник и разобранные примеры</span>
+                <span data-i18n="course.textbookBtn">Учебник и разобранные примеры</span>
               </a>
             </div>
           </div>
 
           <!-- Progress Block (Animated 0 -> value over 800ms) -->
           <div class="progress-panel reveal reveal--up" data-reveal="up" style="--i:6">
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span style="font-size:var(--fs-14);font-weight:700;color:var(--text-primary);">Прогресс курса</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+              <span style="font-size:var(--fs-14);font-weight:700;color:var(--text-primary);" data-i18n="course.progress.label">Освоение курса</span>
               <span id="course-progress-pct" style="font-family:var(--font-mono);font-size:var(--fs-20);font-weight:700;color:var(--accent-primary);">0%</span>
             </div>
-            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="course-progress-aria">
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="course-progress-aria" data-i18n-attr="aria-label:a11y.courseProgressLabel">
               <div id="course-progress-bar" class="progress-fill"></div>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:var(--fs-12);color:var(--text-secondary);">
               <span id="course-progress-count">0 из 12 зачтено · Следующий шаг: Урок 1</span>
             </div>
-            <div style="padding-top:6px;border-top:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;font-size:var(--fs-12);">
-              <span style="color:var(--text-muted);">Статус траектории</span>
+            <div style="padding-top:6px;border-top:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:var(--fs-12);flex-wrap:wrap;">
+              <span style="color:var(--text-muted);" data-i18n="nav.roadmap">Дорожная карта</span>
               <button type="button" onclick="enrollActiveSpecialty()" id="btn-set-primary-course" style="background:none;border:none;padding:0;color:var(--accent-primary);font-size:var(--fs-12);font-weight:700;cursor:pointer;text-decoration:underline;">
                 Сделать основным
               </button>
@@ -1340,42 +1420,42 @@
         </section>
 
         <!-- 3. SEGMENTED STATUS FILTERS & SEARCH -->
-        <section class="controls-bar" aria-label="Фильтры и поиск уроков">
-          <div class="segmented-control reveal reveal--scale" data-reveal="scale" style="--i:5" id="status-filters" role="tablist" aria-label="Фильтр по статусу">
+        <section class="controls-bar" aria-label="Фильтры и поиск уроков" data-i18n-attr="aria-label:a11y.controlsRegion">
+          <div class="segmented-control reveal reveal--scale" data-reveal="scale" style="--i:5" id="status-filters" role="tablist" aria-label="Фильтр по статусу уроков" data-i18n-attr="aria-label:a11y.statusFilterGroup">
             <button type="button" role="tab" aria-selected="true" data-filter="available" onclick="applyStatusFilter('available')" class="seg-btn is-active">
-              <span>Доступные</span>
+              <span data-i18n="filter.available">Доступные</span>
               <span id="cnt-avail">2</span>
             </button>
             <button type="button" role="tab" aria-selected="false" data-filter="in_progress" onclick="applyStatusFilter('in_progress')" class="seg-btn">
-              <span>В процессе</span>
+              <span data-i18n="filter.inProgress">В процессе</span>
               <span id="cnt-prog">1</span>
             </button>
             <button type="button" role="tab" aria-selected="false" data-filter="submitted" onclick="applyStatusFilter('submitted')" class="seg-btn is-zero">
-              <span>На проверке</span>
+              <span data-i18n="filter.submitted">На проверке</span>
               <span id="cnt-sub">0</span>
             </button>
             <button type="button" role="tab" aria-selected="false" data-filter="graded" onclick="applyStatusFilter('graded')" class="seg-btn is-zero">
-              <span>Проверено</span>
+              <span data-i18n="filter.graded">Проверено</span>
               <span id="cnt-graded">0</span>
             </button>
             <button type="button" role="tab" aria-selected="false" data-filter="locked" onclick="applyStatusFilter('locked')" class="seg-btn">
-              <span>Заблокировано</span>
+              <span data-i18n="filter.locked">Заблокировано</span>
               <span id="cnt-locked">10</span>
             </button>
             <button type="button" role="tab" aria-selected="false" data-filter="all" onclick="applyStatusFilter('all')" class="seg-btn">
-              <span>Все</span>
+              <span data-i18n="filter.all">Все</span>
               <span id="cnt-all">12</span>
             </button>
           </div>
 
           <div class="search-box reveal reveal--scale" data-reveal="scale" style="--i:6">
             <span class="material-symbols-outlined" style="font-size:18px;color:var(--text-muted);position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;">search</span>
-            <input type="search" id="task-search-input" oninput="renderTasksList(true)" placeholder="Поиск по теме или инструментам..." aria-label="Поиск по теме или инструментам" class="search-input"/>
+            <input type="search" id="task-search-input" oninput="renderTasksList(true)" placeholder="Поиск по теме или инструментам..." aria-label="Поиск по теме или инструментам" data-i18n-attr="placeholder:search.placeholder;aria-label:a11y.searchLabel" class="search-input"/>
           </div>
         </section>
 
         <!-- 4. VERTICAL TIMELINE & LESSON CARDS -->
-        <section id="tasks-container" class="timeline-list" aria-live="polite">
+        <section id="tasks-container" class="timeline-list" aria-live="polite" data-i18n-attr="aria-label:a11y.lessonsListRegion">
           <!-- Rendered dynamically with stagger & IntersectionObserver -->
         </section>
 
@@ -1391,41 +1471,45 @@
     </a>
   </div>
 
-  <nav class="mobile-bottom-nav" aria-label="Мобильная навигация">
+  <nav class="mobile-bottom-nav" aria-label="Мобильная навигация" data-i18n-attr="aria-label:a11y.mobileNav">
     <a href="student.html" class="mobile-nav-btn">
       <span class="material-symbols-outlined" style="font-size:20px;">space_dashboard</span>
-      <span>Кабинет</span>
+      <span data-i18n="nav.mobile.cabinet">Кабинет</span>
     </a>
     <a href="tasks.html" class="mobile-nav-btn is-active" aria-current="page">
       <span class="material-symbols-outlined" style="font-size:20px;">assignment</span>
-      <span>Модули</span>
+      <span data-i18n="nav.mobile.modules">Модули</span>
     </a>
     <button type="button" onclick="openInteractiveRoadmapModal()" class="mobile-nav-btn">
       <span class="material-symbols-outlined" style="font-size:20px;">route</span>
-      <span>Карта</span>
+      <span data-i18n="nav.mobile.roadmap">Карта</span>
     </button>
     <button type="button" onclick="openMessengerModal()" class="mobile-nav-btn">
       <span class="material-symbols-outlined" style="font-size:20px;">chat_bubble</span>
-      <span>Чат</span>
+      <span data-i18n="nav.mobile.chat">Чат</span>
     </button>
     <a href="profile.html" class="mobile-nav-btn">
       <span class="material-symbols-outlined" style="font-size:20px;">person</span>
-      <span>Профиль</span>
+      <span data-i18n="nav.mobile.profile">Профиль</span>
     </a>
   </nav>
 
   <script>
     let currentSpec = 'it';
     window.currentSpec = currentSpec;
-    // Default filter is 'available' per UX spec (shows active/in-progress + next locked milestone so all 3 states are immediately clear)
     let currentFilter = 'available';
     let tasksData = [];
     let cardObserver = null;
+    let currentStudyDay = 1;
 
-    // Short 5-7 word titles & extracted technical tags for clean scannability
-    function formatConciseLessonMeta(rawTitle, rawTools, taskNum) {
-      const clean = String(rawTitle || '').replace(/^Урок\s*\d+\.\s*/i, '');
-      // Extract parenthetical technical specs like (72 ppi, WebP/PNG) into tags
+    // Short 5-7 word titles & extracted technical tags with full ru/kk localization support
+    function formatConciseLessonMeta(rawTask) {
+      const taskNum = rawTask.task_number;
+      const locContent = window.I18n.localizeLessonContent(currentSpec, taskNum, rawTask);
+      const clean = String(locContent.title || '')
+        .replace(/^Урок\s*\d+\.\s*/i, '')
+        .replace(/^\d+-сабақ\.\s*/i, '');
+
       const techMatches = [];
       const shortBase = clean.replace(/\(([^)]+)\)/g, (_, inside) => {
         techMatches.push(inside.trim());
@@ -1433,34 +1517,47 @@
       }).replace(/\s+/g, ' ').trim();
 
       const words = shortBase.split(' ');
-      const concise = words.length > 7 ? words.slice(0, 7).join(' ') : shortBase;
-      const prefix = `Урок ${taskNum}. `;
+      const concise = locContent.shortTitleOverride || (words.length > 7 ? words.slice(0, 7).join(' ') : shortBase);
+      const prefix = window.I18n.t('lesson.prefix', { num: taskNum });
       const tags = [];
       if (techMatches.length) tags.push(...techMatches);
-      if (rawTools) {
-        rawTools.split(',').slice(0, 2).forEach(t => {
+      if (locContent.tools) {
+        locContent.tools.split(',').slice(0, 2).forEach(t => {
           const tr = t.trim();
           if (tr && !tags.includes(tr)) tags.push(tr);
         });
       }
       return {
         shortTitle: prefix + concise.replace(/[:.,;-]+$/, ''),
-        tags: tags.slice(0, 3)
+        description: locContent.description,
+        tags: tags.slice(0, 3),
+        isFallback: locContent.isFallback
       };
     }
 
     function formatRelativeDate(unlockDay, curDay, isLocked, exactOpen, exactDeadline) {
+      const locOpen = window.I18n.localizeDateString(exactOpen || '12 ноября, 09:00');
+      const locDeadline = window.I18n.localizeDateString(exactDeadline || '13 ноября, 23:59');
+
       if (isLocked) {
         const diff = Math.max(1, unlockDay - curDay);
-        const rel = diff === 1 ? 'Откроется завтра' : `Откроется через ${diff} дн.`;
-        return { label: `Откроется ${exactOpen.split(',')[0]}`, relative: rel, exact: exactOpen };
+        const rel = diff === 1
+          ? window.I18n.t('lesson.dates.opensTomorrow')
+          : window.I18n.plural('lesson.dates.opensInDays', diff);
+        const shortDate = locOpen.split(',')[0];
+        return {
+          label: window.I18n.t('lesson.dates.opensOn', { date: shortDate }),
+          relative: rel,
+          exact: locOpen
+        };
       }
       const dlDiff = Math.max(1, (unlockDay + 2) - curDay);
-      const relDl = dlDiff === 1 ? 'Дедлайн завтра' : `Дедлайн через ${dlDiff} дня`;
-      return { label: relDl, relative: relDl, exact: exactDeadline };
+      const relDl = dlDiff === 1
+        ? window.I18n.t('lesson.dates.deadlineTomorrow')
+        : window.I18n.plural('lesson.dates.deadlineInDays', dlDiff);
+      return { label: relDl, relative: relDl, exact: locDeadline };
     }
 
-    // Animated Progress Bar & Percentage Counter (0 -> target over 800ms)
     function animateProgressCounter(targetPct) {
       const pctEl = document.getElementById('course-progress-pct');
       const barEl = document.getElementById('course-progress-bar');
@@ -1490,7 +1587,6 @@
       requestAnimationFrame(tick);
     }
 
-    // Collapsible Sidebar with persistence
     function toggleSidebarCollapse() {
       const collapsed = document.body.classList.toggle('sidebar-collapsed');
       try { localStorage.setItem('eduspace_sidebar_collapsed', collapsed ? '1' : '0'); } catch {}
@@ -1518,14 +1614,27 @@
       const user = window.EduSpace.getActiveUser();
       const course = window.EduSpace.getCourseBySlug(currentSpec);
       const curatorName = course.curator || 'Власов М. Г.';
-      const initials = curatorName.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+      const initials = window.I18n.toUpper(
+        curatorName.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('')
+      );
+
+      const locTitle = window.I18n.t(`course.catalog.${currentSpec}.title`);
+      const locShort = window.I18n.t(`course.catalog.${currentSpec}.shortTitle`);
+      const locDesc = window.I18n.t(`course.catalog.${currentSpec}.description`);
 
       document.getElementById('curator-initials').textContent = initials || 'КР';
-      document.getElementById('course-code-label').textContent = `${course.code} · Куратор: ${curatorName}`;
-      document.getElementById('course-main-title').textContent = course.title;
-      document.getElementById('course-main-desc').textContent = course.description;
-      document.getElementById('breadcrumb-course-name').textContent = course.short_title || course.title;
+      document.getElementById('course-code-label').textContent = window.I18n.t('course.curatorLine', {
+        code: course.code,
+        curator: curatorName
+      });
+      document.getElementById('course-main-title').textContent = locTitle || course.title;
+      document.getElementById('course-main-desc').textContent = locDesc || course.description;
+      document.getElementById('breadcrumb-course-name').textContent = locShort || course.short_title || course.title;
       document.getElementById('header-textbook-link').href = `learn.html?course=${currentSpec}`;
+      document.getElementById('current-day-label').textContent = window.I18n.t('header.studyDayBadge', {
+        day: currentStudyDay,
+        total: 12
+      });
 
       const passed = tasksData.filter(t => t.status_code === 'graded').length;
       const pct = Math.min(100, Math.round((passed / 12) * 100));
@@ -1533,25 +1642,45 @@
       const nextNum = nextTask ? nextTask.task_number : 1;
 
       animateProgressCounter(pct);
-      document.getElementById('course-progress-count').textContent = `${passed} из 12 зачтено · Следующий шаг: Урок ${nextNum}`;
+      document.getElementById('course-progress-count').textContent = window.I18n.t('course.progress.summary', {
+        done: passed,
+        total: 12,
+        next: nextNum
+      });
 
       // Update Primary CTA & Continue Banner
       const nextHref = `lesson_player.html?catalog=1&specialty=${currentSpec}&task=${nextNum}`;
-      const meta = nextTask ? formatConciseLessonMeta(nextTask.title, nextTask.tools_required, nextNum) : { shortTitle: `Урок ${nextNum}` };
+      const meta = nextTask
+        ? formatConciseLessonMeta(nextTask)
+        : { shortTitle: window.I18n.t('lesson.prefix', { num: nextNum }) };
+      const nextDateInfo = nextTask
+        ? formatRelativeDate(nextTask.unlock_day || nextNum, currentStudyDay, false, nextTask.unlock_date_exact, nextTask.deadline_exact)
+        : { relative: window.I18n.plural('lesson.dates.deadlineInDays', 2) };
+
       document.getElementById('continue-banner-title').textContent = meta.shortTitle;
+      document.getElementById('continue-banner-sub').textContent = window.I18n.t('continueBanner.subtitle', {
+        duration: window.I18n.t('lesson.moduleDuration', { minutes: 60 }),
+        deadline: nextDateInfo.relative
+      });
       document.getElementById('continue-banner-link').href = nextHref;
+      document.getElementById('continue-banner-btn-text').textContent = passed > 0
+        ? window.I18n.t('continueBanner.continueBtn', { num: nextNum })
+        : window.I18n.t('continueBanner.startBtn', { num: nextNum });
+
       document.getElementById('header-primary-cta').href = nextHref;
-      document.getElementById('header-primary-cta-text').textContent = passed > 0 ? `Продолжить обучение · Урок ${nextNum}` : `Начать урок ${nextNum}`;
+      document.getElementById('header-primary-cta-text').textContent = passed > 0
+        ? window.I18n.t('course.primaryCtaContinue', { num: nextNum })
+        : window.I18n.t('course.primaryCtaStart', { num: nextNum });
       document.getElementById('mobile-primary-cta').href = nextHref;
-      document.getElementById('mobile-primary-cta-text').textContent = `Продолжить · Урок ${nextNum}`;
+      document.getElementById('mobile-primary-cta-text').textContent = window.I18n.t('continueBanner.mobileBtn', { num: nextNum });
 
       const primaryBtn = document.getElementById('btn-set-primary-course');
       if (user && user.specialty_slug === currentSpec) {
-        primaryBtn.textContent = 'Основной курс ✓';
+        primaryBtn.textContent = window.I18n.t('course.progress.isPrimary');
         primaryBtn.style.color = '#6ee7b7';
         primaryBtn.style.textDecoration = 'none';
       } else {
-        primaryBtn.textContent = 'Сделать основным';
+        primaryBtn.textContent = window.I18n.t('course.progress.setPrimary');
         primaryBtn.style.color = 'var(--accent-primary)';
         primaryBtn.style.textDecoration = 'underline';
       }
@@ -1574,7 +1703,6 @@
       const res = await window.EduSpace.api(`/api/tasks?specialty=${currentSpec}&user_id=${uid}`);
       let rawTasks = (res.data && res.data.tasks) || [];
 
-      // Fallback to local catalog if API is unreachable (e.g. offline/static test)
       if (!rawTasks.length && window.EDU_LESSONS && window.EDU_LESSONS[currentSpec]) {
         rawTasks = window.EDU_LESSONS[currentSpec].map((l, idx) => ({
           id: idx + 1,
@@ -1596,8 +1724,6 @@
         }));
       }
 
-      // Ensure realistic 3-state visibility when in initial demo state:
-      // Lesson 1: Available, Lesson 2: In Progress (preview/draft), Lessons 3..12: Locked
       tasksData = rawTasks.map(t => {
         const copy = Object.assign({}, t);
         if (copy.task_number === 2 && copy.status_code === 'locked' && !rawTasks.some(x => x.status_code === 'in_progress')) {
@@ -1612,8 +1738,7 @@
       window._cachedTasks = window._cachedTasks || {};
       window._cachedTasks[currentSpec] = tasksData;
 
-      const curDay = (res.data && res.data.current_study_day) || 1;
-      document.getElementById('current-day-label').textContent = `День ${curDay} из 12`;
+      currentStudyDay = (res.data && res.data.current_study_day) || 1;
 
       const counts = {
         all: tasksData.length,
@@ -1632,7 +1757,6 @@
       document.getElementById('cnt-graded').textContent = String(counts.graded);
       document.getElementById('cnt-locked').textContent = String(counts.locked);
 
-      // Mute zero-value filters
       const mapFilterCount = {
         available: counts.available,
         in_progress: counts.in_progress,
@@ -1705,7 +1829,6 @@
       }, { threshold: 0.15 });
 
       cards.forEach((card, idx) => {
-        // First 4 visible cards trigger immediately with cascade; below-the-fold wait for scroll
         if (idx < 4) {
           requestAnimationFrame(() => {
             card.style.willChange = 'transform, opacity';
@@ -1720,16 +1843,17 @@
 
     function renderTasksList(animateSwap = false) {
       const container = document.getElementById('tasks-container');
-      const query = (document.getElementById('task-search-input').value || '').trim().toLowerCase();
+      const rawQuery = (document.getElementById('task-search-input').value || '').trim();
+      const query = window.I18n.toLower(rawQuery);
 
       const doRender = () => {
         let filtered = tasksData.filter(t => {
           if (query) {
-            const hay = `${t.title} ${t.description} ${t.tools_required}`.toLowerCase();
+            const meta = formatConciseLessonMeta(t);
+            const hay = window.I18n.toLower(`${t.title} ${t.description} ${t.tools_required} ${meta.shortTitle} ${meta.description}`);
             return hay.includes(query);
           }
           if (currentFilter === 'available') {
-            // Show available + in_progress + first locked milestone so student sees current work & next horizon (all 3 states)
             const firstLocked = tasksData.find(x => x.is_locked);
             return !t.is_locked || (firstLocked && t.task_number === firstLocked.task_number);
           }
@@ -1743,9 +1867,9 @@
         if (filtered.length === 0) {
           container.innerHTML = `
             <div class="reveal reveal--up is-visible" style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:var(--sp-4);text-align:center;color:var(--text-secondary);">
-              <p style="margin:0 0 12px;font-size:var(--fs-16);font-weight:700;color:var(--text-primary);">В этой категории пока нет уроков</p>
+              <p style="margin:0 0 12px;font-size:var(--fs-16);font-weight:700;color:var(--text-primary);">${escapeHtml(window.I18n.t('filter.emptyTitle'))}</p>
               <button type="button" onclick="applyStatusFilter('all')" class="btn-secondary-outline" style="min-height:36px;padding:6px 14px;font-size:var(--fs-12);">
-                Показать все 12 модулей
+                ${escapeHtml(window.I18n.t('filter.showAllBtn', { total: 12 }))}
               </button>
             </div>
           `;
@@ -1768,38 +1892,46 @@
           // Max 2 Badges: 1 Status Badge (icon + text) + 1 Duration Badge
           let statusBadge = '';
           if (isLocked) {
-            statusBadge = `<span class="badge-status badge-status--locked"><span class="material-symbols-outlined" style="font-size:14px;">lock</span><span>Заблокировано</span></span>`;
+            statusBadge = `<span class="badge-status badge-status--locked"><span class="material-symbols-outlined" style="font-size:14px;">lock</span><span>${escapeHtml(window.I18n.t('lesson.status.locked'))}</span></span>`;
           } else if (sc === 'in_progress' || sc === 'revision') {
-            statusBadge = `<span class="badge-status badge-status--progress"><span class="material-symbols-outlined" style="font-size:14px;">timelapse</span><span>В процессе${t.quiz_score ? ` · Квиз ${t.quiz_score}/3` : ''}</span></span>`;
+            const progLabel = t.quiz_score
+              ? window.I18n.t('lesson.status.inProgressQuiz', { score: t.quiz_score })
+              : window.I18n.t('lesson.status.inProgress');
+            statusBadge = `<span class="badge-status badge-status--progress"><span class="material-symbols-outlined" style="font-size:14px;">timelapse</span><span>${escapeHtml(progLabel)}</span></span>`;
           } else if (sc === 'graded') {
-            statusBadge = `<span class="badge-status badge-status--available"><span class="material-symbols-outlined" style="font-size:14px;">check_circle</span><span>Зачтено · ${t.student_score}/100</span></span>`;
+            statusBadge = `<span class="badge-status badge-status--available"><span class="material-symbols-outlined" style="font-size:14px;">check_circle</span><span>${escapeHtml(window.I18n.t('lesson.status.graded', { score: t.student_score || 100 }))}</span></span>`;
           } else {
-            statusBadge = `<span class="badge-status badge-status--available"><span class="material-symbols-outlined" style="font-size:14px;">play_circle</span><span>Доступно</span></span>`;
+            statusBadge = `<span class="badge-status badge-status--available"><span class="material-symbols-outlined" style="font-size:14px;">play_circle</span><span>${escapeHtml(window.I18n.t('lesson.status.available'))}</span></span>`;
           }
 
-          const durationBadge = `<span class="badge-duration">${escapeHtml(t.time_limit || '60 мин')}</span>`;
-          const meta = formatConciseLessonMeta(t.title, t.tools_required, t.task_number);
+          const durationBadge = `<span class="badge-duration">${escapeHtml(window.I18n.t('lesson.moduleDuration', { minutes: 60 }))}</span>`;
+          const meta = formatConciseLessonMeta(t);
+          const fallbackBadge = meta.isFallback
+            ? `<span class="badge-fallback has-tooltip" lang="ru" data-tip="${escapeHtml(window.I18n.t('lang.fallbackTooltip'))}">${escapeHtml(window.I18n.t('lang.fallbackBadge'))}</span>`
+            : '';
+
           const dateInfo = formatRelativeDate(
             t.unlock_day || t.task_number,
-            t.current_study_day || 1,
+            t.current_study_day || currentStudyDay,
             isLocked,
             t.unlock_date_exact || '12 ноября, 09:00',
             t.deadline_exact || '13 ноября, 23:59'
           );
 
           const tagsHtml = meta.tags.map(tag => `<span class="tech-tag">${escapeHtml(tag)}</span>`).join('');
+          const contentLangAttr = meta.isFallback ? ' lang="ru"' : '';
 
           const actionsHtml = isLocked
-            ? `<div class="locked-pill has-tooltip" tabindex="0" data-tip="Модуль откроется ${escapeHtml(dateInfo.exact)}">
+            ? `<div class="locked-pill has-tooltip" tabindex="0" data-tip="${escapeHtml(window.I18n.t('lesson.dates.lockedTooltip', { date: dateInfo.exact }))}">
                  <span class="material-symbols-outlined" style="font-size:16px;">lock</span>
                  <span>${escapeHtml(dateInfo.label)}</span>
                </div>`
             : `<a href="${lessonHref}" class="btn-primary-cta">
-                 <span>${sc === 'in_progress' ? 'Продолжить урок' : 'Начать урок'}</span>
+                 <span>${escapeHtml(sc === 'in_progress' ? window.I18n.t('lesson.action.continue') : window.I18n.t('lesson.action.start'))}</span>
                  <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
                </a>
                <a href="simulator.html?specialty=${currentSpec}&amp;task=${t.task_number}" class="btn-secondary-outline">
-                 <span>Тренажёр</span>
+                 <span>${escapeHtml(window.I18n.t('lesson.action.simulator'))}</span>
                </a>`;
 
           return `
@@ -1809,16 +1941,17 @@
                 <div class="timeline-line"></div>
               </div>
               <div class="lesson-card">
-                <div style="min-width:0;flex:1;">
+                <div style="min-width:0;flex:1;"${contentLangAttr}>
                   <div class="card-badges">
                     ${statusBadge}
                     ${durationBadge}
+                    ${fallbackBadge}
                   </div>
                   <h2 class="card-title">${escapeHtml(meta.shortTitle)}</h2>
-                  <p class="card-desc">${escapeHtml(t.description)}</p>
+                  <p class="card-desc">${escapeHtml(meta.description)}</p>
                   <div class="card-meta-row">
                     ${tagsHtml}
-                    <span class="has-tooltip" tabindex="0" data-tip="Точная дата: ${escapeHtml(dateInfo.exact)}" style="display:inline-flex;align-items:center;gap:4px;">
+                    <span class="has-tooltip" tabindex="0" data-tip="${escapeHtml(window.I18n.t('lesson.dates.exactDateTooltip', { date: dateInfo.exact }))}" style="display:inline-flex;align-items:center;gap:4px;">
                       <span class="material-symbols-outlined" style="font-size:14px;">schedule</span>
                       <span>${escapeHtml(dateInfo.relative)}</span>
                     </span>
@@ -1846,7 +1979,12 @@
       }
     }
 
-    // Initial Page Load Choreography (<= 1.2s total, once per session)
+    // Re-render dynamic content seamlessly when language switches without reloading
+    window.addEventListener('eduspace:localeChanged', () => {
+      updateCourseHeaderUI();
+      renderTasksList(false);
+    });
+
     function runInitialChoreography() {
       try {
         if (localStorage.getItem('eduspace_sidebar_collapsed') === '1') {
@@ -1874,7 +2012,6 @@
         });
       });
 
-      // Non-blocking safety fallback after 950ms
       setTimeout(() => {
         document.body.classList.add('reveal-fallback');
       }, 950);
@@ -1885,6 +2022,7 @@
       const params = new URLSearchParams(window.location.search);
       currentSpec = params.get('specialty') || (user && user.specialty_slug) || 'it';
       window.currentSpec = currentSpec;
+      if (window.I18n) window.I18n.applyTranslations(document);
       runInitialChoreography();
       loadTasksList();
     });

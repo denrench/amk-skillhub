@@ -3,6 +3,13 @@
    Works seamlessly with Python Flask SQLite (/api/*) AND Static GitHub Pages
    ========================================================================== */
 (function () {
+  function tr(key, fallback, params) {
+    if (window.I18n && typeof window.I18n.t === 'function') {
+      return window.I18n.t(key, params);
+    }
+    if (!params) return fallback;
+    return String(fallback).replace(/\{([a-zA-Z0-9_]+)\}/g, (m, k) => (params[k] !== undefined ? params[k] : m));
+  }
   'use strict';
 
   const SESSION_KEY = 'eduspace_active_session_v3';
@@ -1866,7 +1873,7 @@
     const stats = data.statistics || { passed_count: 0, avg_score: 0, gpa: 0, xp: 0 };
     const subs = data.submissions || [];
     const rowsHtml = subs.length === 0
-      ? `<tr><td colspan="5" class="p-8 text-center text-xs text-slate-500">У вас пока нет сданных работ. Откройте Урок №1, пройдите автопроверку и отправьте первое решение!</td></tr>`
+      ? `<tr><td colspan="5" class="p-8 text-center text-xs text-slate-500">${tr('modal.grades.emptyRow', 'У вас пока нет сданных работ. Откройте Урок №1, пройдите автопроверку и отправьте первое решение!')}</td></tr>`
       : subs.map(s => {
           const isPending = String(s.status).includes('на проверке') || String(s.status).includes('Отправлено');
           const isRev = String(s.status).includes('доработ');
@@ -1876,7 +1883,7 @@
 
           return `
             <tr class="hover:bg-white/[0.04] border-b border-white/5 transition-colors">
-              <td class="p-3 font-bold text-white">Урок №${s.task_number}. ${s.task_title}</td>
+              <td class="p-3 font-bold text-white">${tr('lesson.prefix', 'Урок ' + s.task_number + '. ', { num: s.task_number })}${s.task_title}</td>
               <td class="p-3 text-indigo-400 uppercase text-[10px] font-bold font-mono">${s.specialty_slug}</td>
               <td class="p-3 font-extrabold text-white">${s.score}/100 (${s.grade_letter})</td>
               <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeCls}">${s.status}</span></td>
@@ -1884,18 +1891,18 @@
             </tr>
           `;
         }).join('');
-    openModal(`📊 Зачётная книжка — ${user.full_name}`, `
+    openModal(tr('modal.grades.title', `📊 Зачётная книжка — ${user.full_name}`, { name: user.full_name }), `
       <div class="grid grid-cols-3 gap-3 text-center">
         <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30">
-          <div class="text-[11px] text-indigo-300 font-bold">Зачтено по курсу</div>
+          <div class="text-[11px] text-indigo-300 font-bold">${tr('modal.grades.passedLabel', 'Зачтено по курсу')}</div>
           <div class="text-xl font-extrabold text-indigo-200 mt-0.5">${stats.passed_count} / 12</div>
         </div>
         <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
-          <div class="text-[11px] text-emerald-300 font-bold">Средний балл / GPA</div>
+          <div class="text-[11px] text-emerald-300 font-bold">${tr('modal.grades.gpaLabel', 'Средний балл / GPA')}</div>
           <div class="text-xl font-extrabold text-emerald-200 mt-0.5">${stats.avg_score > 0 ? `${stats.avg_score} (${stats.gpa})` : '—'}</div>
         </div>
         <div class="p-3 rounded-xl bg-purple-950/40 border border-purple-500/30">
-          <div class="text-[11px] text-purple-300 font-bold">Опыт обучения</div>
+          <div class="text-[11px] text-purple-300 font-bold">${tr('modal.grades.xpLabel', 'Опыт обучения')}</div>
           <div class="text-xl font-extrabold text-purple-200 mt-0.5">${stats.xp} XP</div>
         </div>
       </div>
@@ -1903,11 +1910,11 @@
         <table class="w-full text-xs text-left">
           <thead class="bg-white/[0.04] text-slate-400 border-b border-white/10 font-bold">
             <tr>
-              <th class="p-3">Урок / Модуль</th>
-              <th class="p-3">Курс</th>
-              <th class="p-3">Балл</th>
-              <th class="p-3">Статус</th>
-              <th class="p-3">Комментарий куратора</th>
+              <th class="p-3">${tr('modal.grades.colLesson', 'Урок / Модуль')}</th>
+              <th class="p-3">${tr('modal.grades.colCourse', 'Курс')}</th>
+              <th class="p-3">${tr('modal.grades.colScore', 'Балл')}</th>
+              <th class="p-3">${tr('modal.grades.colStatus', 'Статус')}</th>
+              <th class="p-3">${tr('modal.grades.colComment', 'Комментарий куратора')}</th>
             </tr>
           </thead>
           <tbody>${rowsHtml}</tbody>
@@ -1916,9 +1923,9 @@
       <div class="flex justify-between items-center pt-2">
         <button type="button" onclick="exportCsvJournal()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/15 text-xs font-bold flex items-center gap-1.5 transition-colors">
           <span class="material-symbols-outlined text-[16px]">download</span>
-          <span>Скачать выписку CSV</span>
+          <span>${tr('modal.grades.downloadCsv', 'Скачать выписку CSV')}</span>
         </button>
-        <button type="button" onclick="closeModal()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-glow-indigo transition-all">Закрыть</button>
+        <button type="button" onclick="closeModal()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-glow-indigo transition-all">${tr('modal.close', 'Закрыть')}</button>
       </div>
     `, 'max-w-3xl');
   }
@@ -1949,32 +1956,35 @@
         ? 'border-emerald-500/30 bg-emerald-950/30'
         : (isToday ? 'border-indigo-500/80 bg-indigo-950/40 shadow-glow-indigo' : (isLocked ? 'border-white/5 bg-dark-950/40 opacity-70' : 'border-white/10 bg-dark-900/60'));
 
+      const locOpen = window.I18n ? window.I18n.localizeDateString(t.unlock_date_exact) : t.unlock_date_exact;
+      const locDl = window.I18n ? window.I18n.localizeDateString(t.deadline_exact) : t.deadline_exact;
+      const locLesson = window.I18n ? window.I18n.localizeLessonContent(spec, t.task_number, t) : { title: t.title };
       const badge = isDone
-        ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">Выполнено (${t.student_score}/100)</span>`
+        ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">${tr('modal.deadlines.doneBadge', `Выполнено (${t.student_score}/100)`, { score: t.student_score })}</span>`
         : (isLocked
-            ? `<span class="px-2.5 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/10 text-[10px] font-bold">Откроется: ${t.unlock_date_exact}</span>`
-            : `<span class="px-2.5 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold shadow-glow-indigo">${isToday ? 'Задание на сегодня' : 'Доступно'}</span>`);
+            ? `<span class="px-2.5 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/10 text-[10px] font-bold">${tr('modal.deadlines.lockedBadge', `Откроется: ${locOpen}`, { date: locOpen })}</span>`
+            : `<span class="px-2.5 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold shadow-glow-indigo">${isToday ? tr('modal.deadlines.todayBadge', 'Задание на сегодня') : tr('modal.deadlines.availableBadge', 'Доступно')}</span>`);
 
       return `
         <div class="p-3.5 rounded-xl border ${cardCls} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-[11px] font-extrabold text-indigo-400">День ${t.unlock_day}</span>
+              <span class="text-[11px] font-extrabold text-indigo-400">${tr('modal.deadlines.dayLabel', `День ${t.unlock_day}`, { day: t.unlock_day })}</span>
               ${badge}
             </div>
-            <div class="font-bold text-xs text-white mt-1">${t.title}</div>
-            <div class="text-[11px] text-slate-400 mt-0.5">Открытие: ${t.unlock_date_exact} • Дедлайн: ${t.deadline_exact}</div>
+            <div class="font-bold text-xs text-white mt-1">${locLesson.title}</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">${tr('modal.deadlines.scheduleLine', `Открытие: ${locOpen} • Дедлайн: ${locDl}`, { openDate: locOpen, deadlineDate: locDl })}</div>
           </div>
           ${isLocked
             ? '<span class="material-symbols-outlined text-slate-500 text-[20px]">lock</span>'
-            : `<a href="simulator.html?specialty=${spec}&task=${t.task_number}" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs font-bold shrink-0 text-center shadow-glow-indigo transition-all">Открыть урок</a>`
+            : `<a href="simulator.html?specialty=${spec}&task=${t.task_number}" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs font-bold shrink-0 text-center shadow-glow-indigo transition-all">${tr('modal.deadlines.openLessonBtn', 'Открыть урок')}</a>`
           }
         </div>
       `;
     }).join('');
-    openModal(`🗓️ График открытия модулей и дедлайны (Текущий день: День ${curDay})`, `
+    openModal(tr('modal.deadlines.title', `🗓️ График открытия модулей и дедлайны (Текущий день: День ${curDay})`, { day: curDay }), `
       <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-xs text-indigo-300">
-        Задания открываются поэтапно согласно расписанию курса. Будущие уроки заблокированы на сервере до наступления соответствующего учебного дня.
+        ${tr('modal.deadlines.banner', 'Задания открываются поэтапно согласно расписанию курса. Будущие уроки заблокированы на сервере до наступления соответствующего учебного дня.')}
       </div>
       <div class="space-y-2.5">${itemsHtml}</div>
     `, 'max-w-3xl');
@@ -2017,19 +2027,21 @@
     const res = await apiRequest(`/api/notifications?user_id=${uid}&group_name=${encodeURIComponent(grp)}`);
     let items = (res.data && res.data.notifications) || [];
     if (items.length === 0) {
-      const course = getCourseBySlug(window.currentSpec || (user && user.specialty_slug) || 'it');
+      const spec = window.currentSpec || (user && user.specialty_slug) || 'it';
+      const course = getCourseBySlug(spec);
+      const locShort = tr(`course.catalog.${spec}.shortTitle`, course.short_title);
       items = [
         {
           type: 'success',
-          title: `Открыт Урок №1 по курсу «${course.short_title}»`,
-          body: 'Вам доступны интерактивный конспект с видеоразбором, 3D-схема и практический тренажёр с автопроверкой.',
-          created_at: 'Сегодня, 09:00'
+          title: tr('modal.notifications.welcomeTitle', `Открыт Урок №1 по курсу «${locShort}»`, { course: locShort }),
+          body: tr('modal.notifications.welcomeBody', 'Вам доступны интерактивный конспект с видеоразбором, 3D-схема и практический тренажёр с автопроверкой.'),
+          created_at: '09:00'
         },
         {
           type: 'info',
-          title: `Куратор курса: ${course.curator}`,
-          body: 'Ближайший дедлайн отправки первого практического задания — через 2 дня. Вопросы можно задать в чате.',
-          created_at: 'Сегодня, 09:15'
+          title: tr('modal.notifications.curatorTitle', `Куратор курса: ${course.curator}`, { curator: course.curator }),
+          body: tr('modal.notifications.curatorBody', 'Ближайший дедлайн отправки первого практического задания — через 2 дня. Вопросы можно задать в чате.'),
+          created_at: '09:15'
         }
       ];
     }
@@ -2056,18 +2068,18 @@
             </div>
           `;
         }).join('');
-    openModal('🔔 Центр уведомлений', `<div class="space-y-2.5">${listHtml}</div>`);
+    openModal(tr('modal.notifications.title', '🔔 Центр уведомлений'), `<div class="space-y-2.5">${listHtml}</div>`);
   }
 
   async function openMessengerModal(recipient) {
     const peerId = Number.isInteger(recipient) && recipient > 0 ? recipient : null;
-    openModal(peerId ? 'Личный диалог' : 'Обсуждение курса', `
+    openModal(peerId ? 'Личный диалог' : tr('modal.chat.title', 'Обсуждение курса'), `
       <div class="flex flex-col h-80 border border-white/10 rounded-2xl bg-dark-950/60">
-        <p id="edu-chat-status" class="px-4 pt-3 text-sm text-slate-300" role="status">Загружаем сообщения…</p>
+        <p id="edu-chat-status" class="px-4 pt-3 text-sm text-slate-300" role="status">${tr('modal.chat.loading', 'Загружаем сообщения…')}</p>
         <div id="edu-chat-box" class="flex-1 p-4 overflow-y-auto space-y-3" role="log" aria-label="Сообщения чата"></div>
         <form id="edu-chat-form" class="p-2.5 bg-dark-900/90 border-t border-white/10 flex flex-wrap gap-2" hidden>
-          <input type="text" id="edu-chat-input" aria-label="Сообщение" placeholder="Напишите сообщение" maxlength="1000" class="min-w-0 flex-1 px-3 py-2 border border-white/15 bg-dark-800 text-white rounded-xl text-sm" required>
-          <button type="submit" class="academy-action">Отправить</button>
+          <input type="text" id="edu-chat-input" aria-label="Сообщение" placeholder="${tr('modal.chat.inputPlaceholder', 'Напишите сообщение')}" maxlength="1000" class="min-w-0 flex-1 px-3 py-2 border border-white/15 bg-dark-800 text-white rounded-xl text-sm" required>
+          <button type="submit" class="academy-action">${tr('modal.chat.sendBtn', 'Отправить')}</button>
         </form>
       </div>
     `);
@@ -2109,22 +2121,24 @@
       status.textContent = data.peer_name || (data.messages.length ? 'Сообщения участников курса' : 'Пока нет сообщений. Можно начать обсуждение.');
       form.hidden = false;
     } catch (error) {
-      const course = getCourseBySlug(window.currentSpec || 'it');
+      const spec = window.currentSpec || 'it';
+      const course = getCourseBySlug(spec);
+      const locTitle = tr(`course.catalog.${spec}.title`, course.title);
       viewer = -1;
       appendMessage({
         sender_id: 999,
-        sender_name: `Куратор курса · ${course.curator}`,
-        body: `Здравствуйте! Добро пожаловать на курс «${course.title}». Здесь вы можете задать вопрос по текущему уроку, разбору ошибок или дедлайнам.`
+        sender_name: tr('modal.chat.curatorRole', `Куратор курса · ${course.curator}`, { curator: course.curator }),
+        body: tr('modal.chat.welcomeMessage', `Здравствуйте! Добро пожаловать на курс «${locTitle}». Здесь вы можете задать вопрос по текущему уроку, разбору ошибок или дедлайнам.`, { course: locTitle })
       });
-      status.textContent = 'Чат с куратором курса (Ознакомительный режим)';
+      status.textContent = tr('modal.chat.guestStatus', 'Чат с куратором курса (Ознакомительный режим)');
       form.hidden = false;
       form.addEventListener('submit', event => {
         event.preventDefault();
         const body = input.value.trim();
         if (!body) return;
-        appendMessage({ sender_id: -1, sender_name: 'Вы (Студент)', body });
+        appendMessage({ sender_id: -1, sender_name: tr('modal.chat.youLabel', 'Вы (Студент)'), body });
         input.value = '';
-        status.textContent = 'Сообщение доставлено куратору (демо-режим).';
+        status.textContent = tr('modal.chat.sentStatus', 'Сообщение доставлено куратору.');
       });
       return;
     }
@@ -2172,48 +2186,59 @@
     const ln = user.last_name || parts[0] || '';
     const fn = user.first_name || parts[1] || '';
     const mn = user.middle_name !== undefined ? user.middle_name : parts.slice(2).join(' ');
-    const courseOpts = getCoursesList().map(c =>
-      `<option value="${c.slug}" ${c.slug === user.specialty_slug ? 'selected' : ''}>${c.code} — ${c.title}</option>`
-    ).join('');
-    openModal('⚙️ Настройки личного профиля и безопасности', `
+    const curLoc = (window.I18n && window.I18n.getLocale) ? window.I18n.getLocale() : 'ru';
+    const courseOpts = getCoursesList().map(c => {
+      const cTitle = tr(`course.catalog.${c.slug}.title`, c.title);
+      return `<option value="${c.slug}" ${c.slug === user.specialty_slug ? 'selected' : ''}>${c.code} — ${cTitle}</option>`;
+    }).join('');
+    openModal(tr('modal.settings.title', '⚙️ Настройки личного профиля и безопасности'), `
       <form id="edu-profile-settings-form" class="space-y-3.5 text-xs text-slate-200">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="block font-bold text-slate-300 mb-1">Фамилия *</label>
+            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.lastName', 'Фамилия *')}</label>
             <input type="text" id="set-last-name" value="${ln}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" required />
           </div>
           <div>
-            <label class="block font-bold text-slate-300 mb-1">Имя *</label>
+            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.firstName', 'Имя *')}</label>
             <input type="text" id="set-first-name" value="${fn}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" required />
           </div>
           <div>
-            <label class="block font-bold text-slate-300 mb-1">Отчество</label>
-            <input type="text" id="set-middle-name" value="${mn}" placeholder="При наличии" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" />
+            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.middleName', 'Отчество')}</label>
+            <input type="text" id="set-middle-name" value="${mn}" placeholder="${tr('modal.settings.middleNamePlaceholder', 'При наличии')}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" />
           </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-300 mb-1">Подтверждённый Email</label>
+            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.email', 'Подтверждённый Email')}</label>
             <input type="email" value="${user.email}" disabled class="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-dark-950 text-slate-500 cursor-not-allowed font-mono" />
           </div>
           <div>
-            <label class="block font-bold text-slate-300 mb-1">${user.role === 'teacher' ? 'Кафедра / Отделение' : 'Учебная группа'}</label>
+            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.group', 'Учебная группа')}</label>
             <input type="text" id="set-group" value="${user.group_name || 'ИС-21'}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" required />
           </div>
         </div>
-        ${user.role === 'student' ? `
-        <div>
-          <label class="block font-bold text-slate-300 mb-1">Активный курс обучения</label>
-          <select id="set-course" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500">${courseOpts}</select>
-        </div>` : ''}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          ${user.role === 'student' ? `
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.activeCourse', 'Активный курс обучения')}</label>
+            <select id="set-course" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500">${courseOpts}</select>
+          </div>` : ''}
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.interfaceLanguage', 'Язык интерфейса')}</label>
+            <select id="set-locale" onchange="if(window.I18n){window.I18n.setLocale(this.value);openSettingsModal();}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500">
+              <option value="ru" ${curLoc === 'ru' ? 'selected' : ''}>Русский (РУС)</option>
+              <option value="kk" ${curLoc === 'kk' ? 'selected' : ''}>Қазақша (ҚАЗ)</option>
+            </select>
+          </div>
+        </div>
         <div class="pt-2 border-t border-white/10">
-          <label class="block font-bold text-slate-300 mb-1">Новый пароль (оставьте пустым, если не меняете)</label>
-          <input type="password" id="set-new-pwd" placeholder="Минимум 6 символов, буквы и цифры" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500 placeholder-slate-500" />
+          <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.newPassword', 'Новый пароль (оставьте пустым, если не меняете)')}</label>
+          <input type="password" id="set-new-pwd" placeholder="${tr('modal.settings.newPasswordPlaceholder', 'Минимум 6 символов, буквы и цифры')}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500 placeholder-slate-500" />
         </div>
         <div id="set-error-box" class="hidden p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 font-semibold"></div>
         <div class="pt-2 flex justify-end gap-2">
-          <button type="button" onclick="closeModal()" class="px-4 py-2.5 rounded-xl border border-white/15 text-slate-300 font-bold hover:bg-white/10 transition-colors">Отмена</button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold shadow-glow-indigo transition-all">Сохранить изменения</button>
+          <button type="button" onclick="closeModal()" class="px-4 py-2.5 rounded-xl border border-white/15 text-slate-300 font-bold hover:bg-white/10 transition-colors">${tr('modal.cancel', 'Отмена')}</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold shadow-glow-indigo transition-all">${tr('modal.save', 'Сохранить изменения')}</button>
         </div>
       </form>
     `);
@@ -2953,22 +2978,28 @@
   }
 
   function openInteractiveRoadmapModal() {
+    const trRm = (k, fb, p) => (window.I18n && window.I18n.t) ? window.I18n.t(k, p) : fb;
     const user = getActiveUser();
     const spec = window.currentSpec || (user && user.specialty_slug) || 'it';
     const course = (window.EduSpace && window.EduSpace.getCourseBySlug)
       ? window.EduSpace.getCourseBySlug(spec)
       : { slug: spec, short_title: 'Курс', title: 'Курс' };
+    const locCourseShort = trRm(`course.catalog.${spec}.shortTitle`, course.short_title);
     const tasks = (window._cachedTasks && window._cachedTasks[course.slug]) || [];
     const catalogLessons = (window.EDU_LESSONS && window.EDU_LESSONS[course.slug]) || [];
     const nodesHtml = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => {
       const isPro = num > 3;
       const t = tasks.find(x => x.task_number === num);
       const catLesson = catalogLessons.find(x => Number(x.num) === num) || catalogLessons[num - 1];
-      const title = (t && t.title) || (catLesson && catLesson.title) || ('Модуль #' + num);
+      const rawTitle = (t && t.title) || (catLesson && catLesson.title) || ('Модуль #' + num);
+      const locLesson = window.I18n ? window.I18n.localizeLessonContent(course.slug, num, { title: rawTitle, description: '' }) : { title: rawTitle };
+      const title = locLesson.title;
       const isDone = t && t.status_code === 'graded';
       const border = isDone ? 'border-emerald-500/50 bg-emerald-950/20' : (isPro ? 'border-amber-500/40 bg-amber-950/20' : 'border-indigo-500/40 bg-indigo-950/20');
-      const icon = isDone ? 'check_circle' : (isPro ? 'diamond' : 'play_circle');
       const iconColor = isDone ? 'text-emerald-400' : (isPro ? 'text-amber-400' : 'text-indigo-400');
+      const subLabel = isDone
+        ? trRm('modal.roadmap.moduleCompleted', '✓ Модуль зачтён')
+        : (isPro ? trRm('modal.roadmap.modulePro', 'Профильный модуль · Сертификат') : trRm('modal.roadmap.moduleBase', 'Базовый модуль'));
 
       return `
         <div class="p-3.5 rounded-2xl border ${border} flex items-center justify-between gap-3 hover:scale-[1.01] transition-transform">
@@ -2978,18 +3009,18 @@
             </div>
             <div>
               <div class="text-xs font-bold text-white">${title}</div>
-              <div class="text-[10px] text-slate-400">${isDone ? '✓ Модуль зачтен' : (isPro ? 'Тариф Pro • Сертификат' : 'Базовый трек')}</div>
+              <div class="text-[10px] text-slate-400">${subLabel}</div>
             </div>
           </div>
           <a href="simulator.html?specialty=${course.slug}&task=${num}" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all shrink-0">
-            Открыть
+            ${trRm('lesson.action.open', 'Открыть')}
           </a>
         </div>
       `;
     }).join('');
-    openModal('🚀 Интерактивный роадмап курса: ' + course.short_title, `
+    openModal(trRm('modal.roadmap.title', '🚀 Интерактивный роадмап курса: ' + locCourseShort, { course: locCourseShort }), `
       <div class="space-y-4 text-xs">
-        <p class="text-slate-300">Персональная траектория освоения профессии от базовой теории до дипломного проекта с поддержкой 3D-моделей и лабораторных симуляторов.</p>
+        <p class="text-slate-300">${trRm('modal.roadmap.subtitle', 'Персональная траектория освоения профессии от базовой теории до дипломного проекта с поддержкой 3D-моделей и лабораторных симуляторов.')}</p>
         <div class="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1">
           ${nodesHtml}
         </div>

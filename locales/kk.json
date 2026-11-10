@@ -1,0 +1,262 @@
+{
+  "meta": {
+    "locale": "kk",
+    "languageName": "Қазақша",
+    "shortCode": "ҚАЗ",
+    "script": "Cyrl",
+    "pageTitle": "Курс бағдарламасы мен модульдер — EDU SPACE | АМК",
+    "pageDescription": "Курс бағдарламасы мен модульдер — EDU SPACE | АМК цифрлық білім беру платформасы"
+  },
+  "a11y": {
+    "skipToContent": "Негізгі мазмұнға өту",
+    "sidebarNav": "Бүйірлік навигация",
+    "sidebarSections": "Кабинет бөлімдері",
+    "collapseSidebar": "Мәзірді жинау немесе жазу",
+    "collapseSidebarTitle": "Мәзірді жинау",
+    "breadcrumbs": "Навигация тізбегі",
+    "langSwitcher": "Интерфейс тілін таңдау",
+    "nextActionRegion": "Келесі әрекет",
+    "courseHeaderRegion": "Курс туралы ақпарат және оқу үлгерімі",
+    "courseProgressLabel": "Курсты меңгеру",
+    "controlsRegion": "Сабақтарды сүзу және іздеу",
+    "statusFilterGroup": "Сабақ мәртебесі бойынша сүзгі",
+    "searchLabel": "Тақырып немесе құралдар бойынша іздеу",
+    "lessonsListRegion": "Курс модульдерінің тізімі",
+    "mobileNav": "Мобильді навигация",
+    "closeModal": "Терезені жабу"
+  },
+  "brand": {
+    "homeTitle": "EDU SPACE басты бетіне өту",
+    "cabinetSubtitle": "АМК кабинеті"
+  },
+  "lang": {
+    "switcherLabel": "Интерфейс тілі",
+    "ru": "Русский",
+    "kk": "Қазақша",
+    "ruShort": "РУС",
+    "kkShort": "ҚАЗ",
+    "fallbackBadge": "Орысша",
+    "fallbackTooltip": "Бұл материал әзірше орыс тілінде берілген"
+  },
+  "nav": {
+    "group": {
+      "learning": "Оқу",
+      "progress": "Үлгерім",
+      "communication": "Байланыс",
+      "profile": "Профиль"
+    },
+    "myLearning": "Менің оқуым",
+    "myLearningTooltip": "Менің оқуым және курстарым",
+    "lessonsAndTasks": "Сабақтар мен тапсырмалар",
+    "lessonsAndTasksTooltip": "Сабақтар мен тапсырмалар",
+    "availableCountTitle": "Қолжетімді сабақ саны",
+    "roadmap": "Жол картасы",
+    "roadmapTooltip": "Курстың жол картасы",
+    "grades": "Бағалар",
+    "gradesTooltip": "Бағалар мен сынақ кітапшасы",
+    "deadlines": "Тапсыру мерзімі",
+    "deadlinesTooltip": "Мерзімдер күнтізбесі",
+    "curatorChat": "Куратормен чат",
+    "curatorChatTooltip": "Куратормен чат",
+    "curatorOnlineTitle": "Куратор желіде",
+    "notifications": "Хабарландырулар",
+    "notificationsTooltip": "Хабарландырулар",
+    "profileAndCert": "Профиль және сертификат",
+    "profileAndCertTooltip": "Профиль және сертификат",
+    "career": "Мансап",
+    "careerTooltip": "Мансап және түйіндеме",
+    "tools": "Құралдар",
+    "toolsTooltip": "Оқу құралдары",
+    "resetDemo": "Демо-үлгерімді нөлдеу",
+    "resetDemoTitle": "Демо-үлгерімді 0% деңгейіне қайтару",
+    "settings": "Параметрлер",
+    "settingsTooltip": "Параметрлер",
+    "logout": "Шығу",
+    "logoutTooltip": "Аккаунттан шығу",
+    "mobile": {
+      "cabinet": "Кабинет",
+      "modules": "Модульдер",
+      "roadmap": "Карта",
+      "chat": "Чат",
+      "profile": "Профиль"
+    }
+  },
+  "header": {
+    "breadcrumbCabinet": "Кабинет",
+    "breadcrumbModules": "Модульдер",
+    "studyDayBadge": "{day}-күн / {total}",
+    "studyDayTooltip": "Оқу кестесі бойынша әр жаңа оқу күні келесі модуль ашылады",
+    "studentDefaultName": "Студент",
+    "studentDefaultInitials": "СТ"
+  },
+  "continueBanner": {
+    "badge": "Келесі қадам",
+    "subtitle": "Практикалық модуль · ~{duration} · {deadline}",
+    "startBtn": "{num}-сабақты бастау",
+    "continueBtn": "{num}-сабақты жалғастыру",
+    "mobileBtn": "Жалғастыру · {num}-сабақ"
+  },
+  "course": {
+    "curatorLine": "{code} · Куратор: {curator}",
+    "switchCourseBtn": "Курсты ауыстыру",
+    "switchCourseAria": "Оқу курсын ауыстыру",
+    "primaryCtaStart": "Сабақты бастау · {num}-сабақ",
+    "primaryCtaContinue": "Оқуды жалғастыру · {num}-сабақ",
+    "textbookBtn": "Оқулық және талданған мысалдар",
+    "progress": {
+      "label": "Курсты меңгеру",
+      "summary": "{total} модульдің {done} тапсырылды · Келесі: {next}-сабақ",
+      "setPrimary": "Негізгі курс ету",
+      "isPrimary": "Негізгі курс ✓"
+    },
+    "catalog": {
+      "it": {
+        "title": "Бағдарламалық қамтамасыз ету (Web Design)",
+        "shortTitle": "Web Design",
+        "description": "Веб-дизайн бойынша практикалық курс: Photoshop пен Illustrator бағдарламаларында графика дайындау, Figma-да интерфейс, Auto Layout пен компоненттер құрастыру, HTML/CSS беттеу."
+      },
+      "graphic_design": {
+        "title": "Графикалық дизайн және брендинг",
+        "shortTitle": "Графикалық дизайн",
+        "description": "Illustrator, Photoshop және Figma көмегімен айдентика, векторлық графика, жарнама постерлері мен көпбетті макеттер жасау."
+      },
+      "autoelectric": {
+        "title": "Автоэлектрика және компьютерлік диагностика",
+        "shortTitle": "Автоэлектрика",
+        "description": "Электр тізбектерін мультиметрмен және осциллографпен тексеру, іске қосу жүйесі, ЭБЖ датчиктері, CAN/LIN шиналары мен OBD-II кодтарын диагностикалау."
+      },
+      "hvac": {
+        "title": "Тоңазытқыш жабдықтары және ауа баптау",
+        "shortTitle": "Тоңазытқыш жабдықтары",
+        "description": "Термодинамикалық цикл, саңылаусыздықты тексеру, вакуумдау, хладагент құю және автоматиканы баптау."
+      },
+      "automechanic": {
+        "title": "Автомеханика және техникалық қызмет көрсету",
+        "shortTitle": "Автомеханика",
+        "description": "ІЖҚ тораптарын ақаулау, ГТМ фазаларын реттеу, тежегіш жүйесіне, аспа мен трансмиссияға регламенттік ТҚК жүргізу."
+      }
+    }
+  },
+  "filter": {
+    "available": "Қолжетімді",
+    "inProgress": "Орындалуда",
+    "submitted": "Тексеруде",
+    "graded": "Тексерілді",
+    "locked": "Жабық",
+    "all": "Барлығы",
+    "emptyTitle": "Бұл санатта әзірше сабақ жоқ",
+    "showAllBtn": "Барлық {total} модульді көрсету"
+  },
+  "search": {
+    "placeholder": "Тақырып немесе құрал бойынша іздеу (Figma, SVG, 72 ppi)..."
+  },
+  "lesson": {
+    "prefix": "{num}-сабақ. ",
+    "moduleDuration": "{minutes} мин",
+    "status": {
+      "available": "Қолжетімді",
+      "inProgress": "Орындалуда",
+      "inProgressQuiz": "Орындалуда · Тест {score}/3",
+      "submitted": "Тексеруде",
+      "graded": "Тексерілді · {score}/100",
+      "locked": "Жабық"
+    },
+    "action": {
+      "start": "Сабақты бастау",
+      "continue": "Оқуды жалғастыру",
+      "simulator": "Тренажер",
+      "open": "Ашу"
+    },
+    "dates": {
+      "opensOn": "Ашылады: {date}",
+      "opensTomorrow": "Ертең ашылады",
+      "opensInDays_one": "Ашылуына {count} күн қалды",
+      "opensInDays_few": "Ашылуына {count} күн қалды",
+      "opensInDays_many": "Ашылуына {count} күн қалды",
+      "opensInDays_other": "Ашылуына {count} күн қалды",
+      "deadlineTomorrow": "Тапсыру мерзімі: ертең",
+      "deadlineInDays_one": "Тапсыру мерзімі: {count} күннен кейін",
+      "deadlineInDays_few": "Тапсыру мерзімі: {count} күннен кейін",
+      "deadlineInDays_many": "Тапсыру мерзімі: {count} күннен кейін",
+      "deadlineInDays_other": "Тапсыру мерзімі: {count} күннен кейін",
+      "exactDateTooltip": "Нақты уақыты: {date}",
+      "lockedTooltip": "Модуль ашылатын уақыт: {date}"
+    }
+  },
+  "modal": {
+    "close": "Жабу",
+    "cancel": "Болдырмау",
+    "save": "Өзгерістерді сақтау",
+    "roadmap": {
+      "title": "🚀 Жол картасы: {course}",
+      "subtitle": "Базалық теориядан бастап 3D-модельдер мен практикалық тренажерларды қамтитын дипломдық жобаға дейінгі оқу траекториясы.",
+      "moduleCompleted": "✓ Модуль тапсырылды",
+      "modulePro": "Кәсіби модуль · Сертификат",
+      "moduleBase": "Базалық модуль"
+    },
+    "grades": {
+      "title": "📊 Бағалар мен сынақ кітапшасы — {name}",
+      "passedLabel": "Курс бойынша тапсырылды",
+      "gpaLabel": "Орташа балл / GPA",
+      "xpLabel": "Оқу тәжірибесі",
+      "colLesson": "Сабақ / Модуль",
+      "colCourse": "Курс",
+      "colScore": "Балл",
+      "colStatus": "Мәртебесі",
+      "colComment": "Куратор пікірі",
+      "emptyRow": "Сізде әзірше тапсырылған жұмыс жоқ. 1-сабақты ашып, автотексеруден өтіп, алғашқы тапсырманы жіберіңіз!",
+      "downloadCsv": "CSV үзіндісін жүктеп алу"
+    },
+    "deadlines": {
+      "title": "🗓️ Мерзімдер күнтізбесі (Ағымдағы оқу күні: {day}-күн)",
+      "banner": "Тапсырмалар курс кестесіне сәйкес кезең-кезеңімен ашылады. Келесі сабақтар тиісті оқу күні келгенде қолжетімді болады.",
+      "dayLabel": "{day}-күн",
+      "doneBadge": "Орындалды ({score}/100)",
+      "lockedBadge": "Ашылады: {date}",
+      "todayBadge": "Бүгінгі тапсырма",
+      "availableBadge": "Қолжетімді",
+      "scheduleLine": "Ашылуы: {openDate} · Тапсыру мерзімі: {deadlineDate}",
+      "openLessonBtn": "Сабақты ашу"
+    },
+    "chat": {
+      "title": "💬 Куратормен чат",
+      "loading": "Хабарламалар жүктелуде…",
+      "guestStatus": "Куратормен чат (Танысу режимі)",
+      "curatorRole": "Курс кураторы · {curator}",
+      "welcomeMessage": "Сәлеметсіз бе! «{course}» курсына қош келдіңіз. Осы чатта ағымдағы сабақ, қатемен жұмыс немесе тапсыру мерзімі бойынша сұрақ қоя аласыз.",
+      "inputPlaceholder": "Кураторға хабарлама жазыңыз...",
+      "sendBtn": "Жіберу",
+      "youLabel": "Сіз (Студент)",
+      "sentStatus": "Хабарлама кураторға жеткізілді."
+    },
+    "notifications": {
+      "title": "🔔 Хабарландырулар",
+      "empty": "Жаңа хабарландырулар жоқ.",
+      "welcomeTitle": "«{course}» курсы бойынша 1-сабақ ашылды",
+      "welcomeBody": "Сізге бейнеталдауы бар интерактивті конспект, 3D-сызба және автотексеруі бар практикалық тренажер қолжетімді.",
+      "curatorTitle": "Курс кураторы: {curator}",
+      "curatorBody": "Бірінші практикалық тапсырманы тапсыру мерзімі — 2 күннен кейін. Сұрақтарыңызды чатта қоя аласыз."
+    },
+    "settings": {
+      "title": "⚙️ Профиль және интерфейс параметрлері",
+      "lastName": "Тегі *",
+      "firstName": "Аты *",
+      "middleName": "Әкесінің аты",
+      "middleNamePlaceholder": "Болған жағдайда",
+      "email": "Расталған Email",
+      "group": "Оқу тобы",
+      "activeCourse": "Белсенді оқу курсы",
+      "interfaceLanguage": "Интерфейс тілі",
+      "newPassword": "Жаңа құпиясөз (өзгертпесеңіз, бос қалдырыңыз)",
+      "newPasswordPlaceholder": "Кемінде 6 таңба, әріптер мен сандар"
+    }
+  },
+  "toast": {
+    "langSwitched": "Интерфейс тілі ауыстырылды: Қазақша",
+    "courseSwitched": "Оқу курсы сәтті ауыстырылды!",
+    "settingsSaved": "Параметрлер сәтті сақталды!",
+    "demoResetConfirm": "Демо-үлгерімді бастапқы күйге (0%, 1-күн) қайтару керек пе?",
+    "demoResetSuccess": "Демо-үлгерім бастапқы күйге қайтарылды!",
+    "csvExported": "Үлгерім ведомосі CSV форматында жүктелді!"
+  }
+}
