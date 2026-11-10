@@ -6,6 +6,34 @@
   --workshop-text: #f6f7ef;
   --workshop-muted: #c3d4c7;
   --workshop-accent: #dbf477;
+  --workshop-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --workshop-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --workshop-shadow: 0 14px 32px -10px rgba(0, 0, 0, 0.45);
+  --workshop-glow: 0 12px 28px -8px rgba(219, 244, 119, 0.22);
+}
+
+@keyframes workshopSoftReveal {
+  from {
+    opacity: 0.92;
+    transform: translateY(12px) scale(0.99);
+    filter: blur(1.5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes workshopDynamicReveal {
+  from {
+    opacity: 0.92;
+    transform: translateY(10px) scale(0.992);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 body.workshop {
@@ -43,6 +71,12 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
   gap: .7rem;
   background: var(--workshop-shell);
   border: 1px solid var(--workshop-line);
+  animation: workshopSoftReveal 420ms var(--workshop-ease) both;
+  transition: transform 260ms var(--workshop-ease), border-color 220ms ease, box-shadow 260ms var(--workshop-ease);
+}
+.workshop :is(.academy-workbench, .academy-panel):hover {
+  border-color: #84a690;
+  box-shadow: var(--workshop-shadow);
 }
 .academy-kicker {
   color: var(--workshop-accent);
@@ -61,8 +95,17 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
   background: var(--workshop-accent);
   font-weight: 690;
   text-decoration: none;
+  transition: transform 180ms var(--workshop-ease), background-color 180ms ease, box-shadow 180ms var(--workshop-ease), border-color 180ms ease;
 }
-.academy-action:hover { color: #202a15; background: #e9f7a7; }
+.academy-action:hover {
+  color: #202a15;
+  background: #e9f7a7;
+  transform: translateY(-2px);
+  box-shadow: var(--workshop-glow);
+}
+.academy-action:active {
+  transform: translateY(0) scale(0.98);
+}
 .academy-skip {
   position: fixed;
   z-index: 100;
@@ -72,6 +115,7 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
   color: #202a15;
   border-radius: .5rem;
   transform: translateY(calc(-100% - 10px));
+  transition: transform 180ms var(--workshop-ease);
 }
 .academy-skip:focus { transform: none; }
 .workshop :is(#sidebar-available-badge, #course-code-label) { color: var(--workshop-accent); }
@@ -88,6 +132,7 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
   border: 1px solid var(--workshop-line);
   border-radius: 1.1rem;
   background: var(--workshop-shell);
+  animation: workshopSoftReveal 460ms var(--workshop-ease) both;
 }
 .workshop-home h1 {
   margin: .6rem 0 1rem;
@@ -111,19 +156,116 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
   color: var(--workshop-text);
   background: var(--workshop-surface);
   font-weight: 650;
+  transition: transform 180ms var(--workshop-ease), background-color 180ms ease, border-color 180ms ease, box-shadow 180ms var(--workshop-ease);
+}
+.workshop-button:hover {
+  border-color: var(--workshop-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--workshop-shadow);
+}
+.workshop-button:active {
+  transform: translateY(0) scale(0.98);
 }
 .workshop-button-primary { color: #202820; background: var(--workshop-accent); border-color: var(--workshop-accent); }
-.workshop-button-primary:hover { color: #202820; background: #ffe6aa; }
-.workshop-example img { display: block; width: 100%; border-radius: .65rem; border: 1px solid var(--workshop-line); }
+.workshop-button-primary:hover { color: #202820; background: #ffe6aa; box-shadow: var(--workshop-glow); }
+.workshop-example img {
+  display: block;
+  width: 100%;
+  border-radius: .65rem;
+  border: 1px solid var(--workshop-line);
+  transition: transform 280ms var(--workshop-ease), border-color 220ms ease;
+}
+.workshop-example img:hover {
+  transform: translateY(-3px);
+  border-color: var(--workshop-accent);
+}
 .workshop-example h2 { font-size: 1.2rem; font-weight: 700; margin-top: .8rem; }
-.workshop-course { background: var(--workshop-shell); border: 1px solid var(--workshop-line); min-width: 0; }
+.workshop-course {
+  background: var(--workshop-shell);
+  border: 1px solid var(--workshop-line);
+  min-width: 0;
+  animation: workshopSoftReveal 420ms var(--workshop-ease) both;
+  transition: border-color 220ms ease, box-shadow 260ms var(--workshop-ease);
+}
+.workshop-course:hover {
+  border-color: #799c88;
+  box-shadow: var(--workshop-shadow);
+}
 .workshop-course-progress { background: var(--workshop-surface); border: 1px solid var(--workshop-line); min-width: min(100%, 14rem); }
-.workshop #specialty-pills .spec-btn { min-height: 44px; }
+.workshop #specialty-pills .spec-btn {
+  min-height: 44px;
+  transition: transform 180ms var(--workshop-ease), background-color 180ms ease, border-color 180ms ease, box-shadow 180ms var(--workshop-ease);
+}
+.workshop #specialty-pills .spec-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--workshop-accent);
+}
+.workshop #specialty-pills .spec-btn:active {
+  transform: translateY(0) scale(0.98);
+}
 .workshop #specialty-pills .spec-btn.bg-indigo-600 { background: var(--workshop-accent); color: #202820; box-shadow: none; }
-.workshop .workshop-visual { display: block; width: 100%; aspect-ratio: 16 / 9; background: #153a2d; border-radius: .75rem; }
+.workshop .workshop-visual {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #153a2d;
+  border-radius: .75rem;
+  transition: border-color 220ms ease, box-shadow 260ms var(--workshop-ease);
+}
 .workshop-visual canvas { display: block; width: 100%; height: 100%; }
 .workshop .workshop-visual[hidden] { display: none; }
+
+/* Dynamic Task Cards, Lesson Player Blocks, Modals & Table Rows Soft Reveal + Hover */
+.workshop #tasks-grid > *,
+.workshop #lp-blocks-viewport > *,
+.workshop .starter-panel,
+.workshop .workshop-model-panel,
+.workshop .sh-reveal-enter {
+  animation: workshopDynamicReveal 360ms var(--workshop-ease) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+.workshop #tasks-grid > *:nth-child(1) { --reveal-delay: 20ms; }
+.workshop #tasks-grid > *:nth-child(2) { --reveal-delay: 55ms; }
+.workshop #tasks-grid > *:nth-child(3) { --reveal-delay: 90ms; }
+.workshop #tasks-grid > *:nth-child(4) { --reveal-delay: 125ms; }
+.workshop #tasks-grid > *:nth-child(5) { --reveal-delay: 160ms; }
+.workshop #tasks-grid > *:nth-child(6) { --reveal-delay: 195ms; }
+.workshop #tasks-grid > *:nth-child(n+7) { --reveal-delay: 220ms; }
+
+.workshop #tasks-grid > * {
+  transition: transform 240ms var(--workshop-ease), border-color 220ms ease, box-shadow 240ms var(--workshop-ease);
+}
+.workshop #tasks-grid > *:hover {
+  transform: translateY(-4px);
+  border-color: var(--workshop-accent);
+  box-shadow: var(--workshop-shadow);
+}
+
+.workshop :is(.lp-quiz-opt, .lp-match-btn, .workshop-model-panel [data-part]) {
+  transition: transform 180ms var(--workshop-ease), border-color 180ms ease, background-color 180ms ease, box-shadow 180ms var(--workshop-ease);
+}
+.workshop :is(.lp-quiz-opt, .lp-match-btn, .workshop-model-panel [data-part]):hover {
+  transform: translateY(-2px);
+  border-color: var(--workshop-accent);
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.4);
+}
+.workshop :is(.lp-quiz-opt, .lp-match-btn, .workshop-model-panel [data-part]):active {
+  transform: translateY(0) scale(0.985);
+}
+
+.workshop tbody > tr {
+  animation: workshopDynamicReveal 280ms var(--workshop-ease) both;
+  transition: background-color 160ms ease;
+}
+.workshop tbody > tr:hover {
+  background-color: rgba(219, 244, 119, 0.06);
+}
+
 @media (max-width: 700px) { .workshop-home { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) {
-  .workshop :is(.animate-float-slow, .animate-pulse, .btn-shimmer) { animation: none; }
+  .workshop *, .workshop *::before, .workshop *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

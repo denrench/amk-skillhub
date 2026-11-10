@@ -2910,3 +2910,44 @@
       </div>
     `);
   }
+
+
+  // ==========================================
+  // SMOOTH REVEAL & INTERACTIVE MOTION ENGINE
+  // ==========================================
+  function initSmoothRevealEngine() {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const markReveal = (el, index = 0) => {
+      if (!el || el.nodeType !== 1 || el.dataset.shRevealed === '1') return;
+      el.dataset.shRevealed = '1';
+      el.style.setProperty('--reveal-delay', `${Math.min(index * 35, 240)}ms`);
+      el.classList.add('sh-reveal-enter');
+    };
+
+    const selector = 'main section, main article, #tasks-grid > *, #lp-blocks-viewport > *, .glass-card, .card, .workshop-course';
+    document.querySelectorAll(selector).forEach((el, idx) => markReveal(el, idx % 6));
+
+    if ('MutationObserver' in window && document.body) {
+      const mo = new MutationObserver(mutations => {
+        for (const m of mutations) {
+          let batchIdx = 0;
+          m.addedNodes.forEach(node => {
+            if (node.nodeType === 1) {
+              markReveal(node, batchIdx++);
+            }
+          });
+        }
+      });
+      mo.observe(document.body, { childList: true, subtree: true });
+    }
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initSmoothRevealEngine);
+    } else {
+      initSmoothRevealEngine();
+    }
+  }

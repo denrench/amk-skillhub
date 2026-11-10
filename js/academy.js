@@ -65,7 +65,7 @@
     const rows = list.map(([title], index) => {
       const number = index + 1;
       const done = completed.includes(`${slug}:${number}`);
-      return `<a class="lesson-row" href="${href(slug, number)}"><span class="course-num">${String(number).padStart(2, '0')}</span>
+      return `<a class="lesson-row" style="--reveal-delay:${index * 28}ms" href="${href(slug, number)}"><span class="course-num">${String(number).padStart(2, '0')}</span>
         <strong>${title}</strong><small data-lesson-key="${slug}:${number}">${done ? 'Пройдено' : 'Текст и практика'}</small></a>`;
     }).join('');
     root.innerHTML = `
@@ -123,9 +123,10 @@
     let passed = completed.includes(key);
     if (passed) nextAction.hidden = false;
 
-    for (const choice of choices) {
+    for (const [idx, choice] of choices.entries()) {
       const button = document.createElement('button');
-      button.className = 'button answer';
+      button.className = 'button answer reveal-item';
+      button.style.setProperty('--reveal-delay', `${idx * 60}ms`);
       button.type = 'button';
       button.textContent = choice;
       button.setAttribute('aria-pressed', 'false');
