@@ -7,6 +7,7 @@
   --starter-wash: #e4eee4;
   --starter-brand: #153a2d;
   --starter-accent: #fbd275;
+  --starter-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 .starter-lesson > :is(header, nav, footer) {
   background: var(--starter-brand);
@@ -41,9 +42,14 @@
   border: 1px solid var(--starter-line);
   background: var(--starter-paper);
   border-radius: .75rem;
+  transition: border-color 200ms ease, box-shadow 220ms var(--starter-ease);
+}
+.starter-sidebar:hover, .starter-notes:hover {
+  border-color: var(--starter-muted);
+  box-shadow: 0 10px 24px -10px rgba(21, 58, 45, 0.14);
 }
 .starter-sidebar { display: grid; gap: .6rem; }
-.starter-sidebar h3, .starter-sidebar legend, .starter-notes summary { font-weight: 700; }
+.starter-sidebar h3, .starter-sidebar legend, .starter-notes summary { font-weight: 700; cursor: pointer; }
 .starter-sidebar fieldset { min-width: 0; }
 .starter-notes { margin-top: .65rem; }
 .starter-notes :is(p, ul, a) { margin-top: .65rem; }
@@ -56,11 +62,34 @@
   color: var(--starter-ink);
   padding: .4rem .65rem;
   text-align: start;
+  cursor: pointer;
+  transition: transform 180ms var(--starter-ease), border-color 180ms ease, background-color 180ms ease, box-shadow 180ms var(--starter-ease);
 }
-.starter-button:hover:not(:disabled) { border-color: var(--starter-muted); }
+.starter-button:hover:not(:disabled) {
+  border-color: var(--starter-muted);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px -8px rgba(21, 58, 45, 0.22);
+}
+.starter-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
 .starter-button:disabled { opacity: .6; }
 .starter-primary { background: var(--starter-accent); color: #202820; font-weight: 700; }
-.starter-point { display: flex; align-items: center; gap: .55rem; min-height: 44px; }
+.starter-primary:hover:not(:disabled) { background: #fce097; }
+.starter-point {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  min-height: 44px;
+  padding: .25rem .45rem;
+  border-radius: .45rem;
+  cursor: pointer;
+  transition: background-color 160ms ease, transform 160ms var(--starter-ease);
+}
+.starter-point:hover {
+  background: var(--starter-wash);
+  transform: translateY(-1px);
+}
 .starter-point input { width: 1.1rem; height: 1.1rem; accent-color: var(--starter-brand); }
 .starter-view { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .5rem; }
 .starter-panel [hidden] { display: none; }

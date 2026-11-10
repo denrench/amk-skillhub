@@ -217,6 +217,7 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
 
 /* Dynamic Task Cards, Lesson Player Blocks, Modals & Table Rows Soft Reveal + Hover */
 .workshop #tasks-grid > *,
+.workshop #lp-block-canvas > *,
 .workshop #lp-blocks-viewport > *,
 .workshop .starter-panel,
 .workshop .workshop-model-panel,
@@ -241,15 +242,15 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
   box-shadow: var(--workshop-shadow);
 }
 
-.workshop :is(.lp-quiz-opt, .lp-match-btn, .workshop-model-panel [data-part]) {
+.workshop :is(button[id^="step-btn-"], #lp-prev-btn, #lp-next-btn, .lp-quiz-opt, .lp-match-btn, .workshop-model-panel [data-part]) {
   transition: transform 180ms var(--workshop-ease), border-color 180ms ease, background-color 180ms ease, box-shadow 180ms var(--workshop-ease);
 }
-.workshop :is(.lp-quiz-opt, .lp-match-btn, .workshop-model-panel [data-part]):hover {
+.workshop :is(button[id^="step-btn-"]:not(:disabled), #lp-prev-btn:not(:disabled), #lp-next-btn:not(:disabled), .lp-quiz-opt, .lp-match-btn, .workshop-model-panel [data-part]):hover {
   transform: translateY(-2px);
   border-color: var(--workshop-accent);
   box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.4);
 }
-.workshop :is(.lp-quiz-opt, .lp-match-btn, .workshop-model-panel [data-part]):active {
+.workshop :is(button[id^="step-btn-"]:not(:disabled), #lp-prev-btn:not(:disabled), #lp-next-btn:not(:disabled), .lp-quiz-opt, .lp-match-btn, .workshop-model-panel [data-part]):active {
   transform: translateY(0) scale(0.985);
 }
 

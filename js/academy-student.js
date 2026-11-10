@@ -14,8 +14,9 @@
     return response.json();
   }
 
-  function addListItem(list, title, subtitle, href) {
+  function addListItem(list, title, subtitle, href, index = 0) {
     const item = document.createElement('li');
+    item.style.setProperty('--reveal-delay', `${index * 45}ms`);
     const heading = document.createElement(href ? 'a' : 'strong');
     if (href) heading.href = href;
     heading.textContent = title;
@@ -67,10 +68,10 @@
       const outstanding = tasks.filter(task => task.status_code !== 'graded');
       status.textContent = !tasks.length ? 'По графику пока нет открытых заданий.' :
         outstanding.length ? 'Открытые задания и работы на проверке.' : 'Все открытые задания зачтены.';
-      for (const task of outstanding.slice(0, 4)) {
+      for (const [idx, task] of outstanding.slice(0, 4).entries()) {
         const href = task.status_code === 'submitted' ? `tasks.html?specialty=${slug}` :
           `simulator.html?specialty=${slug}&task=${Number(task.task_number)}`;
-        addListItem(list, task.title, task.status_label || 'Открыто', href);
+        addListItem(list, task.title, task.status_label || 'Открыто', href, idx);
       }
     } catch {
       status.textContent = 'Не удалось загрузить задания. Откройте список практикума или обновите страницу.';
@@ -87,8 +88,8 @@
       const notices = data.notifications;
       status.textContent = !notices.length ? 'Пока нет объявлений.' :
         data.unread_count ? `Непрочитано: ${data.unread_count}` : 'Все объявления прочитаны.';
-      for (const notice of notices.slice(0, 5)) {
-        const item = addListItem(list, notice.title, notice.body);
+      for (const [idx, notice] of notices.slice(0, 5).entries()) {
+        const item = addListItem(list, notice.title, notice.body, null, idx);
         if (!notice.is_read) item.dataset.unread = 'true';
       }
       mark.hidden = !data.unread_count;
