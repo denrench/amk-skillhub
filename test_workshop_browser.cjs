@@ -22,7 +22,7 @@ async function auditAccessibility(page) {
 (async () => {
   const browser = await chromium.launch({
     executablePath: process.env.SKILLHUB_CHROME,
-    args: ['--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
+    args: ['--mute-audio', '--enable-unsafe-swiftshader', '--use-angle=swiftshader'],
   });
   try {
     const page = await browser.newPage({viewport: {width: 390, height: 840}});

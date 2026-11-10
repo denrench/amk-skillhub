@@ -2828,7 +2828,7 @@
 
   // ==========================================
   let audioCtx = null;
-  let audioEnabled = localStorage.getItem('eduspace_audio_mute') !== 'true';
+  let audioEnabled = false;
 
   function playUiTone(type) {
     if (!audioEnabled) return;
