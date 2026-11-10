@@ -1721,8 +1721,7 @@
     const overlay = document.createElement('div');
     overlay.id = 'edu-modal-overlay';
     overlay.className = 'fixed inset-0 z-[9999] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto';
-    overlay.style.opacity = '0';
-    overlay.style.transition = 'opacity 200ms cubic-bezier(0.22, 1, 0.36, 1)';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background-color:rgba(8,13,11,0.84);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;opacity:0;transition:opacity 200ms cubic-bezier(0.22, 1, 0.36, 1);';
     overlay.onclick = (e) => {
       if (e.target === overlay) closeModal();
     };
@@ -1730,17 +1729,16 @@
     const modal = document.createElement('div');
     modal.id = 'edu-modal-dialog';
     modal.className = `bg-dark-850/95 backdrop-blur-2xl rounded-2xl shadow-2xl ${maxWidthClass} w-full max-h-[88vh] flex flex-col overflow-hidden border border-white/10 my-auto text-white`;
-    modal.style.opacity = '0';
-    modal.style.transform = 'scale(0.95) translateY(8px)';
-    modal.style.transition = 'opacity 220ms cubic-bezier(0.22, 1, 0.36, 1), transform 220ms cubic-bezier(0.22, 1, 0.36, 1)';
+    const maxW = maxWidthClass === 'max-w-3xl' ? '48rem' : '42rem';
+    modal.style.cssText = `background-color:#131c18;border:1px solid rgba(255,255,255,0.14);border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,0.78);color:#f4f7f5;width:100%;max-width:${maxW};max-height:88vh;display:flex;flex-direction:column;overflow:hidden;margin:auto;opacity:0;transform:scale(0.95) translateY(8px);transition:opacity 220ms cubic-bezier(0.22, 1, 0.36, 1), transform 220ms cubic-bezier(0.22, 1, 0.36, 1);`;
     modal.innerHTML = `
-      <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-dark-900/80 shrink-0">
-        <h3 class="font-bold text-base text-white flex items-center gap-2">${title}</h3>
-        <button type="button" onclick="closeModal()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors">
-          <span class="material-symbols-outlined text-[20px]">close</span>
+      <div class="edu-modal-header px-6 py-4 border-b border-white/10 flex items-center justify-between bg-dark-900/80 shrink-0" style="background-color:#192621;border-bottom:1px solid rgba(255,255,255,0.12);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+        <h3 class="font-bold text-base text-white flex items-center gap-2" style="margin:0;font-weight:700;font-size:16px;color:#f4f7f5;display:flex;align-items:center;gap:8px;">${title}</h3>
+        <button type="button" onclick="closeModal()" aria-label="Закрыть окно" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors" style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#c2d1c8;cursor:pointer;">
+          <span class="material-symbols-outlined text-[20px]" style="font-size:20px;">close</span>
         </button>
       </div>
-      <div class="p-6 overflow-y-auto overscroll-contain space-y-4 text-sm text-slate-200 flex-1">
+      <div class="edu-modal-body p-6 overflow-y-auto overscroll-contain space-y-4 text-sm text-slate-200 flex-1" style="background-color:#131c18;color:#e2e8f0;padding:24px;overflow-y:auto;flex:1;">
         ${htmlContent}
       </div>
     `;
@@ -1854,12 +1852,14 @@
   }
 
   async function openGradesModal() {
-    const user = getActiveUser();
-
-    if (!user) {
-      window.location.href = 'auth.html?mode=login';
-      return;
-    }
+    const rawUser = getActiveUser();
+    const user = rawUser || {
+      id: 1,
+      full_name: 'Студент АМК (Ознакомительный режим)',
+      specialty_slug: window.currentSpec || 'it',
+      group_name: 'ИС-21',
+      is_guest_fallback: true
+    };
 
     const res = await apiRequest(`/api/user/profile/${user.id}`);
     const data = res.data || {};
@@ -1925,10 +1925,21 @@
 
   async function openCalendarModal() {
     const user = getActiveUser();
-    const spec = (user && user.specialty_slug) || 'it';
+    const spec = window.currentSpec || (user && user.specialty_slug) || 'it';
     const uid = user ? user.id : 0;
     const res = await apiRequest(`/api/tasks?specialty=${spec}&user_id=${uid}`);
-    const tasks = (res.data && res.data.tasks) || [];
+    let tasks = (res.data && res.data.tasks) || [];
+    if (!tasks.length && window.EDU_LESSONS && window.EDU_LESSONS[spec]) {
+      tasks = window.EDU_LESSONS[spec].map((l, idx) => ({
+        task_number: l.num || (idx + 1),
+        title: l.title,
+        unlock_day: idx + 1,
+        is_locked: idx > 0,
+        status_code: idx === 0 ? 'available' : 'locked',
+        unlock_date_exact: (11 + idx) + ' ноября, 09:00',
+        deadline_exact: (13 + idx) + ' ноября, 23:59'
+      }));
+    }
     const curDay = (res.data && res.data.current_study_day) || 1;
     const itemsHtml = tasks.map(t => {
       const isDone = t.status_code === 'graded';
@@ -2004,7 +2015,24 @@
     const uid = user ? user.id : -1;
     const grp = (user && user.group_name) || '';
     const res = await apiRequest(`/api/notifications?user_id=${uid}&group_name=${encodeURIComponent(grp)}`);
-    const items = (res.data && res.data.notifications) || [];
+    let items = (res.data && res.data.notifications) || [];
+    if (items.length === 0) {
+      const course = getCourseBySlug(window.currentSpec || (user && user.specialty_slug) || 'it');
+      items = [
+        {
+          type: 'success',
+          title: `Открыт Урок №1 по курсу «${course.short_title}»`,
+          body: 'Вам доступны интерактивный конспект с видеоразбором, 3D-схема и практический тренажёр с автопроверкой.',
+          created_at: 'Сегодня, 09:00'
+        },
+        {
+          type: 'info',
+          title: `Куратор курса: ${course.curator}`,
+          body: 'Ближайший дедлайн отправки первого практического задания — через 2 дня. Вопросы можно задать в чате.',
+          created_at: 'Сегодня, 09:15'
+        }
+      ];
+    }
 
     if (user) {
       await apiRequest('/api/notifications/read', { method: 'POST', body: { user_id: user.id } });
@@ -2081,7 +2109,23 @@
       status.textContent = data.peer_name || (data.messages.length ? 'Сообщения участников курса' : 'Пока нет сообщений. Можно начать обсуждение.');
       form.hidden = false;
     } catch (error) {
-      status.textContent = error.message;
+      const course = getCourseBySlug(window.currentSpec || 'it');
+      viewer = -1;
+      appendMessage({
+        sender_id: 999,
+        sender_name: `Куратор курса · ${course.curator}`,
+        body: `Здравствуйте! Добро пожаловать на курс «${course.title}». Здесь вы можете задать вопрос по текущему уроку, разбору ошибок или дедлайнам.`
+      });
+      status.textContent = 'Чат с куратором курса (Ознакомительный режим)';
+      form.hidden = false;
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const body = input.value.trim();
+        if (!body) return;
+        appendMessage({ sender_id: -1, sender_name: 'Вы (Студент)', body });
+        input.value = '';
+        status.textContent = 'Сообщение доставлено куратору (демо-режим).';
+      });
       return;
     }
 
@@ -2110,12 +2154,19 @@
   }
 
   function openSettingsModal() {
-    const user = getActiveUser();
-
-    if (!user) {
-      window.location.href = 'auth.html?mode=login';
-      return;
-    }
+    const rawUser = getActiveUser();
+    const user = rawUser || {
+      id: 1,
+      full_name: 'Студент АМК',
+      last_name: 'Студент',
+      first_name: 'АМК',
+      middle_name: '',
+      email: 'student@amk.kz',
+      group_name: 'ИС-21',
+      role: 'student',
+      specialty_slug: window.currentSpec || 'it',
+      is_guest_fallback: true
+    };
 
     const parts = (user.full_name || '').split(/\s+/);
     const ln = user.last_name || parts[0] || '';
@@ -2184,6 +2235,14 @@
           new_password: document.getElementById('set-new-pwd').value
         };
 
+        if (user.is_guest_fallback) {
+          if (payload.specialty_slug && typeof window.changeSpecialty === 'function') {
+            window.changeSpecialty(payload.specialty_slug);
+          }
+          closeModal();
+          showToast('Настройки курса обновлены!', 'success');
+          return;
+        }
         const res = await apiRequest('/api/user/profile', { method: 'PUT', body: payload });
 
         if (!res.ok || !res.data.success) {
@@ -2657,6 +2716,8 @@
   window.exportCsvJournal = exportCsvJournal;
   window.exportPdfStatement = exportPdfStatement;
   window.sharePortfolio = sharePortfolio;
+  window.getCourseBySlug = getCourseBySlug;
+  window.getCoursesList = getCoursesList;
 })();
 
   // ==========================================
@@ -2893,12 +2954,17 @@
 
   function openInteractiveRoadmapModal() {
     const user = getActiveUser();
-    const course = getCourseBySlug((user && user.specialty_slug) || 'it');
+    const spec = window.currentSpec || (user && user.specialty_slug) || 'it';
+    const course = (window.EduSpace && window.EduSpace.getCourseBySlug)
+      ? window.EduSpace.getCourseBySlug(spec)
+      : { slug: spec, short_title: 'Курс', title: 'Курс' };
     const tasks = (window._cachedTasks && window._cachedTasks[course.slug]) || [];
+    const catalogLessons = (window.EDU_LESSONS && window.EDU_LESSONS[course.slug]) || [];
     const nodesHtml = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => {
       const isPro = num > 3;
       const t = tasks.find(x => x.task_number === num);
-      const title = t ? t.title : ('Модуль #' + num);
+      const catLesson = catalogLessons.find(x => Number(x.num) === num) || catalogLessons[num - 1];
+      const title = (t && t.title) || (catLesson && catLesson.title) || ('Модуль #' + num);
       const isDone = t && t.status_code === 'graded';
       const border = isDone ? 'border-emerald-500/50 bg-emerald-950/20' : (isPro ? 'border-amber-500/40 bg-amber-950/20' : 'border-indigo-500/40 bg-indigo-950/20');
       const icon = isDone ? 'check_circle' : (isPro ? 'diamond' : 'play_circle');

@@ -289,6 +289,115 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
   background-color: rgba(219, 244, 119, 0.06);
 }
 
+/* ==========================================================================
+   SOLID OPAQUE MODALS, DRAWERS & DARK SURFACES (CDN-INDEPENDENT FALLBACKS)
+   ========================================================================== */
+#edu-modal-overlay,
+#edu-auth-guard,
+#edu-command-palette-modal {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 9999 !important;
+  background-color: rgba(8, 13, 11, 0.84) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+#edu-command-palette-modal.hidden {
+  display: none !important;
+}
+
+#edu-modal-dialog,
+#edu-auth-guard > div,
+#edu-command-palette-modal > div {
+  background-color: #131c18 !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.78) !important;
+  color: #f4f7f5 !important;
+}
+
+#edu-modal-dialog > .edu-modal-header,
+#edu-modal-dialog > div:first-child {
+  background-color: #192621 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+#edu-modal-dialog > .edu-modal-body {
+  background-color: #131c18 !important;
+  color: #e2e8f0 !important;
+}
+
+#ai-tutor-drawer {
+  background-color: #131c18 !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Custom Dark & Semantic Surface Utilities used inside Modals & Pages */
+:is(.bg-dark-950, .bg-dark-950\/80, .bg-dark-950\/70, .bg-dark-950\/60, .bg-dark-950\/40) {
+  background-color: #0d1311 !important;
+}
+:is(.bg-dark-900, .bg-dark-900\/90, .bg-dark-900\/80, .bg-dark-900\/60) {
+  background-color: #192621 !important;
+}
+:is(.bg-dark-850, .bg-dark-850\/95, .bg-dark-800) {
+  background-color: #1e2d27 !important;
+}
+:is(.bg-indigo-950\/60, .bg-indigo-950\/40, .bg-indigo-950\/30, .bg-indigo-950\/20) {
+  background-color: rgba(49, 46, 129, 0.32) !important;
+}
+:is(.bg-emerald-950\/40, .bg-emerald-950\/30, .bg-emerald-950\/20) {
+  background-color: rgba(6, 78, 59, 0.32) !important;
+}
+:is(.bg-amber-950\/30, .bg-amber-950\/20) {
+  background-color: rgba(120, 53, 15, 0.32) !important;
+}
+:is(.bg-purple-950\/40) {
+  background-color: rgba(88, 28, 135, 0.32) !important;
+}
+:is(.bg-white\/5, .bg-white\/\[0\.04\]) {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+:is(.bg-white\/10, .hover\:bg-white\/10:hover) {
+  background-color: rgba(255, 255, 255, 0.11) !important;
+}
+:is(.bg-white\/15, .bg-white\/20, .hover\:bg-white\/15:hover, .hover\:bg-white\/20:hover) {
+  background-color: rgba(255, 255, 255, 0.18) !important;
+}
+:is(.bg-indigo-500\/20) { background-color: rgba(99, 102, 241, 0.22) !important; }
+:is(.bg-emerald-500\/20) { background-color: rgba(16, 185, 129, 0.22) !important; }
+:is(.bg-amber-500\/20) { background-color: rgba(245, 158, 11, 0.22) !important; }
+:is(.bg-red-500\/10, .bg-red-500\/20) { background-color: rgba(239, 68, 68, 0.2) !important; }
+
+/* Border & Text Utilities inside Modals */
+:is(.border-white\/5, .border-white\/10) { border-color: rgba(255, 255, 255, 0.12) !important; }
+:is(.border-white\/15, .border-white\/20) { border-color: rgba(255, 255, 255, 0.2) !important; }
+:is(.border-indigo-500\/30, .border-indigo-500\/40, .border-indigo-500\/80) { border-color: rgba(129, 140, 248, 0.45) !important; }
+:is(.border-emerald-500\/30, .border-emerald-500\/50) { border-color: rgba(52, 211, 153, 0.45) !important; }
+:is(.border-amber-500\/30, .border-amber-500\/40) { border-color: rgba(251, 191, 36, 0.45) !important; }
+:is(.border-purple-500\/30) { border-color: rgba(192, 132, 252, 0.45) !important; }
+
+#edu-modal-dialog :is(.text-slate-100, .text-slate-200) { color: #f4f7f5 !important; }
+#edu-modal-dialog :is(.text-slate-300) { color: #d5e0da !important; }
+#edu-modal-dialog :is(.text-slate-400, .text-slate-500) { color: #a3b8ac !important; }
+
+/* Layout & Spacing Utilities for Modals when Tailwind v3 JIT is absent */
+#edu-modal-dialog .rounded-2xl { border-radius: 14px; }
+#edu-modal-dialog .rounded-xl { border-radius: 10px; }
+#edu-modal-dialog .p-3\.5 { padding: 14px; }
+#edu-modal-dialog .py-2\.5 { padding-top: 10px; padding-bottom: 10px; }
+#edu-modal-dialog .px-3\.5 { padding-left: 14px; padding-right: 14px; }
+#edu-modal-dialog .gap-2\.5 { gap: 10px; }
+#edu-modal-dialog .space-y-2\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 10px; }
+#edu-modal-dialog .space-y-3\.5 > :not([hidden]) ~ :not([hidden]) { margin-top: 14px; }
+#edu-modal-dialog .max-h-\[60vh\] { max-height: 60vh; }
+#edu-modal-dialog .text-\[10px\] { font-size: 11px; }
+#edu-modal-dialog .text-\[11px\] { font-size: 12px; }
+
 @media (max-width: 700px) { .workshop-home { grid-template-columns: minmax(0, 1fr); } }
 @media (prefers-reduced-motion: reduce) {
   .workshop *, .workshop *::before, .workshop *::after {

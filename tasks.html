@@ -1416,6 +1416,7 @@
 
   <script>
     let currentSpec = 'it';
+    window.currentSpec = currentSpec;
     // Default filter is 'available' per UX spec (shows active/in-progress + next locked milestone so all 3 states are immediately clear)
     let currentFilter = 'available';
     let tasksData = [];
@@ -1608,6 +1609,9 @@
         return copy;
       });
 
+      window._cachedTasks = window._cachedTasks || {};
+      window._cachedTasks[currentSpec] = tasksData;
+
       const curDay = (res.data && res.data.current_study_day) || 1;
       document.getElementById('current-day-label').textContent = `День ${curDay} из 12`;
 
@@ -1651,6 +1655,7 @@
       if (dd) dd.classList.remove('is-open');
       if (currentSpec === spec) return;
       currentSpec = spec;
+      window.currentSpec = currentSpec;
       const container = document.getElementById('tasks-container');
       container.classList.add('is-filtering-out');
       setTimeout(() => {
@@ -1879,6 +1884,7 @@
       const user = window.EduSpace.getActiveUser();
       const params = new URLSearchParams(window.location.search);
       currentSpec = params.get('specialty') || (user && user.specialty_slug) || 'it';
+      window.currentSpec = currentSpec;
       runInitialChoreography();
       loadTasksList();
     });
