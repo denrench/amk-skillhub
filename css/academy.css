@@ -1146,8 +1146,8 @@ button.button { cursor: pointer; }
 
 .playground-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.15rem;
 }
 
 .sim-widget {
@@ -1804,6 +1804,181 @@ body[data-mood="cyber"] .hero-highlight {
 
 @media (max-width: 820px) {
   .student-guest-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* Interactive AMK Competency Roadmap (#skill-roadmap) */
+.roadmap-shell {
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(1.3rem, 3vw, 2rem);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: var(--shadow-soft);
+}
+
+.roadmap-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.roadmap-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.roadmap-tab {
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  background: #f8fafc;
+  color: #334155;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.roadmap-tab:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent);
+}
+
+.roadmap-tab[aria-pressed="true"] {
+  background: linear-gradient(135deg, #4f46e5, #0284c7);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.roadmap-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 1.35rem;
+  align-items: center;
+}
+
+.roadmap-case-box {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border-radius: 20px;
+  background: linear-gradient(150deg, #0b1120 0%, #17153b 65%, #0c223f 100%);
+  border: 1px solid rgba(99, 102, 241, 0.38);
+  color: #f8fafc;
+}
+
+.roadmap-case-box h3 { color: #ffffff; font-size: 1.22rem; }
+.roadmap-case-box p { color: #cbd5e1; font-size: 0.94rem; }
+
+.roadmap-bars {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.roadmap-meter-row {
+  display: grid;
+  gap: 0.32rem;
+}
+
+.roadmap-meter-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.roadmap-meter-head strong {
+  color: #2563eb;
+  font-family: ui-monospace, monospace;
+}
+
+.roadmap-bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.roadmap-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #4f46e5, #0ea5e9);
+  transition: width 460ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Bolt Interactive Grid inside Auto Mechanic Torque Sim */
+.bolt-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.bolt-node {
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(15, 23, 42, 0.85);
+  color: #cbd5e1;
+  font: 700 0.78rem/1.2 ui-monospace, monospace;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 160ms ease;
+}
+
+.bolt-node[data-tight="true"] {
+  background: rgba(6, 78, 59, 0.65);
+  border-color: #34d399;
+  color: #d1fae5;
+}
+
+.bolt-node[data-bad="true"] {
+  background: rgba(127, 29, 29, 0.7);
+  border-color: #f87171;
+  color: #fee2e2;
+}
+
+/* Learn.html Course Mastery Meter & Bookmarks */
+.course-meter-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+  padding: 0.95rem 1.05rem;
+  margin-block: 0.5rem 0.9rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #eef2ff, #f0f9ff);
+  border: 1px solid rgba(79, 70, 229, 0.22);
+}
+
+.course-meter-track {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.1);
+  overflow: hidden;
+  margin-top: 0.35rem;
+}
+
+.course-meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #4f46e5, #10b981);
+  transition: width 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lesson-bookmark-btn[aria-pressed="true"] {
+  background: linear-gradient(135deg, #1d4ed8, #4f46e5);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+@media (max-width: 880px) {
+  .roadmap-body { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* Signature Contrast CTA Island */

@@ -17,12 +17,16 @@
   const lesson = Number.isInteger(requested) && requested > 0 ? data[slug][requested - 1] : null;
 
   const storeKey = 'skillhub.academy.completed.v1';
+  const markKey = 'skillhub.academy.bookmarks.v1';
   const serverProgress = !location.hostname.endsWith('.github.io');
   let accountProgress = new Set();
   let completed = [];
+  let bookmarks = [];
   try {
     const saved = JSON.parse(localStorage.getItem(storeKey) || '[]');
     if (Array.isArray(saved)) completed = saved;
+    const savedMarks = JSON.parse(localStorage.getItem(markKey) || '[]');
+    if (Array.isArray(savedMarks)) bookmarks = savedMarks;
   } catch {}
 
   function href(target, number) {
@@ -95,12 +99,20 @@
 
   function catalog() {
     const list = data[slug];
+    let doneCount = 0;
+    let firstPending = 1;
+    let foundPending = false;
     const rows = list.map(([title], index) => {
       const number = index + 1;
-      const done = completed.includes(`${slug}:${number}`);
+      const key = `${slug}:${number}`;
+      const done = completed.includes(key);
+      const marked = bookmarks.includes(key);
+      if (done) doneCount += 1;
+      else if (!foundPending) { firstPending = number; foundPending = true; }
       return `<a class="lesson-row" style="--reveal-delay:${index * 28}ms" href="${href(slug, number)}"><span class="course-num">${String(number).padStart(2, '0')}</span>
-        <strong>${title}</strong><small data-lesson-key="${slug}:${number}">${done ? 'Пройдено' : 'Текст и практика'}</small></a>`;
+        <strong>${marked ? '★ ' : ''}${title}</strong><small data-lesson-key="${key}">${done ? 'Пройдено' : 'Текст и практика'}</small></a>`;
     }).join('');
+    const pct = Math.round((doneCount / Math.max(1, list.length)) * 100);
     root.innerHTML = `
       <div class="container catalog-head stack"><p class="eyebrow">5 специальностей / 60 уроков</p><h1>Учебник</h1>
       <p class="muted">Выберите направление. В каждом уроке есть объяснение, разобранный пример и задача с обратной связью.</p></div>
@@ -108,6 +120,16 @@
         <nav class="catalog-menu" aria-label="Специальности">${Object.entries(courses).map(([id, entry]) =>
           `<a href="${href(id)}"${id === slug ? ' aria-current="page"' : ''}>${entry[0]}</a>`).join('')}</nav>
         <section class="card"><p class="eyebrow">Программа курса</p><h2>${course[0]}</h2><p class="muted">${course[1]}</p>
+        <div class="course-meter-box" id="academy-course-meter">
+          <div style="flex:1 1 220px;min-width:0;">
+            <div style="display:flex;justify-content:space-between;font-size:0.86rem;font-weight:700;color:#1e293b;">
+              <span>Прогресс по направлению</span>
+              <span>${doneCount} / ${list.length} (${pct}%)</span>
+            </div>
+            <div class="course-meter-track"><div class="course-meter-fill" style="width:${pct}%;"></div></div>
+          </div>
+          <a class="button primary" href="${href(slug, firstPending)}">${doneCount ? `Продолжить с урока ${firstPending} →` : 'Начать с урока 1 →'}</a>
+        </div>
         <div>${rows}</div></section>
       </div>`;
   }
@@ -134,6 +156,7 @@
           <span class="lesson-step-chip" data-done="true">01 · Видео-схема 10 сек</span>
           <span class="lesson-step-chip" data-done="true">02 · Объяснение и пример</span>
           <span class="lesson-step-chip" id="chip-quiz-step" data-done="false">03 · Проверка знаний</span>
+          <button type="button" class="button lesson-bookmark-btn" id="lesson-bookmark-btn" aria-pressed="${bookmarks.includes(key) ? 'true' : 'false'}" style="min-height:32px;padding:0.2rem 0.7rem;font-size:0.78rem;">${bookmarks.includes(key) ? '★ В закладках' : '☆ В закладки'}</button>
         </div>
       </div></div>
       <div class="container lesson-layout">
@@ -175,6 +198,19 @@
     const nextAction = root.querySelector('[data-next]');
     let passed = completed.includes(key);
     const quizChip = root.querySelector('#chip-quiz-step');
+    const markBtn = root.querySelector('#lesson-bookmark-btn');
+    if (markBtn) {
+      markBtn.addEventListener('click', () => {
+        const idx = bookmarks.indexOf(key);
+        if (idx === -1) bookmarks.push(key);
+        else bookmarks.splice(idx, 1);
+        const on = idx === -1;
+        markBtn.setAttribute('aria-pressed', String(on));
+        markBtn.textContent = on ? '★ В закладках' : '☆ В закладки';
+        try { localStorage.setItem(markKey, JSON.stringify(bookmarks)); } catch {}
+        if (on && window.PrismFX) window.PrismFX.play('good');
+      });
+    }
     if (passed) {
       nextAction.hidden = false;
       if (quizChip) quizChip.dataset.done = 'true';

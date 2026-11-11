@@ -363,6 +363,91 @@
           </div>
           <div class="sim-status" id="sim-flex-code" style="font-family: ui-monospace, monospace; font-size: 0.78rem;">display: flex; justify-content: space-between;</div>
         </article>
+
+        <!-- Live Sim 4: Auto Mechanic Cylinder Head Torque & Cross-Pattern Tightening -->
+        <article class="sim-widget" id="sim-torque-widget">
+          <div class="sim-head">
+            <span class="sim-pill">Автомеханика</span>
+            <span class="sim-pill" id="sim-tq-badge" style="color:#d1fae5;border-color:rgba(52,211,153,0.4);background:rgba(6,78,59,0.5);">65 Н·м · Эталон</span>
+          </div>
+          <h3>Затяжка ГБЦ динамометрическим ключом</h3>
+          <div class="sim-stage">
+            <div class="bolt-grid" id="sim-bolt-grid" role="group" aria-label="Схема болтов ГБЦ: нажмите от центра крест-накрест">
+              <button type="button" class="bolt-node" data-bolt="5">Болт #5</button>
+              <button type="button" class="bolt-node" data-bolt="1">Центр #1</button>
+              <button type="button" class="bolt-node" data-bolt="3">Болт #3</button>
+              <button type="button" class="bolt-node" data-bolt="4">Болт #4</button>
+              <button type="button" class="bolt-node" data-bolt="2">Центр #2</button>
+              <button type="button" class="bolt-node" data-bolt="6">Болт #6</button>
+            </div>
+          </div>
+          <div class="sim-controls">
+            <div class="sim-label-row">
+              <label for="sim-torque">Момент на ключе (Н·м):</label>
+              <strong id="sim-tq-val">65 Н·м</strong>
+            </div>
+            <input class="sim-range" id="sim-torque" type="range" min="25" max="105" value="65">
+            <div class="sim-btn-row">
+              <button type="button" class="sim-chip" id="sim-bolt-reset">Сбросить болты (порядок 1 → 6)</button>
+            </div>
+          </div>
+          <div class="sim-status" id="sim-tq-status" data-state="ok">Нажимайте болты от центра крест-накрест (шаг 1 из 6)</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- NEW AMK Domain Feature: Interactive 5-Profession Competency Roadmap -->
+    <section class="container section" id="skill-roadmap" aria-labelledby="roadmap-title">
+      <div class="roadmap-shell">
+        <div class="roadmap-head">
+          <div class="stack" style="gap:0.35rem;">
+            <p class="eyebrow">Стандарты ТиПО АМК · Матрица навыков</p>
+            <h2 id="roadmap-title">Как растёт профиль специалиста за 12 дней</h2>
+          </div>
+          <div class="roadmap-tabs" role="group" aria-label="Выбор этапа обучения">
+            <button type="button" class="roadmap-tab" data-rm-stage="1" aria-pressed="true">День 1 · Старт</button>
+            <button type="button" class="roadmap-tab" data-rm-stage="6" aria-pressed="false">День 6 · База</button>
+            <button type="button" class="roadmap-tab" data-rm-stage="12" aria-pressed="false">День 12 · Мастер</button>
+          </div>
+        </div>
+
+        <div class="roadmap-tabs" role="tablist" aria-label="Специальность для просмотра траектории">
+          <button type="button" class="roadmap-tab" data-rm-course="it" aria-selected="true" aria-pressed="true">Веб-дизайн</button>
+          <button type="button" class="roadmap-tab" data-rm-course="graphic_design" aria-selected="false" aria-pressed="false">Графический дизайн</button>
+          <button type="button" class="roadmap-tab" data-rm-course="autoelectric" aria-selected="false" aria-pressed="false">Автоэлектрика</button>
+          <button type="button" class="roadmap-tab" data-rm-course="hvac" aria-selected="false" aria-pressed="false">Холодильное</button>
+          <button type="button" class="roadmap-tab" data-rm-course="automechanic" aria-selected="false" aria-pressed="false">Автомеханика</button>
+        </div>
+
+        <div class="roadmap-body">
+          <div class="roadmap-case-box">
+            <span class="sim-pill" id="rm-code">ГОСО 06130100 · ДЕНЬ 1</span>
+            <h3 id="rm-case-title">Адаптивная сетка 8px и первый коммерческий макет</h3>
+            <p id="rm-case-desc">На первом этапе студент осваивает модульную сетку, экспорт графики под WebP/72 ppi и проверяет макет на реальных точках перелома Flexbox.</p>
+            <div class="actions" style="margin-top:0.25rem;">
+              <a class="button primary" id="rm-link" href="learn.html?course=it&amp;lesson=1">Открыть модуль специальности →</a>
+            </div>
+          </div>
+
+          <div class="roadmap-bars" aria-label="Шкалы компетенций">
+            <div class="roadmap-meter-row">
+              <div class="roadmap-meter-head"><span>Теория и стандарты</span><strong id="rm-v1">35%</strong></div>
+              <div class="roadmap-bar-track"><div class="roadmap-bar-fill" id="rm-b1" style="width:35%;"></div></div>
+            </div>
+            <div class="roadmap-meter-row">
+              <div class="roadmap-meter-head"><span>Работа с инструментами и приборами</span><strong id="rm-v2">30%</strong></div>
+              <div class="roadmap-bar-track"><div class="roadmap-bar-fill" id="rm-b2" style="width:30%;"></div></div>
+            </div>
+            <div class="roadmap-meter-row">
+              <div class="roadmap-meter-head"><span>Диагностика и скорость выполнения</span><strong id="rm-v3">25%</strong></div>
+              <div class="roadmap-bar-track"><div class="roadmap-bar-fill" id="rm-b3" style="width:25%;"></div></div>
+            </div>
+            <div class="roadmap-meter-row">
+              <div class="roadmap-meter-head"><span>Готовность к практике / трудоустройству</span><strong id="rm-v4">22%</strong></div>
+              <div class="roadmap-bar-track"><div class="roadmap-bar-fill" id="rm-b4" style="width:22%;"></div></div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -689,6 +774,162 @@
         });
       }
 
+      // Live Sim 4: Auto Mechanic Cylinder Head Torque & Cross-Pattern Bolts
+      const tqSlider = document.getElementById('sim-torque');
+      const tqVal = document.getElementById('sim-tq-val');
+      const tqBadge = document.getElementById('sim-tq-badge');
+      const tqStatus = document.getElementById('sim-tq-status');
+      const boltResetBtn = document.getElementById('sim-bolt-reset');
+      const boltNodes = Array.from(document.querySelectorAll('#sim-bolt-grid .bolt-node'));
+      let nextBolt = 1;
+
+      function updateTorqueSim() {
+        if (!tqSlider) return;
+        const nm = Number(tqSlider.value);
+        tqVal.textContent = nm + ' Н·м';
+        if (nm < 58) {
+          tqBadge.textContent = nm + ' Н·м · Недотяг';
+          tqBadge.style.color = '#fef3c7';
+          tqBadge.style.background = 'rgba(120,53,15,0.55)';
+          tqStatus.dataset.state = 'warn';
+          tqStatus.textContent = 'Слабая притяжка: возможна утечка антифриза (дотяните до 65 Н·м)';
+        } else if (nm > 72) {
+          tqBadge.textContent = nm + ' Н·м · Перетяг';
+          tqBadge.style.color = '#fee2e2';
+          tqBadge.style.background = 'rgba(127,29,29,0.6)';
+          tqStatus.dataset.state = 'crit';
+          tqStatus.textContent = 'Превышение момента! Риск вытягивания резьбы блока алюминия';
+        } else {
+          tqBadge.textContent = nm + ' Н·м · Эталон';
+          tqBadge.style.color = '#d1fae5';
+          tqBadge.style.background = 'rgba(6,78,59,0.5)';
+          tqStatus.dataset.state = 'ok';
+          tqStatus.textContent = nextBolt > 6
+            ? '✓ Все 6 болтов ГБЦ протянуты по спирали с моментом ' + nm + ' Н·м + 90°!'
+            : 'Нажимайте болты от центра крест-накрест (ожидается #' + nextBolt + ' из 6)';
+        }
+      }
+
+      if (tqSlider) {
+        tqSlider.addEventListener('input', updateTorqueSim);
+        boltNodes.forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const num = Number(btn.getAttribute('data-bolt'));
+            if (num === nextBolt) {
+              btn.removeAttribute('data-bad');
+              btn.setAttribute('data-tight', 'true');
+              btn.textContent = '✓ #' + num;
+              nextBolt += 1;
+              playFx(nextBolt > 6 ? 'bonus' : 'good');
+            } else if (!btn.hasAttribute('data-tight')) {
+              btn.setAttribute('data-bad', 'true');
+              playFx('bad');
+              setTimeout(function () { btn.removeAttribute('data-bad'); }, 450);
+              tqStatus.dataset.state = 'warn';
+              tqStatus.textContent = 'Нарушен порядок! Сначала затяните болт #' + nextBolt + ' от центра.';
+              return;
+            }
+            updateTorqueSim();
+          });
+        });
+        if (boltResetBtn) {
+          boltResetBtn.addEventListener('click', function () {
+            nextBolt = 1;
+            boltNodes.forEach(function (btn) {
+              const num = Number(btn.getAttribute('data-bolt'));
+              btn.removeAttribute('data-tight');
+              btn.removeAttribute('data-bad');
+              btn.textContent = (num <= 2 ? 'Центр #' : 'Болт #') + num;
+            });
+            updateTorqueSim();
+          });
+        }
+      }
+
+      // Interactive 5-Profession Competency Roadmap (#skill-roadmap)
+      const RM_DATA = {
+        it: {
+          code: 'ГОСО 06130100',
+          stages: {
+            1: { t: 'Адаптивная сетка 8px и первый коммерческий макет', d: 'Освоение модульной сетки 8px, экспорт облегчённых баннеров WebP 72 ppi и вёрстка базового заголовка Flexbox.', m: [35, 30, 25, 22] },
+            6: { t: 'Компонентная система Figma + интерактивный DOM', d: 'Построение переиспользуемых UI-компонентов с Auto Layout и связывание состояния интерфейса на чистом JS.', m: [68, 72, 64, 58] },
+            12: { t: 'Full-Flow лендинг с 3D-сценой и Lighthouse 95+', d: 'Полный цикл разработки от прототипа и адаптации 390px до продакшн-оптимизации и публикации в портфолио.', m: [96, 94, 92, 95] }
+          }
+        },
+        graphic_design: {
+          code: 'ГОСО 02130100',
+          stages: {
+            1: { t: 'Цветовой профиль CMYK vs RGB и правила отступов', d: 'Разделение макетов для экрана и печати, корректный контраст типографики и модульная композиция.', m: [38, 28, 24, 20] },
+            6: { t: 'Брендбук компании и векторная графика Illustrator', d: 'Создание логотипа по сетке, фирменных паттернов, гайдлайнов носителей и ретуши для полиграфии.', m: [70, 74, 65, 62] },
+            12: { t: 'Итоговый Prepress PDF/X-1a с вылетами 3 мм', d: 'Полная допечатная проверка тиража, оверпринт, суммарный лимит краски TIL и кейс-портфолио заказчика.', m: [95, 96, 90, 94] }
+          }
+        },
+        autoelectric: {
+          code: 'ГОСО 07161301',
+          stages: {
+            1: { t: 'Замер падения напряжения (Voltage Drop) под нагрузкой', d: 'Поиск окисленных клемм и плохой массы в силовой цепи стартера без ложной замены исправной АКБ.', m: [36, 34, 30, 24] },
+            6: { t: 'Шина CAN, датчики Холла и чтение кодов OBD-II', d: 'Диагностика осциллограмм датчика коленвала, поиск обрывов в жгуте и расшифровка Freeze Frame.', m: [72, 76, 68, 65] },
+            12: { t: 'Комплексный поиск утечки тока и калибровка ЭБУ', d: 'Локализация скрытых замыканий 0.4 А за 15 минут, проверка генератора под нагрузкой и выдача диагностического листа.', m: [96, 95, 93, 96] }
+          }
+        },
+        hvac: {
+          code: 'ГОСО 07130700',
+          stages: {
+            1: { t: 'Расчёт перегрева испарителя ΔT (Superheat) по R600a', d: 'Чтение манометрического коллектора и исключение влажного хода компрессора при наладке контура.', m: [34, 32, 28, 22] },
+            6: { t: 'Пайка медных трасс, опрессовка азотом и вакуумирование', d: 'Выявление микроутечек по падению давления, глубокий вакуум до 300 микрон и заправка по весам.', m: [69, 75, 70, 64] },
+            12: { t: 'Пусконаладка инверторных систем и переохлаждение ΔT', d: 'Диагностика ТРВ/капиллярной трубки под нагрузкой, баланс переохлаждения и аудит энергоэффективности.', m: [95, 94, 92, 95] }
+          }
+        },
+        automechanic: {
+          code: 'ГОСО 07161300',
+          stages: {
+            1: { t: 'Работа с динамометрическим ключом и схема затяжки ГБЦ', d: 'Последовательная крест-накрест протяжка головки блока от центра с точным моментом и доворотом.', m: [35, 36, 30, 25] },
+            6: { t: 'Выставление фаз ГРМ и микрометрия цилиндров', d: 'Контроль натяжения цепи/ремня по меткам ВМТ, замер эллипсности гильз и диагностика компрессии.', m: [71, 74, 72, 66] },
+            12: { t: 'Капитальная дефектовка узлов ДВС и ходовой части', d: 'Полный цикл диагностики агрегата по допускам завода-изготовителя и сдача автомобиля после ТО.', m: [96, 97, 94, 96] }
+          }
+        }
+      };
+      let rmCourse = 'it', rmStage = 1;
+      const rmCourseBtns = Array.from(document.querySelectorAll('[data-rm-course]'));
+      const rmStageBtns = Array.from(document.querySelectorAll('[data-rm-stage]'));
+      function renderRoadmap() {
+        const spec = RM_DATA[rmCourse] || RM_DATA.it;
+        const st = spec.stages[rmStage] || spec.stages[1];
+        const codeEl = document.getElementById('rm-code');
+        const tEl = document.getElementById('rm-case-title');
+        const dEl = document.getElementById('rm-case-desc');
+        const lEl = document.getElementById('rm-link');
+        if (codeEl) codeEl.textContent = spec.code + ' · ДЕНЬ ' + rmStage;
+        if (tEl) tEl.textContent = st.t;
+        if (dEl) dEl.textContent = st.d;
+        if (lEl) lEl.href = 'learn.html?course=' + rmCourse + '&lesson=' + rmStage;
+        for (let i = 1; i <= 4; i++) {
+          const valEl = document.getElementById('rm-v' + i);
+          const barEl = document.getElementById('rm-b' + i);
+          if (valEl) valEl.textContent = st.m[i - 1] + '%';
+          if (barEl) barEl.style.width = st.m[i - 1] + '%';
+        }
+      }
+      rmCourseBtns.forEach(function (b) {
+        b.addEventListener('click', function () {
+          rmCourse = b.getAttribute('data-rm-course');
+          rmCourseBtns.forEach(function (x) {
+            x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+            x.setAttribute('aria-selected', x === b ? 'true' : 'false');
+          });
+          playFx('click');
+          renderRoadmap();
+        });
+      });
+      rmStageBtns.forEach(function (b) {
+        b.addEventListener('click', function () {
+          rmStage = Number(b.getAttribute('data-rm-stage')) || 1;
+          rmStageBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+          playFx('good');
+          renderRoadmap();
+        });
+      });
+
       // Web Audio API Synth FX + Toast + Floating XP Engine (Studio Minimal)
       let audioCtx = null;
       let sfxEnabled = false;
@@ -842,7 +1083,7 @@
 
       // Staggered Below-the-Fold Scroll Reveals (Zero Flash Above Fold)
       if ('IntersectionObserver' in window) {
-        const revealTargets = document.querySelectorAll('.pipeline-card, .card-link, #holo-3d-lab, #arcade-game, #quick-quest, .cta-band');
+        const revealTargets = document.querySelectorAll('.pipeline-card, .card-link, #holo-3d-lab, #skill-roadmap, #arcade-game, #quick-quest, .cta-band');
         const revIo = new IntersectionObserver(function (entries) {
           entries.forEach(function (ent) {
             if (ent.isIntersecting) {
