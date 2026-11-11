@@ -210,12 +210,44 @@
     return lessons.find(l => Number(l.num) === Number(num)) || null;
   }
 
-  function computeExactDates(unlockDay) {
+  function getUserStudyDay(userOrUid, db) {
+    const platformDay = (db && Number(db.current_study_day)) ? Math.max(1, Math.min(12, Number(db.current_study_day))) : 1;
+    let u = null;
+    if (userOrUid && typeof userOrUid === 'object') {
+      u = userOrUid;
+    } else if (userOrUid && db && Array.isArray(db.users)) {
+      u = db.users.find(x => Number(x.id) === Number(userOrUid)) || null;
+    }
+    if (!u && typeof getActiveUser === 'function') {
+      try { u = getActiveUser(); } catch (e) {}
+    }
+    if (!u || !u.created_at) return platformDay;
+    try {
+      const raw = String(u.created_at).trim();
+      const iso = (raw.includes('T') || raw.endsWith('Z')) ? raw : raw.replace(' ', 'T') + 'Z';
+      const regDt = new Date(iso);
+      if (isNaN(regDt.getTime())) return platformDay;
+      const now = new Date();
+      const elapsedMs = Math.max(0, now.getTime() - regDt.getTime());
+      const daysBy24h = Math.floor(elapsedMs / 86400000);
+      const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+      const regMidnight = new Date(regDt.getFullYear(), regDt.getMonth(), regDt.getDate()).getTime();
+      const daysByCalendar = Math.max(0, Math.round((nowMidnight - regMidnight) / 86400000));
+      const daysElapsed = Math.max(daysBy24h, daysByCalendar);
+      const userDay = Math.max(1, Math.min(12, daysElapsed + 1));
+      return Math.max(platformDay, userDay);
+    } catch (e) {
+      return platformDay;
+    }
+  }
+
+  function computeExactDates(unlockDay, curDay = 1) {
     const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
     const base = new Date();
     base.setHours(9, 0, 0, 0);
 
-    const openDt = new Date(base.getTime() + Math.max(0, unlockDay - 1) * 86400000);
+    const studyDay = Math.max(1, Number(curDay || 1));
+    const openDt = new Date(base.getTime() + (Number(unlockDay || 1) - studyDay) * 86400000);
     const dlDt = new Date(openDt.getTime() + 2 * 86400000);
 
     return {
@@ -241,6 +273,7 @@
     copy.initials = getInitials(copy.full_name);
     copy.email_verified = Boolean(copy.email_verified);
     copy.is_demo = Boolean(copy.is_demo);
+    copy.current_study_day = getUserStudyDay(copy);
 
     return copy;
   }
@@ -714,7 +747,7 @@
     if (path === '/api/tasks' && method === 'GET') {
       const spec = params.get('specialty') || 'it';
       const uid = Number(params.get('user_id') || 0);
-      const curDay = db.current_study_day;
+      const curDay = getUserStudyDay(uid, db);
       const slugs = params.get('specialty') ? [spec] : getCoursesList().map(c => c.slug);
       const tasksOut = [];
       let globalId = 1;
@@ -737,7 +770,7 @@
           const isLocked = unlockDay > curDay;
           const sub = uid ? db.submissions.find(s => s.user_id === uid && s.specialty_slug === sSlug && s.task_number === i) : null;
           const prog = uid ? db.progress[`${uid}:${sSlug}:${i}`] : null;
-          const dates = computeExactDates(unlockDay);
+          const dates = computeExactDates(unlockDay, curDay);
           let statusCode = 'available';
           let statusLabel = 'Доступно';
           let score = 0;
@@ -821,7 +854,8 @@
       const uid = sessionRole === 'student' ? sessionUid : Number(body.user_id || sessionUid);
       const spec = (body.specialty_slug || 'it').trim().toLowerCase();
       const num = Number(body.task_number || 1);
-      if (num > db.current_study_day) {
+      const userCurDay = getUserStudyDay(uid, db);
+      if (num > userCurDay) {
         return reply(403, { success: false, is_locked: true, error: `Урок №${num} заблокирован до Дня ${num}.` });
       }
 
@@ -874,8 +908,9 @@
       const num = Number(body.task_number || 1);
       const custom = db.custom_tasks[`${spec}:${num}`];
       const unlockDay = custom ? Number(custom.unlock_day || num) : num;
+      const userCurDay = getUserStudyDay(uid, db);
 
-      if (unlockDay > db.current_study_day) {
+      if (unlockDay > userCurDay) {
         return reply(403, {
           success: false,
           is_locked: true,
@@ -1936,18 +1971,23 @@
     const uid = user ? user.id : 0;
     const res = await apiRequest(`/api/tasks?specialty=${spec}&user_id=${uid}`);
     let tasks = (res.data && res.data.tasks) || [];
+    const curDay = (res.data && res.data.current_study_day) || getUserStudyDay(user);
     if (!tasks.length && window.EDU_LESSONS && window.EDU_LESSONS[spec]) {
-      tasks = window.EDU_LESSONS[spec].map((l, idx) => ({
-        task_number: l.num || (idx + 1),
-        title: l.title,
-        unlock_day: idx + 1,
-        is_locked: idx > 0,
-        status_code: idx === 0 ? 'available' : 'locked',
-        unlock_date_exact: (11 + idx) + ' ноября, 09:00',
-        deadline_exact: (13 + idx) + ' ноября, 23:59'
-      }));
+      tasks = window.EDU_LESSONS[spec].map((l, idx) => {
+        const num = l.num || (idx + 1);
+        const locked = num > curDay;
+        const dates = computeExactDates(num, curDay);
+        return {
+          task_number: num,
+          title: l.title,
+          unlock_day: num,
+          is_locked: locked,
+          status_code: locked ? 'locked' : 'available',
+          unlock_date_exact: dates.openText,
+          deadline_exact: dates.deadlineText
+        };
+      });
     }
-    const curDay = (res.data && res.data.current_study_day) || 1;
     const itemsHtml = tasks.map(t => {
       const isDone = t.status_code === 'graded';
       const isLocked = t.is_locked;
@@ -2484,6 +2524,7 @@
     getCourseBySlug,
     getLessonFromCatalog,
     computeExactDates,
+    getUserStudyDay,
     getInitials,
     getActiveUser,
     setActiveUser,
@@ -2987,19 +3028,24 @@
     const locCourseShort = trRm(`course.catalog.${spec}.shortTitle`, course.short_title);
     const tasks = (window._cachedTasks && window._cachedTasks[course.slug]) || [];
     const catalogLessons = (window.EDU_LESSONS && window.EDU_LESSONS[course.slug]) || [];
+    const curDay = getUserStudyDay(user);
     const nodesHtml = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => {
       const isPro = num > 3;
       const t = tasks.find(x => x.task_number === num);
+      const isLocked = t ? Boolean(t.is_locked) : (num > curDay);
       const catLesson = catalogLessons.find(x => Number(x.num) === num) || catalogLessons[num - 1];
       const rawTitle = (t && t.title) || (catLesson && catLesson.title) || ('Модуль #' + num);
       const locLesson = window.I18n ? window.I18n.localizeLessonContent(course.slug, num, { title: rawTitle, description: '' }) : { title: rawTitle };
       const title = locLesson.title;
       const isDone = t && t.status_code === 'graded';
-      const border = isDone ? 'border-emerald-500/50 bg-emerald-950/20' : (isPro ? 'border-amber-500/40 bg-amber-950/20' : 'border-indigo-500/40 bg-indigo-950/20');
-      const iconColor = isDone ? 'text-emerald-400' : (isPro ? 'text-amber-400' : 'text-indigo-400');
+      const border = isDone ? 'border-emerald-500/50 bg-emerald-950/20' : (isLocked ? 'border-white/10 bg-dark-950/40 opacity-75' : (isPro ? 'border-amber-500/40 bg-amber-950/20' : 'border-indigo-500/40 bg-indigo-950/20'));
+      const iconColor = isDone ? 'text-emerald-400' : (isLocked ? 'text-slate-500' : (isPro ? 'text-amber-400' : 'text-indigo-400'));
       const subLabel = isDone
         ? trRm('modal.roadmap.moduleCompleted', '✓ Модуль зачтён')
-        : (isPro ? trRm('modal.roadmap.modulePro', 'Профильный модуль · Сертификат') : trRm('modal.roadmap.moduleBase', 'Базовый модуль'));
+        : (isLocked ? `День ${num}` : (isPro ? trRm('modal.roadmap.modulePro', 'Профильный модуль · Сертификат') : trRm('modal.roadmap.moduleBase', 'Базовый модуль')));
+      const actionHtml = isLocked
+        ? `<span class="px-3 py-1.5 rounded-xl bg-white/5 text-slate-400 text-xs font-bold shrink-0 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">lock</span><span>День ${num}</span></span>`
+        : `<a href="simulator.html?specialty=${course.slug}&task=${num}" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all shrink-0">${trRm('lesson.action.open', 'Открыть')}</a>`;
 
       return `
         <div class="p-3.5 rounded-2xl border ${border} flex items-center justify-between gap-3 hover:scale-[1.01] transition-transform">
@@ -3012,9 +3058,7 @@
               <div class="text-[10px] text-slate-400">${subLabel}</div>
             </div>
           </div>
-          <a href="simulator.html?specialty=${course.slug}&task=${num}" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all shrink-0">
-            ${trRm('lesson.action.open', 'Открыть')}
-          </a>
+          ${actionHtml}
         </div>
       `;
     }).join('');

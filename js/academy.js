@@ -34,11 +34,44 @@
     try {
       const response = await fetch('/api/academy/progress', {signal: AbortSignal.timeout(4500)});
       if (!response.ok) return;
-      const data = await response.json();
-      accountProgress = new Set(data.completed || []);
+      const progData = await response.json();
+      accountProgress = new Set(progData.completed || []);
+      const unlockedDay = Number(progData.current_study_day || 12);
       root.querySelectorAll('[data-lesson-key]').forEach(marker => {
-        if (accountProgress.has(marker.dataset.lessonKey)) marker.textContent = 'Пройдено';
+        const key = marker.dataset.lessonKey || '';
+        const num = Number(key.split(':')[1] || 1);
+        if (num > unlockedDay) {
+          marker.textContent = num === unlockedDay + 1 ? 'Откроется завтра' : `Откроется на ${num}-й день`;
+          const row = marker.closest('a.lesson-row');
+          if (row) {
+            row.removeAttribute('href');
+            row.setAttribute('aria-disabled', 'true');
+            row.style.opacity = '0.6';
+            row.style.cursor = 'not-allowed';
+          }
+        } else if (accountProgress.has(key)) {
+          marker.textContent = 'Пройдено';
+        }
       });
+      if (lesson && requested > unlockedDay) {
+        const waitText = requested === unlockedDay + 1 ? 'завтра' : `на ${requested}-й день после регистрации`;
+        root.innerHTML = `
+          <div class="lesson-head"><div class="container stack">
+            <a href="${href(slug)}">← Все уроки курса</a>
+            <p class="eyebrow">${course[0]} / Урок ${String(requested).padStart(2, '0')} из ${data[slug].length}</p>
+            <h1>Урок откроется ${waitText}</h1>
+            <p class="muted">Первый урок открывается сразу после регистрации, второй — на следующий день и так далее по одному уроку в день.</p>
+            <div class="actions"><a class="button dark" href="${href(slug)}">Вернуться к программе курса</a></div>
+          </div></div>`;
+        return;
+      }
+      if (lesson && requested + 1 > unlockedDay && requested < data[slug].length) {
+        const nextLink = root.querySelector('[data-next] a');
+        if (nextLink) {
+          nextLink.href = href(slug);
+          nextLink.textContent = `Урок ${requested + 1} откроется завтра · К программе`;
+        }
+      }
       if (accountProgress.has(`${slug}:${requested}`)) {
         const next = root.querySelector('[data-next]');
         if (next) next.hidden = false;

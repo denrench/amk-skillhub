@@ -904,7 +904,8 @@ def init_db():
                     role = EXCLUDED.role,
                     password_hash = EXCLUDED.password_hash,
                     is_demo = 1,
-                    email_verified = 1
+                    email_verified = 1,
+                    created_at = CURRENT_TIMESTAMP
                 """, acc)
 
             try:
@@ -1346,6 +1347,7 @@ def init_db():
             password_hash = excluded.password_hash,
             is_demo = 1,
             email_verified = 1,
+            created_at = CURRENT_TIMESTAMP,
             last_name = CASE WHEN users.last_name = '' THEN excluded.last_name ELSE users.last_name END,
             first_name = CASE WHEN users.first_name = '' THEN excluded.first_name ELSE users.first_name END
         """, acc)
@@ -1361,17 +1363,67 @@ def init_db():
 init_db()
 
 
-def get_current_day():
+def get_user_study_day_from_created_at(created_at_val):
+    if not created_at_val:
+        return 1
+    try:
+        if isinstance(created_at_val, datetime):
+            reg_dt = created_at_val
+            if reg_dt.tzinfo is not None:
+                reg_utc = reg_dt.astimezone(timezone.utc)
+            else:
+                reg_utc = reg_dt.replace(tzinfo=timezone.utc)
+        else:
+            raw = str(created_at_val).strip().replace('T', ' ').replace('Z', '')
+            if '+' in raw:
+                raw = raw.split('+')[0].strip()
+            if '.' in raw:
+                raw = raw.split('.')[0].strip()
+            reg_naive = datetime.strptime(raw[:19], '%Y-%m-%d %H:%M:%S')
+            reg_utc = reg_naive.replace(tzinfo=timezone.utc)
+
+        now_utc = datetime.now(timezone.utc)
+        elapsed_seconds = max(0.0, (now_utc - reg_utc).total_seconds())
+        days_by_24h = int(elapsed_seconds // 86400)
+        days_by_local_date = max(0, (now_utc.astimezone().date() - reg_utc.astimezone().date()).days)
+        days_elapsed = max(days_by_24h, days_by_local_date)
+        return max(1, min(12, days_elapsed + 1))
+    except Exception:
+        return 1
+
+
+def get_current_day(user_id=None):
     conn = get_db()
     c = conn.cursor()
     c.execute("SELECT value FROM platform_settings WHERE key = 'current_study_day';")
     row = c.fetchone()
+    platform_day = 1
     if row:
         try:
-            return max(1, min(12, int(row['value'])))
+            platform_day = max(1, min(12, int(row['value'])))
         except Exception:
-            return 1
-    return 1
+            platform_day = 1
+
+    uid = user_id
+    if uid is None:
+        try:
+            uid = request.args.get('user_id', type=int) or session.get('user_id')
+            if not uid and hasattr(g, 'current_user') and g.current_user:
+                uid = g.current_user.get('id')
+        except Exception:
+            uid = None
+
+    if uid:
+        try:
+            c.execute("SELECT created_at, role FROM users WHERE id = ?", (int(uid),))
+            u_row = c.fetchone()
+            if u_row and (u_row['role'] or 'student') == 'student':
+                user_day = get_user_study_day_from_created_at(u_row['created_at'])
+                return max(platform_day, user_day)
+        except Exception:
+            pass
+
+    return platform_day
 
 
 def _capitalize_name_part(part):
@@ -1648,12 +1700,14 @@ def serialize_user(row):
     d["subscription_tier"] = d.get("subscription_tier") or "free"
     d["is_pro"] = (d["subscription_tier"] == "pro")
     d["pro_expires_at"] = d.get("pro_expires_at")
+    d["current_study_day"] = get_user_study_day_from_created_at(d.get("created_at"))
     return d
 
 
-def compute_dates_for_day(unlock_day):
+def compute_dates_for_day(unlock_day, current_day=1):
     base = datetime.now().replace(hour=9, minute=0, second=0, microsecond=0)
-    open_dt = base + timedelta(days=max(0, unlock_day - 1))
+    cur_d = max(1, int(current_day or 1))
+    open_dt = base + timedelta(days=(int(unlock_day or 1) - cur_d))
     deadline_dt = open_dt + timedelta(days=2)
     months_ru = [
         "", "января", "февраля", "марта", "апреля", "мая", "июня",
@@ -2297,7 +2351,7 @@ def get_profile(user_id):
             achievements_list = []
 
     course_meta = COURSES_BY_SLUG[spec_slug]
-    current_day = get_current_day()
+    current_day = get_current_day(user_id)
     skills_out = []
     for sk in course_meta["skills"]:
         t_list = sk["tasks"]
@@ -2426,7 +2480,7 @@ def get_tasks():
     if error:
         return error
 
-    current_day = get_current_day()
+    current_day = get_current_day(user_id)
     conn = get_db()
     cursor = conn.cursor()
 
@@ -2496,7 +2550,7 @@ def get_tasks():
         key = (t['specialty_slug'], t['task_number'])
         sub_info = user_subs.get(key)
         prog_info = user_prog.get(key)
-        open_str, dl_str = compute_dates_for_day(unlock_day)
+        open_str, dl_str = compute_dates_for_day(unlock_day, current_day)
 
         if is_locked:
             status_code = 'locked'
@@ -2620,7 +2674,7 @@ def save_lesson_progress():
     if not user_id:
         return jsonify({"success": False, "message": "Требуется авторизация."}), 401
 
-    current_day = get_current_day()
+    current_day = get_current_day(user_id)
     if task_number > current_day:
         return jsonify({
             "success": False,
@@ -2711,7 +2765,7 @@ def submit_task():
         if not await_teacher and (submitted_code or repo_url):
             await_teacher = True
 
-    current_day = get_current_day()
+    current_day = get_current_day(user_id)
     conn = get_db()
     cursor = conn.cursor()
 
@@ -2912,7 +2966,7 @@ def reset_demo():
         c.execute(f"DELETE FROM xp_transactions WHERE user_id IN ({placeholders});", demo_uids)
         c.execute(f"DELETE FROM lesson_block_progress WHERE user_id IN ({placeholders});", demo_uids)
         c.execute(f"DELETE FROM daily_quests_log WHERE user_id IN ({placeholders});", demo_uids)
-        c.execute(f"UPDATE users SET bonus_xp = 0, streak_days = 1, achievements_json = '[]' WHERE id IN ({placeholders});", demo_uids)
+        c.execute(f"UPDATE users SET bonus_xp = 0, streak_days = 1, achievements_json = '[]', created_at = CURRENT_TIMESTAMP WHERE id IN ({placeholders});", demo_uids)
 
     c.execute("INSERT OR REPLACE INTO platform_settings (key, value) VALUES ('current_study_day', '1');")
     conn.commit()

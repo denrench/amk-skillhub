@@ -215,18 +215,27 @@ def list_lessons():
     cursor.execute(query, tuple(params))
     lessons = [dict(r) for r in cursor.fetchall()]
 
-    # If student is logged in, attach completion flag
+    # If student is logged in, attach completion flag and drip-feed unlock status
+    import server
     user = _get_current_user()
+    current_day = server.get_current_day(user['id'] if user else None)
+    completed_ids = set()
     if user:
         cursor.execute("""
         SELECT DISTINCT lesson_id FROM lesson_block_progress
         WHERE user_id = ? AND block_id = 'b8_summary' AND completed = 1
         """, (user['id'],))
         completed_ids = {r[0] for r in cursor.fetchall()}
-        for les in lessons:
+
+    for les in lessons:
+        unlock_day = int(les.get('unlock_day') or les.get('order_num') or 1)
+        les['unlock_day'] = unlock_day
+        les['current_study_day'] = current_day
+        les['is_locked'] = bool(unlock_day > current_day)
+        if user:
             les['is_completed'] = les['id'] in completed_ids
 
-    return jsonify({"success": True, "lessons": lessons})
+    return jsonify({"success": True, "current_study_day": current_day, "lessons": lessons})
 
 @interactive_lessons_bp.route('/api/lessons/<int:lesson_id>', methods=['GET'])
 def get_lesson_detail(lesson_id):
@@ -298,6 +307,12 @@ def get_lesson_detail(lesson_id):
     lesson['prev_lesson_id'] = prev_lesson_id
     lesson['block_progress'] = block_progress
     lesson['is_completed'] = is_completed
+    import server
+    current_day = server.get_current_day(user['id'] if user else None)
+    unlock_day = int(lesson.get('unlock_day') or lesson.get('order_num') or 1)
+    lesson['unlock_day'] = unlock_day
+    lesson['current_study_day'] = current_day
+    lesson['is_locked'] = bool(unlock_day > current_day)
     return jsonify({"success": True, "lesson": lesson})
 
 @interactive_lessons_bp.route('/api/lessons', methods=['POST'])
@@ -416,6 +431,8 @@ def academy_progress():
     conn = _get_db()
     cursor = conn.cursor()
     if request.method == 'GET':
+        import server
+        current_day = server.get_current_day(user['id'])
         cursor.execute("""
             SELECT c.slug, l.order_num
             FROM lesson_block_progress p
@@ -423,7 +440,11 @@ def academy_progress():
             JOIN courses c ON c.id = l.course_id
             WHERE p.user_id = ? AND p.block_id = 'academy_reading' AND p.completed = 1
         """, (user['id'],))
-        return jsonify({'success': True, 'completed': [f"{row['slug']}:{row['order_num']}" for row in cursor.fetchall()]})
+        return jsonify({
+            'success': True,
+            'completed': [f"{row['slug']}:{row['order_num']}" for row in cursor.fetchall()],
+            'current_study_day': current_day
+        })
     data = request.get_json(silent=True)
     if not isinstance(data, dict):
         return jsonify({'success': False, 'message': 'Укажите урок.'}), 400

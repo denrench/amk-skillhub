@@ -247,6 +247,26 @@ class TestFullLmsSuite(unittest.TestCase):
         self.assertEqual(r_bypass.status_code, 403)
         self.assertTrue(r_bypass.get_json()['is_locked'])
 
+        # Simulate 1 day after registration -> Lesson 2 unlocks automatically, Lesson 3 still locked
+        conn = sqlite3.connect(server.DB_PATH)
+        cur = conn.cursor()
+        cur.execute("UPDATE users SET created_at = datetime('now', '-1 day', '-1 hour') WHERE id = ?", (student_id,))
+        conn.commit()
+        conn.close()
+
+        r_day2 = self.app.get(f"/api/tasks?specialty=it&user_id={student_id}").get_json()
+        self.assertEqual(r_day2['current_study_day'], 2)
+        self.assertFalse(r_day2['tasks'][0]['is_locked'])
+        self.assertFalse(r_day2['tasks'][1]['is_locked'])
+        self.assertTrue(r_day2['tasks'][2]['is_locked'])
+
+        # Restore registration timestamp to today (Day 1)
+        conn = sqlite3.connect(server.DB_PATH)
+        cur = conn.cursor()
+        cur.execute("UPDATE users SET created_at = CURRENT_TIMESTAMP WHERE id = ?", (student_id,))
+        conn.commit()
+        conn.close()
+
     def test_12_quiz_progress_and_teacher_grading_workflow(self):
         conn = sqlite3.connect(server.DB_PATH)
         cur = conn.cursor()

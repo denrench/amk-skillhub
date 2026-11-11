@@ -1703,42 +1703,39 @@
       const res = await window.EduSpace.api(`/api/tasks?specialty=${currentSpec}&user_id=${uid}`);
       let rawTasks = (res.data && res.data.tasks) || [];
 
+      const fallbackDay = (res.data && res.data.current_study_day) || (window.EduSpace.getUserStudyDay ? window.EduSpace.getUserStudyDay(user) : 1);
       if (!rawTasks.length && window.EDU_LESSONS && window.EDU_LESSONS[currentSpec]) {
-        rawTasks = window.EDU_LESSONS[currentSpec].map((l, idx) => ({
-          id: idx + 1,
-          specialty_slug: currentSpec,
-          task_number: l.num || (idx + 1),
-          title: l.title,
-          description: l.task_prompt || '',
-          tools_required: l.tools || 'Практикум EDU SPACE',
-          difficulty: l.difficulty || 'Базовый',
-          time_limit: l.time_limit || '60 мин',
-          unlock_day: idx + 1,
-          current_study_day: 1,
-          is_locked: idx > 0,
-          status_code: idx === 0 ? 'available' : 'locked',
-          status_label: idx === 0 ? 'Доступно' : 'Заблокировано',
-          unlock_date_exact: '12 ноября, 09:00',
-          deadline_exact: '13 ноября, 23:59',
-          quiz_score: 0
-        }));
+        rawTasks = window.EDU_LESSONS[currentSpec].map((l, idx) => {
+          const num = l.num || (idx + 1);
+          const locked = num > fallbackDay;
+          const dates = window.EduSpace.computeExactDates ? window.EduSpace.computeExactDates(num, fallbackDay) : { openText: '12 ноября, 09:00', deadlineText: '13 ноября, 23:59' };
+          return {
+            id: idx + 1,
+            specialty_slug: currentSpec,
+            task_number: num,
+            title: l.title,
+            description: l.task_prompt || '',
+            tools_required: l.tools || 'Практикум EDU SPACE',
+            difficulty: l.difficulty || 'Базовый',
+            time_limit: l.time_limit || '60 мин',
+            unlock_day: num,
+            current_study_day: fallbackDay,
+            is_locked: locked,
+            status_code: locked ? 'locked' : 'available',
+            status_label: locked ? 'Заблокировано' : 'Доступно',
+            unlock_date_exact: dates.openText,
+            deadline_exact: dates.deadlineText,
+            quiz_score: 0
+          };
+        });
       }
 
-      tasksData = rawTasks.map(t => {
-        const copy = Object.assign({}, t);
-        if (copy.task_number === 2 && copy.status_code === 'locked' && !rawTasks.some(x => x.status_code === 'in_progress')) {
-          copy.is_locked = false;
-          copy.status_code = 'in_progress';
-          copy.status_label = 'В процессе';
-          copy.quiz_score = copy.quiz_score || 2;
-        }
-        return copy;
-      });
+      tasksData = rawTasks.map(t => Object.assign({}, t));
 
       window._cachedTasks = window._cachedTasks || {};
       window._cachedTasks[currentSpec] = tasksData;
 
-      currentStudyDay = (res.data && res.data.current_study_day) || 1;
+      currentStudyDay = fallbackDay;
 
       const counts = {
         all: tasksData.length,

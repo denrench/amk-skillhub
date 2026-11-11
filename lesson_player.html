@@ -1581,10 +1581,17 @@
       }
       if (nextBtn) {
         const nextId = currentLesson.next_lesson_id;
-        if (nextId) {
-          const nextTaskNum = (currentLesson.order_num ? currentLesson.order_num + 1 : 1);
-          nextBtn.href = `lesson_player.html?lesson_id=${nextId}&specialty=${specSlug}&task=${nextTaskNum}`;
-          nextBtn.style.display = 'flex';
+        const nextTaskNum = (currentLesson.order_num ? currentLesson.order_num + 1 : 1);
+        const studyDay = Number(currentLesson.current_study_day || (window.EduSpace && window.EduSpace.getUserStudyDay ? window.EduSpace.getUserStudyDay() : 1));
+        if (nextId && nextTaskNum <= 12) {
+          if (nextTaskNum <= studyDay) {
+            nextBtn.href = `lesson_player.html?lesson_id=${nextId}&specialty=${specSlug}&task=${nextTaskNum}`;
+            nextBtn.style.display = 'flex';
+          } else {
+            nextBtn.href = `tasks.html?specialty=${specSlug}`;
+            nextBtn.innerHTML = `<span class="material-symbols-outlined text-[18px]">schedule</span><span>Урок №${nextTaskNum} откроется завтра</span>`;
+            nextBtn.style.display = 'flex';
+          }
         } else {
           nextBtn.style.display = 'none';
         }
