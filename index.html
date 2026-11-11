@@ -3,56 +3,181 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="AMK SkillHub. Учебник с практическими примерами по пяти специальностям Алматинского многопрофильного колледжа.">
-  <meta name="theme-color" content="#142d24">
-  <title>AMK SkillHub · Учебная платформа</title>
+  <meta name="description" content="AMK SkillHub. Учебник, 10-секундные видео-разборы и живые тренажёры по пяти специальностям Алматинского многопрофильного колледжа.">
+  <meta name="theme-color" content="#060913">
+  <title>AMK SkillHub · Образовательная платформа нового поколения</title>
   <link rel="icon" href="assets/eduspace-logo.svg">
   <link rel="stylesheet" href="css/academy.css">
 </head>
 <body>
-  <header class="topbar"><div class="container">
-    <a href="index.html" class="brand" aria-current="page"><span>AMK</span> SkillHub</a>
-    <nav aria-label="Основное меню"><a href="learn.html">Учебник</a><a href="tasks.html">Практикум</a><a href="auth.html">Войти</a></nav>
-  </div></header>
+  <header class="topbar">
+    <div class="container">
+      <a href="index.html" class="brand" aria-current="page"><span>AMK</span> SkillHub</a>
+      <nav aria-label="Основное меню">
+        <a href="learn.html">Учебник</a>
+        <a href="tasks.html">Практикум</a>
+        <a href="about.html">О колледже</a>
+        <a href="auth.html">Войти</a>
+      </nav>
+    </div>
+  </header>
+
   <main>
-    <section class="hero"><div class="container hero-grid">
-      <div class="stack">
-        <p class="eyebrow">Алматинский многопрофильный колледж</p>
-        <h1>Знания, которые можно применить</h1>
-        <p>От первого объяснения до самостоятельной задачи. Изучайте материалы по пяти специальностям и проверяйте, как работает решение.</p>
-        <div class="actions"><a class="button primary" href="learn.html">Открыть учебник</a><a class="button" href="auth.html?mode=register">Создать аккаунт</a></div>
-      </div>
-      <div class="hero-art">
-        <svg viewBox="0 0 430 270" aria-labelledby="hero-diagram">
-          <title id="hero-diagram">Учебная схема цепи запуска с аккумулятором, реле и стартером</title>
-          <defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#456555" stroke-width="1"/></pattern></defs>
-          <path d="M0 0h430v270H0z" fill="url(#grid)"/>
-          <g fill="none" stroke="#dbf477" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M111 148h207M111 163h24v49h160v-49h23M110 141h30V86h50m50 0h74v47"/>
-          </g>
-          <g fill="#142d24" stroke="#a9c4ad" stroke-width="2"><rect x="28" y="119" width="83" height="65" rx="9"/><rect x="182" y="63" width="72" height="43" rx="8"/><rect x="314" y="120" width="87" height="64" rx="9"/></g>
-          <g fill="#f6f7ef" font-family="system-ui, sans-serif" font-size="15" font-weight="650" text-anchor="middle">
-            <text x="69" y="157">АКБ</text><text x="218" y="90">Реле</text><text x="357" y="157">Стартер</text>
-          </g>
-          <g fill="#dbf477"><circle cx="122" cy="148" r="6"/><circle cx="304" cy="148" r="6"/></g>
-          <text x="24" y="32" fill="#dbf477" font-family="monospace" font-size="14">СХЕМА 01 / СИСТЕМА ПУСКА</text>
-          <text x="215" y="237" fill="#c1d6c7" text-anchor="middle" font-family="system-ui" font-size="13">Обратный путь через массу</text>
-        </svg>
-        <a href="learn.html?course=autoelectric&amp;lesson=3">Разобрать пример диагностики →</a>
-      </div>
-    </div></section>
-    <section class="container section" aria-labelledby="courses">
-      <div class="section-head"><div class="stack"><p class="eyebrow">60 уроков · 5 специальностей</p><h2 id="courses">Выберите направление</h2></div></div>
-      <div class="course-grid">
-        <a class="card card-link" href="learn.html?course=it"><span class="course-num">01</span><h3>Веб-дизайн</h3><p class="muted">От макета и композиции до вёрстки и событий JavaScript.</p></a>
-        <a class="card card-link" href="learn.html?course=graphic_design"><span class="course-num">02</span><h3>Графический дизайн</h3><p class="muted">Типографика, цвет, упаковка и подготовка к печати.</p></a>
-        <a class="card card-link" href="learn.html?course=autoelectric"><span class="course-num">03</span><h3>Автоэлектрика</h3><p class="muted">Измерения, схемы запуска и диагностика сигналов.</p></a>
-        <a class="card card-link" href="learn.html?course=hvac"><span class="course-num">04</span><h3>Холодильное оборудование</h3><p class="muted">Холодильный цикл и разбор сервисных случаев.</p></a>
-        <a class="card card-link" href="learn.html?course=automechanic"><span class="course-num">05</span><h3>Автомеханика</h3><p class="muted">Двигатель, ходовая часть и результаты измерений.</p></a>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="stack">
+          <div class="hero-pill">
+            <span class="hero-pill-dot" aria-hidden="true"></span>
+            <span>АМК · 5 специальностей · 60 интерактивных уроков</span>
+          </div>
+          <h1>Знания, которые можно применить</h1>
+          <p>От 10-секундных наглядных видео-схем до живых тренажёров, 3D-стендов и ежедневного пошагового роста. Изучайте практику по пяти направлениям и закрепляйте результат без воды.</p>
+          <div class="actions">
+            <a class="button primary" href="learn.html">Открыть учебник</a>
+            <a class="button" href="tasks.html">Перейти в практикум</a>
+            <a class="button" href="auth.html?mode=register">Создать аккаунт</a>
+          </div>
+          <div class="hero-metrics" aria-label="Показатели платформы">
+            <div class="hero-metric">
+              <strong>60 уроков</strong>
+              <span>По 12 в каждой профессии</span>
+            </div>
+            <div class="hero-metric">
+              <strong>10 сек</strong>
+              <span>Визуальные схемы темы</span>
+            </div>
+            <div class="hero-metric">
+              <strong>1 / день</strong>
+              <span>Умный график открытия</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="workbench-preview">
+          <div class="workbench-chrome">
+            <div class="workbench-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span class="workbench-tag">WORKBENCH · LIVE</span>
+          </div>
+          <svg viewBox="0 0 430 270" aria-labelledby="hero-diagram">
+            <title id="hero-diagram">Интерактивная учебная схема цепи запуска с аккумулятором, реле и стартером</title>
+            <defs>
+              <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+                <path d="M24 0H0V24" fill="none" stroke="rgba(56, 189, 248, 0.14)" stroke-width="1"/>
+              </pattern>
+              <linearGradient id="wireGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#6366f1"/>
+                <stop offset="50%" stop-color="#38bdf8"/>
+                <stop offset="100%" stop-color="#34d399"/>
+              </linearGradient>
+            </defs>
+            <rect width="430" height="270" fill="url(#grid)"/>
+            <g fill="none" stroke="url(#wireGrad)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M111 148h207M111 163h24v49h160v-49h23M110 141h30V86h50m50 0h74v47"/>
+            </g>
+            <g fill="#0f172a" stroke="#38bdf8" stroke-width="2">
+              <rect x="28" y="119" width="83" height="65" rx="10"/>
+              <rect x="182" y="63" width="72" height="43" rx="10" stroke="#818cf8"/>
+              <rect x="314" y="120" width="87" height="64" rx="10" stroke="#34d399"/>
+            </g>
+            <g fill="#f8fafc" font-family="system-ui, sans-serif" font-size="14" font-weight="700" text-anchor="middle">
+              <text x="69" y="156">АКБ 12.6В</text>
+              <text x="218" y="89">Реле</text>
+              <text x="357" y="156">Стартер</text>
+            </g>
+            <g fill="#38bdf8">
+              <circle cx="122" cy="148" r="5.5"/>
+              <circle cx="304" cy="148" r="5.5" fill="#34d399"/>
+            </g>
+            <text x="24" y="34" fill="#7dd3fc" font-family="monospace" font-size="13" font-weight="700">СТЕНД 03 / ДИАГНОСТИКА ПУСКА</text>
+            <text x="215" y="242" fill="#cbd5e1" text-anchor="middle" font-family="system-ui" font-size="12.5">Измерение падения напряжения под нагрузкой</text>
+          </svg>
+          <div class="workbench-footer">
+            <span class="muted" style="font-size: 0.85rem;">Живой стенд и разбор неисправностей</span>
+            <a href="learn.html?course=autoelectric&amp;lesson=3">Разобрать пример диагностики →</a>
+          </div>
+        </div>
       </div>
     </section>
-    <section class="container section"><div class="card"><h2>Как устроен урок</h2><p>Сначала прочитайте объяснение, затем разберите готовый пример и примените тот же принцип к своей задаче. У подходящих тем есть интерактивная модель.</p></div></section>
+
+    <section class="container section" aria-labelledby="format-title">
+      <div class="section-head">
+        <div class="stack">
+          <p class="eyebrow">Как это устроено</p>
+          <h2 id="format-title">Обучение без скучных полотен текста</h2>
+        </div>
+      </div>
+      <div class="bento-grid">
+        <article class="bento-card">
+          <span class="bento-badge">01 · Видео-схемы 10 сек</span>
+          <h3>Суть темы за 10 секунд</h3>
+          <p class="muted">Короткие анимированные ролики показывают проблему «До», принцип работы и эталонный результат «После» с субтитрами.</p>
+        </article>
+        <article class="bento-card">
+          <span class="bento-badge">02 · Интерактив и 3D</span>
+          <h3>Живые тренажёры</h3>
+          <p class="muted">Симулятор мультиметра, манометр перегрева, песочница Flexbox, CMYK-препресс и алгоритмы сборки в каждом уроке.</p>
+        </article>
+        <article class="bento-card">
+          <span class="bento-badge">03 · Умный темп</span>
+          <h3>Урок №1 сразу, далее по дням</h3>
+          <p class="muted">Первый модуль открывается сразу после регистрации, второй — на следующий день и так далее, чтобы материал усваивался уверенно.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="container section" aria-labelledby="courses">
+      <div class="section-head">
+        <div class="stack">
+          <p class="eyebrow">60 уроков · 5 специальностей</p>
+          <h2 id="courses">Выберите направление</h2>
+        </div>
+        <a class="button" href="tasks.html">Открыть все модули →</a>
+      </div>
+      <div class="course-grid">
+        <a class="card card-link" href="learn.html?course=it">
+          <span class="course-num">01 · 12 уроков</span>
+          <h3>Веб-дизайн</h3>
+          <p class="muted">От макетов в Photoshop/Figma и сетки 8px до вёрстки Flexbox и событий JavaScript.</p>
+          <div class="spec-tags"><span class="spec-tag">Figma</span><span class="spec-tag">HTML/CSS</span><span class="spec-tag">JS</span></div>
+        </a>
+        <a class="card card-link" href="learn.html?course=graphic_design">
+          <span class="course-num">02 · 12 уроков</span>
+          <h3>Графический дизайн</h3>
+          <p class="muted">Типографика, колористика RGB/CMYK, айдентика, упаковка и допечатная подготовка.</p>
+          <div class="spec-tags"><span class="spec-tag">CMYK</span><span class="spec-tag">Vector</span><span class="spec-tag">Prepress</span></div>
+        </a>
+        <a class="card card-link" href="learn.html?course=autoelectric">
+          <span class="course-num">03 · 12 уроков</span>
+          <h3>Автоэлектрика</h3>
+          <p class="muted">Измерения мультиметром, схемы DIN, шина CAN, OBD-II и осциллография датчиков.</p>
+          <div class="spec-tags"><span class="spec-tag">12V/24V</span><span class="spec-tag">CAN</span><span class="spec-tag">OBD-II</span></div>
+        </a>
+        <a class="card card-link" href="learn.html?course=hvac">
+          <span class="course-num">04 · 12 уроков</span>
+          <h3>Холодильное оборудование</h3>
+          <p class="muted">Термодинамика цикла, пайка в азоте, вакуумирование и расчёт перегрева Superheat.</p>
+          <div class="spec-tags"><span class="spec-tag">R600a</span><span class="spec-tag">Superheat</span><span class="spec-tag">No Frost</span></div>
+        </a>
+        <a class="card card-link" href="learn.html?course=automechanic">
+          <span class="course-num">05 · 12 уроков</span>
+          <h3>Автомеханика</h3>
+          <p class="muted">Диагностика ДВС, фазы ГРМ, дефектовка микрометром, 3D сход-развал и тормозные стенды.</p>
+          <div class="spec-tags"><span class="spec-tag">ДВС</span><span class="spec-tag">ГРМ</span><span class="spec-tag">ТО-1/ТО-2</span></div>
+        </a>
+      </div>
+    </section>
   </main>
-  <footer class="footer"><div class="container"><a href="index.html" class="brand"><span>AMK</span> SkillHub</a><nav class="actions" aria-label="Дополнительное меню"><a href="about.html">О колледже</a><a href="career.html">Карьера</a><a href="tools.html">Инструменты</a></nav></div></footer>
+
+  <footer class="footer">
+    <div class="container">
+      <a href="index.html" class="brand"><span>AMK</span> SkillHub</a>
+      <nav class="actions" aria-label="Дополнительное меню">
+        <a href="about.html">О колледже</a>
+        <a href="career.html">Карьера</a>
+        <a href="tools.html">Инструменты</a>
+        <a href="pricing.html">Тарифы</a>
+      </nav>
+    </div>
+  </footer>
 </body>
 </html>

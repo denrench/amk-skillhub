@@ -1,11 +1,11 @@
 :root {
-  --workshop-bg: #101a16;
-  --workshop-surface: #1b2a23;
-  --workshop-shell: #142d24;
-  --workshop-line: #526d5e;
-  --workshop-text: #f6f7ef;
-  --workshop-muted: #c3d4c7;
-  --workshop-accent: #dbf477;
+  --workshop-bg: #060913;
+  --workshop-surface: #111a2e;
+  --workshop-shell: #0b1120;
+  --workshop-line: rgba(148, 163, 184, 0.24);
+  --workshop-text: #f8fafc;
+  --workshop-muted: #cbd5e1;
+  --workshop-accent: #38bdf8;
 
   /* Motion Design Tokens */
   --dur-fast: 150ms;
@@ -20,8 +20,8 @@
 
   --workshop-ease: var(--ease-out);
   --workshop-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --workshop-shadow: 0 14px 32px -10px rgba(0, 0, 0, 0.45);
-  --workshop-glow: 0 12px 28px -8px rgba(219, 244, 119, 0.22);
+  --workshop-shadow: 0 18px 38px -12px rgba(2, 6, 23, 0.65);
+  --workshop-glow: 0 12px 28px -8px rgba(56, 189, 248, 0.32);
 }
 
 @keyframes workshopSoftReveal {
@@ -80,11 +80,14 @@ body.reveal-fallback [data-reveal] {
 }
 
 body.workshop {
-  font-family: system-ui, sans-serif;
-  background: var(--workshop-bg);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background-color: var(--workshop-bg);
+  background-image:
+    radial-gradient(ellipse 80% 45% at 20% 0%, rgba(99, 102, 241, 0.16), transparent 60%),
+    radial-gradient(ellipse 65% 40% at 85% 5%, rgba(6, 182, 212, 0.12), transparent 55%);
   color: var(--workshop-text);
 }
-body.workshop :is(main, aside) { scrollbar-color: #698071 var(--workshop-bg); }
+body.workshop :is(main, aside) { scrollbar-color: #475569 var(--workshop-bg); }
 body.workshop:not(.starter-lesson) :is(header, footer) {
   background-color: var(--workshop-shell);
   border-color: var(--workshop-line);
@@ -132,17 +135,17 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
   align-items: center;
   min-height: 44px;
   padding: .45rem .8rem;
-  border: 1px solid #aec95c;
-  border-radius: .5rem;
-  color: #202a15;
+  border: 1px solid #7dd3fc;
+  border-radius: .6rem;
+  color: #06101c;
   background: var(--workshop-accent);
-  font-weight: 690;
+  font-weight: 750;
   text-decoration: none;
   transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-fast) ease, box-shadow var(--dur-fast) var(--ease-out), border-color var(--dur-fast) ease;
 }
 .academy-action:hover {
-  color: #202a15;
-  background: #e9f7a7;
+  color: #06101c;
+  background: #7dd3fc;
   transform: translateY(-2px);
   box-shadow: var(--workshop-glow);
 }
@@ -209,8 +212,8 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
 .workshop-button:active {
   transform: translateY(0) scale(0.98);
 }
-.workshop-button-primary { color: #202820; background: var(--workshop-accent); border-color: var(--workshop-accent); }
-.workshop-button-primary:hover { color: #202820; background: #ffe6aa; box-shadow: var(--workshop-glow); }
+.workshop-button-primary { color: #06101c; background: var(--workshop-accent); border-color: #7dd3fc; }
+.workshop-button-primary:hover { color: #06101c; background: #7dd3fc; box-shadow: var(--workshop-glow); }
 .workshop-example img {
   display: block;
   width: 100%;
@@ -246,12 +249,12 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
 .workshop #specialty-pills .spec-btn:active {
   transform: translateY(0) scale(0.98);
 }
-.workshop #specialty-pills .spec-btn.bg-indigo-600 { background: var(--workshop-accent); color: #202820; box-shadow: none; }
+.workshop #specialty-pills .spec-btn.bg-indigo-600 { background: var(--workshop-accent); color: #06101c; box-shadow: none; }
 .workshop .workshop-visual {
   display: block;
   width: 100%;
   aspect-ratio: 16 / 9;
-  background: #153a2d;
+  background: #0b1120;
   border-radius: .75rem;
   transition: border-color var(--dur-fast) ease, box-shadow var(--dur-base) var(--ease-out);
 }
@@ -314,38 +317,38 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
 #edu-modal-dialog,
 #edu-auth-guard > div,
 #edu-command-palette-modal > div {
-  background-color: #131c18 !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background-color: #0b1120 !important;
+  border: 1px solid rgba(148, 163, 184, 0.22) !important;
   border-radius: 16px !important;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.78) !important;
-  color: #f4f7f5 !important;
+  color: #f8fafc !important;
 }
 
 #edu-modal-dialog > .edu-modal-header,
 #edu-modal-dialog > div:first-child {
-  background-color: #192621 !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background-color: #0f172a !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16) !important;
 }
 
 #edu-modal-dialog > .edu-modal-body {
-  background-color: #131c18 !important;
+  background-color: #0b1120 !important;
   color: #e2e8f0 !important;
 }
 
 #ai-tutor-drawer {
-  background-color: #131c18 !important;
-  border-left: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background-color: #0b1120 !important;
+  border-left: 1px solid rgba(148, 163, 184, 0.2) !important;
 }
 
 /* Custom Dark & Semantic Surface Utilities used inside Modals & Pages */
 :is(.bg-dark-950, .bg-dark-950\/80, .bg-dark-950\/70, .bg-dark-950\/60, .bg-dark-950\/40) {
-  background-color: #0d1311 !important;
+  background-color: #070b14 !important;
 }
 :is(.bg-dark-900, .bg-dark-900\/90, .bg-dark-900\/80, .bg-dark-900\/60) {
-  background-color: #192621 !important;
+  background-color: #0f172a !important;
 }
 :is(.bg-dark-850, .bg-dark-850\/95, .bg-dark-800) {
-  background-color: #1e2d27 !important;
+  background-color: #131c31 !important;
 }
 :is(.bg-indigo-950\/60, .bg-indigo-950\/40, .bg-indigo-950\/30, .bg-indigo-950\/20) {
   background-color: rgba(49, 46, 129, 0.32) !important;
