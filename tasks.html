@@ -111,10 +111,11 @@
       font-family: var(--font-sans);
       font-size: var(--fs-14);
       line-height: 1.5;
-      background-color: var(--bg-canvas);
+      background-color: #f4f6ff;
       background-image:
-        radial-gradient(ellipse 75% 45% at 15% -10%, rgba(14, 165, 233, 0.08), transparent 60%),
-        radial-gradient(ellipse 65% 40% at 90% 0%, rgba(79, 70, 229, 0.08), transparent 60%);
+        radial-gradient(ellipse 65% 45% at 10% -5%, rgba(251, 146, 60, 0.14), transparent 60%),
+        radial-gradient(ellipse 70% 50% at 92% 0%, rgba(79, 70, 229, 0.16), transparent 58%),
+        radial-gradient(ellipse 60% 45% at 80% 85%, rgba(14, 165, 233, 0.12), transparent 60%);
       background-attachment: fixed;
       color: var(--text-primary);
       overflow-x: hidden;
@@ -143,8 +144,8 @@
       position: sticky;
       top: 0;
       height: 100vh;
-      background: var(--bg-surface);
-      border-right: 1px solid var(--border-subtle);
+      background: linear-gradient(180deg, #ffffff 0%, #eef2ff 100%);
+      border-right: 1px solid rgba(79, 70, 229, 0.14);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -475,8 +476,8 @@
 
     /* Quick Continue Strip at Top */
     .continue-banner {
-      background: linear-gradient(90deg, #eef2ff 0%, #ffffff 100%);
-      border: 1px solid rgba(37, 99, 235, 0.28);
+      background: linear-gradient(90deg, #e0e7ff 0%, #e0f2fe 100%);
+      border: 1px solid rgba(79, 70, 229, 0.25);
       border-radius: var(--radius-md);
       padding: 12px var(--sp-2);
       display: flex;
@@ -486,16 +487,18 @@
       gap: var(--sp-2);
     }
 
-    /* Course Header Card */
+    /* Course Header Card (Prism Contrast Island) */
     .course-header-card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-default);
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 58%, #0369a1 100%);
+      border: 1px solid rgba(129, 140, 248, 0.42);
       border-radius: var(--radius-lg);
       padding: var(--sp-3);
       display: grid;
       grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr);
       gap: var(--sp-3);
       align-items: start;
+      color: #ffffff;
+      box-shadow: 0 22px 46px -16px rgba(30, 27, 75, 0.32);
     }
 
     .curator-row {
@@ -503,16 +506,16 @@
       align-items: center;
       gap: var(--sp-1);
       font-size: var(--fs-12);
-      color: var(--text-secondary);
+      color: #dbeafe;
       margin-bottom: var(--sp-1);
     }
     .curator-avatar {
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      background: var(--accent-secondary-soft);
-      border: 1px solid rgba(139, 92, 246, 0.4);
-      color: #ddd6fe;
+      background: rgba(56, 189, 248, 0.24);
+      border: 1px solid rgba(125, 211, 252, 0.55);
+      color: #e0f2fe;
       font-size: 11px;
       font-weight: 700;
       display: inline-flex;
@@ -534,9 +537,44 @@
       font-weight: 800;
       line-height: 1.2;
       letter-spacing: -0.02em;
-      color: var(--text-primary);
+      color: #ffffff;
       margin: 0;
     }
+    .course-header-card p,
+    .course-header-card .text-slate-300,
+    .course-header-card .text-slate-400 { color: #e2e8f0 !important; }
+    .course-header-card .course-dropdown-trigger {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+    }
+    .course-header-card .course-dropdown-trigger:hover {
+      background: rgba(255, 255, 255, 0.24);
+      border-color: #7dd3fc;
+    }
+    .course-header-card .btn-secondary-outline {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff !important;
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .course-header-card .btn-secondary-outline:hover {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: #7dd3fc;
+    }
+    .course-header-card .progress-panel {
+      background: rgba(15, 23, 42, 0.48);
+      border-color: rgba(255, 255, 255, 0.24);
+      color: #e2e8f0 !important;
+    }
+    .course-header-card .progress-panel strong { color: #ffffff !important; }
+    .course-header-card .progress-panel span { color: #e2e8f0 !important; }
+    .course-header-card .progress-panel a { color: #7dd3fc !important; }
+    .course-header-card #course-pct,
+    .course-header-card #progress-percent { color: #7dd3fc !important; }
+    .course-header-card .progress-track { background: rgba(15, 23, 42, 0.55); border-color: rgba(255, 255, 255, 0.18); }
+    .course-header-card #course-code-label { color: #7dd3fc !important; }
+    .course-header-card .btn-primary-cta { background: #38bdf8; border-color: #38bdf8; color: #04101d !important; }
+    .course-header-card .btn-primary-cta:hover { background: #7dd3fc; border-color: #7dd3fc; box-shadow: 0 10px 24px -6px rgba(56, 189, 248, 0.45); }
 
     /* Custom Course Switcher Dropdown */
     .course-dropdown {
