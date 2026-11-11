@@ -1,23 +1,23 @@
 .starter-lesson, .workshop-model-panel {
-  --starter-paper: #fffefa;
-  --starter-bg: #f3f1eb;
-  --starter-ink: #202720;
-  --starter-muted: #4d6054;
-  --starter-line: #d0d7cd;
-  --starter-wash: #e4eee4;
-  --starter-brand: #153a2d;
-  --starter-accent: #fbd275;
+  --starter-paper: #ffffff;
+  --starter-bg: #f1f5f9;
+  --starter-ink: #0f172a;
+  --starter-muted: #475569;
+  --starter-line: rgba(15, 23, 42, 0.12);
+  --starter-wash: #eef2ff;
+  --starter-brand: #1e3a8a;
+  --starter-accent: #2563eb;
   --starter-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 .starter-lesson > :is(header, nav, footer) {
-  background: var(--starter-brand);
-  border-color: #597569;
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.1);
 }
 .starter-lesson > nav button { flex: 0 0 auto; }
-.starter-lesson > nav button[id^="step-btn-"] { color: #e6f0e9; }
+.starter-lesson > nav button[id^="step-btn-"] { color: #334155; }
 .starter-lesson > nav button[id^="step-btn-"].stepper-item-active,
 .starter-lesson #lp-next-btn {
-  color: #202820;
+  color: #ffffff;
   background: var(--starter-accent);
   box-shadow: none;
 }
@@ -74,8 +74,8 @@
   transform: translateY(0) scale(0.985);
 }
 .starter-button:disabled { opacity: .6; }
-.starter-primary { background: var(--starter-accent); color: #202820; font-weight: 700; }
-.starter-primary:hover:not(:disabled) { background: #fce097; }
+.starter-primary { background: var(--starter-accent); color: #ffffff; font-weight: 700; }
+.starter-primary:hover:not(:disabled) { background: #1d4ed8; }
 .starter-point {
   display: flex;
   align-items: center;
@@ -99,14 +99,4 @@
 @media (max-width: 650px) {
   .starter-grid { grid-template-columns: 1fr; }
   .starter-lesson > header button > span:last-child { font-size: .65rem; }
-}
-@media (prefers-color-scheme: dark) {
-  .starter-lesson, .workshop-model-panel {
-    --starter-paper: #1e2422;
-    --starter-bg: #151817;
-    --starter-ink: #f2f4eb;
-    --starter-muted: #afc0b6;
-    --starter-line: #53635a;
-    --starter-wash: #263b31;
-  }
 }

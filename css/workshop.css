@@ -1,11 +1,12 @@
 :root {
-  --workshop-bg: #060913;
-  --workshop-surface: #111a2e;
-  --workshop-shell: #0b1120;
-  --workshop-line: rgba(148, 163, 184, 0.24);
-  --workshop-text: #f8fafc;
-  --workshop-muted: #cbd5e1;
-  --workshop-accent: #38bdf8;
+  color-scheme: light;
+  --workshop-bg: #f1f5f9;
+  --workshop-surface: #ffffff;
+  --workshop-shell: #ffffff;
+  --workshop-line: rgba(15, 23, 42, 0.12);
+  --workshop-text: #0f172a;
+  --workshop-muted: #475569;
+  --workshop-accent: #2563eb;
 
   /* Motion Design Tokens */
   --dur-fast: 150ms;
@@ -20,8 +21,8 @@
 
   --workshop-ease: var(--ease-out);
   --workshop-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --workshop-shadow: 0 18px 38px -12px rgba(2, 6, 23, 0.65);
-  --workshop-glow: 0 12px 28px -8px rgba(56, 189, 248, 0.32);
+  --workshop-shadow: 0 14px 32px -12px rgba(15, 23, 42, 0.14);
+  --workshop-glow: 0 12px 26px -8px rgba(37, 99, 235, 0.28);
 }
 
 @keyframes workshopSoftReveal {
@@ -83,11 +84,11 @@ body.workshop {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   background-color: var(--workshop-bg);
   background-image:
-    radial-gradient(ellipse 80% 45% at 20% 0%, rgba(99, 102, 241, 0.16), transparent 60%),
-    radial-gradient(ellipse 65% 40% at 85% 5%, rgba(6, 182, 212, 0.12), transparent 55%);
+    radial-gradient(ellipse 80% 45% at 20% 0%, rgba(79, 70, 229, 0.08), transparent 60%),
+    radial-gradient(ellipse 65% 40% at 85% 5%, rgba(14, 165, 233, 0.08), transparent 55%);
   color: var(--workshop-text);
 }
-body.workshop :is(main, aside) { scrollbar-color: #475569 var(--workshop-bg); }
+body.workshop :is(main, aside) { scrollbar-color: #cbd5e1 var(--workshop-bg); }
 body.workshop:not(.starter-lesson) :is(header, footer) {
   background-color: var(--workshop-shell);
   border-color: var(--workshop-line);
@@ -135,17 +136,17 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
   align-items: center;
   min-height: 44px;
   padding: .45rem .8rem;
-  border: 1px solid #7dd3fc;
+  border: 1px solid #2563eb;
   border-radius: .6rem;
-  color: #06101c;
+  color: #ffffff;
   background: var(--workshop-accent);
   font-weight: 750;
   text-decoration: none;
   transition: transform var(--dur-fast) var(--ease-out), background-color var(--dur-fast) ease, box-shadow var(--dur-fast) var(--ease-out), border-color var(--dur-fast) ease;
 }
 .academy-action:hover {
-  color: #06101c;
-  background: #7dd3fc;
+  color: #ffffff;
+  background: #1d4ed8;
   transform: translateY(-2px);
   box-shadow: var(--workshop-glow);
 }
@@ -212,8 +213,8 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
 .workshop-button:active {
   transform: translateY(0) scale(0.98);
 }
-.workshop-button-primary { color: #06101c; background: var(--workshop-accent); border-color: #7dd3fc; }
-.workshop-button-primary:hover { color: #06101c; background: #7dd3fc; box-shadow: var(--workshop-glow); }
+.workshop-button-primary { color: #ffffff; background: var(--workshop-accent); border-color: #2563eb; }
+.workshop-button-primary:hover { color: #ffffff; background: #1d4ed8; box-shadow: var(--workshop-glow); }
 .workshop-example img {
   display: block;
   width: 100%;
@@ -249,7 +250,7 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
 .workshop #specialty-pills .spec-btn:active {
   transform: translateY(0) scale(0.98);
 }
-.workshop #specialty-pills .spec-btn.bg-indigo-600 { background: var(--workshop-accent); color: #06101c; box-shadow: none; }
+.workshop #specialty-pills .spec-btn.bg-indigo-600 { background: var(--workshop-accent); color: #ffffff; box-shadow: none; }
 .workshop .workshop-visual {
   display: block;
   width: 100%;
@@ -301,9 +302,9 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
   position: fixed !important;
   inset: 0 !important;
   z-index: 9999 !important;
-  background-color: rgba(8, 13, 11, 0.84) !important;
-  backdrop-filter: blur(10px) !important;
-  -webkit-backdrop-filter: blur(10px) !important;
+  background-color: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -317,76 +318,130 @@ body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
 #edu-modal-dialog,
 #edu-auth-guard > div,
 #edu-command-palette-modal > div {
-  background-color: #0b1120 !important;
-  border: 1px solid rgba(148, 163, 184, 0.22) !important;
+  background-color: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.14) !important;
   border-radius: 16px !important;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.78) !important;
-  color: #f8fafc !important;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18) !important;
+  color: #0f172a !important;
 }
 
 #edu-modal-dialog > .edu-modal-header,
 #edu-modal-dialog > div:first-child {
-  background-color: #0f172a !important;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.16) !important;
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1) !important;
 }
 
 #edu-modal-dialog > .edu-modal-body {
-  background-color: #0b1120 !important;
-  color: #e2e8f0 !important;
+  background-color: #ffffff !important;
+  color: #334155 !important;
 }
 
 #ai-tutor-drawer {
-  background-color: #0b1120 !important;
-  border-left: 1px solid rgba(148, 163, 184, 0.2) !important;
+  background-color: #ffffff !important;
+  border-left: 1px solid rgba(15, 23, 42, 0.12) !important;
 }
 
-/* Custom Dark & Semantic Surface Utilities used inside Modals & Pages */
-:is(.bg-dark-950, .bg-dark-950\/80, .bg-dark-950\/70, .bg-dark-950\/60, .bg-dark-950\/40) {
-  background-color: #070b14 !important;
+/* ==========================================================================
+   UNIVERSAL LIGHT DAYLIGHT OVERRIDE ACROSS PORTAL & MARKETING PAGES
+   ========================================================================== */
+html, body {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
 }
-:is(.bg-dark-900, .bg-dark-900\/90, .bg-dark-900\/80, .bg-dark-900\/60) {
-  background-color: #0f172a !important;
+
+.bg-grid-white {
+  background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px) !important;
 }
-:is(.bg-dark-850, .bg-dark-850\/95, .bg-dark-800) {
-  background-color: #131c31 !important;
+
+:is([class*="bg-dark-950"], [class*="bg-slate-950"], [class*="bg-gray-950"]) {
+  background-color: #f1f5f9 !important;
+}
+:is([class*="bg-dark-900"], [class*="bg-slate-900"], [class*="bg-slate-800"], [class*="bg-gray-900"]) {
+  background-color: #ffffff !important;
+}
+:is([class*="bg-dark-850"], [class*="bg-dark-800"], [class*="bg-dark-700"]) {
+  background-color: #f8fafc !important;
 }
 :is(.bg-indigo-950\/60, .bg-indigo-950\/40, .bg-indigo-950\/30, .bg-indigo-950\/20) {
-  background-color: rgba(49, 46, 129, 0.32) !important;
+  background-color: #eef2ff !important;
 }
 :is(.bg-emerald-950\/40, .bg-emerald-950\/30, .bg-emerald-950\/20) {
-  background-color: rgba(6, 78, 59, 0.32) !important;
+  background-color: #ecfdf5 !important;
 }
 :is(.bg-amber-950\/30, .bg-amber-950\/20) {
-  background-color: rgba(120, 53, 15, 0.32) !important;
+  background-color: #fffbeb !important;
 }
 :is(.bg-purple-950\/40) {
-  background-color: rgba(88, 28, 135, 0.32) !important;
+  background-color: #f5f3ff !important;
 }
 :is(.bg-white\/5, .bg-white\/\[0\.04\]) {
-  background-color: rgba(255, 255, 255, 0.06) !important;
+  background-color: rgba(15, 23, 42, 0.04) !important;
 }
 :is(.bg-white\/10, .hover\:bg-white\/10:hover) {
-  background-color: rgba(255, 255, 255, 0.11) !important;
+  background-color: rgba(15, 23, 42, 0.07) !important;
 }
 :is(.bg-white\/15, .bg-white\/20, .hover\:bg-white\/15:hover, .hover\:bg-white\/20:hover) {
-  background-color: rgba(255, 255, 255, 0.18) !important;
+  background-color: rgba(15, 23, 42, 0.11) !important;
 }
-:is(.bg-indigo-500\/20) { background-color: rgba(99, 102, 241, 0.22) !important; }
-:is(.bg-emerald-500\/20) { background-color: rgba(16, 185, 129, 0.22) !important; }
-:is(.bg-amber-500\/20) { background-color: rgba(245, 158, 11, 0.22) !important; }
-:is(.bg-red-500\/10, .bg-red-500\/20) { background-color: rgba(239, 68, 68, 0.2) !important; }
+:is(.bg-indigo-500\/20, .bg-indigo-500\/10) { background-color: rgba(79, 70, 229, 0.09) !important; }
+:is(.bg-emerald-500\/20, .bg-emerald-500\/10) { background-color: rgba(5, 150, 105, 0.09) !important; }
+:is(.bg-amber-500\/20, .bg-amber-500\/10) { background-color: rgba(217, 119, 6, 0.09) !important; }
+:is(.bg-cyan-500\/20, .bg-cyan-500\/10) { background-color: rgba(2, 132, 199, 0.09) !important; }
+:is(.bg-red-500\/10, .bg-red-500\/20) { background-color: rgba(220, 38, 38, 0.09) !important; }
+:is(.blur-3xl, .blur-2xl).pointer-events-none { opacity: 0.35 !important; z-index: 0 !important; }
+#lp-block-canvas .relative > :not(.pointer-events-none) { position: relative; z-index: 1; }
 
-/* Border & Text Utilities inside Modals */
-:is(.border-white\/5, .border-white\/10) { border-color: rgba(255, 255, 255, 0.12) !important; }
-:is(.border-white\/15, .border-white\/20) { border-color: rgba(255, 255, 255, 0.2) !important; }
-:is(.border-indigo-500\/30, .border-indigo-500\/40, .border-indigo-500\/80) { border-color: rgba(129, 140, 248, 0.45) !important; }
-:is(.border-emerald-500\/30, .border-emerald-500\/50) { border-color: rgba(52, 211, 153, 0.45) !important; }
-:is(.border-amber-500\/30, .border-amber-500\/40) { border-color: rgba(251, 191, 36, 0.45) !important; }
-:is(.border-purple-500\/30) { border-color: rgba(192, 132, 252, 0.45) !important; }
+/* Crisp Light Borders */
+:is(.border-white\/5, .border-white\/10, .border-slate-800, .border-dark-700, .border-dark-600) {
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+:is(.border-white\/15, .border-white\/20) {
+  border-color: rgba(15, 23, 42, 0.18) !important;
+}
+:is(.border-indigo-500\/30, .border-indigo-500\/40, .border-indigo-500\/80) { border-color: rgba(79, 70, 229, 0.35) !important; }
+:is(.border-emerald-500\/30, .border-emerald-500\/50) { border-color: rgba(5, 150, 105, 0.35) !important; }
+:is(.border-amber-500\/30, .border-amber-500\/40) { border-color: rgba(217, 119, 6, 0.35) !important; }
+:is(.border-purple-500\/30) { border-color: rgba(124, 58, 237, 0.35) !important; }
 
-#edu-modal-dialog :is(.text-slate-100, .text-slate-200) { color: #f4f7f5 !important; }
-#edu-modal-dialog :is(.text-slate-300) { color: #d5e0da !important; }
-#edu-modal-dialog :is(.text-slate-400, .text-slate-500) { color: #a3b8ac !important; }
+/* Dark High-Contrast Typography inside Light Containers */
+:is(.text-white, .text-slate-100, .text-slate-200, .text-gray-100, .text-gray-200) {
+  color: #0f172a !important;
+}
+:is(.text-slate-300, .text-gray-300) { color: #334155 !important; }
+:is(.text-slate-400, .text-slate-500, .text-gray-400) { color: #475569 !important; }
+:is(.text-indigo-300, .text-indigo-200) { color: #3730a3 !important; }
+:is(.text-cyan-300, .text-cyan-400, .text-sky-300) { color: #0369a1 !important; }
+:is(.text-emerald-300, .text-emerald-400) { color: #047857 !important; }
+:is(.text-amber-300, .text-amber-400) { color: #b45309 !important; }
+:is(.text-purple-300, .text-purple-400) { color: #6d28d9 !important; }
+
+/* Preserve White Ink strictly inside Solid Colored CTA Buttons & Gradients (excluding bg-clip-text) */
+:is(
+  .bg-indigo-600, .bg-indigo-500, .bg-blue-600, .bg-cyan-600,
+  .bg-emerald-600, .bg-purple-600, .bg-rose-600, .bg-red-600,
+  [class*="bg-gradient-to-"]:not(.bg-clip-text):not(.text-transparent), .stepper-item-active, #lp-next-btn
+),
+:is(
+  .bg-indigo-600, .bg-indigo-500, .bg-blue-600, .bg-cyan-600,
+  .bg-emerald-600, .bg-purple-600, .bg-rose-600, .bg-red-600,
+  [class*="bg-gradient-to-"]:not(.bg-clip-text):not(.text-transparent), .stepper-item-active, #lp-next-btn
+) *:not(.bg-clip-text) {
+  color: #ffffff !important;
+}
+
+/* High-contrast daylight gradient text */
+.bg-clip-text {
+  background-image: linear-gradient(135deg, #1d4ed8, #4f46e5) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: #1d4ed8 !important;
+}
+
+/* Preserve dark stage inside 3D / Video containers */
+.studio-stage, .workshop-visual, #lp-block-canvas video {
+  background-color: #0f172a !important;
+}
 
 /* Layout & Spacing Utilities for Modals when Tailwind v3 JIT is absent */
 #edu-modal-dialog .rounded-2xl { border-radius: 14px; }
