@@ -50,6 +50,8 @@
               <button type="button" class="mood-btn" data-mood="prism" aria-pressed="true">Prism</button>
               <button type="button" class="mood-btn" data-mood="cyber" aria-pressed="false">Cyber Blue</button>
               <button type="button" class="mood-btn" data-mood="emerald" aria-pressed="false">Emerald Lab</button>
+              <button type="button" class="fx-btn" id="sfx-toggle-btn" aria-pressed="false">🔊 Звуки UI</button>
+              <button type="button" class="fx-btn party-btn" id="party-burst-btn">🎉 Салют!</button>
             </div>
           </div>
 
@@ -98,36 +100,36 @@
 
         <div class="marquee-wrap" aria-label="Ключевые инструменты обучения">
           <div class="marquee-track">
-            <span class="marquee-pill">⚡ Мультиметр 12.6 В</span>
-            <span class="marquee-pill">❄️ Манометр Superheat ΔT</span>
-            <span class="marquee-pill">🎨 Figma Auto Layout</span>
-            <span class="marquee-pill">🖨️ CMYK / PDF/X-1a Prepress</span>
-            <span class="marquee-pill">🔧 3D-стенды Three.js</span>
-            <span class="marquee-pill">🚗 OBD-II Осциллограф</span>
-            <span class="marquee-pill">⚙️ Фазы ГРМ &amp; Микрометр</span>
-            <span class="marquee-pill">💻 HTML5 + CSS Flexbox</span>
-            <span class="marquee-pill">⚡ Мультиметр 12.6 В</span>
-            <span class="marquee-pill">❄️ Манометр Superheat ΔT</span>
-            <span class="marquee-pill">🎨 Figma Auto Layout</span>
-            <span class="marquee-pill">🖨️ CMYK / PDF/X-1a Prepress</span>
-            <span class="marquee-pill">🔧 3D-стенды Three.js</span>
-            <span class="marquee-pill">🚗 OBD-II Осциллограф</span>
-            <span class="marquee-pill">⚙️ Фазы ГРМ &amp; Микрометр</span>
-            <span class="marquee-pill">💻 HTML5 + CSS Flexbox</span>
+            <span class="marquee-pill" data-fact="⚡ Замеряй падение напряжения под нагрузкой, а не только холостой вольтаж!">⚡ Мультиметр 12.6 В</span>
+            <span class="marquee-pill" data-fact="❄️ Оптимальный перегрев испарителя (Superheat) — от 4 до 8 K.">❄️ Манометр Superheat ΔT</span>
+            <span class="marquee-pill" data-fact="🎨 Сетка кратная 8px делает макеты аккуратными на любых экранах.">🎨 Figma Auto Layout</span>
+            <span class="marquee-pill" data-fact="🖨️ Вылеты (Bleed) по 3–5 мм спасают тираж при обрезке в типографии.">🖨️ CMYK / PDF/X-1a Prepress</span>
+            <span class="marquee-pill" data-fact="🔧 3D-разбор узлов помогает понять посадку деталей до работы в боксе.">🔧 3D-стенды Three.js</span>
+            <span class="marquee-pill" data-fact="🚗 Замороженный кадр (Freeze Frame) хранит точные обороты и нагрузку в момент сбоя.">🚗 OBD-II Осциллограф</span>
+            <span class="marquee-pill" data-fact="⚙️ Ошибка всего на 1 зуб ГРМ уже сдвигает фазу газораспределения.">⚙️ Фазы ГРМ &amp; Микрометр</span>
+            <span class="marquee-pill" data-fact="💻 Flexbox + Grid позволяют верстать адаптивные интерфейсы без костылей.">💻 HTML5 + CSS Flexbox</span>
+            <span class="marquee-pill" data-fact="⚡ Замеряй падение напряжения под нагрузкой, а не только холостой вольтаж!">⚡ Мультиметр 12.6 В</span>
+            <span class="marquee-pill" data-fact="❄️ Оптимальный перегрев испарителя (Superheat) — от 4 до 8 K.">❄️ Манометр Superheat ΔT</span>
+            <span class="marquee-pill" data-fact="🎨 Сетка кратная 8px делает макеты аккуратными на любых экранах.">🎨 Figma Auto Layout</span>
+            <span class="marquee-pill" data-fact="🖨️ Вылеты (Bleed) по 3–5 мм спасают тираж при обрезке в типографии.">🖨️ CMYK / PDF/X-1a Prepress</span>
+            <span class="marquee-pill" data-fact="🔧 3D-разбор узлов помогает понять посадку деталей до работы в боксе.">🔧 3D-стенды Three.js</span>
+            <span class="marquee-pill" data-fact="🚗 Замороженный кадр (Freeze Frame) хранит точные обороты и нагрузку в момент сбоя.">🚗 OBD-II Осциллограф</span>
+            <span class="marquee-pill" data-fact="⚙️ Ошибка всего на 1 зуб ГРМ уже сдвигает фазу газораспределения.">⚙️ Фазы ГРМ &amp; Микрометр</span>
+            <span class="marquee-pill" data-fact="💻 Flexbox + Grid позволяют верстать адаптивные интерфейсы без костылей.">💻 HTML5 + CSS Flexbox</span>
           </div>
         </div>
 
         <div class="kpi-strip" aria-label="Ключевые показатели платформы">
           <div class="kpi-cell">
-            <strong>60 уроков</strong>
+            <strong data-count="60" data-suffix=" уроков">60 уроков</strong>
             <span>12 последовательных модулей в каждом направлении</span>
           </div>
           <div class="kpi-cell">
-            <strong>5 профессий</strong>
+            <strong data-count="5" data-suffix=" профессий">5 профессий</strong>
             <span>IT, графический дизайн, автодело и HVAC</span>
           </div>
           <div class="kpi-cell">
-            <strong>10 секунд</strong>
+            <strong data-count="10" data-suffix=" секунд">10 секунд</strong>
             <span>Наглядная видео-схема сути темы вместо сухой теории</span>
           </div>
           <div class="kpi-cell">
@@ -233,10 +235,12 @@
             <button type="button" class="sim-chip" data-3d-model="gyro" aria-pressed="false">3D Гиро-контур</button>
             <button type="button" class="sim-chip" data-3d-model="crystal" aria-pressed="false">3D Кристалл</button>
             <button type="button" class="sim-chip" data-3d-model="helix" aria-pressed="false">3D Спираль</button>
+            <button type="button" class="sim-chip" data-3d-model="atom" aria-pressed="false">3D Атом ⚡</button>
           </div>
           <div class="sim-btn-row">
             <button type="button" class="sim-chip" id="holo-explode-btn" aria-pressed="false">Взрыв-схема (Explode 3D)</button>
             <button type="button" class="sim-chip" id="holo-spin-btn" aria-pressed="true">Авто-вращение</button>
+            <button type="button" class="sim-chip" id="holo-impulse-btn">⚡ Импульс 3D</button>
           </div>
           <div class="sim-controls">
             <div class="sim-label-row">
@@ -363,7 +367,39 @@
       </div>
     </section>
 
-    <section class="container section" id="quick-quest" aria-labelledby="quest-title">
+    <section class="container section" id="arcade-game" aria-labelledby="arcade-title" data-reveal>
+      <div class="arcade-card">
+        <div class="stack" style="gap: 0.75rem;">
+          <p class="eyebrow" style="color:#7dd3fc;">Мини-игра · Рефлексы мастера</p>
+          <h2 id="arcade-title" style="color:#ffffff;">SkillHub Аркада: поймай правильный сигнал</h2>
+          <p style="color:#cbd5e1;">Ловите эталонные показания (12.6 В, ΔT 6K, Grid 8px, 🌟 Бонус x2) за 15 секунд, набивайте комбо-множитель и избегайте короткого замыкания!</p>
+          <div class="arcade-hud">
+            <div class="arcade-stat"><span>Очки XP</span><strong id="arc-score">0</strong></div>
+            <div class="arcade-stat"><span>Комбо</span><strong id="arc-combo" class="is-hot">x1</strong></div>
+            <div class="arcade-stat"><span>Время</span><strong id="arc-time">15s</strong></div>
+            <div class="arcade-stat"><span>Рекорд</span><strong id="arc-best">0</strong></div>
+          </div>
+          <div class="sim-btn-row">
+            <button type="button" class="button primary" id="arc-start-btn">▶ Старт (15 сек)</button>
+            <button type="button" class="sim-chip" id="arc-turbo-btn" aria-pressed="false">🔥 Турбо-режим</button>
+          </div>
+          <div class="sim-status" id="arc-status">Нажмите «Старт» — проверьте скорость реакции!</div>
+        </div>
+        <div class="arcade-grid" id="arc-grid" role="group" aria-label="Игровое поле 3 на 3">
+          <button type="button" class="arcade-pad" data-pad="0">·</button>
+          <button type="button" class="arcade-pad" data-pad="1">·</button>
+          <button type="button" class="arcade-pad" data-pad="2">·</button>
+          <button type="button" class="arcade-pad" data-pad="3">·</button>
+          <button type="button" class="arcade-pad" data-pad="4">·</button>
+          <button type="button" class="arcade-pad" data-pad="5">·</button>
+          <button type="button" class="arcade-pad" data-pad="6">·</button>
+          <button type="button" class="arcade-pad" data-pad="7">·</button>
+          <button type="button" class="arcade-pad" data-pad="8">·</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section" id="quick-quest" aria-labelledby="quest-title" data-reveal>
       <div class="quest-card">
         <div class="stack" style="gap: 0.45rem;">
           <p class="eyebrow">Экспресс-кейс · Проверка интуиции за 10 секунд</p>
@@ -422,6 +458,8 @@
       </div>
     </div>
   </footer>
+
+  <div class="fun-toast" id="fun-toast" role="status" aria-live="polite"></div>
 
   <script>
     (function () {
@@ -652,14 +690,210 @@
         });
       }
 
+      // Web Audio API Synth FX + Toast + Floating XP Engine (Zero External Assets)
+      let audioCtx = null;
+      let sfxEnabled = false;
+      const sfxToggleBtn = document.getElementById('sfx-toggle-btn');
+      const partyBurstBtn = document.getElementById('party-burst-btn');
+      const funToast = document.getElementById('fun-toast');
+      let toastTimer = 0;
+
+      function playFx(kind) {
+        if (!sfxEnabled) return;
+        try {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return;
+          if (!audioCtx) audioCtx = new AC();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          if (kind === 'good') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, now);
+            osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.09);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+            osc.start(now); osc.stop(now + 0.15);
+          } else if (kind === 'bonus' || kind === 'party') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, now);
+            osc.frequency.setValueAtTime(783.99, now + 0.06);
+            osc.frequency.setValueAtTime(1046.5, now + 0.12);
+            gain.gain.setValueAtTime(0.09, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+            osc.start(now); osc.stop(now + 0.29);
+          } else if (kind === 'bad') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(190, now);
+            osc.frequency.exponentialRampToValueAtTime(95, now + 0.16);
+            gain.gain.setValueAtTime(0.07, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+            osc.start(now); osc.stop(now + 0.19);
+          } else if (kind === 'impulse') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(220, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+            osc.start(now); osc.stop(now + 0.19);
+          } else {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(460, now);
+            gain.gain.setValueAtTime(0.04, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.055);
+            osc.start(now); osc.stop(now + 0.06);
+          }
+        } catch (e) {}
+      }
+
+      function showFunToast(msg) {
+        if (!funToast) return;
+        funToast.textContent = msg;
+        funToast.classList.add('is-shown');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { funToast.classList.remove('is-shown'); }, 3200);
+      }
+
+      function spawnFloatingText(x, y, text, variant) {
+        const el = document.createElement('span');
+        el.className = 'xp-float' + (variant ? ' ' + variant : '');
+        el.textContent = text;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        document.body.appendChild(el);
+        setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 750);
+      }
+
+      if (sfxToggleBtn) {
+        sfxToggleBtn.addEventListener('click', function () {
+          sfxEnabled = !sfxEnabled;
+          sfxToggleBtn.setAttribute('aria-pressed', sfxEnabled ? 'true' : 'false');
+          sfxToggleBtn.textContent = sfxEnabled ? '🔊 Звуки: ВКЛ' : '🔊 Звуки UI';
+          if (sfxEnabled) {
+            playFx('bonus');
+            showFunToast('🔊 Синтезированные звуки UI включены!');
+          }
+        });
+      }
+
+      // Fixed-Pool GPU Spark & Confetti Particle System inside #global-3d-canvas
+      const MAX_FX_PARTS = 96;
+      const fxPool = [];
+      const fxPalette = ['#4f46e5', '#0284c7', '#10b981', '#f59e0b', '#ec4899', '#38bdf8'];
+      for (let pi = 0; pi < MAX_FX_PARTS; pi++) {
+        fxPool.push({ active: false, kind: 0, x: 0, y: 0, vx: 0, vy: 0, life: 0, maxLife: 1, size: 4, color: fxPalette[0], rot: 0, vr: 0 });
+      }
+      let fxCursor = 0;
+
+      function spawnFxParticle(kind, x, y, vx, vy, size, color, maxLife) {
+        const p = fxPool[fxCursor];
+        fxCursor = (fxCursor + 1) % MAX_FX_PARTS;
+        p.active = true;
+        p.kind = kind; // 0=spark, 1=confetti, 2=shockwave-ring
+        p.x = x; p.y = y; p.vx = vx; p.vy = vy;
+        p.size = size; p.color = color;
+        p.life = maxLife; p.maxLife = maxLife;
+        p.rot = Math.random() * Math.PI * 2;
+        p.vr = (Math.random() - 0.5) * 0.25;
+      }
+
+      function spawnBurst(x, y, count, withConfetti) {
+        spawnFxParticle(2, x, y, 0, 0, 8, fxPalette[Math.floor(Math.random() * fxPalette.length)], 26);
+        for (let i = 0; i < count; i++) {
+          const ang = (i / count) * Math.PI * 2 + Math.random() * 0.4;
+          const spd = (withConfetti ? 2.4 : 1.8) + Math.random() * 5.2;
+          spawnFxParticle(
+            withConfetti ? 1 : 0,
+            x, y,
+            Math.cos(ang) * spd,
+            Math.sin(ang) * spd - (withConfetti ? 2.2 : 0.4),
+            withConfetti ? 5 + Math.random() * 4 : 2.5 + Math.random() * 2.5,
+            fxPalette[i % fxPalette.length],
+            withConfetti ? 46 + Math.random() * 20 : 24 + Math.random() * 14
+          );
+        }
+      }
+
+      if (partyBurstBtn) {
+        partyBurstBtn.addEventListener('click', function (e) {
+          if (!sfxEnabled) {
+            sfxEnabled = true;
+            if (sfxToggleBtn) {
+              sfxToggleBtn.setAttribute('aria-pressed', 'true');
+              sfxToggleBtn.textContent = '🔊 Звуки: ВКЛ';
+            }
+          }
+          playFx('party');
+          const r = partyBurstBtn.getBoundingClientRect();
+          spawnBurst(r.left + r.width * 0.5, r.top + r.height * 0.5, 30, true);
+          spawnBurst(window.innerWidth * 0.5, window.innerHeight * 0.35, 34, true);
+          spawnFloatingText(r.left + r.width * 0.5, r.top - 8, '🎉 +100% НАСТРОЕНИЯ!', 'is-bonus');
+          showFunToast('🎉 Режим праздника активирован — кликайте по элементам!');
+        });
+      }
+
+      // Clickable Marquee Tool Chips -> Micro-Fact Toast + Spark Pop
+      document.querySelectorAll('.marquee-pill').forEach(function (pill) {
+        pill.addEventListener('click', function (e) {
+          playFx('good');
+          spawnBurst(e.clientX, e.clientY, 16, true);
+          const fact = pill.getAttribute('data-fact');
+          if (fact) showFunToast(fact);
+        });
+      });
+
+      // Global subtle click spark ripple
+      window.addEventListener('click', function (e) {
+        if (e.target.closest('button, a, input')) return;
+        spawnBurst(e.clientX, e.clientY, 10, false);
+      }, { passive: true });
+
+      // KPI Count-Up Animation on Hero Load
+      document.querySelectorAll('.kpi-cell strong[data-count]').forEach(function (el) {
+        const target = Number(el.getAttribute('data-count')) || 0;
+        const suffix = el.getAttribute('data-suffix') || '';
+        const t0 = performance.now();
+        function stepKpi(now) {
+          const p = Math.min(1, (now - t0) / 850);
+          const eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(target * eased) + suffix;
+          if (p < 1) requestAnimationFrame(stepKpi);
+        }
+        requestAnimationFrame(stepKpi);
+      });
+
+      // Staggered Below-the-Fold Scroll Reveals (Zero Flash Above Fold)
+      if ('IntersectionObserver' in window) {
+        const revealTargets = document.querySelectorAll('.pipeline-card, .card-link, #holo-3d-lab, #arcade-game, #quick-quest, .cta-band');
+        const revIo = new IntersectionObserver(function (entries) {
+          entries.forEach(function (ent) {
+            if (ent.isIntersecting) {
+              ent.target.classList.add('is-visible');
+              revIo.unobserve(ent.target);
+            }
+          });
+        }, { threshold: 0.08 });
+        revealTargets.forEach(function (el) {
+          if (el.getBoundingClientRect().top > window.innerHeight * 0.92) {
+            el.setAttribute('data-reveal', '');
+            revIo.observe(el);
+          }
+        });
+      }
+
       // Palette Mood Switcher
       const moodBtns = Array.from(document.querySelectorAll('.mood-btn'));
       moodBtns.forEach(function (btn) {
-        btn.addEventListener('click', function () {
+        btn.addEventListener('click', function (e) {
           const mood = btn.getAttribute('data-mood');
           if (mood === 'prism') document.body.removeAttribute('data-mood');
           else document.body.setAttribute('data-mood', mood);
           moodBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === btn ? 'true' : 'false'); });
+          playFx('click');
+          spawnBurst(e.clientX, e.clientY, 14, true);
         });
       });
 
@@ -667,10 +901,15 @@
       const questOpts = Array.from(document.querySelectorAll('.quest-opt'));
       const questFeedback = document.getElementById('quest-feedback');
       questOpts.forEach(function (opt) {
-        opt.addEventListener('click', function () {
+        opt.addEventListener('click', function (e) {
           const isOk = opt.getAttribute('data-quest') === 'correct';
           questOpts.forEach(function (x) { x.removeAttribute('data-state'); });
           opt.setAttribute('data-state', isOk ? 'ok' : 'bad');
+          playFx(isOk ? 'bonus' : 'bad');
+          if (isOk) {
+            spawnBurst(e.clientX, e.clientY, 28, true);
+            spawnFloatingText(e.clientX, e.clientY - 12, '+25 XP!', 'is-bonus');
+          }
           if (questFeedback) {
             questFeedback.hidden = false;
             questFeedback.dataset.state = isOk ? 'ok' : 'crit';
@@ -747,9 +986,23 @@
         }
         resizeBg();
         window.addEventListener('resize', resizeBg, { passive: true });
+        let lastTrailTime = 0;
         window.addEventListener('pointermove', function (e) {
           bPtrX = (e.clientX / Math.max(1, bw) - 0.5) * 2;
           bPtrY = (e.clientY / Math.max(1, bh) - 0.5) * 2;
+          const nowT = performance.now();
+          if (nowT - lastTrailTime > 38) {
+            lastTrailTime = nowT;
+            spawnFxParticle(
+              0,
+              e.clientX, e.clientY,
+              (Math.random() - 0.5) * 1.1,
+              -0.6 - Math.random() * 0.9,
+              2.2 + Math.random() * 1.6,
+              fxPalette[Math.floor(Math.random() * fxPalette.length)],
+              22
+            );
+          }
         }, { passive: true });
 
         const octVerts = [[0,-1.3,0],[1.15,0,0],[0,0,1.15],[-1.15,0,0],[0,0,-1.15],[0,1.3,0]];
@@ -838,6 +1091,45 @@
             }
             bctx.stroke();
           }
+
+          // Render Active Pointer Sparks, Click Shockwaves & Confetti Bursts (Fixed Pool = Zero GC)
+          for (let fi = 0; fi < MAX_FX_PARTS; fi++) {
+            const p = fxPool[fi];
+            if (!p.active) continue;
+            p.life -= 1;
+            if (p.life <= 0) { p.active = false; continue; }
+            const alpha = Math.max(0, p.life / p.maxLife);
+            bctx.globalAlpha = alpha;
+            if (p.kind === 2) {
+              p.size += 3.2;
+              bctx.strokeStyle = p.color;
+              bctx.lineWidth = 2;
+              bctx.beginPath();
+              bctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              bctx.stroke();
+            } else if (p.kind === 1) {
+              p.x += p.vx;
+              p.y += p.vy;
+              p.vy += 0.16;
+              p.vx *= 0.985;
+              p.rot += p.vr;
+              bctx.save();
+              bctx.translate(p.x, p.y);
+              bctx.rotate(p.rot);
+              bctx.fillStyle = p.color;
+              bctx.fillRect(-p.size * 0.6, -p.size * 0.35, p.size * 1.2, p.size * 0.7);
+              bctx.restore();
+            } else {
+              p.x += p.vx;
+              p.y += p.vy;
+              bctx.fillStyle = p.color;
+              bctx.beginPath();
+              bctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+              bctx.fill();
+            }
+          }
+          bctx.globalAlpha = 1;
+
           if (!reduceMotion) requestAnimationFrame(drawBg);
         }
         drawBg();
@@ -898,6 +1190,17 @@
         }
 
         function getPartsForModel(m) {
+          if (m === 'atom') {
+            const atomPts = [boxMesh(0, 0, 0, 0.32, 0.32, 0.32, '236,72,153', '#f9a8d4', [0, 0, 0])];
+            for (let k = 0; k < 6; k++) {
+              const ang = (k / 6) * Math.PI * 2;
+              const rx = Math.cos(ang) * 0.95;
+              const rz = Math.sin(ang) * 0.95;
+              const ry = Math.sin(ang * 2) * 0.45;
+              atomPts.push(boxMesh(rx, ry, rz, 0.14, 0.14, 0.14, k % 2 === 0 ? '56,189,248' : '251,191,36', k % 2 === 0 ? '#7dd3fc' : '#fcd34d', [rx * 0.8, ry * 0.8, rz * 0.8]));
+            }
+            return atomPts;
+          }
           if (m === 'helix') {
             const pts = [];
             for (let k = -3; k <= 3; k++) {
@@ -938,11 +1241,21 @@
         }
 
         let currentParts = getPartsForModel(activeModel);
+        const impulseBtn = document.getElementById('holo-impulse-btn');
+        if (impulseBtn) {
+          impulseBtn.addEventListener('click', function (e) {
+            velY += 0.28;
+            velX += (Math.random() - 0.5) * 0.16;
+            playFx('impulse');
+            spawnBurst(e.clientX, e.clientY, 18, true);
+          });
+        }
         modelBtns.forEach(function (b) {
           b.addEventListener('click', function () {
             activeModel = b.getAttribute('data-3d-model');
             currentParts = getPartsForModel(activeModel);
             modelBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+            playFx('click');
             if (holoHud) holoHud.textContent = '3D ENGINE · ' + b.textContent.toUpperCase() + ' · DRAG 360°';
           });
         });
@@ -1053,6 +1366,163 @@
           io.observe(holoViewport);
         }
         renderHolo();
+      }
+
+      // SkillHub Arcade 15-Second Reflex Mini-Game (#arcade-game)
+      const arcStartBtn = document.getElementById('arc-start-btn');
+      const arcTurboBtn = document.getElementById('arc-turbo-btn');
+      const arcScoreEl = document.getElementById('arc-score');
+      const arcComboEl = document.getElementById('arc-combo');
+      const arcTimeEl = document.getElementById('arc-time');
+      const arcBestEl = document.getElementById('arc-best');
+      const arcStatusEl = document.getElementById('arc-status');
+      const arcPads = Array.from(document.querySelectorAll('#arc-grid .arcade-pad'));
+
+      if (arcStartBtn && arcPads.length === 9) {
+        const ARC_SIGNALS = [
+          { type: 'good', icon: '⚡', label: '12.6 В OK', pts: 10 },
+          { type: 'good', icon: '❄️', label: 'ΔT 6K OK', pts: 15 },
+          { type: 'good', icon: '🎨', label: 'Grid 8px', pts: 15 },
+          { type: 'good', icon: '🚗', label: 'OBD OK', pts: 20 },
+          { type: 'bonus', icon: '🌟', label: 'ТУРБО x2', pts: 35 },
+          { type: 'hazard', icon: '💥', label: 'КЗ 0 Ом!', pts: -25 }
+        ];
+        const BEST_KEY = 'amk_arcade_best_xp';
+        let bestScore = Number(localStorage.getItem(BEST_KEY) || 0) || 0;
+        if (arcBestEl) arcBestEl.textContent = String(bestScore);
+
+        let arcRunning = false, arcScore = 0, arcCombo = 1, arcTimeLeft = 15, turboMode = false;
+        let tickTimer = 0, spawnTimer = 0;
+        const padState = arcPads.map(function () { return null; });
+
+        function renderPad(i, item) {
+          padState[i] = item;
+          const btn = arcPads[i];
+          btn.className = 'arcade-pad' + (item ? ' is-' + (item.type === 'good' ? 'active' : item.type) : '');
+          if (!item) {
+            btn.textContent = '·';
+          } else {
+            btn.innerHTML = '<span class="arcade-pad-icon">' + item.icon + '</span><span class="arcade-pad-label">' + item.label + '</span>';
+          }
+        }
+
+        function updateArcHud() {
+          if (arcScoreEl) arcScoreEl.textContent = String(arcScore);
+          if (arcComboEl) arcComboEl.textContent = 'x' + arcCombo;
+          if (arcTimeEl) arcTimeEl.textContent = arcTimeLeft + 's';
+          if (arcBestEl) arcBestEl.textContent = String(bestScore);
+        }
+
+        function spawnWave() {
+          for (let i = 0; i < arcPads.length; i++) renderPad(i, null);
+          const activeCount = turboMode ? 4 : 3;
+          const indices = [];
+          while (indices.length < activeCount) {
+            const idx = Math.floor(Math.random() * 9);
+            if (indices.indexOf(idx) === -1) indices.push(idx);
+          }
+          indices.forEach(function (idx, n) {
+            let pick;
+            if (n === 0) pick = ARC_SIGNALS[Math.floor(Math.random() * 4)];
+            else if (Math.random() < 0.24) pick = ARC_SIGNALS[5];
+            else if (Math.random() < 0.22) pick = ARC_SIGNALS[4];
+            else pick = ARC_SIGNALS[Math.floor(Math.random() * 4)];
+            renderPad(idx, pick);
+          });
+        }
+
+        function stopArcade() {
+          arcRunning = false;
+          clearInterval(tickTimer);
+          clearInterval(spawnTimer);
+          for (let i = 0; i < arcPads.length; i++) renderPad(i, null);
+          arcStartBtn.disabled = false;
+          arcStartBtn.textContent = '↻ Ещё раунд (15 сек)';
+          const isNewBest = arcScore > bestScore && arcScore > 0;
+          if (isNewBest) {
+            bestScore = arcScore;
+            try { localStorage.setItem(BEST_KEY, String(bestScore)); } catch (e) {}
+            updateArcHud();
+            playFx('party');
+            const gRect = document.getElementById('arc-grid').getBoundingClientRect();
+            spawnBurst(gRect.left + gRect.width * 0.5, gRect.top + gRect.height * 0.4, 34, true);
+            showFunToast('🏆 Новый рекорд аркады: ' + bestScore + ' XP!');
+          } else {
+            playFx('good');
+          }
+          if (arcStatusEl) {
+            arcStatusEl.dataset.state = isNewBest ? 'ok' : (arcScore >= 120 ? 'ok' : 'warn');
+            arcStatusEl.textContent = isNewBest
+              ? '🏆 НОВЫЙ РЕКОРД: ' + arcScore + ' XP! Отличная реакция!'
+              : 'Раунд завершён! Результат: ' + arcScore + ' XP (рекорд: ' + bestScore + ' XP).';
+          }
+        }
+
+        if (arcTurboBtn) {
+          arcTurboBtn.addEventListener('click', function () {
+            turboMode = !turboMode;
+            arcTurboBtn.setAttribute('aria-pressed', turboMode ? 'true' : 'false');
+            playFx('click');
+          });
+        }
+
+        arcStartBtn.addEventListener('click', function (e) {
+          if (arcRunning) return;
+          if (!sfxEnabled) {
+            sfxEnabled = true;
+            if (sfxToggleBtn) {
+              sfxToggleBtn.setAttribute('aria-pressed', 'true');
+              sfxToggleBtn.textContent = '🔊 Звуки: ВКЛ';
+            }
+          }
+          arcRunning = true;
+          arcScore = 0;
+          arcCombo = 1;
+          arcTimeLeft = 15;
+          arcStartBtn.disabled = true;
+          arcStartBtn.textContent = '⏱ Идёт раунд...';
+          if (arcStatusEl) {
+            arcStatusEl.dataset.state = 'ok';
+            arcStatusEl.textContent = turboMode ? '🔥 ТУРБО! Лови сигналы и не жми на КЗ!' : 'Лови эталонные сигналы и набивай комбо!';
+          }
+          playFx('impulse');
+          spawnBurst(e.clientX, e.clientY, 16, true);
+          updateArcHud();
+          spawnWave();
+
+          const paceMs = turboMode ? 650 : 920;
+          spawnTimer = setInterval(spawnWave, paceMs);
+          tickTimer = setInterval(function () {
+            arcTimeLeft -= 1;
+            updateArcHud();
+            if (arcTimeLeft <= 0) stopArcade();
+          }, 1000);
+        });
+
+        arcPads.forEach(function (pad, idx) {
+          pad.addEventListener('click', function (e) {
+            if (!arcRunning) return;
+            const item = padState[idx];
+            if (!item) return;
+            renderPad(idx, null);
+            if (item.type === 'hazard') {
+              arcCombo = 1;
+              arcScore = Math.max(0, arcScore + item.pts);
+              pad.classList.add('is-boom');
+              setTimeout(function () { pad.classList.remove('is-boom'); }, 280);
+              playFx('bad');
+              spawnFloatingText(e.clientX, e.clientY, 'КЗ! ' + item.pts, 'is-bad');
+            } else {
+              const earned = item.pts * arcCombo;
+              arcScore += earned;
+              arcCombo = Math.min(5, arcCombo + 1);
+              playFx(item.type === 'bonus' ? 'bonus' : 'good');
+              spawnBurst(e.clientX, e.clientY, item.type === 'bonus' ? 20 : 10, item.type === 'bonus');
+              spawnFloatingText(e.clientX, e.clientY, '+' + earned + ' XP' + (arcCombo >= 3 ? ' 🔥' : ''), item.type === 'bonus' ? 'is-bonus' : '');
+            }
+            updateArcHud();
+          });
+        });
       }
     })();
   </script>
