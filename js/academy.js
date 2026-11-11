@@ -147,7 +147,7 @@
               <span class="eyebrow">10-секундная визуальная схема темы</span>
               <span class="lesson-visual-meta">ПРОБЛЕМА «ДО» → МЕХАНИКА → ЭТАЛОН «ПОСЛЕ»</span>
             </div>
-            <video class="academy-media" controls muted playsinline preload="metadata" poster="${mediaBase.jpg}" src="${mediaBase.mp4}" aria-label="Видео-разбор темы урока">
+            <video class="academy-media" controls autoplay muted loop playsinline preload="auto" poster="${mediaBase.jpg}" src="${mediaBase.mp4}" aria-label="Видео-разбор темы урока">
               <track kind="captions" src="${mediaBase.vtt}" srclang="ru" label="Русские субтитры" default>
             </video>
             <div class="actions">
@@ -195,6 +195,13 @@
         result.textContent = right ? `Верно. ${explanation}` : 'Попробуйте ещё раз. Сравните варианты с разобранным примером выше.';
         if (right) {
           if (quizChip) quizChip.dataset.done = 'true';
+          if (window.PrismFX) {
+            const rect = button.getBoundingClientRect();
+            const cx = rect.left + rect.width * 0.5;
+            const cy = rect.top + rect.height * 0.5;
+            window.PrismFX.burst(cx, cy, 24, true);
+            window.PrismFX.spawnFloat(cx, rect.top - 8, '+25 XP ✓', true);
+          }
           if (!passed) {
             passed = true;
             completed.push(key);

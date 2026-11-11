@@ -10,11 +10,12 @@
   <script src="js/academy-lessons.js" defer></script>
   <script src="js/courses-catalog.js" defer></script>
   <script src="js/academy-student.js" defer></script>
+  <script src="js/prism-fx.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#student-main">К содержимому</a>
   <header class="topbar"><div class="container">
-    <a href="index.html" class="brand"><span>AMK</span> SkillHub</a>
+    <a href="index.html" class="brand"><img class="brand-logo" src="assets/eduspace-logo.svg" alt="" width="30" height="30"> AMK SkillHub</a>
     <nav aria-label="Основное меню">
       <a href="learn.html">Учебник</a><a href="tasks.html">Практикум</a>
       <a href="student.html" aria-current="page">Моё обучение</a>
@@ -23,15 +24,30 @@
   </div></header>
   <main id="student-main" tabindex="-1">
     <div class="container section" data-gate>
-      <section class="card">
+      <section class="card student-guest-hero">
+        <p class="eyebrow">Портал студента АМК</p>
         <h1 class="dashboard-title">Личный кабинет студента</h1>
         <p class="muted" data-gate-status role="status">Проверяем сессию…</p>
         <div class="actions" data-gate-actions hidden>
-          <a class="button dark" href="auth.html?mode=login">Войти в аккаунт</a>
+          <a class="button primary" href="auth.html?mode=login">Войти в аккаунт</a>
           <a class="button" href="learn.html">Открыть учебник</a>
         </div>
         <button type="button" class="button" data-reload hidden>Повторить загрузку</button>
       </section>
+      <div class="student-guest-grid" aria-label="Доступные инструменты без входа">
+        <a class="student-perk-card tilt-3d" href="learn.html">
+          <strong>📚 Учебник (60 уроков)</strong>
+          <span>10-секундные видео-схемы сути темы, разобранные примеры и квизы с обратной связью.</span>
+        </a>
+        <a class="student-perk-card tilt-3d" href="simulator.html">
+          <strong>🔧 3D-тренажёры</strong>
+          <span>Виртуальные стенды ДВС, автоэлектрики, холодильного контура и веб-вёрстки.</span>
+        </a>
+        <a class="student-perk-card tilt-3d" href="auth.html?mode=register">
+          <strong>🚀 Прогресс и рейтинг</strong>
+          <span>Создайте аккаунт студента АМК за 1 минуту — открывайте модули по расписанию и копите XP.</span>
+        </a>
+      </div>
     </div>
     <div data-dashboard hidden>
       <section class="lesson-head"><div class="container stack">
@@ -81,7 +97,7 @@
       <p class="container notice" data-dashboard-status role="status"></p>
     </div>
   </main>
-  <footer class="footer"><div class="container"><a href="index.html" class="brand"><span>AMK</span> SkillHub</a><a href="learn.html">Открыть учебник</a></div></footer>
+  <footer class="footer"><div class="container"><a href="index.html" class="brand"><img class="brand-logo" src="assets/eduspace-logo.svg" alt="" width="30" height="30"> AMK SkillHub</a><a href="learn.html">Открыть учебник</a></div></footer>
   <noscript><p class="container">Включите JavaScript, чтобы открыть кабинет.</p></noscript>
 </body>
 </html>

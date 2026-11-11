@@ -96,6 +96,40 @@ body.workshop:not(.starter-lesson) :is(header, footer) {
 body.workshop:not(.starter-lesson) :is(header, footer) > .backdrop-blur-xl {
   background-color: var(--workshop-shell);
 }
+body.workshop header nav a,
+body.workshop header a[href*="auth"] {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.prism-fx-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+.prism-xp-float {
+  position: fixed;
+  pointer-events: none;
+  z-index: 60;
+  font: 900 1rem/1 ui-monospace, monospace;
+  color: #38bdf8;
+  text-shadow: 0 2px 8px rgba(15, 23, 42, 0.45);
+}
+body.workshop > main,
+body.workshop > footer {
+  position: relative;
+  z-index: 1;
+}
+body.workshop main :where(.rounded-3xl, .rounded-2xl):not(input):not(button) {
+  transition: transform 220ms var(--workshop-spring), border-color 180ms ease, box-shadow 220ms var(--workshop-ease);
+}
+body.workshop main a:is(.rounded-3xl, .rounded-2xl):hover,
+body.workshop main .tilt-3d:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--workshop-shadow);
+}
 .workshop main { min-width: 0; }
 .workshop main :where(section, article, form, fieldset) { min-width: 0; }
 .workshop main :where(h1, h2, h3) { letter-spacing: -.025em; }
@@ -422,6 +456,11 @@ html, body {
 :is(.text-amber-300, .text-amber-400) { color: #b45309 !important; }
 :is(.text-purple-300, .text-purple-400) { color: #6d28d9 !important; }
 
+/* Rich dark-indigo gradient restoration for hero banners & featured cards with dark stops */
+body.workshop main [class*="bg-gradient-to-"]:is([class*="900"], [class*="950"], [class*="800"]):not(.bg-clip-text):not(.text-transparent) {
+  background: linear-gradient(135deg, #0b1120 0%, #1e1b4b 56%, #0c3b66 100%) !important;
+  border-color: rgba(99, 102, 241, 0.38) !important;
+}
 /* Preserve White Ink strictly inside Solid Colored CTA Buttons & Gradients (excluding bg-clip-text) */
 :is(
   .bg-indigo-600, .bg-indigo-500, .bg-blue-600, .bg-cyan-600,
@@ -434,6 +473,12 @@ html, body {
   [class*="bg-gradient-to-"]:not(.bg-clip-text):not(.text-transparent), .stepper-item-active, #lp-next-btn
 ) *:not(.bg-clip-text) {
   color: #ffffff !important;
+}
+
+body.workshop main #cv-avatar-initials,
+body.workshop main [class*="bg-gradient-to-"]:not(.bg-clip-text) .bg-dark-850#cv-avatar-initials {
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff) !important;
+  color: #312e81 !important;
 }
 
 /* High-contrast daylight gradient text */
