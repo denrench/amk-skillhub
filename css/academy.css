@@ -699,57 +699,148 @@ button.button { cursor: pointer; }
   z-index: 0;
 }
 
+.hero-fx-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .landing-hero-inner {
   position: relative;
   z-index: 1;
   display: grid;
-  gap: clamp(1.5rem, 3.5vw, 2.5rem);
+  gap: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.landing-hero-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
+  gap: clamp(1.5rem, 3.5vw, 2.75rem);
+  align-items: center;
 }
 
 .landing-hero-copy {
   display: grid;
-  justify-items: center;
-  text-align: center;
-  gap: 1.1rem;
-  max-width: 78ch;
-  margin-inline: auto;
+  justify-items: start;
+  text-align: left;
+  gap: 1.05rem;
   animation: academySoftReveal var(--dur-base) var(--ease-out) both;
 }
 
 .landing-hero-copy h1 {
-  font-size: clamp(2.35rem, 5.6vw, 4.4rem);
-  line-height: 1.03;
-  letter-spacing: -0.04em;
+  font-size: clamp(2.15rem, 4.3vw, 3.65rem);
+  line-height: 1.16;
+  letter-spacing: -0.035em;
   color: #0f172a;
-  max-width: 18ch;
+  max-width: 15ch;
+}
+
+.hero-highlight {
+  display: inline;
+  padding: 0.02em 0.22em;
+  border-radius: 10px;
+  background: linear-gradient(120deg, rgba(37, 99, 235, 0.16), rgba(79, 70, 229, 0.2));
+  color: #2563eb;
+  border-bottom: 3px solid #4f46e5;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .landing-hero-copy p {
   color: #334155;
-  font-size: clamp(1.02rem, 1.45vw, 1.2rem);
-  max-width: 60ch;
+  font-size: clamp(0.98rem, 1.3vw, 1.12rem);
+  max-width: 52ch;
 }
 
 .landing-cta-row {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.75rem;
-  margin-top: 0.25rem;
+  justify-content: flex-start;
+  gap: 0.65rem;
+  margin-top: 0.15rem;
 }
 
-/* Interactive Studio Dock — Contrast Midnight Sapphire Focal Console on Bright Canvas */
+.mood-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  box-shadow: var(--shadow-soft);
+}
+.mood-bar span { font-size: 0.78rem; font-weight: 700; color: #475569; padding-inline: 0.35rem; }
+.mood-btn {
+  min-height: 30px;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #334155;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+.mood-btn[aria-pressed="true"] {
+  background: #0f172a;
+  color: #ffffff;
+}
+
+/* Marquee Ticker Ribbon */
+@keyframes marqueeScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-wrap {
+  overflow: hidden;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  padding-block: 0.55rem;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee-track {
+  display: flex;
+  gap: 0.65rem;
+  width: max-content;
+  animation: marqueeScroll 26s linear infinite;
+}
+.marquee-wrap:hover .marquee-track { animation-play-state: paused; }
+.marquee-pill {
+  white-space: nowrap;
+  padding: 0.28rem 0.72rem;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid rgba(79, 70, 229, 0.2);
+  color: #1e293b;
+  font: 700 0.78rem/1.3 ui-monospace, monospace;
+}
+
+/* Interactive Studio Dock — Contrast Midnight Sapphire Focal Console with Subtle 3D Perspective */
 .studio-dock {
   background: linear-gradient(155deg, #0b1120 0%, #17153b 55%, #0c223f 100%);
-  border: 1px solid rgba(99, 102, 241, 0.45);
+  border: 1px solid rgba(99, 102, 241, 0.48);
   border-radius: 26px;
   box-shadow:
-    0 32px 72px -18px rgba(30, 27, 75, 0.36),
+    0 32px 72px -18px rgba(30, 27, 75, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.08) inset;
   color: #f8fafc;
   overflow: hidden;
   animation: academyDynamicReveal var(--dur-base) var(--ease-out) both;
   animation-delay: 80ms;
+  transition: transform 320ms var(--ease-out), box-shadow 320ms var(--ease-out);
+}
+.studio-dock:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 38px 80px -18px rgba(37, 99, 235, 0.42),
+    0 0 0 1px rgba(125, 211, 252, 0.25) inset;
 }
 
 .studio-topbar {
@@ -817,10 +908,10 @@ button.button { cursor: pointer; }
 
 .studio-body {
   display: grid;
-  grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr);
-  gap: 1.25rem;
-  padding: clamp(1rem, 2.4vw, 1.55rem);
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  padding: clamp(0.95rem, 2vw, 1.3rem);
+  align-items: start;
 }
 
 .studio-stage {
@@ -1200,6 +1291,81 @@ button.button { cursor: pointer; }
   color: #04101d;
 }
 
+/* Quick Diagnostic Mini-Quest */
+.quest-card {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.35rem, 3vw, 2.2rem);
+  border-radius: 24px;
+  background: linear-gradient(155deg, #0b1120 0%, #17153b 60%, #0f2942 100%);
+  border: 1px solid rgba(99, 102, 241, 0.45);
+  color: #f8fafc;
+  box-shadow: 0 24px 56px -18px rgba(30, 27, 75, 0.36);
+  display: grid;
+  gap: 1rem;
+}
+.quest-card .eyebrow { color: #7dd3fc; }
+.quest-card h2 { font-size: clamp(1.35rem, 2.5vw, 1.95rem); color: #ffffff; }
+.quest-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.quest-opt {
+  text-align: left;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.82);
+  color: #f1f5f9;
+  font-size: 0.92rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: transform 140ms var(--ease-out), border-color 140ms ease, background-color 140ms ease;
+}
+.quest-opt:hover { border-color: #38bdf8; transform: translateY(-2px); background: rgba(30, 41, 59, 0.92); }
+.quest-opt[data-state="ok"] { background: rgba(6, 78, 59, 0.75); border-color: #34d399; color: #ecfdf5; }
+.quest-opt[data-state="bad"] { background: rgba(127, 29, 29, 0.65); border-color: #f87171; color: #fee2e2; }
+
+/* Cursor Spotlight Card Glow & Theme Moods */
+:is(.sim-widget, .card-link, .pipeline-card) {
+  position: relative;
+}
+:is(.sim-widget, .card-link, .pipeline-card)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(56, 189, 248, 0.15), transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+:is(.sim-widget, .card-link, .pipeline-card):hover::after { opacity: 1; }
+
+body[data-mood="cyber"] {
+  background-image:
+    radial-gradient(ellipse 65% 45% at 10% -5%, rgba(6, 182, 212, 0.22), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 92% 0%, rgba(56, 189, 248, 0.22), transparent 58%),
+    radial-gradient(rgba(2, 132, 199, 0.09) 1px, transparent 1px);
+}
+body[data-mood="emerald"] {
+  background-image:
+    radial-gradient(ellipse 65% 45% at 10% -5%, rgba(16, 185, 129, 0.2), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 92% 0%, rgba(14, 165, 233, 0.18), transparent 58%),
+    radial-gradient(rgba(5, 150, 105, 0.09) 1px, transparent 1px);
+}
+body[data-mood="emerald"] .hero-highlight {
+  background: linear-gradient(120deg, rgba(5, 150, 105, 0.16), rgba(2, 132, 199, 0.18));
+  color: #047857;
+  border-bottom-color: #059669;
+}
+body[data-mood="cyber"] .hero-highlight {
+  background: linear-gradient(120deg, rgba(2, 132, 199, 0.18), rgba(99, 102, 241, 0.18));
+  color: #0369a1;
+  border-bottom-color: #0284c7;
+}
+
 /* Signature Contrast CTA Island */
 .cta-band {
   padding: clamp(1.6rem, 3.8vw, 2.75rem);
@@ -1252,8 +1418,11 @@ button.button { cursor: pointer; }
 .footer-col a:hover { color: #0f172a; text-decoration: underline; text-underline-offset: 0.2em; }
 
 @media (max-width: 960px) {
+  .landing-hero-split { grid-template-columns: minmax(0, 1fr); }
+  .landing-hero-copy { justify-items: center; text-align: center; }
+  .landing-cta-row { justify-content: center; }
   .studio-body { grid-template-columns: minmax(0, 1fr); }
-  .playground-grid { grid-template-columns: minmax(0, 1fr); }
+  .playground-grid, .quest-options { grid-template-columns: minmax(0, 1fr); }
   .kpi-strip, .pipeline-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

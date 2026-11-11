@@ -30,58 +30,90 @@
 
   <main id="main-content">
     <section class="landing-hero">
+      <canvas id="hero-fx-canvas" class="hero-fx-canvas" aria-hidden="true"></canvas>
       <div class="container landing-hero-inner">
-        <div class="landing-hero-copy">
-          <div class="hero-pill">
-            <span class="hero-pill-dot" aria-hidden="true"></span>
-            <span>EDU SPACE · Алматинский многопрофильный колледж · 60 уроков</span>
+        <div class="landing-hero-split">
+          <div class="landing-hero-copy">
+            <div class="hero-pill">
+              <span class="hero-pill-dot" aria-hidden="true"></span>
+              <span>EDU SPACE · АМК · 60 интерактивных уроков</span>
+            </div>
+            <h1>Знания, которые <span class="hero-highlight">можно применить</span></h1>
+            <p>Интерактивная мастерская нового поколения: живые тренажёры, 10-секундные видео-схемы сути и пошаговое ежедневное открытие модулей.</p>
+            <div class="landing-cta-row">
+              <a class="button primary" href="learn.html">Открыть учебник</a>
+              <a class="button" href="tasks.html">Перейти в практикум</a>
+              <a class="button" href="auth.html?mode=register">Создать аккаунт</a>
+            </div>
+            <div class="mood-bar" role="group" aria-label="Атмосфера оформления">
+              <span>Палитра:</span>
+              <button type="button" class="mood-btn" data-mood="prism" aria-pressed="true">Prism</button>
+              <button type="button" class="mood-btn" data-mood="cyber" aria-pressed="false">Cyber Blue</button>
+              <button type="button" class="mood-btn" data-mood="emerald" aria-pressed="false">Emerald Lab</button>
+            </div>
           </div>
-          <h1>Знания, которые можно применить</h1>
-          <p>Новая интерактивная среда обучения: 10-секундные видео-схемы сути темы, живые симуляторы стендов и пошаговое ежедневное открытие модулей после старта.</p>
-          <div class="landing-cta-row">
-            <a class="button primary" href="learn.html">Открыть учебник</a>
-            <a class="button" href="tasks.html">Перейти в практикум</a>
-            <a class="button" href="auth.html?mode=register">Создать аккаунт</a>
+
+          <div class="studio-dock" aria-label="Интерактивный предпросмотр специальностей">
+            <div class="studio-topbar">
+              <span class="studio-status">
+                <span class="studio-status-dot" aria-hidden="true"></span>
+                EDU SPACE STUDIO · LIVE PREVIEW
+              </span>
+              <div class="studio-tabs" role="tablist" aria-label="Выбор специальности для предпросмотра">
+                <button type="button" class="studio-tab" role="tab" id="tab-it" aria-selected="true" aria-controls="studio-panel" data-course="it">Веб-дизайн</button>
+                <button type="button" class="studio-tab" role="tab" id="tab-graphic" aria-selected="false" aria-controls="studio-panel" data-course="graphic_design">Графика</button>
+                <button type="button" class="studio-tab" role="tab" id="tab-auto-el" aria-selected="false" aria-controls="studio-panel" data-course="autoelectric">Автоэлектрика</button>
+                <button type="button" class="studio-tab" role="tab" id="tab-hvac" aria-selected="false" aria-controls="studio-panel" data-course="hvac">Холодильное</button>
+                <button type="button" class="studio-tab" role="tab" id="tab-auto-mech" aria-selected="false" aria-controls="studio-panel" data-course="automechanic">Автомеханика</button>
+              </div>
+            </div>
+
+            <div class="studio-body" id="studio-panel" role="tabpanel" aria-labelledby="tab-it">
+              <div class="studio-stage">
+                <video id="studio-video" src="assets/lesson-intros/it-1.mp4" poster="assets/lesson-intros/it-1.jpg" autoplay muted loop playsinline preload="metadata" aria-label="10-секундная визуальная схема темы">
+                  <track id="studio-track" kind="captions" src="assets/lesson-intros/it-1.vtt" srclang="ru" label="Русский" default>
+                </video>
+              </div>
+
+              <div class="studio-inspector">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+                  <p class="eyebrow" id="studio-eyebrow">Модуль 01 · Веб-дизайн</p>
+                  <span class="sim-pill" id="studio-stage-badge">IT · 10 СЕК ВИДЕО-СХЕМА</span>
+                </div>
+                <h2 id="studio-title">Композиция, сетка 8px и живая вёрстка</h2>
+                <p class="muted" id="studio-desc">Разберите логику отступов и визуальной иерархии в коротком ролике, затем сразу закрепите на интерактивном тренажёре.</p>
+                <ul class="studio-meta-list">
+                  <li><span class="studio-meta-key">ИНТЕРАКТИВ</span><span id="studio-lab">Песочница сетки и Flexbox</span></li>
+                  <li><span class="studio-meta-key">РАСПИСАНИЕ</span><span>День 1 сразу · День 2 на следующий день</span></li>
+                  <li><span class="studio-meta-key">МАТЕРИАЛЫ</span><span id="studio-tools">Figma · HTML/CSS · Шпаргалка</span></li>
+                </ul>
+                <div class="actions">
+                  <a class="button primary" id="studio-link" href="learn.html?course=it&amp;lesson=1">Разобрать урок 1 →</a>
+                  <a class="button" id="studio-sim-link" href="tasks.html?specialty=it">Открыть тренажёры</a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="studio-dock" aria-label="Интерактивный предпросмотр специальностей">
-          <div class="studio-topbar">
-            <span class="studio-status">
-              <span class="studio-status-dot" aria-hidden="true"></span>
-              EDU SPACE STUDIO · LIVE PREVIEW
-            </span>
-            <div class="studio-tabs" role="tablist" aria-label="Выбор специальности для предпросмотра">
-              <button type="button" class="studio-tab" role="tab" id="tab-it" aria-selected="true" aria-controls="studio-panel" data-course="it">Веб-дизайн</button>
-              <button type="button" class="studio-tab" role="tab" id="tab-graphic" aria-selected="false" aria-controls="studio-panel" data-course="graphic_design">Графика</button>
-              <button type="button" class="studio-tab" role="tab" id="tab-auto-el" aria-selected="false" aria-controls="studio-panel" data-course="autoelectric">Автоэлектрика</button>
-              <button type="button" class="studio-tab" role="tab" id="tab-hvac" aria-selected="false" aria-controls="studio-panel" data-course="hvac">Холодильное</button>
-              <button type="button" class="studio-tab" role="tab" id="tab-auto-mech" aria-selected="false" aria-controls="studio-panel" data-course="automechanic">Автомеханика</button>
-            </div>
-          </div>
-
-          <div class="studio-body" id="studio-panel" role="tabpanel" aria-labelledby="tab-it">
-            <div class="studio-stage">
-              <video id="studio-video" src="assets/lesson-intros/it-1.mp4" poster="assets/lesson-intros/it-1.jpg" autoplay muted loop playsinline preload="metadata" aria-label="10-секундная визуальная схема темы">
-                <track id="studio-track" kind="captions" src="assets/lesson-intros/it-1.vtt" srclang="ru" label="Русский" default>
-              </video>
-              <span class="studio-stage-badge" id="studio-stage-badge">10 СЕК · ВИЗУАЛЬНАЯ СХЕМА</span>
-            </div>
-
-            <div class="studio-inspector">
-              <p class="eyebrow" id="studio-eyebrow">Модуль 01 · Веб-дизайн</p>
-              <h2 id="studio-title">Композиция, сетка 8px и живая вёрстка</h2>
-              <p class="muted" id="studio-desc">Разберите логику отступов и визуальной иерархии в коротком ролике, затем сразу закрепите на интерактивном тренажёре.</p>
-              <ul class="studio-meta-list">
-                <li><span class="studio-meta-key">ИНТЕРАКТИВ</span><span id="studio-lab">Песочница сетки и Flexbox</span></li>
-                <li><span class="studio-meta-key">РАСПИСАНИЕ</span><span>День 1 сразу · День 2 на следующий день</span></li>
-                <li><span class="studio-meta-key">МАТЕРИАЛЫ</span><span id="studio-tools">Figma · HTML/CSS · Шпаргалка</span></li>
-              </ul>
-              <div class="actions">
-                <a class="button primary" id="studio-link" href="learn.html?course=it&amp;lesson=1">Разобрать урок 1 →</a>
-                <a class="button" id="studio-sim-link" href="tasks.html?specialty=it">Открыть тренажёры</a>
-              </div>
-            </div>
+        <div class="marquee-wrap" aria-label="Ключевые инструменты обучения">
+          <div class="marquee-track">
+            <span class="marquee-pill">⚡ Мультиметр 12.6 В</span>
+            <span class="marquee-pill">❄️ Манометр Superheat ΔT</span>
+            <span class="marquee-pill">🎨 Figma Auto Layout</span>
+            <span class="marquee-pill">🖨️ CMYK / PDF/X-1a Prepress</span>
+            <span class="marquee-pill">🔧 3D-стенды Three.js</span>
+            <span class="marquee-pill">🚗 OBD-II Осциллограф</span>
+            <span class="marquee-pill">⚙️ Фазы ГРМ &amp; Микрометр</span>
+            <span class="marquee-pill">💻 HTML5 + CSS Flexbox</span>
+            <span class="marquee-pill">⚡ Мультиметр 12.6 В</span>
+            <span class="marquee-pill">❄️ Манометр Superheat ΔT</span>
+            <span class="marquee-pill">🎨 Figma Auto Layout</span>
+            <span class="marquee-pill">🖨️ CMYK / PDF/X-1a Prepress</span>
+            <span class="marquee-pill">🔧 3D-стенды Three.js</span>
+            <span class="marquee-pill">🚗 OBD-II Осциллограф</span>
+            <span class="marquee-pill">⚙️ Фазы ГРМ &amp; Микрометр</span>
+            <span class="marquee-pill">💻 HTML5 + CSS Flexbox</span>
           </div>
         </div>
 
@@ -297,6 +329,21 @@
           </div>
           <div class="sim-status" id="sim-flex-code" style="font-family: ui-monospace, monospace; font-size: 0.78rem;">display: flex; justify-content: space-between;</div>
         </article>
+      </div>
+    </section>
+
+    <section class="container section" id="quick-quest" aria-labelledby="quest-title">
+      <div class="quest-card">
+        <div class="stack" style="gap: 0.45rem;">
+          <p class="eyebrow">Экспресс-кейс · Проверка интуиции за 10 секунд</p>
+          <h2 id="quest-title">Стартер щёлкает, на АКБ 12.6 В, а на клемме стартера при пуске 8.7 В. Что делать первым?</h2>
+        </div>
+        <div class="quest-options" role="group" aria-label="Варианты диагностики">
+          <button type="button" class="quest-opt" data-quest="wrong">1. Сразу покупать новый аккумулятор</button>
+          <button type="button" class="quest-opt" data-quest="correct">2. Замерить падение напряжения (Voltage Drop) по силовой цепи и массе</button>
+          <button type="button" class="quest-opt" data-quest="wrong">3. Заменить блок управления двигателем</button>
+        </div>
+        <div class="sim-status" id="quest-feedback" hidden></div>
       </div>
     </section>
 
@@ -572,6 +619,106 @@
           dirBtn.setAttribute('aria-pressed', currentDir === 'column' ? 'true' : 'false');
           updateFlexSim();
         });
+      }
+
+      // Palette Mood Switcher
+      const moodBtns = Array.from(document.querySelectorAll('.mood-btn'));
+      moodBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const mood = btn.getAttribute('data-mood');
+          if (mood === 'prism') document.body.removeAttribute('data-mood');
+          else document.body.setAttribute('data-mood', mood);
+          moodBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === btn ? 'true' : 'false'); });
+        });
+      });
+
+      // Quick Diagnostic Mini-Quest
+      const questOpts = Array.from(document.querySelectorAll('.quest-opt'));
+      const questFeedback = document.getElementById('quest-feedback');
+      questOpts.forEach(function (opt) {
+        opt.addEventListener('click', function () {
+          const isOk = opt.getAttribute('data-quest') === 'correct';
+          questOpts.forEach(function (x) { x.removeAttribute('data-state'); });
+          opt.setAttribute('data-state', isOk ? 'ok' : 'bad');
+          if (questFeedback) {
+            questFeedback.hidden = false;
+            questFeedback.dataset.state = isOk ? 'ok' : 'crit';
+            questFeedback.textContent = isOk
+              ? '✓ Точно! Потеря 3.9 В под нагрузкой указывает на окисление клеммы или провода массы, а не на неисправность АКБ (+25 XP).'
+              : '✕ Не торопитесь с заменой: АКБ показывает 12.6 В в покое, ищите где теряются 3.9 В под нагрузкой.';
+          }
+        });
+      });
+
+      // Cursor Spotlight Glow across Cards
+      document.querySelectorAll('.sim-widget, .card-link, .pipeline-card').forEach(function (card) {
+        card.addEventListener('mousemove', function (ev) {
+          const rect = card.getBoundingClientRect();
+          card.style.setProperty('--mx', (ev.clientX - rect.left) + 'px');
+          card.style.setProperty('--my', (ev.clientY - rect.top) + 'px');
+        });
+      });
+
+      // Subtle Kinetic Constellation Canvas behind Hero
+      const canvas = document.getElementById('hero-fx-canvas');
+      if (canvas && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const ctx = canvas.getContext('2d');
+        const nodes = [];
+        let pointer = { x: -999, y: -999 };
+        function resizeCanvas() {
+          const parent = canvas.parentElement;
+          canvas.width = parent ? parent.clientWidth : window.innerWidth;
+          canvas.height = parent ? parent.clientHeight : 620;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        canvas.parentElement.addEventListener('mousemove', function (e) {
+          const r = canvas.getBoundingClientRect();
+          pointer.x = e.clientX - r.left;
+          pointer.y = e.clientY - r.top;
+        });
+        for (let i = 0; i < 28; i++) {
+          nodes.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.45,
+            vy: (Math.random() - 0.5) * 0.45,
+            r: 2 + Math.random() * 2.2
+          });
+        }
+        function tick() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          for (let i = 0; i < nodes.length; i++) {
+            const a = nodes[i];
+            a.x += a.vx; a.y += a.vy;
+            if (a.x < 0 || a.x > canvas.width) a.vx *= -1;
+            if (a.y < 0 || a.y > canvas.height) a.vy *= -1;
+            const dxp = pointer.x - a.x, dyp = pointer.y - a.y;
+            const distP = Math.hypot(dxp, dyp);
+            if (distP < 140 && distP > 1) {
+              a.x += dxp * 0.008;
+              a.y += dyp * 0.008;
+            }
+            ctx.beginPath();
+            ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(79, 70, 229, 0.28)';
+            ctx.fill();
+            for (let j = i + 1; j < nodes.length; j++) {
+              const b = nodes[j];
+              const d = Math.hypot(a.x - b.x, a.y - b.y);
+              if (d < 135) {
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.strokeStyle = 'rgba(37, 99, 235, ' + ((1 - d / 135) * 0.16).toFixed(3) + ')';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+              }
+            }
+          }
+          requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
       }
     })();
   </script>
