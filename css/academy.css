@@ -36,19 +36,14 @@ html {
   scroll-behavior: smooth;
 }
 
-@keyframes gridDrift {
-  from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
-  to { background-position: 0 0, 0 0, 0 0, 0 0, 52px 52px; }
-}
-
 @keyframes auroraFloatA {
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(40px, -28px, 0) scale(1.09); }
+  50% { transform: translate3d(36px, -22px, 0) scale(1.06); }
 }
 
 @keyframes auroraFloatB {
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50% { transform: translate3d(-44px, 30px, 0) scale(1.12); }
+  50% { transform: translate3d(-38px, 24px, 0) scale(1.08); }
 }
 
 body {
@@ -57,13 +52,10 @@ body {
   position: relative;
   background-color: #eef2ff;
   background-image:
-    radial-gradient(ellipse 65% 45% at 10% -5%, rgba(251, 146, 60, 0.18), transparent 60%),
-    radial-gradient(ellipse 70% 50% at 90% 0%, rgba(79, 70, 229, 0.22), transparent 58%),
-    radial-gradient(ellipse 65% 45% at 50% 42%, rgba(14, 165, 233, 0.16), transparent 60%),
-    radial-gradient(ellipse 60% 40% at 85% 92%, rgba(16, 185, 129, 0.15), transparent 58%),
-    radial-gradient(rgba(79, 70, 229, 0.11) 1.2px, transparent 1.2px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 26px 26px;
-  animation: gridDrift 18s linear infinite;
+    radial-gradient(ellipse 65% 45% at 10% -5%, rgba(251, 146, 60, 0.17), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 90% 0%, rgba(79, 70, 229, 0.2), transparent 58%),
+    radial-gradient(rgba(79, 70, 229, 0.085) 1.2px, transparent 1.2px);
+  background-size: 100% 100%, 100% 100%, 28px 28px;
   color: var(--ink);
   overflow-x: hidden;
 }
@@ -72,26 +64,26 @@ body::before,
 body::after {
   content: '';
   position: fixed;
-  width: min(560px, 70vw);
-  height: min(560px, 70vw);
+  width: min(620px, 75vw);
+  height: min(620px, 75vw);
   border-radius: 999px;
-  filter: blur(72px);
   pointer-events: none;
+  will-change: transform;
   z-index: 0;
 }
 
 body::before {
-  top: -120px;
-  left: -100px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.24), rgba(56, 189, 248, 0.12), transparent 72%);
-  animation: auroraFloatA 14s ease-in-out infinite;
+  top: -160px;
+  left: -140px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(56, 189, 248, 0.09) 42%, transparent 70%);
+  animation: auroraFloatA 16s ease-in-out infinite;
 }
 
 body::after {
-  bottom: -140px;
-  right: -120px;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.22), rgba(244, 114, 182, 0.12), transparent 72%);
-  animation: auroraFloatB 17s ease-in-out infinite;
+  bottom: -160px;
+  right: -140px;
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.17) 0%, rgba(244, 114, 182, 0.09) 42%, transparent 70%);
+  animation: auroraFloatB 19s ease-in-out infinite;
 }
 
 .topbar, main, .footer { position: relative; z-index: 2; }
@@ -150,11 +142,9 @@ button, input, select { font: inherit; }
 }
 .muted { color: var(--muted); }
 
-/* Frosted Daylight Topbar */
+/* Crisp GPU-Friendly Topbar */
 .topbar {
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.96);
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
@@ -1479,12 +1469,31 @@ body[data-mood="cyber"] .hero-highlight {
 .holo-3d-panel h2 { color: #ffffff; font-size: clamp(1.35rem, 2.5vw, 1.9rem); }
 .holo-3d-panel p { color: #cbd5e1; }
 
-/* True CSS Preserve-3D Physical Tilt Physics */
+/* True CSS Preserve-3D Physical Tilt Physics (Zero Spring-Fighting Lag) */
 .tilt-3d {
   transform-style: preserve-3d;
   transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateZ(var(--tz, 0px));
-  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease, border-color 220ms ease;
+  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1), border-color 200ms ease;
   will-change: transform;
+}
+.tilt-3d.is-tilting {
+  transition: border-color 140ms ease;
+}
+
+/* Shimmer Glint & Choreographed 3D Section Reveals */
+.button.primary { position: relative; overflow: hidden; }
+.button.primary::after {
+  content: '';
+  position: absolute;
+  inset: -40% auto -40% -60%;
+  width: 45%;
+  background: linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.36) 50%, transparent 80%);
+  transform: translate3d(-120%, 0, 0);
+  transition: transform 550ms var(--ease-out);
+  pointer-events: none;
+}
+.button.primary:hover::after {
+  transform: translate3d(420%, 0, 0);
 }
 
 /* Signature Contrast CTA Island */

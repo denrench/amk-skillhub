@@ -232,6 +232,7 @@
             <button type="button" class="sim-chip" data-3d-model="engine" aria-pressed="true">3D Ротор ДВС</button>
             <button type="button" class="sim-chip" data-3d-model="gyro" aria-pressed="false">3D Гиро-контур</button>
             <button type="button" class="sim-chip" data-3d-model="crystal" aria-pressed="false">3D Кристалл</button>
+            <button type="button" class="sim-chip" data-3d-model="helix" aria-pressed="false">3D Спираль</button>
           </div>
           <div class="sim-btn-row">
             <button type="button" class="sim-chip" id="holo-explode-btn" aria-pressed="false">Взрыв-схема (Explode 3D)</button>
@@ -680,22 +681,37 @@
         });
       });
 
-      // Cursor Spotlight Glow + True CSS Preserve-3D Tilt Physics across Cards
+      // Zero-Lag Cached Cursor Spotlight + Preserve-3D Tilt Physics (Batched via rAF)
       document.querySelectorAll('.sim-widget, .card-link, .pipeline-card, .studio-dock').forEach(function (card) {
         card.classList.add('tilt-3d');
-        card.addEventListener('mousemove', function (ev) {
-          const rect = card.getBoundingClientRect();
-          const px = (ev.clientX - rect.left) / rect.width;
-          const py = (ev.clientY - rect.top) / rect.height;
-          card.style.setProperty('--mx', (ev.clientX - rect.left) + 'px');
-          card.style.setProperty('--my', (ev.clientY - rect.top) + 'px');
-          const ry = ((px - 0.5) * 9).toFixed(2) + 'deg';
-          const rx = ((0.5 - py) * 7).toFixed(2) + 'deg';
-          card.style.setProperty('--rx', rx);
-          card.style.setProperty('--ry', ry);
-          card.style.setProperty('--tz', '8px');
+        let cachedRect = null;
+        let rafPending = false;
+        let lastEv = null;
+        card.addEventListener('pointerenter', function () {
+          cachedRect = card.getBoundingClientRect();
+          card.classList.add('is-tilting');
         });
-        card.addEventListener('mouseleave', function () {
+        card.addEventListener('pointermove', function (ev) {
+          lastEv = ev;
+          if (rafPending || !cachedRect) return;
+          rafPending = true;
+          requestAnimationFrame(function () {
+            rafPending = false;
+            if (!lastEv || !cachedRect) return;
+            const lx = lastEv.clientX - cachedRect.left;
+            const ly = lastEv.clientY - cachedRect.top;
+            const px = lx / Math.max(1, cachedRect.width);
+            const py = ly / Math.max(1, cachedRect.height);
+            card.style.setProperty('--mx', lx.toFixed(0) + 'px');
+            card.style.setProperty('--my', ly.toFixed(0) + 'px');
+            card.style.setProperty('--rx', ((0.5 - py) * 6).toFixed(2) + 'deg');
+            card.style.setProperty('--ry', ((px - 0.5) * 8).toFixed(2) + 'deg');
+            card.style.setProperty('--tz', '6px');
+          });
+        }, { passive: true });
+        card.addEventListener('pointerleave', function () {
+          cachedRect = null;
+          card.classList.remove('is-tilting');
           card.style.setProperty('--rx', '0deg');
           card.style.setProperty('--ry', '0deg');
           card.style.setProperty('--tz', '0px');
@@ -704,107 +720,130 @@
 
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // 3D Projection Math Helper
-      function rot3D(pt, ax, ay, az) {
-        let x = pt[0], y = pt[1], z = pt[2];
+      // 3D Projection Math Helper (Allocation-free)
+      function rot3DInto(x, y, z, ax, ay, az, out) {
         const cx = Math.cos(ax), sx = Math.sin(ax);
         const y1 = y * cx - z * sx, z1 = y * sx + z * cx;
         const cy = Math.cos(ay), sy = Math.sin(ay);
         const x2 = x * cy + z1 * sy, z2 = -x * sy + z1 * cy;
+        if (az === 0) {
+          out[0] = x2; out[1] = y1; out[2] = z2;
+          return;
+        }
         const cz = Math.cos(az), sz = Math.sin(az);
-        return [x2 * cz - y1 * sz, x2 * sz + y1 * cz, z2];
+        out[0] = x2 * cz - y1 * sz;
+        out[1] = x2 * sz + y1 * cz;
+        out[2] = z2;
       }
 
-      // Full-Viewport Animated 3D Background Canvas (Floating Polyhedra + Perspective Horizon Grid)
+      // Full-Viewport 60 FPS GPU-Friendly Animated 3D Backdrop (3D Wave Ribbon + Astrolabe Rings + Polyhedra)
       const bgCanvas = document.getElementById('global-3d-canvas');
       if (bgCanvas) {
-        const bctx = bgCanvas.getContext('2d');
-        let bw = 1280, bh = 800, bPtrX = 0, bPtrY = 0;
+        const bctx = bgCanvas.getContext('2d', { alpha: true });
+        let bw = 1280, bh = 800, bPtrX = 0, bPtrY = 0, phase = 0;
         function resizeBg() {
           bw = bgCanvas.width = window.innerWidth;
           bh = bgCanvas.height = window.innerHeight;
         }
         resizeBg();
-        window.addEventListener('resize', resizeBg);
-        window.addEventListener('mousemove', function (e) {
+        window.addEventListener('resize', resizeBg, { passive: true });
+        window.addEventListener('pointermove', function (e) {
           bPtrX = (e.clientX / Math.max(1, bw) - 0.5) * 2;
           bPtrY = (e.clientY / Math.max(1, bh) - 0.5) * 2;
-        });
+        }, { passive: true });
 
-        const cubeVerts = [[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
-        const cubeEdges = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
-        const octVerts = [[0,-1.35,0],[1.2,0,0],[0,0,1.2],[-1.2,0,0],[0,0,-1.2],[0,1.35,0]];
+        const octVerts = [[0,-1.3,0],[1.15,0,0],[0,0,1.15],[-1.15,0,0],[0,0,-1.15],[0,1.3,0]];
         const octEdges = [[0,1],[0,2],[0,3],[0,4],[5,1],[5,2],[5,3],[5,4],[1,2],[2,3],[3,4],[4,1]];
-
         const shapes = [];
-        const shapeColors = ['rgba(79,70,229,0.22)', 'rgba(2,132,199,0.22)', 'rgba(16,185,129,0.2)', 'rgba(217,119,6,0.18)'];
-        for (let i = 0; i < 12; i++) {
+        const shapeColors = ['rgba(79,70,229,0.22)', 'rgba(2,132,199,0.22)', 'rgba(16,185,129,0.18)', 'rgba(217,119,6,0.16)'];
+        for (let i = 0; i < 8; i++) {
           shapes.push({
-            x: (i / 12) + 0.04,
-            y: ((i * 37) % 100) / 100,
-            z: 2.2 + (i % 4) * 0.9,
-            size: 24 + (i % 4) * 14,
-            rx: i * 0.6, ry: i * 0.9, rz: i * 0.3,
-            vx: 0.004 + (i % 3) * 0.0025,
-            vy: 0.006 + (i % 2) * 0.003,
-            type: i % 2 === 0 ? 'cube' : 'oct',
+            x: (i + 0.5) / 8,
+            y: ((i * 41 + 17) % 100) / 100,
+            z: 2.0 + (i % 3) * 0.9,
+            size: 26 + (i % 3) * 14,
+            rx: i * 0.7, ry: i * 1.1,
+            vx: 0.006 + (i % 3) * 0.002,
+            vy: 0.009 + (i % 2) * 0.003,
             color: shapeColors[i % shapeColors.length]
           });
         }
+        const tmpPt = [0, 0, 0];
+        const projPts = octVerts.map(function () { return [0, 0]; });
 
-        let gridOffset = 0;
         function drawBg() {
+          if (document.hidden) {
+            if (!reduceMotion) requestAnimationFrame(drawBg);
+            return;
+          }
           bctx.clearRect(0, 0, bw, bh);
-          // Animated 3D perspective wireframe horizon at lower band
-          const horizonY = bh * 0.62 - bPtrY * 18;
-          bctx.strokeStyle = 'rgba(79, 70, 229, 0.075)';
-          bctx.lineWidth = 1;
-          for (let gx = -8; gx <= 8; gx++) {
-            bctx.beginPath();
-            bctx.moveTo(bw * 0.5 + gx * 48 - bPtrX * 22, horizonY);
-            bctx.lineTo(bw * 0.5 + gx * 260, bh + 20);
-            bctx.stroke();
-          }
-          for (let gz = 0; gz < 9; gz++) {
-            const p = ((gz + gridOffset) % 9) / 9;
-            const yy = horizonY + Math.pow(p, 1.9) * (bh - horizonY + 20);
-            bctx.beginPath();
-            bctx.moveTo(0, yy);
-            bctx.lineTo(bw, yy);
-            bctx.stroke();
-          }
-          if (!reduceMotion) gridOffset += 0.015;
+          if (!reduceMotion) phase += 0.018;
 
-          const scrollShift = (window.scrollY || 0) * 0.08;
-          shapes.forEach(function (s) {
-            if (!reduceMotion) {
-              s.rx += s.vx;
-              s.ry += s.vy;
+          // Flowing 3D Parametric Sine-Wave Ribbon (Zero GC allocations)
+          const horizonY = bh * 0.68 - bPtrY * 14;
+          bctx.lineWidth = 1.15;
+          for (let row = 0; row < 3; row++) {
+            bctx.beginPath();
+            bctx.strokeStyle = row === 0 ? 'rgba(79,70,229,0.14)' : row === 1 ? 'rgba(2,132,199,0.12)' : 'rgba(16,185,129,0.1)';
+            for (let step = 0; step <= 28; step++) {
+              const t = step / 28;
+              const px = t * bw;
+              const wave = Math.sin(t * 7 + phase + row * 1.25) * 34 + Math.cos(t * 3 - phase * 0.7) * 18;
+              const py = horizonY + row * 38 + wave + bPtrY * (10 + row * 6);
+              if (step === 0) bctx.moveTo(px, py);
+              else bctx.lineTo(px, py);
             }
-            const verts = s.type === 'cube' ? cubeVerts : octVerts;
-            const edges = s.type === 'cube' ? cubeEdges : octEdges;
-            const cx = s.x * bw - bPtrX * (38 / s.z);
-            const cy = ((s.y * bh - scrollShift / s.z) % (bh + 140) + bh + 140) % (bh + 140) - 70 - bPtrY * (28 / s.z);
-            const proj = verts.map(function (v) {
-              const r = rot3D(v, s.rx, s.ry, s.rz);
-              const d = 4.2 / (4.2 + r[2]);
-              return [cx + r[0] * s.size * d, cy + r[1] * s.size * d];
-            });
+            bctx.stroke();
+          }
+
+          // Two Orbiting 3D Astrolabe Rings at side margins
+          bctx.strokeStyle = 'rgba(79, 70, 229, 0.14)';
+          for (let rIdx = 0; rIdx < 2; rIdx++) {
+            const acx = rIdx === 0 ? bw * 0.12 : bw * 0.88;
+            const acy = rIdx === 0 ? bh * 0.34 : bh * 0.72;
+            const rad = Math.min(bw, bh) * 0.11;
+            bctx.beginPath();
+            for (let aStep = 0; aStep <= 24; aStep++) {
+              const ang = (aStep / 24) * Math.PI * 2;
+              rot3DInto(Math.cos(ang), Math.sin(ang), 0, phase * (0.6 + rIdx * 0.3) + bPtrY * 0.3, phase * 0.5 + bPtrX * 0.3, rIdx * 0.8, tmpPt);
+              const d = 4 / (4 + tmpPt[2]);
+              const sx = acx + tmpPt[0] * rad * d;
+              const sy = acy + tmpPt[1] * rad * d;
+              if (aStep === 0) bctx.moveTo(sx, sy);
+              else bctx.lineTo(sx, sy);
+            }
+            bctx.stroke();
+          }
+
+          // Floating 3D Polyhedra
+          const scrollShift = (window.scrollY || 0) * 0.06;
+          for (let si = 0; si < shapes.length; si++) {
+            const s = shapes[si];
+            if (!reduceMotion) { s.rx += s.vx; s.ry += s.vy; }
+            const cx = s.x * bw - bPtrX * (30 / s.z);
+            const cy = ((s.y * bh - scrollShift / s.z) % (bh + 120) + bh + 120) % (bh + 120) - 60 - bPtrY * (22 / s.z);
+            for (let vi = 0; vi < octVerts.length; vi++) {
+              const v = octVerts[vi];
+              rot3DInto(v[0], v[1], v[2], s.rx, s.ry, 0, tmpPt);
+              const d = 4.2 / (4.2 + tmpPt[2]);
+              projPts[vi][0] = cx + tmpPt[0] * s.size * d;
+              projPts[vi][1] = cy + tmpPt[1] * s.size * d;
+            }
             bctx.strokeStyle = s.color;
-            bctx.lineWidth = 1.4;
-            edges.forEach(function (e) {
-              bctx.beginPath();
-              bctx.moveTo(proj[e[0]][0], proj[e[0]][1]);
-              bctx.lineTo(proj[e[1]][0], proj[e[1]][1]);
-              bctx.stroke();
-            });
-          });
+            bctx.beginPath();
+            for (let ei = 0; ei < octEdges.length; ei++) {
+              const e = octEdges[ei];
+              bctx.moveTo(projPts[e[0]][0], projPts[e[0]][1]);
+              bctx.lineTo(projPts[e[1]][0], projPts[e[1]][1]);
+            }
+            bctx.stroke();
+          }
           if (!reduceMotion) requestAnimationFrame(drawBg);
         }
         drawBg();
       }
 
-      // Interactive 3D Holo-Engine Canvas Widget (#studio-3d-canvas)
+      // Interactive Viewport-Culled 3D Holo-Engine Canvas Widget (#studio-3d-canvas)
       const holoCanvas = document.getElementById('studio-3d-canvas');
       const holoHud = document.getElementById('holo-3d-hud');
       const holoViewport = document.getElementById('holo-3d-viewport');
@@ -817,12 +856,13 @@
       if (holoCanvas && holoViewport) {
         const hctx = holoCanvas.getContext('2d');
         let hw = 520, hh = 325;
-        let camRx = 0.45, camRy = 0.65, velX = 0, velY = 0;
+        let camRx = 0.42, camRy = 0.65, velX = 0, velY = 0;
         let dragging = false, lastX = 0, lastY = 0;
         let exploded = false, explodeT = 0, autoSpin = true, spinMult = 1.0, activeModel = 'engine';
+        let holoInView = true, holoRaf = 0;
 
         function resizeHolo() {
-          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
           hw = holoViewport.clientWidth || 520;
           hh = holoViewport.clientHeight || 325;
           holoCanvas.width = hw * dpr;
@@ -830,7 +870,7 @@
           hctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         }
         resizeHolo();
-        window.addEventListener('resize', resizeHolo);
+        window.addEventListener('resize', resizeHolo, { passive: true });
 
         holoViewport.addEventListener('pointerdown', function (e) {
           dragging = true;
@@ -847,12 +887,61 @@
           velX = dy * 0.008;
           camRy += velY;
           camRx += velX;
-        });
+        }, { passive: true });
         window.addEventListener('pointerup', function () { dragging = false; });
 
+        function boxMesh(cx, cy, cz, sx, sy, sz, rgb, stroke, dir) {
+          const x0 = cx - sx, x1 = cx + sx, y0 = cy - sy, y1 = cy + sy, z0 = cz - sz, z1 = cz + sz;
+          const v = [[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]];
+          const f = [[0,1,2,3],[5,4,7,6],[4,0,3,7],[1,5,6,2],[3,2,6,7],[4,5,1,0]];
+          return { v: v, f: f, rgb: rgb, stroke: stroke, dir: dir };
+        }
+
+        function getPartsForModel(m) {
+          if (m === 'helix') {
+            const pts = [];
+            for (let k = -3; k <= 3; k++) {
+              const ang = k * 0.62;
+              const y = k * 0.25;
+              const x = Math.cos(ang) * 0.72;
+              const z = Math.sin(ang) * 0.72;
+              pts.push(boxMesh(x, y, z, 0.14, 0.1, 0.14, '56,189,248', '#7dd3fc', [x * 0.7, 0, z * 0.7]));
+              pts.push(boxMesh(-x, y, -z, 0.14, 0.1, 0.14, '99,102,241', '#a5b4fc', [-x * 0.7, 0, -z * 0.7]));
+            }
+            return pts;
+          }
+          if (m === 'crystal') {
+            return [
+              boxMesh(0, 0, 0, 0.5, 0.5, 0.5, '99,102,241', '#a5b4fc', [0,0,0]),
+              boxMesh(0, -0.78, 0, 0.34, 0.2, 0.34, '56,189,248', '#7dd3fc', [0,-0.85,0]),
+              boxMesh(0, 0.78, 0, 0.34, 0.2, 0.34, '52,211,153', '#6ee7b7', [0,0.85,0]),
+              boxMesh(-0.78, 0, 0, 0.18, 0.36, 0.36, '251,191,36', '#fcd34d', [-0.85,0,0]),
+              boxMesh(0.78, 0, 0, 0.18, 0.36, 0.36, '244,114,182', '#f9a8d4', [0.85,0,0])
+            ];
+          }
+          if (m === 'gyro') {
+            return [
+              boxMesh(0, 0, 0, 0.38, 0.38, 0.38, '56,189,248', '#7dd3fc', [0,0,0]),
+              boxMesh(-0.72, 0, 0, 0.12, 0.85, 0.6, '99,102,241', '#a5b4fc', [-0.85,0,0]),
+              boxMesh(0.72, 0, 0, 0.12, 0.85, 0.6, '52,211,153', '#6ee7b7', [0.85,0,0]),
+              boxMesh(0, -0.82, 0, 0.85, 0.1, 0.6, '251,191,36', '#fcd34d', [0,-0.7,0]),
+              boxMesh(0, 0.82, 0, 0.85, 0.1, 0.6, '56,189,248', '#7dd3fc', [0,0.7,0])
+            ];
+          }
+          return [
+            boxMesh(0, 0.25, 0, 0.88, 0.44, 0.54, '51,65,85', '#94a3b8', [0,0.55,0]),
+            boxMesh(-0.55, -0.35, 0, 0.16, 0.28, 0.16, '56,189,248', '#7dd3fc', [-0.45,-0.5,0]),
+            boxMesh(0, -0.45, 0, 0.16, 0.28, 0.16, '52,211,153', '#6ee7b7', [0,-0.65,0]),
+            boxMesh(0.55, -0.35, 0, 0.16, 0.28, 0.16, '56,189,248', '#7dd3fc', [0.45,-0.5,0]),
+            boxMesh(0, -0.85, 0, 0.92, 0.18, 0.56, '99,102,241', '#a5b4fc', [0,-0.8,0])
+          ];
+        }
+
+        let currentParts = getPartsForModel(activeModel);
         modelBtns.forEach(function (b) {
           b.addEventListener('click', function () {
             activeModel = b.getAttribute('data-3d-model');
+            currentParts = getPartsForModel(activeModel);
             modelBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
             if (holoHud) holoHud.textContent = '3D ENGINE · ' + b.textContent.toUpperCase() + ' · DRAG 360°';
           });
@@ -876,90 +965,92 @@
           });
         }
 
-        function boxMesh(cx, cy, cz, sx, sy, sz, fill, stroke, dir) {
-          const x0 = cx - sx, x1 = cx + sx, y0 = cy - sy, y1 = cy + sy, z0 = cz - sz, z1 = cz + sz;
-          const v = [[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]];
-          const f = [[0,1,2,3],[5,4,7,6],[4,0,3,7],[1,5,6,2],[3,2,6,7],[4,5,1,0]];
-          return { v: v, f: f, fill: fill, stroke: stroke, dir: dir };
-        }
-
-        function buildSceneParts() {
-          if (activeModel === 'crystal') {
-            return [
-              boxMesh(0, 0, 0, 0.52, 0.52, 0.52, 'rgba(99,102,241,0.45)', '#818cf8', [0,0,0]),
-              boxMesh(0, -0.78, 0, 0.36, 0.2, 0.36, 'rgba(56,189,248,0.45)', '#38bdf8', [0,-0.85,0]),
-              boxMesh(0, 0.78, 0, 0.36, 0.2, 0.36, 'rgba(52,211,153,0.45)', '#34d399', [0,0.85,0]),
-              boxMesh(-0.78, 0, 0, 0.18, 0.38, 0.38, 'rgba(251,191,36,0.42)', '#fbbf24', [-0.85,0,0]),
-              boxMesh(0.78, 0, 0, 0.18, 0.38, 0.38, 'rgba(244,114,182,0.42)', '#f472b6', [0.85,0,0])
-            ];
-          }
-          if (activeModel === 'gyro') {
-            return [
-              boxMesh(0, 0, 0, 0.38, 0.38, 0.38, 'rgba(56,189,248,0.52)', '#7dd3fc', [0,0,0]),
-              boxMesh(-0.72, 0, 0, 0.12, 0.85, 0.62, 'rgba(99,102,241,0.34)', '#818cf8', [-0.9,0,0]),
-              boxMesh(0.72, 0, 0, 0.12, 0.85, 0.62, 'rgba(52,211,153,0.34)', '#34d399', [0.9,0,0]),
-              boxMesh(0, -0.82, 0, 0.85, 0.1, 0.62, 'rgba(251,191,36,0.34)', '#fbbf24', [0,-0.75,0]),
-              boxMesh(0, 0.82, 0, 0.85, 0.1, 0.62, 'rgba(56,189,248,0.34)', '#38bdf8', [0,0.75,0])
-            ];
-          }
-          // Engine block + pistons + cylinder head
-          return [
-            boxMesh(0, 0.25, 0, 0.88, 0.45, 0.56, 'rgba(30,41,59,0.72)', '#64748b', [0,0.55,0]),
-            boxMesh(-0.55, -0.35, 0, 0.16, 0.28, 0.16, 'rgba(56,189,248,0.6)', '#38bdf8', [-0.45,-0.5,0]),
-            boxMesh(0, -0.45, 0, 0.16, 0.28, 0.16, 'rgba(52,211,153,0.6)', '#34d399', [0,-0.65,0]),
-            boxMesh(0.55, -0.35, 0, 0.16, 0.28, 0.16, 'rgba(56,189,248,0.6)', '#38bdf8', [0.45,-0.5,0]),
-            boxMesh(0, -0.85, 0, 0.92, 0.18, 0.58, 'rgba(99,102,241,0.48)', '#818cf8', [0,-0.85,0])
-          ];
-        }
-
+        const tmpH = [0, 0, 0];
         function renderHolo() {
+          holoRaf = 0;
+          if (!holoInView || document.hidden) {
+            if (!reduceMotion && holoInView) holoRaf = requestAnimationFrame(renderHolo);
+            return;
+          }
           if (!dragging) {
-            if (autoSpin && !reduceMotion) camRy += 0.011 * spinMult;
+            if (autoSpin && !reduceMotion) camRy += 0.012 * spinMult;
             camRx += velX;
             camRy += velY;
-            velX *= 0.92;
-            velY *= 0.92;
+            velX *= 0.9;
+            velY *= 0.9;
           }
-          explodeT += ((exploded ? 1 : 0) - explodeT) * 0.1;
+          explodeT += ((exploded ? 1 : 0) - explodeT) * 0.11;
 
           hctx.clearRect(0, 0, hw, hh);
-          const scale = Math.min(hw, hh) * 0.28;
+          const scale = Math.min(hw, hh) * 0.27;
           const cx = hw * 0.5, cy = hh * 0.52;
-          const parts = buildSceneParts();
-          const allFaces = [];
 
-          parts.forEach(function (part) {
+          // Glowing holographic orbit ring under 3D assembly
+          hctx.beginPath();
+          for (let ri = 0; ri <= 28; ri++) {
+            const ang = (ri / 28) * Math.PI * 2;
+            rot3DInto(Math.cos(ang) * 1.45, 0.95, Math.sin(ang) * 1.45, camRx, camRy, 0, tmpH);
+            const p = 4.6 / (4.6 + tmpH[2]);
+            const gx = cx + tmpH[0] * scale * p;
+            const gy = cy + tmpH[1] * scale * p;
+            if (ri === 0) hctx.moveTo(gx, gy);
+            else hctx.lineTo(gx, gy);
+          }
+          hctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+          hctx.lineWidth = 1.25;
+          hctx.stroke();
+
+          const allFaces = [];
+          for (let pi = 0; pi < currentParts.length; pi++) {
+            const part = currentParts[pi];
             const offX = part.dir[0] * explodeT;
             const offY = part.dir[1] * explodeT;
             const offZ = part.dir[2] * explodeT;
-            const transformed = part.v.map(function (pt) {
-              const shifted = [pt[0] + offX, pt[1] + offY, pt[2] + offZ];
-              const r = rot3D(shifted, camRx, camRy, 0);
-              const persp = 4.5 / (4.5 + r[2]);
-              return { x: cx + r[0] * scale * persp, y: cy + r[1] * scale * persp, z: r[2] };
-            });
-            part.f.forEach(function (idx) {
-              const pts = idx.map(function (k) { return transformed[k]; });
-              const avgZ = (pts[0].z + pts[1].z + pts[2].z + pts[3].z) / 4;
-              allFaces.push({ pts: pts, z: avgZ, fill: part.fill, stroke: part.stroke });
-            });
-          });
+            const tVerts = [];
+            for (let vi = 0; vi < part.v.length; vi++) {
+              const pt = part.v[vi];
+              rot3DInto(pt[0] + offX, pt[1] + offY, pt[2] + offZ, camRx, camRy, 0, tmpH);
+              const persp = 4.6 / (4.6 + tmpH[2]);
+              tVerts.push({ x: cx + tmpH[0] * scale * persp, y: cy + tmpH[1] * scale * persp, rx: tmpH[0], ry: tmpH[1], rz: tmpH[2] });
+            }
+            for (let fi = 0; fi < part.f.length; fi++) {
+              const idx = part.f[fi];
+              const p0 = tVerts[idx[0]], p1 = tVerts[idx[1]], p2 = tVerts[idx[2]], p3 = tVerts[idx[3]];
+              // Compute face normal for real directional lighting
+              const ux = p1.rx - p0.rx, uy = p1.ry - p0.ry, uz = p1.rz - p0.rz;
+              const vx = p2.rx - p0.rx, vy = p2.ry - p0.ry, vz = p2.rz - p0.rz;
+              const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
+              const nlen = Math.hypot(nx, ny, nz) || 1;
+              const light = Math.max(0.24, Math.min(0.86, 0.32 + Math.abs((nx * 0.4 + ny * -0.5 + nz * 0.85) / nlen) * 0.54));
+              allFaces.push({ p0: p0, p1: p1, p2: p2, p3: p3, z: (p0.rz + p1.rz + p2.rz + p3.rz) * 0.25, rgb: part.rgb, stroke: part.stroke, alpha: light });
+            }
+          }
 
-          // Painter's algorithm back-to-front
           allFaces.sort(function (a, b) { return b.z - a.z; });
-          allFaces.forEach(function (face) {
+          for (let fi = 0; fi < allFaces.length; fi++) {
+            const fc = allFaces[fi];
             hctx.beginPath();
-            hctx.moveTo(face.pts[0].x, face.pts[0].y);
-            for (let i = 1; i < face.pts.length; i++) hctx.lineTo(face.pts[i].x, face.pts[i].y);
+            hctx.moveTo(fc.p0.x, fc.p0.y);
+            hctx.lineTo(fc.p1.x, fc.p1.y);
+            hctx.lineTo(fc.p2.x, fc.p2.y);
+            hctx.lineTo(fc.p3.x, fc.p3.y);
             hctx.closePath();
-            hctx.fillStyle = face.fill;
+            hctx.fillStyle = 'rgba(' + fc.rgb + ',' + fc.alpha.toFixed(2) + ')';
             hctx.fill();
-            hctx.strokeStyle = face.stroke;
-            hctx.lineWidth = 1.6;
+            hctx.strokeStyle = fc.stroke;
+            hctx.lineWidth = 1.4;
             hctx.stroke();
-          });
+          }
 
-          if (!reduceMotion) requestAnimationFrame(renderHolo);
+          if (!reduceMotion && holoInView) holoRaf = requestAnimationFrame(renderHolo);
+        }
+
+        if ('IntersectionObserver' in window) {
+          const io = new IntersectionObserver(function (entries) {
+            holoInView = entries[0].isIntersecting;
+            if (holoInView && !holoRaf && !reduceMotion) holoRaf = requestAnimationFrame(renderHolo);
+          }, { threshold: 0.05 });
+          io.observe(holoViewport);
         }
         renderHolo();
       }
