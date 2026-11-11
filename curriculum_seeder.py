@@ -203,8 +203,8 @@ def _build_interactive_widget(item, spec, num):
             "id": "b4_interactive",
             "type": "interactive",
             "widget_type": "sequence",
-            "title": "Технологическая последовательность: Регламент выполнения",
-            "instructions": "Ознакомьтесь с этапами технологического процесса и правильным порядком шагов.",
+            "title": "Собери алгоритм: Регламент выполнения",
+            "instructions": "Расставьте технологические шаги в правильном порядке кнопками ↑ / ↓ и проверьте себя.",
             "steps": steps
         }
 
@@ -218,16 +218,15 @@ def _generate_lesson_video_data(spec, num, clean_title, tools, summary):
     }
 
     timecodes = [
-        {"sec": 0, "time_str": "00:00", "title": f"Введение в тему: {clean_title[:38]}"},
-        {"sec": 15, "time_str": "00:15", "title": f"Инструменты и регламент: {tools[:38] if tools else 'Отраслевой стандарт'}"},
-        {"sec": 30, "time_str": "00:30", "title": "Пошаговая демонстрация выполнения"},
-        {"sec": 45, "time_str": "00:45", "title": "Чек-лист качества и критерии сдачи"}
+        {"sec": 0, "time_str": "00:00", "title": f"1. Проблема «До»: {clean_title[:36]}"},
+        {"sec": 3, "time_str": "00:03", "title": f"2. Как это работает: {tools[:34] if tools else 'Принцип действия'}"},
+        {"sec": 7, "time_str": "00:07", "title": "3. Эталон «После» и ключевое правило"}
     ]
 
     return {
         "video_url": "assets/sample-lesson.mp4",
-        "video_title": f"Видео-лекция: {clean_title}",
-        "video_duration": "00:52",
+        "video_title": f"Видео-разбор (10 сек): {clean_title}",
+        "video_duration": "00:10",
         "video_poster": "assets/eduspace-logo.svg",
         "embed_url": spec_embed_map.get(spec, "assets/sample-lesson.mp4"),
         "timecodes": timecodes,
@@ -294,7 +293,7 @@ def _build_8_block_lesson(item, spec, num):
         {
             "id": "b3_theory",
             "type": "theory",
-            "title": f"Теория и Видео-лекция: {clean_title[:50]}",
+            "title": f"Теория и Видео-объяснение: {clean_title[:50]}",
             "video_url": video_data["video_url"],
             "video_title": video_data["video_title"],
             "video_duration": video_data["video_duration"],
@@ -302,6 +301,11 @@ def _build_8_block_lesson(item, spec, num):
             "embed_url": video_data["embed_url"],
             "timecodes": video_data["timecodes"],
             "transcript": video_data["transcript"],
+            "cheatsheet": [
+                f"Инструмент / стандарт: {tools or 'профильный регламент АМК'}",
+                criteria[0] if criteria else f"Контроль ключевых допусков по теме «{clean_title[:45]}»",
+                first_q.get("explain", "Фиксация результата и сверка с эталонным значением")
+            ],
             "chunks": chunks
         },
         interactive_widget,
