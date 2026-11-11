@@ -128,7 +128,7 @@ window.LessonInteractives = (() => {
             <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-3">${block.title || 'Восстановите правильный порядок'}</h2>
             <p class="text-xs text-slate-300 mt-1">Расставьте этапы технологического процесса от первого к последнему кнопками ↑ / ↓ и проверьте себя.</p>
           </div>
-          <div class="bg-dark-850/80 p-5 sm:p-6 rounded-3xl border border-white/10 space-y-3">
+          <div id="seq-bench" class="bg-dark-850/80 p-5 sm:p-6 rounded-3xl border border-white/10 space-y-3">
             ${rows}
             <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-top:10px;">
               <span id="seq-status" style="font-size:12px;color:#94a3b8;font-weight:600;">Нажмите «Проверить порядок», когда будете готовы.</span>

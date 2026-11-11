@@ -445,9 +445,27 @@ html, body {
   color: #1d4ed8 !important;
 }
 
-/* Preserve dark stage inside 3D / Video containers */
+/* Preserve dark stage inside 3D / Video / Interactive Lab consoles */
 .studio-stage, .workshop-visual, #lp-block-canvas video {
   background-color: #0f172a !important;
+}
+
+#lab-workspace,
+#seq-bench {
+  background: linear-gradient(155deg, #0b1120 0%, #17153b 100%) !important;
+  border-color: rgba(99, 102, 241, 0.42) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 20px 44px -18px rgba(30, 27, 75, 0.35) !important;
+}
+#lab-workspace :is(h2, h3, p, span, strong, label, code),
+#seq-bench :is(h2, h3, p, span, strong, label) {
+  color: #f8fafc !important;
+}
+#lab-workspace .text-slate-300,
+#lab-workspace .text-slate-400 { color: #cbd5e1 !important; }
+#lab-mentor-feedback > div {
+  background: linear-gradient(135deg, #0f172a, #1e1b4b) !important;
+  color: #f8fafc !important;
 }
 
 /* Layout & Spacing Utilities for Modals when Tailwind v3 JIT is absent */

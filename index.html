@@ -186,6 +186,120 @@
       </div>
     </section>
 
+    <section class="container section" id="live-playground" aria-labelledby="playground-title">
+      <div class="section-head">
+        <div class="stack">
+          <p class="eyebrow">Живой интерактив прямо здесь</p>
+          <h2 id="playground-title">Покрутите настройки тренажёров</h2>
+        </div>
+        <a class="button" href="simulator.html">Все 3D-тренажёры →</a>
+      </div>
+
+      <div class="playground-grid">
+        <!-- Live Sim 1: Auto Electric Voltage Drop Circuit -->
+        <article class="sim-widget">
+          <div class="sim-head">
+            <span class="sim-pill">Автоэлектрика</span>
+            <span class="sim-pill" id="sim-v-badge" style="color:#d1fae5;border-color:rgba(52,211,153,0.4);background:rgba(6,78,59,0.5);">12.4 В · Норма</span>
+          </div>
+          <h3>Поиск падения напряжения 12.6 В</h3>
+          <div class="sim-stage">
+            <svg viewBox="0 0 280 110" aria-label="Схема падения напряжения АКБ - Стартер">
+              <defs>
+                <pattern id="simGrid1" width="16" height="16" patternUnits="userSpaceOnUse">
+                  <path d="M16 0H0V16" fill="none" stroke="rgba(56,189,248,0.12)" stroke-width="1"/>
+                </pattern>
+              </defs>
+              <rect width="280" height="110" fill="url(#simGrid1)" rx="8"/>
+              <path d="M62 55H216" stroke="rgba(148,163,184,0.28)" stroke-width="4" stroke-linecap="round"/>
+              <path id="sim-wire-anim" class="wire-flow" d="M62 55H216" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/>
+              <rect x="14" y="34" width="52" height="42" rx="8" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+              <text x="40" y="59" fill="#f8fafc" font-size="11" font-weight="700" text-anchor="middle">12.6 В</text>
+              <rect id="sim-ox-node" x="118" y="39" width="44" height="32" rx="6" fill="#1e293b" stroke="#fbbf24" stroke-width="2"/>
+              <text x="140" y="59" fill="#fcd34d" font-size="10" font-weight="700" text-anchor="middle" id="sim-ox-svg">0.04 Ом</text>
+              <rect x="212" y="34" width="54" height="42" rx="8" fill="#0f172a" stroke="#34d399" stroke-width="2"/>
+              <text x="239" y="59" fill="#f8fafc" font-size="11" font-weight="700" text-anchor="middle">Пуск</text>
+            </svg>
+          </div>
+          <div class="sim-controls">
+            <div class="sim-label-row">
+              <label for="sim-ohms">Окисление контакта (Ом):</label>
+              <strong id="sim-ohms-val">0.04 Ом</strong>
+            </div>
+            <input class="sim-range" id="sim-ohms" type="range" min="0" max="80" value="4">
+            <button type="button" class="sim-chip" id="sim-clean-btn">Зачистить клемму до 0.01 Ом</button>
+          </div>
+          <div class="sim-status" id="sim-elec-status" data-state="ok">Стартер крутит уверенно: 278 об/мин</div>
+        </article>
+
+        <!-- Live Sim 2: HVAC Superheat Gauge -->
+        <article class="sim-widget">
+          <div class="sim-head">
+            <span class="sim-pill">HVAC · R600a</span>
+            <span class="sim-pill" id="sim-sh-badge" style="color:#d1fae5;border-color:rgba(52,211,153,0.4);background:rgba(6,78,59,0.5);">ΔT = 6 K</span>
+          </div>
+          <h3>Манометр и перегрев Superheat</h3>
+          <div class="sim-stage">
+            <svg viewBox="0 0 280 110" aria-label="Круговой манометр расчёта перегрева испарителя">
+              <path d="M55 92 A 85 85 0 0 1 112 22" fill="none" stroke="#ef4444" stroke-width="10" stroke-linecap="round"/>
+              <path d="M118 20 A 85 85 0 0 1 176 23" fill="none" stroke="#10b981" stroke-width="10" stroke-linecap="round"/>
+              <path d="M182 26 A 85 85 0 0 1 225 92" fill="none" stroke="#f59e0b" stroke-width="10" stroke-linecap="round"/>
+              <g id="sim-sh-needle" transform="rotate(0 140 92)" style="transition: transform 220ms cubic-bezier(0.22,1,0.36,1);">
+                <line x1="140" y1="92" x2="140" y2="24" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round"/>
+                <circle cx="140" cy="92" r="7" fill="#38bdf8"/>
+              </g>
+              <text x="12" y="106" fill="#fca5a5" font-size="9.5" font-weight="700" text-anchor="start">Влажный &lt;4K</text>
+              <text x="142" y="106" fill="#6ee7b7" font-size="9.5" font-weight="700" text-anchor="middle">Норма 5–8K</text>
+              <text x="268" y="106" fill="#fcd34d" font-size="9.5" font-weight="700" text-anchor="end">Голод &gt;9K</text>
+            </svg>
+          </div>
+          <div class="sim-controls">
+            <div class="sim-label-row">
+              <label for="sim-tevap">t кипения:</label>
+              <strong id="sim-tevap-val">-14 °C</strong>
+            </div>
+            <input class="sim-range" id="sim-tevap" type="range" min="-22" max="-4" value="-14">
+            <div class="sim-label-row">
+              <label for="sim-tsuct">t трубки всасывания:</label>
+              <strong id="sim-tsuct-val">-8 °C</strong>
+            </div>
+            <input class="sim-range" id="sim-tsuct" type="range" min="-18" max="6" value="-8">
+          </div>
+          <div class="sim-status" id="sim-sh-status" data-state="ok">Эталонный режим: фреон кипит полностью</div>
+        </article>
+
+        <!-- Live Sim 3: Web Design Interactive Flexbox Sandbox -->
+        <article class="sim-widget">
+          <div class="sim-head">
+            <span class="sim-pill">Веб-дизайн</span>
+            <span class="sim-pill">Live CSS</span>
+          </div>
+          <h3>Живая песочница Flexbox Header</h3>
+          <div class="sim-stage">
+            <div class="sim-flex-preview" id="sim-flex-box-wrap" style="justify-content: space-between; align-items: center; gap: 12px;">
+              <div class="sim-flex-box">Лого</div>
+              <div class="sim-flex-box">Меню</div>
+              <div class="sim-flex-box">Вход</div>
+            </div>
+          </div>
+          <div class="sim-controls">
+            <div class="sim-label-row">
+              <span>Выравнивание (justify-content):</span>
+            </div>
+            <div class="sim-btn-row" role="group" aria-label="Параметры Flexbox">
+              <button type="button" class="sim-chip" data-jc="space-between" aria-pressed="true">space-between</button>
+              <button type="button" class="sim-chip" data-jc="center" aria-pressed="false">center</button>
+              <button type="button" class="sim-chip" data-jc="flex-end" aria-pressed="false">flex-end</button>
+            </div>
+            <div class="sim-btn-row">
+              <button type="button" class="sim-chip" id="sim-flex-dir-btn" aria-pressed="false">Переключить в row / column</button>
+            </div>
+          </div>
+          <div class="sim-status" id="sim-flex-code" style="font-family: ui-monospace, monospace; font-size: 0.78rem;">display: flex; justify-content: space-between;</div>
+        </article>
+      </div>
+    </section>
+
     <section class="container section">
       <div class="cta-band">
         <div class="stack">
@@ -353,6 +467,112 @@
           }
         });
       });
+
+      // Live Simulator 1: Voltage Drop
+      const ohmsInput = document.getElementById('sim-ohms');
+      const ohmsVal = document.getElementById('sim-ohms-val');
+      const oxSvg = document.getElementById('sim-ox-svg');
+      const oxNode = document.getElementById('sim-ox-node');
+      const wireAnim = document.getElementById('sim-wire-anim');
+      const vBadge = document.getElementById('sim-v-badge');
+      const elecStatus = document.getElementById('sim-elec-status');
+      const cleanBtn = document.getElementById('sim-clean-btn');
+
+      function updateVoltageSim() {
+        if (!ohmsInput) return;
+        const r = Number(ohmsInput.value) / 100;
+        const vLoad = Math.max(7.2, 12.6 - r * 5.2);
+        const speedDur = (0.8 + r * 3.2).toFixed(2) + 's';
+        ohmsVal.textContent = r.toFixed(2) + ' Ом';
+        oxSvg.textContent = r.toFixed(2) + ' Ом';
+        if (wireAnim) wireAnim.style.animationDuration = speedDur;
+        if (r <= 0.12) {
+          vBadge.textContent = vLoad.toFixed(1) + ' В · Норма';
+          vBadge.style.color = '#d1fae5';
+          oxNode.setAttribute('stroke', '#34d399');
+          wireAnim.setAttribute('stroke', '#38bdf8');
+          elecStatus.dataset.state = 'ok';
+          elecStatus.textContent = 'Стартер крутит уверенно: ' + Math.round(285 - r * 120) + ' об/мин';
+        } else if (r <= 0.35) {
+          vBadge.textContent = vLoad.toFixed(1) + ' В · Падение';
+          vBadge.style.color = '#fef3c7';
+          oxNode.setAttribute('stroke', '#fbbf24');
+          wireAnim.setAttribute('stroke', '#fbbf24');
+          elecStatus.dataset.state = 'warn';
+          elecStatus.textContent = 'Повышенное сопротивление! Просадка до ' + vLoad.toFixed(1) + ' В';
+        } else {
+          vBadge.textContent = vLoad.toFixed(1) + ' В · Отказ';
+          vBadge.style.color = '#fee2e2';
+          oxNode.setAttribute('stroke', '#f87171');
+          wireAnim.setAttribute('stroke', '#f87171');
+          elecStatus.dataset.state = 'crit';
+          elecStatus.textContent = 'Реле щёлкает, стартер не тянет — зачистите клемму!';
+        }
+      }
+      if (ohmsInput) ohmsInput.addEventListener('input', updateVoltageSim);
+      if (cleanBtn) cleanBtn.addEventListener('click', function () { ohmsInput.value = '1'; updateVoltageSim(); });
+
+      // Live Simulator 2: HVAC Superheat
+      const tevap = document.getElementById('sim-tevap');
+      const tsuct = document.getElementById('sim-tsuct');
+      const tevapVal = document.getElementById('sim-tevap-val');
+      const tsuctVal = document.getElementById('sim-tsuct-val');
+      const shBadge = document.getElementById('sim-sh-badge');
+      const shNeedle = document.getElementById('sim-sh-needle');
+      const shStatus = document.getElementById('sim-sh-status');
+
+      function updateSuperheatSim() {
+        if (!tevap || !tsuct) return;
+        const ev = Number(tevap.value);
+        const su = Number(tsuct.value);
+        const dt = su - ev;
+        tevapVal.textContent = ev + ' °C';
+        tsuctVal.textContent = su + ' °C';
+        shBadge.textContent = 'ΔT = ' + dt + ' K';
+        const deg = Math.max(-68, Math.min(68, (dt - 6.5) * 9));
+        if (shNeedle) shNeedle.setAttribute('transform', 'rotate(' + deg + ' 140 92)');
+        if (dt >= 5 && dt <= 8) {
+          shStatus.dataset.state = 'ok';
+          shStatus.textContent = 'Эталон 5–8 K: максимальный КПД без риска гидроудара';
+        } else if (dt < 5) {
+          shStatus.dataset.state = 'crit';
+          shStatus.textContent = 'Опасно (<5 K): риск попадания жидкого фреона в компрессор';
+        } else {
+          shStatus.dataset.state = 'warn';
+          shStatus.textContent = 'Высокий перегрев (>8 K): нехватка хладагента или засор';
+        }
+      }
+      if (tevap) tevap.addEventListener('input', updateSuperheatSim);
+      if (tsuct) tsuct.addEventListener('input', updateSuperheatSim);
+
+      // Live Simulator 3: Flexbox Sandbox
+      const flexWrap = document.getElementById('sim-flex-box-wrap');
+      const flexCode = document.getElementById('sim-flex-code');
+      const jcButtons = Array.from(document.querySelectorAll('[data-jc]'));
+      const dirBtn = document.getElementById('sim-flex-dir-btn');
+      let currentDir = 'row';
+      let currentJc = 'space-between';
+
+      function updateFlexSim() {
+        if (!flexWrap) return;
+        flexWrap.style.flexDirection = currentDir;
+        flexWrap.style.justifyContent = currentJc;
+        flexCode.textContent = 'display: flex; flex-direction: ' + currentDir + '; justify-content: ' + currentJc + ';';
+      }
+      jcButtons.forEach(function (b) {
+        b.addEventListener('click', function () {
+          currentJc = b.getAttribute('data-jc');
+          jcButtons.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+          updateFlexSim();
+        });
+      });
+      if (dirBtn) {
+        dirBtn.addEventListener('click', function () {
+          currentDir = currentDir === 'row' ? 'column' : 'row';
+          dirBtn.setAttribute('aria-pressed', currentDir === 'column' ? 'true' : 'false');
+          updateFlexSim();
+        });
+      }
     })();
   </script>
 </body>

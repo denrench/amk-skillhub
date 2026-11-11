@@ -118,6 +118,9 @@
     const choices = requested % 2 ? [incorrect, correct] : [correct, incorrect];
     const hasModel = models.has(key);
     const next = requested < data[slug].length ? href(slug, requested + 1) : href(slug);
+    const mediaBase = key === 'autoelectric:3'
+      ? { mp4: 'assets/starter-lesson/overview.mp4', jpg: 'assets/starter-lesson/poster.jpg', vtt: 'assets/starter-lesson/captions-ru.vtt' }
+      : { mp4: `assets/lesson-intros/${slug}-${requested}.mp4`, jpg: `assets/lesson-intros/${slug}-${requested}.jpg`, vtt: `assets/lesson-intros/${slug}-${requested}.vtt` };
     const safety = ['autoelectric', 'automechanic', 'hvac'].includes(slug)
       ? '<p class="muted">Учебный пример для разбора. Действия на оборудовании выполняют по инструкции производителя под руководством преподавателя.</p>'
       : '';
@@ -127,13 +130,30 @@
         <a href="${href(slug)}">← Все уроки курса</a>
         <p class="eyebrow">${course[0]} / Урок ${String(requested).padStart(2, '0')} из ${data[slug].length}</p>
         <h1>${title}</h1>
+        <div class="lesson-progress-chips" aria-label="Этапы урока">
+          <span class="lesson-step-chip" data-done="true">01 · Видео-схема 10 сек</span>
+          <span class="lesson-step-chip" data-done="true">02 · Объяснение и пример</span>
+          <span class="lesson-step-chip" id="chip-quiz-step" data-done="false">03 · Проверка знаний</span>
+        </div>
       </div></div>
       <div class="container lesson-layout">
         <nav class="catalog-menu lesson-nav" aria-label="Разделы урока">
-          <a href="#explanation">1. Объяснение</a><a href="#example">2. Пример</a><a href="#exercise">3. Задание</a>
-          ${hasModel ? '<a href="#model">4. Модель</a>' : ''}
+          <a href="#visual">0. Видео-схема 10 сек</a><a href="#explanation">1. Объяснение</a><a href="#example">2. Пример</a><a href="#exercise">3. Задание</a>
+          ${hasModel ? '<a href="#model">4. 3D-модель</a>' : ''}
         </nav>
         <article>
+          <section id="visual" class="lesson-visual-card">
+            <div class="lesson-visual-head">
+              <span class="eyebrow">10-секундная визуальная схема темы</span>
+              <span class="lesson-visual-meta">ПРОБЛЕМА «ДО» → МЕХАНИКА → ЭТАЛОН «ПОСЛЕ»</span>
+            </div>
+            <video class="academy-media" controls muted playsinline preload="metadata" poster="${mediaBase.jpg}" src="${mediaBase.mp4}" aria-label="Видео-разбор темы урока">
+              <track kind="captions" src="${mediaBase.vtt}" srclang="ru" label="Русские субтитры" default>
+            </video>
+            <div class="actions">
+              <a class="button primary" href="lesson_player.html?catalog=1&amp;specialty=${slug}&amp;lesson=${requested}">Открыть интерактивный тренажёр урока →</a>
+            </div>
+          </section>
           <section id="explanation" class="card"><p class="eyebrow">01 / Разберитесь</p><h2>Главная идея</h2><p data-concept></p></section>
           <section id="example" class="card example"><p class="eyebrow">02 / Посмотрите решение</p><h2>Разбор примера</h2><p data-example></p>${safety}</section>
           <section id="exercise" class="card"><p class="eyebrow">03 / Примените знания</p><h2>Проверьте себя</h2><p data-question></p>
@@ -154,7 +174,11 @@
     const result = root.querySelector('.answer-result');
     const nextAction = root.querySelector('[data-next]');
     let passed = completed.includes(key);
-    if (passed) nextAction.hidden = false;
+    const quizChip = root.querySelector('#chip-quiz-step');
+    if (passed) {
+      nextAction.hidden = false;
+      if (quizChip) quizChip.dataset.done = 'true';
+    }
 
     for (const [idx, choice] of choices.entries()) {
       const button = document.createElement('button');
@@ -170,6 +194,7 @@
         result.dataset.correct = String(right);
         result.textContent = right ? `Верно. ${explanation}` : 'Попробуйте ещё раз. Сравните варианты с разобранным примером выше.';
         if (right) {
+          if (quizChip) quizChip.dataset.done = 'true';
           if (!passed) {
             passed = true;
             completed.push(key);
