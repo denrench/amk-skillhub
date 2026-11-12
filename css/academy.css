@@ -1855,7 +1855,8 @@ body[data-mood="cyber"] .hero-highlight {
   border-color: var(--accent);
 }
 
-.roadmap-tab[aria-pressed="true"] {
+.roadmap-tab[aria-pressed="true"],
+.roadmap-tab[aria-selected="true"] {
   background: linear-gradient(135deg, #4f46e5, #0284c7);
   border-color: transparent;
   color: #ffffff;

@@ -879,7 +879,7 @@ window.TopicGameEngine = (function () {
               <span class="tge-mech-badge ${ml.cls}">${svgIcon(ml.icon, 13)} <span>${ml.name}</span></span>
               <span class="tge-inst-badge">${esc(game.instrument || 'Симулятор темы')}</span>
             </div>
-            <h3 class="tge-title">${esc(game.title)}</h3>
+            <div class="tge-title">${esc(game.title)}</div>
             ${game.brief ? `<p class="tge-brief">${esc(game.brief)}</p>` : ''}
           </div>
           <div class="tge-hud">
@@ -1023,7 +1023,7 @@ window.TopicGameEngine = (function () {
             <span style="font-weight:700;color:#e2e8f0;">${esc(c.label)}</span>
             <span style="font-family:monospace;font-weight:900;color:#67e8f9;font-size:14px;" id="tge-range-lbl-${esc(c.id)}">${esc(curVal)}${esc(c.unit || '')}</span>
           </div>
-          <input type="range" ${rSt.solved ? 'disabled' : ''} min="${c.min}" max="${c.max}" step="${c.step || 1}" value="${curVal}" oninput="TopicGameEngine.setBenchRange('${escAttr(inst.id)}','${escAttr(c.id)}',this.value)" class="tge-range" />
+          <input type="range" aria-label="${escAttr(c.label)}" ${rSt.solved ? 'disabled' : ''} min="${c.min}" max="${c.max}" step="${c.step || 1}" value="${curVal}" oninput="TopicGameEngine.setBenchRange('${escAttr(inst.id)}','${escAttr(c.id)}',this.value)" class="tge-range" />
         </div>
       `;
     }).join('');
@@ -1320,7 +1320,7 @@ window.TopicGameEngine = (function () {
           <span class="tge-mech-badge tge-mech-triage">
             ${inst.singleRoundPreview ? 'Демо-раунд пройден ✓' : 'Тема освоена в симуляторе ✓'}
           </span>
-          <h3 class="tge-title" style="font-size:20px;margin-top:10px;">${esc(inst.game.title)}</h3>
+          <div class="tge-title" style="font-size:20px;margin-top:10px;">${esc(inst.game.title)}</div>
           <p style="margin:6px 0 0;font-size:12px;color:#cbd5e1;">Набрано <strong style="color:#67e8f9;font-family:monospace;">${inst.score} PTS</strong> • Макс. комбо <strong style="color:#fcd34d;font-family:monospace;">x${inst.maxCombo}</strong> • Награда <strong style="color:#6ee7b7;font-family:monospace;">+25 XP</strong></p>
         </div>
         ${takeawaysHtml ? `

@@ -412,11 +412,11 @@
         </div>
 
         <div class="roadmap-tabs" role="tablist" aria-label="Специальность для просмотра траектории">
-          <button type="button" class="roadmap-tab" data-rm-course="it" aria-selected="true" aria-pressed="true">Веб-дизайн</button>
-          <button type="button" class="roadmap-tab" data-rm-course="graphic_design" aria-selected="false" aria-pressed="false">Графический дизайн</button>
-          <button type="button" class="roadmap-tab" data-rm-course="autoelectric" aria-selected="false" aria-pressed="false">Автоэлектрика</button>
-          <button type="button" class="roadmap-tab" data-rm-course="hvac" aria-selected="false" aria-pressed="false">Холодильное</button>
-          <button type="button" class="roadmap-tab" data-rm-course="automechanic" aria-selected="false" aria-pressed="false">Автомеханика</button>
+          <button type="button" class="roadmap-tab" role="tab" data-rm-course="it" aria-selected="true">Веб-дизайн</button>
+          <button type="button" class="roadmap-tab" role="tab" data-rm-course="graphic_design" aria-selected="false">Графический дизайн</button>
+          <button type="button" class="roadmap-tab" role="tab" data-rm-course="autoelectric" aria-selected="false">Автоэлектрика</button>
+          <button type="button" class="roadmap-tab" role="tab" data-rm-course="hvac" aria-selected="false">Холодильное</button>
+          <button type="button" class="roadmap-tab" role="tab" data-rm-course="automechanic" aria-selected="false">Автомеханика</button>
         </div>
 
         <div class="roadmap-body">
@@ -912,7 +912,6 @@
         b.addEventListener('click', function () {
           rmCourse = b.getAttribute('data-rm-course');
           rmCourseBtns.forEach(function (x) {
-            x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
             x.setAttribute('aria-selected', x === b ? 'true' : 'false');
           });
           playFx('click');
