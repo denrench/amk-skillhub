@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" class="h-full scroll-smooth">
+<html lang="ru">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -880,6 +880,7 @@
         // Fallback or guest
       }
 
+      renderDayTimeline(currentStudyDay);
       const courseFilter = document.getElementById('queue-course-filter') ? document.getElementById('queue-course-filter').value : '';
 
       const [statsRes, studentsRes, journalRes] = await Promise.all([

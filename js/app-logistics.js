@@ -3116,7 +3116,7 @@
         for (const m of mutations) {
           let batchIdx = 0;
           m.addedNodes.forEach(node => {
-            if (node.nodeType === 1) {
+            if (node.nodeType === 1 && node.matches && node.matches(selector)) {
               markReveal(node, batchIdx++);
             }
           });
