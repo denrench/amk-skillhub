@@ -63,15 +63,14 @@ async function auditAccessibility(page) {
     await page.locator('main a[href*="catalog=1"]').first().click();
     await page.waitForFunction(() => typeof currentLesson !== 'undefined' && currentLesson?.id === 'catalog-it-1');
     await page.locator('#step-btn-2').click();
-    await page.locator('#lp-video-play-btn').click();
-    await page.waitForFunction(() => document.querySelector('#lp-lecture-video')?.currentTime > .1);
+    await page.locator('#lp-topic-game-mount .tge-shell').waitFor();
+    assert.match(await page.locator('#tge-round-label').textContent(), /раунд 1 из 3/i);
     await page.unroute('**/api/tasks?*');
 
     const pilot = lessons.find(lesson => lesson.course_slug === 'autoelectric' && lesson.order_num === 3);
     await openLesson(page, pilot);
     await page.locator('#step-btn-2').click();
-    await page.locator('[data-play]').click();
-    await page.waitForFunction(() => document.querySelector('.starter-video')?.currentTime > .1);
+    await page.locator('#lp-topic-game-mount .tge-shell').waitFor();
     await page.locator('#step-btn-3').click();
     await page.getByLabel('A · Плюс АКБ', {exact: true}).check();
     await page.getByLabel('B · Силовой вход стартера', {exact: true}).check();
@@ -83,28 +82,24 @@ async function auditAccessibility(page) {
     await page.getByText('Задание выполнено. Ответ восстановлен.').waitFor();
 
     const actual = new Set();
-    for (const lesson of lessons.filter(item => item !== pilot)) {
+    for (const lesson of lessons) {
       await openLesson(page, lesson);
-      const key = `${lesson.course_slug}-${lesson.order_num}`;
       const theory = await page.evaluate(() => currentLesson.blocks.find(block => block.type === 'theory'));
-      assert.equal(theory.video_url, `assets/lesson-intros/${key}.mp4`);
-      assert.equal(theory.video_captions, `assets/lesson-intros/${key}.vtt`);
-      actual.add(theory.video_url);
-      const media = await page.request.head(`${origin}/${theory.video_url}`);
-      assert.equal(media.status(), 200);
+      assert.ok(theory.game && Array.isArray(theory.game.rounds) && theory.game.rounds.length === 3, `Missing 3-round game for ${lesson.title}`);
+      actual.add(theory.game.title);
       if (samples[lesson.course_slug] !== lesson.order_num) continue;
       await page.locator('#step-btn-2').click();
-      await page.locator('#lp-video-play-btn').click();
-      await page.waitForFunction(() => document.querySelector('#lp-lecture-video')?.currentTime > .1);
-      await page.getByRole('button', {name:'Русские субтитры'}).click();
-      assert.equal(await page.locator('#lp-video-captions').getAttribute('aria-pressed'), 'true');
+      await page.locator('#lp-topic-game-mount .tge-shell').waitFor();
+      await page.locator('#lp-tab-text').click();
+      assert.equal(await page.locator('#lp-theory-text-box').evaluate(el => !el.classList.contains('hidden')), true);
+      await page.locator('#lp-tab-game').click();
       await page.locator('#step-btn-3').click();
       if (process.env.SKILLHUB_THREE) await page.locator('.workshop-visual canvas').waitFor();
       const point = page.locator('.workshop-model-panel [data-part]').first();
       await point.click();
       assert.equal(await point.getAttribute('aria-pressed'), 'true');
     }
-    assert.equal(actual.size, 59);
+    assert.equal(actual.size, 60);
     await page.goto(origin + '/student.html', {waitUntil: 'domcontentloaded'});
     await page.getByText('Войдите, чтобы увидеть свой прогресс и задания.').waitFor();
     const student = await page.request.post(origin + '/api/auth/login', {
@@ -141,7 +136,7 @@ async function auditAccessibility(page) {
     await page.locator('#account-register').waitFor();
     await auditAccessibility(page);
     assert.deepEqual(errors, []);
-    console.log('Catalog navigation, 49 intro sources, five playback and model samples, pilot progress, and teacher preview passed.');
+    console.log('Catalog navigation, 60 unique topic games, five playback and model samples, pilot progress, and teacher preview passed.');
   } finally {
     await browser.close();
   }

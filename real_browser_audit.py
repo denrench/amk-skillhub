@@ -41,7 +41,7 @@ if not is_server_listening():
 
 options = EdgeOptions()
 options.add_argument("--headless=new")
-    options.add_argument("--mute-audio")
+options.add_argument("--mute-audio")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-gpu")
@@ -172,7 +172,7 @@ for page_url, page_desc in admin_pages:
 # =========================================================================
 # DEEP INTERACTIVE WORKFLOW TESTS INSIDE REAL BROWSER
 # =========================================================================
-print("\n--- DEEP INTERACTIVE WORKFLOW 1: LESSON PLAYER 8-BLOCK & VIDEO ---")
+print("\n--- DEEP INTERACTIVE WORKFLOW 1: LESSON PLAYER 8-BLOCK & TOPIC GAME ---")
 try:
     login_as("student@amk.kz", "student123", "student")
     driver.get(f"{BASE_URL}/lesson_player.html?lesson_id=1")
@@ -181,24 +181,29 @@ try:
     title_el = driver.find_element(By.ID, "lp-lesson-title")
     print(f"  [OK] Rendered Lesson Title: '{title_el.text}'")
 
-    # Jump to Theory & Video Block (index 2)
+    # Jump to Topic Game & Theory Block (index 2)
     driver.execute_script("jumpToBlock(2);")
     time.sleep(0.5)
-    vid = driver.find_element(By.ID, "lp-lecture-video")
-    print("  [OK] Lesson Player HTML5 Video element found")
-    driver.execute_script("togglePlayLpVideo();")
-    time.sleep(1)
-    is_paused = driver.execute_script("return arguments[0].paused;", vid)
-    print(f"  [OK] Lesson Player Video playback active: paused={is_paused}")
-    driver.execute_script("togglePlayLpVideo();")
+    game_shell = driver.find_element(By.CSS_SELECTOR, "#lp-topic-game-mount .tge-shell")
+    round_lbl = driver.find_element(By.ID, "tge-round-label").text
+    assert game_shell is not None and "раунд 1 из 3" in round_lbl.lower(), f"Topic game check failed: {round_lbl}"
+    print(f"  [OK] Lesson Player Topic Game active: '{round_lbl}'")
+    driver.execute_script("switchLpTheoryView('text');")
+    time.sleep(0.3)
+    assert not driver.execute_script("return document.getElementById('lp-theory-text-box').classList.contains('hidden');")
+    driver.execute_script("switchLpTheoryView('game');")
+    time.sleep(0.3)
+    assert not driver.execute_script("return document.getElementById('lp-theory-game-box').classList.contains('hidden');")
+    print("  [OK] Sub-tab toggle Game <-> Notes working cleanly")
 
     # Interactive Block 4 (index 3)
     driver.execute_script("jumpToBlock(3);")
     time.sleep(0.5)
     cards = driver.find_elements(By.CSS_SELECTOR, ".flip-card")
     canvas = driver.find_elements(By.ID, "lp-3d-canvas-box")
-    print(f"  [OK] Interactive Block 4 rendered: flip_cards={len(cards)}, 3d_canvas={len(canvas)}")
-    assert len(cards) > 0 or len(canvas) > 0, "Block 4 interactive widget must be present!"
+    topic_labs = driver.find_elements(By.CSS_SELECTOR, "#int-stage, .workshop-model-panel")
+    print(f"  [OK] Interactive Block 4 rendered: flip_cards={len(cards)}, 3d_canvas={len(canvas)}, topic_labs={len(topic_labs)}")
+    assert len(cards) > 0 or len(canvas) > 0 or len(topic_labs) > 0, "Block 4 interactive widget must be present!"
 
     # AI Tutor Drawer
     driver.execute_script("toggleAiTutor(true);")

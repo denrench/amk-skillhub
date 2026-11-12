@@ -95,6 +95,8 @@
   </style>
 
   <script src="js/courses-catalog.js"></script>
+  <script src="js/topic-games-60.js"></script>
+  <script src="js/topic-game-engine.js"></script>
   <script src="js/app-logistics.js"></script>
   <script src="js/interactive-simulators.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
@@ -264,8 +266,8 @@
           <!-- 3-STAGE STEP SWITCHER -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 p-1.5 bg-dark-950/80 rounded-2xl border border-white/10">
             <button type="button" id="step-tab-theory" onclick="switchLessonStage('theory')" class="py-2.5 px-4 rounded-xl font-bold text-xs bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center justify-center gap-2">
-              <span class="material-symbols-outlined text-[18px]">menu_book</span>
-              <span>1. Теория и конспект</span>
+              <span class="material-symbols-outlined text-[18px]">sports_esports</span>
+              <span>1. Игра-тема и конспект</span>
             </button>
             <button type="button" id="step-tab-quiz" onclick="switchLessonStage('quiz')" class="py-2.5 px-4 rounded-xl font-bold text-xs text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2">
               <span class="material-symbols-outlined text-[18px]">quiz</span>
@@ -278,15 +280,15 @@
           </div>
         </section>
 
-        <!-- ================= STAGE 1: THEORY & VIDEO ================= -->
+        <!-- ================= STAGE 1: INTERACTIVE TOPIC GAME & THEORY ================= -->
         <section id="stage-panel-theory" class="bg-dark-850/80 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-white/10 shadow-xl space-y-6">
           
-          <!-- Sub-tab switcher: Video vs Lecture -->
+          <!-- Sub-tab switcher: Topic Game vs Lecture Notes -->
           <div class="flex flex-wrap items-center justify-between border-b border-white/10 pb-4 gap-3">
             <div class="flex items-center gap-2">
-              <button type="button" id="tab-sub-video" onclick="switchTheoryView('video')" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">play_circle</span>
-                <span>Видео-разбор урока</span>
+              <button type="button" id="tab-sub-game" onclick="switchTheoryView('game')" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">sports_esports</span>
+                <span>Игра по теме</span>
               </button>
               <button type="button" id="tab-sub-text" onclick="switchTheoryView('text')" class="px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px]">menu_book</span>
@@ -296,99 +298,9 @@
             <span class="text-xs text-slate-400 font-mono" id="theory-tools-badge">Стек инструментов</span>
           </div>
 
-          <!-- Video View -->
-          <div id="theory-video-container" class="space-y-4">
-            <div class="rounded-2xl border border-white/15 bg-black overflow-hidden shadow-2xl relative group">
-              <!-- Real HTML5 Video Element -->
-              <video id="active-lecture-video" class="w-full aspect-video object-contain bg-black" playsinline preload="metadata">
-                <source id="active-lecture-video-src" src="assets/sample-lesson.mp4" type="video/mp4">
-                Ваш браузер не поддерживает встроенное воспроизведение HTML5 видео.
-              </video>
-
-              <!-- Central Play/Pause Overlay -->
-              <div id="video-center-overlay" onclick="togglePlayLectureVideo()" class="absolute inset-0 flex flex-col items-center justify-center bg-black/45 backdrop-blur-[2px] transition-all duration-300 cursor-pointer z-10">
-                <div class="w-16 h-16 rounded-2xl bg-indigo-600/90 text-white flex items-center justify-center border border-indigo-400/60 shadow-glow-indigo hover:scale-110 transition-transform mb-3">
-                  <span id="video-center-play-icon" class="material-symbols-outlined text-[40px]">play_arrow</span>
-                </div>
-                <div class="text-center px-4 max-w-lg">
-                  <div class="font-bold text-white text-base sm:text-lg drop-shadow" id="lecture-video-title">Видео-разбор практического задания</div>
-                  <p class="text-xs text-slate-300 mt-1 drop-shadow" id="lecture-video-desc">Пошагоковое объяснение архитектуры решения, предотвращение частых ошибок и демонстрация критериев автопроверки.</p>
-                </div>
-                <div class="mt-4 flex items-center gap-3">
-                  <span class="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] font-mono text-slate-200">Длительность: <span id="video-time-overlay-dur">01:15</span></span>
-                  <span class="px-3 py-1 rounded-full bg-emerald-500/20 backdrop-blur-md border border-emerald-500/30 text-[11px] text-emerald-300 font-bold">1080p HD • АМК</span>
-                </div>
-              </div>
-
-              <!-- Interactive Custom Control Bar -->
-              <div id="video-control-bar" class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3 pt-6 flex flex-col gap-2 transition-opacity duration-300 z-20">
-                <!-- Progress Scrubber Slider -->
-                <div class="relative w-full flex items-center group/scrub">
-                  <input type="range" id="video-progress-scrubber" min="0" max="100" value="0" step="0.1" oninput="onVideoScrubberInput(this.value)" onchange="onVideoScrubberChange(this.value)" class="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-indigo-500 hover:h-2.5 transition-all">
-                </div>
-
-                <!-- Control Buttons Row -->
-                <div class="flex items-center justify-between text-xs text-white">
-                  <div class="flex items-center gap-2.5 sm:gap-3">
-                    <button type="button" id="video-play-btn" onclick="togglePlayLectureVideo()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors" title="Воспроизвести / Пауза">
-                      <span id="video-play-icon" class="material-symbols-outlined text-[20px]">play_arrow</span>
-                    </button>
-                    <div class="font-mono text-[11px] text-slate-300 whitespace-nowrap">
-                      <span id="video-time-cur">00:00</span> / <span id="video-time-dur">00:00</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 pl-1">
-                      <button type="button" id="video-mute-btn" onclick="toggleVideoMute()" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center text-slate-300 hover:text-white transition-colors" title="Звук">
-                        <span id="video-mute-icon" class="material-symbols-outlined text-[18px]">volume_up</span>
-                      </button>
-                      <input type="range" id="video-volume-slider" min="0" max="1" step="0.05" value="1" oninput="setVideoVolume(this.value)" class="w-14 sm:w-16 h-1 bg-white/20 rounded accent-indigo-500 cursor-pointer hidden sm:inline-block">
-                    </div>
-                  </div>
-
-                  <div class="flex items-center gap-2">
-                    <select id="video-playback-speed" onchange="setVideoSpeed(this.value)" class="bg-dark-900/90 border border-white/20 text-slate-200 text-[11px] rounded-lg px-2 py-0.5 outline-none font-mono cursor-pointer" title="Скорость">
-                      <option value="0.75">0.75x</option>
-                      <option value="1" selected>1.0x</option>
-                      <option value="1.25">1.25x</option>
-                      <option value="1.5">1.5x</option>
-                      <option value="2">2.0x</option>
-                    </select>
-                    <span id="video-badge-status" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono hidden sm:inline-block">1080p HD</span>
-                    <button type="button" onclick="toggleVideoFullscreen()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors" title="На весь экран">
-                      <span class="material-symbols-outlined text-[18px]">fullscreen</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Video Timecodes & Key Steps -->
-            <div class="p-4 rounded-2xl bg-dark-950/60 border border-white/10 space-y-2.5">
-              <div class="text-xs font-bold text-white uppercase tracking-wider flex items-center justify-between">
-                <div class="flex items-center gap-1.5">
-                  <span class="material-symbols-outlined text-indigo-400 text-[16px]">schedule</span>
-                  <span>Ключевые таймкоды практического занятия:</span>
-                </div>
-                <span class="text-[11px] text-indigo-400 font-mono" id="video-active-timecode-hint">Нажмите для перехода</span>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs" id="lecture-timecodes-grid">
-                <div onclick="seekLectureTime(0)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
-                  <span><strong class="text-indigo-300 font-mono">00:00</strong> — Постановка технической задачи</span>
-                  <span class="material-symbols-outlined text-[16px] text-indigo-400">arrow_forward</span>
-                </div>
-                <div onclick="seekLectureTime(15)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
-                  <span><strong class="text-indigo-300 font-mono">00:15</strong> — Разбор архитектуры и стандартов</span>
-                  <span class="material-symbols-outlined text-[16px] text-indigo-400">arrow_forward</span>
-                </div>
-                <div onclick="seekLectureTime(30)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
-                  <span><strong class="text-indigo-300 font-mono">00:30</strong> — Пошаговое выполнение задания</span>
-                  <span class="material-symbols-outlined text-[16px] text-indigo-400">arrow_forward</span>
-                </div>
-                <div onclick="seekLectureTime(45)" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
-                  <span><strong class="text-indigo-300 font-mono">00:45</strong> — Проверка чек-листа перед сдачей</span>
-                  <span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>
-                </div>
-              </div>
-            </div>
+          <!-- Topic Game View -->
+          <div id="theory-game-container" class="space-y-4">
+            <div id="sim-topic-game-mount"></div>
           </div>
 
           <!-- Text View -->
@@ -747,22 +659,12 @@
         banner.classList.add('hidden');
       }
 
-      // Stage 1: Theory & Real Video
+      // Stage 1: Interactive Topic Game & Theory Notes
       document.getElementById('theory-tools-badge').textContent = activeTaskServer.tools_required;
       document.getElementById('theory-content-body').innerHTML =
         (activeLessonCatalog && activeLessonCatalog.theory) || `<p>${activeTaskServer.description}</p>`;
 
-      setupVideoEventListeners();
-      const vTitle = document.getElementById('lecture-video-title');
-      if (vTitle) vTitle.textContent = `Видео-разбор: ${activeTaskServer.title}`;
-      const vDesc = document.getElementById('lecture-video-desc');
-      if (vDesc) vDesc.textContent = (activeLessonCatalog && activeLessonCatalog.summary) || `Пошаговое объяснение темы «${activeTaskServer.title}», частых ошибок и критериев автопроверки.`;
-
-      const savedTime = localStorage.getItem(`eduspace_sim_video_${activeSpecialty}_${activeTaskNumber}`);
-      const vidEl = document.getElementById('active-lecture-video');
-      if (vidEl && savedTime && parseFloat(savedTime) > 0) {
-        vidEl.currentTime = parseFloat(savedTime);
-      }
+      mountSimulatorTopicGame();
 
       // Stage 2: Quiz
       currentQuizScore = Number(activeTaskServer.quiz_score || 0);
@@ -1325,206 +1227,46 @@
 
   
     function switchTheoryView(view) {
-      const vBtn = document.getElementById('tab-sub-video');
+      const gBtn = document.getElementById('tab-sub-game');
       const tBtn = document.getElementById('tab-sub-text');
-      const vBox = document.getElementById('theory-video-container');
+      const gBox = document.getElementById('theory-game-container');
       const tBox = document.getElementById('theory-text-container');
 
-      if (view === 'video') {
-        vBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2';
-        tBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2';
-        vBox.classList.remove('hidden');
-        tBox.classList.add('hidden');
+      if (view === 'game') {
+        if (gBtn) gBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2';
+        if (tBtn) tBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2';
+        if (gBox) gBox.classList.remove('hidden');
+        if (tBox) tBox.classList.add('hidden');
       } else {
-        tBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2';
-        vBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2';
-        tBox.classList.remove('hidden');
-        vBox.classList.add('hidden');
+        if (tBtn) tBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2';
+        if (gBtn) gBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2';
+        if (tBox) tBox.classList.remove('hidden');
+        if (gBox) gBox.classList.add('hidden');
       }
     }
 
-    // ==========================================
-    // REAL HTML5 VIDEO CONTROLS & LIFECYCLE
-    // ==========================================
-    let isVideoScrubbing = false;
+    function mountSimulatorTopicGame() {
+      if (!window.TopicGameEngine || !document.getElementById('sim-topic-game-mount')) return;
+      const storeKey = `eduspace_sim_game_${activeSpecialty}_${activeTaskNumber}`;
+      let saved = {};
+      try {
+        saved = JSON.parse(localStorage.getItem(storeKey) || '{}') || {};
+      } catch (e) {}
+      const done = Boolean(saved && (saved.game_completed || saved.gameCompleted));
 
-    function formatVideoTime(seconds) {
-      if (!seconds || isNaN(seconds)) return '00:00';
-      const s = Math.floor(seconds);
-      const m = Math.floor(s / 60);
-      const remS = s % 60;
-      return `${m < 10 ? '0' : ''}${m}:${remS < 10 ? '0' : ''}${remS}`;
-    }
-
-    function togglePlayLectureVideo() {
-      const vid = document.getElementById('active-lecture-video');
-      if (!vid) return;
-
-      if (vid.paused) {
-        const playPromise = vid.play();
-        if (playPromise !== undefined) {
-          playPromise.then(() => {
-            syncVideoUiState();
-          }).catch(err => {
-            console.warn('Playback error, retrying fallback stream:', err);
-            const curSrc = vid.currentSrc || '';
-            if (!curSrc.includes('interactive-examples')) {
-              vid.src = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
-              vid.play().then(() => syncVideoUiState()).catch(e => {
-                showToast('Воспроизведение видео: кликните для разрешения автозапуска', 'info');
-              });
-            }
-          });
-        }
-      } else {
-        vid.pause();
-        syncVideoUiState();
-      }
-    }
-
-    function syncVideoUiState() {
-      const vid = document.getElementById('active-lecture-video');
-      if (!vid) return;
-
-      const overlay = document.getElementById('video-center-overlay');
-      const playIcon = document.getElementById('video-play-icon');
-      const centerPlayIcon = document.getElementById('video-center-play-icon');
-
-      if (vid.paused) {
-        if (overlay) {
-          overlay.classList.remove('opacity-0', 'pointer-events-none');
-        }
-        if (playIcon) playIcon.textContent = 'play_arrow';
-        if (centerPlayIcon) centerPlayIcon.textContent = 'play_arrow';
-      } else {
-        if (overlay) {
-          overlay.classList.add('opacity-0', 'pointer-events-none');
-        }
-        if (playIcon) playIcon.textContent = 'pause';
-        if (centerPlayIcon) centerPlayIcon.textContent = 'pause';
-      }
-    }
-
-    function seekLectureTime(sec) {
-      const vid = document.getElementById('active-lecture-video');
-      if (!vid) return;
-
-      const dur = vid.duration;
-      let target = sec;
-      if (dur && !isNaN(dur) && dur > 0) {
-        target = Math.min(sec, Math.max(0, dur - 0.5));
-      }
-      vid.currentTime = target;
-      vid.play().then(() => {
-        syncVideoUiState();
-        showToast(`Переход к таймкоду [${formatVideoTime(target)}]`, 'info');
-      }).catch(() => {
-        syncVideoUiState();
-      });
-    }
-
-    function onVideoScrubberInput(val) {
-      isVideoScrubbing = true;
-      const vid = document.getElementById('active-lecture-video');
-      if (!vid || !vid.duration) return;
-      const targetTime = (parseFloat(val) / 100) * vid.duration;
-      const curEl = document.getElementById('video-time-cur');
-      if (curEl) curEl.textContent = formatVideoTime(targetTime);
-    }
-
-    function onVideoScrubberChange(val) {
-      const vid = document.getElementById('active-lecture-video');
-      if (vid && vid.duration) {
-        vid.currentTime = (parseFloat(val) / 100) * vid.duration;
-      }
-      isVideoScrubbing = false;
-    }
-
-    function setVideoSpeed(rate) {
-      const vid = document.getElementById('active-lecture-video');
-      if (!vid) return;
-      vid.playbackRate = parseFloat(rate);
-      showToast(`Скорость воспроизведения: ${rate}x`, 'info');
-    }
-
-    function toggleVideoMute() {
-      const vid = document.getElementById('active-lecture-video');
-      if (!vid) return;
-      vid.muted = !vid.muted;
-      const icon = document.getElementById('video-mute-icon');
-      if (icon) icon.textContent = vid.muted ? 'volume_off' : (vid.volume < 0.5 ? 'volume_down' : 'volume_up');
-      const slider = document.getElementById('video-volume-slider');
-      if (slider && vid.muted) slider.value = 0;
-      else if (slider) slider.value = vid.volume;
-    }
-
-    function setVideoVolume(val) {
-      const vid = document.getElementById('active-lecture-video');
-      if (!vid) return;
-      vid.volume = parseFloat(val);
-      vid.muted = (vid.volume === 0);
-      const icon = document.getElementById('video-mute-icon');
-      if (icon) icon.textContent = vid.muted ? 'volume_off' : (vid.volume < 0.5 ? 'volume_down' : 'volume_up');
-    }
-
-    function toggleVideoFullscreen() {
-      const container = document.getElementById('theory-video-container');
-      if (!container) return;
-      if (!document.fullscreenElement) {
-        if (container.requestFullscreen) container.requestFullscreen();
-        else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-      }
-    }
-
-    function setupVideoEventListeners() {
-      const vid = document.getElementById('active-lecture-video');
-      if (!vid || vid.dataset.listenersAttached) return;
-      vid.dataset.listenersAttached = 'true';
-
-      vid.addEventListener('play', () => syncVideoUiState());
-      vid.addEventListener('pause', () => syncVideoUiState());
-
-      vid.addEventListener('loadedmetadata', () => {
-        const durEl = document.getElementById('video-time-dur');
-        const overDurEl = document.getElementById('video-time-overlay-dur');
-        const fmt = formatVideoTime(vid.duration);
-        if (durEl) durEl.textContent = fmt;
-        if (overDurEl) overDurEl.textContent = fmt;
-      });
-
-      vid.addEventListener('timeupdate', () => {
-        if (isVideoScrubbing) return;
-        const curEl = document.getElementById('video-time-cur');
-        const scrubber = document.getElementById('video-progress-scrubber');
-        if (curEl) curEl.textContent = formatVideoTime(vid.currentTime);
-        if (scrubber && vid.duration) {
-          scrubber.value = ((vid.currentTime / vid.duration) * 100).toFixed(1);
-        }
-        if (activeTaskNumber) {
+      window.TopicGameEngine.mount({
+        containerId: 'sim-topic-game-mount',
+        spec: activeSpecialty,
+        taskNum: activeTaskNumber,
+        title: (activeTaskServer && activeTaskServer.title) || 'Тренажёр темы',
+        summary: (activeTaskServer && activeTaskServer.description) || '',
+        savedState: saved,
+        alreadyCompleted: done,
+        onComplete: (res) => {
           try {
-            localStorage.setItem(`eduspace_sim_video_${activeSpecialty}_${activeTaskNumber}`, vid.currentTime);
-          } catch(e){}
-        }
-      });
-
-      vid.addEventListener('ended', () => {
-        syncVideoUiState();
-        showToast('Поздравляем! Видеоматериал усвоен (+20 XP к прогрессу)', 'success');
-        const badge = document.getElementById('video-badge-status');
-        if (badge) {
-          badge.textContent = '✓ Просмотрено (+20 XP)';
-          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-mono';
-        }
-      });
-
-      vid.addEventListener('error', (e) => {
-        console.warn('Video element error:', e);
-        const curSrc = vid.currentSrc || '';
-        if (!curSrc.includes('interactive-examples')) {
-          vid.src = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
-          vid.load();
+            localStorage.setItem(storeKey, JSON.stringify(Object.assign({}, res, { game_completed: true })));
+          } catch (e) {}
+          showToast('Тема освоена в симуляторе (+25 XP)!', 'success');
         }
       });
     }

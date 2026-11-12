@@ -27,6 +27,8 @@
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="js/courses-catalog.js"></script>
+  <script src="js/topic-games-60.js"></script>
+  <script src="js/topic-game-engine.js"></script>
   <script src="js/lesson-media.js"></script>
   <script src="js/eduspace-3d-engine.js"></script>
   <script src="js/starter-lesson.js"></script>
@@ -90,8 +92,8 @@
       <span>2. Цели</span>
     </button>
     <button type="button" onclick="jumpToBlock(2)" id="step-btn-2" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all">
-      <span class="material-symbols-outlined text-[16px]">menu_book</span>
-      <span>3. Теория</span>
+      <span class="material-symbols-outlined text-[16px]">sports_esports</span>
+      <span>3. Игра-тема</span>
     </button>
     <button type="button" onclick="jumpToBlock(3)" id="step-btn-3" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all">
       <span class="material-symbols-outlined text-[16px]">touch_app</span>
@@ -282,7 +284,7 @@
       };
       let rawSlug = (urlParams.get('specialty') || '').toLowerCase().trim();
       let specSlug = specAliases[rawSlug] || rawSlug;
-      let taskParam = parseInt(urlParams.get('task'), 10);
+      let taskParam = parseInt(urlParams.get('task') || urlParams.get('lesson'), 10);
       let lessonNum = (!isNaN(taskParam) && taskParam >= 1 && taskParam <= 12) ? taskParam : idNum;
 
       if (!specSlug || !specs.includes(specSlug)) {
@@ -350,17 +352,9 @@
           {
             id: 'b3_theory',
             type: 'theory',
-            title: (catLesson && catLesson.video_title) || `Теория и Видео-разбор: ${title}`,
-            video_url: (catLesson && catLesson.video_url) || 'assets/sample-lesson.mp4',
-            video_title: (catLesson && catLesson.video_title) || `Видео-разбор: ${title}`,
-            video_duration: (catLesson && catLesson.video_duration) || '00:52',
-            video_poster: (catLesson && catLesson.video_poster) || 'assets/eduspace-logo.svg',
-            embed_url: (catLesson && catLesson.embed_url) || '',
-            timecodes: (catLesson && catLesson.timecodes) || [
-              { sec: 0, time_str: '00:00', title: `1. Проблема «До»: ${title.replace(/^Урок\s*\d+\.\s*/i, '').slice(0, 32)}` },
-              { sec: 3, time_str: '00:03', title: '2. Механика: как это работает' },
-              { sec: 7, time_str: '00:07', title: '3. Эталон «После» и ключевое правило' }
-            ],
+            title: `Интерактивный симулятор темы: ${title}`,
+            summary: (catLesson && catLesson.summary) || 'Ключевые правила и практические допуски темы.',
+            game: window.EDU_TOPIC_GAMES?.[specSlug]?.[String(lessonNum)] || null,
             cheatsheet: [
               `Инструмент темы: ${(catLesson && catLesson.tools) || 'стандарт отрасли'}`,
               (catLesson && catLesson.criteria && catLesson.criteria[0]) || 'Соблюдайте технологический регламент и допуски',
@@ -373,7 +367,7 @@
                 callout: {
                   type: 'tip',
                   title: 'Совет эксперта',
-                  text: 'Внимательно изучите видеоматериал и воспользуйтесь таймкодами для повторения сложных моментов.'
+                  text: 'Пройдите все 3 раунда игры по теме и используйте шпаргалку для закрепления правил.'
                 }
               }
             ]
@@ -441,32 +435,7 @@
     }
 
     function withLessonIntro(lesson) {
-      const key = `${lesson.course_slug}-${lesson.order_num}`;
-      const intro = window.LessonMedia?.[key];
-      const title = lesson.title.replace(/^Урок\s+\d+\.\s*/i, '').trim();
-      if (!intro || title !== intro[0] || !Array.isArray(lesson.blocks)) return lesson;
-      const base = `assets/lesson-intros/${key}`;
-      const mechSec = Number(intro[1] || 3);
-      const resSec = Number(intro[2] || 7);
-      return {
-        ...lesson,
-        blocks: lesson.blocks.map(block => {
-          if (block.type !== 'theory' || (block.video_url && block.video_url !== lpDemoVideoUrl)) return block;
-          return {
-            ...block,
-            video_url: base + '.mp4',
-            video_poster: base + '.jpg',
-            video_captions: base + '.vtt',
-            video_title: 'Видео-объяснение (10 сек) · ' + title,
-            introductory_video: true,
-            timecodes: [
-              { sec: 0, time_str: '00:00', title: '1. Проблема «До»' },
-              { sec: mechSec, time_str: `00:0${mechSec}`, title: '2. Как это работает' },
-              { sec: resSec, time_str: `00:0${resSec}`, title: '3. Эталон «После»' },
-            ],
-          };
-        }),
-      };
+      return lesson;
     }
 
     async function fetchLesson(lessonId) {
@@ -503,7 +472,7 @@
     async function loadLesson(lessonId) {
       const params = new URLSearchParams(window.location.search);
       const specialty = params.get('specialty');
-      const task = Number(params.get('task'));
+      const task = Number(params.get('task') || params.get('lesson'));
       const fromCatalog = params.get('catalog') === '1' &&
         window.EDU_LESSONS?.[specialty]?.some?.(lesson => lesson.num === task);
       const lessonData = fromCatalog ? {
@@ -595,11 +564,6 @@
 
       const canvas = document.getElementById('lp-block-canvas');
       canvas.innerHTML = '';
-      if (isStarterLesson && block.id === 'b3_theory' && (!block.video_url || block.video_url === lpDemoVideoUrl)) {
-        window.StarterLesson.showTheory(canvas, () =>
-          syncBlockState({ ...getCurrentBlockState(), starterVideoWatched: true }, true));
-        return;
-      }
       if (isStarterLesson && block.id === 'b4_interactive') {
         disposeLessonModel = window.StarterLesson.showPractice(canvas, getCurrentBlockState(), async state => {
           const saved = syncBlockState(state, true);
@@ -679,7 +643,7 @@
           break;
         case 'theory':
           canvas.innerHTML = renderTheoryBlock(block);
-          setupLpVideoEventListeners(block.video_url || lpDemoVideoUrl, block.introductory_video);
+          mountLpTopicGame(block);
           break;
         case 'interactive':
           canvas.innerHTML = renderInteractiveWidgetBlock(block);
@@ -787,20 +751,6 @@
         </div>
       `).join('');
 
-      const isDemo = !b.video_url || b.video_url === lpDemoVideoUrl;
-      const videoTitle = isDemo ? 'Демонстрационный ролик' : (b.video_title || currentLesson.title);
-      const videoLabel = isDemo ? 'Демо' : b.introductory_video ? '10 сек · Объяснение' : 'Видео';
-      const timecodesList = (b.timecodes && Array.isArray(b.timecodes) && b.timecodes.length > 0) ? b.timecodes : [
-        { sec: 0, time_str: '00:00', title: '1. Проблема «До»' },
-        { sec: 3, time_str: '00:03', title: '2. Как это работает' },
-        { sec: 7, time_str: '00:07', title: '3. Эталон «После»' }
-      ];
-      const timecodesHtml = timecodesList.map(tc => `
-        <div onclick="seekLpLectureTime(${tc.sec})" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 cursor-pointer flex items-center justify-between text-slate-300 hover:text-white transition-colors">
-          <span><strong class="text-indigo-300 font-mono">${escapeHtml(tc.time_str || formatLpTime(tc.sec))}</strong> — ${escapeHtml(tc.title)}</span>
-          <span class="material-symbols-outlined text-[16px] text-indigo-400">arrow_forward</span>
-        </div>
-      `).join('');
       const cheatsheetItems = (b.cheatsheet && Array.isArray(b.cheatsheet) && b.cheatsheet.length) ? b.cheatsheet : [];
       const cheatsheetHtml = cheatsheetItems.length ? `
         <details class="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 text-xs text-slate-200">
@@ -819,102 +769,26 @@
           <div class="flex flex-wrap items-center justify-between gap-3">
             <div>
               <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                Фундаментальный блок
+                Интерактивное изучение темы
               </span>
-              <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-3">${b.title || 'Изучение материала'}</h2>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-3">${escapeHtml(b.title || 'Освоение темы в симуляторе')}</h2>
             </div>
-            <!-- Sub-tab switcher: Video vs Notes -->
+            <!-- Sub-tab switcher: Topic Game vs Cheatsheet Notes -->
             <div class="flex items-center gap-2 bg-dark-950/80 p-1.5 rounded-2xl border border-white/10">
-              <button type="button" id="lp-tab-video" onclick="switchLpTheoryView('video')" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">play_circle</span>
-                <span>Видео-лекция</span>
+              <button type="button" id="lp-tab-game" onclick="switchLpTheoryView('game')" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">sports_esports</span>
+                <span>Игра по теме</span>
               </button>
               <button type="button" id="lp-tab-text" onclick="switchLpTheoryView('text')" class="px-4 py-2 rounded-xl text-xs font-bold bg-transparent text-slate-400 hover:text-white transition-all flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px]">menu_book</span>
-                <span>Конспект</span>
+                <span>Шпаргалка (конспект)</span>
               </button>
             </div>
           </div>
 
-          <!-- Video Sub-view -->
-          <div id="lp-theory-video-box" class="space-y-4">
-            <div class="rounded-3xl border border-white/15 bg-black overflow-hidden shadow-2xl relative group">
-              <video id="lp-lecture-video" class="w-full aspect-video object-contain bg-black" playsinline preload="metadata"
-                ${b.introductory_video ? `poster="${escapeHtml(b.video_poster)}"` : ''}>
-                ${b.video_captions ? `<track kind="captions" srclang="ru" label="Русский" src="${escapeHtml(b.video_captions)}">` : ''}
-                Ваш браузер не поддерживает HTML5 видео.
-              </video>
-
-              <!-- Central Overlay -->
-              <div id="lp-video-center-overlay" onclick="togglePlayLpVideo()" class="absolute inset-0 flex flex-col items-center justify-center bg-black/45 backdrop-blur-[2px] transition-all duration-300 cursor-pointer z-10">
-                <div class="w-16 h-16 rounded-2xl bg-indigo-600/90 text-white flex items-center justify-center border border-indigo-400/60 shadow-glow-indigo hover:scale-110 transition-transform mb-3">
-                  <span id="lp-video-center-play-icon" class="material-symbols-outlined text-[40px]">play_arrow</span>
-                </div>
-                <div class="text-center px-4 max-w-lg">
-                  <div class="font-bold text-white text-base sm:text-lg drop-shadow" id="lp-video-overlay-title">${escapeHtml(videoTitle)}</div>
-                  <p class="text-xs text-slate-300 mt-1 drop-shadow">${b.introductory_video ? '10-секундное визуальное объяснение: Проблема → Механика → Эталон' : (isDemo ? 'Материал урока доступен во вкладке «Конспект»' : 'Интерактивный видео-разбор темы урока')}</p>
-                </div>
-                <div class="mt-4 flex items-center gap-3">
-                  <span class="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-[11px] font-mono text-slate-200">Длительность: <span id="lp-video-time-total-overlay">00:00</span></span>
-                </div>
-              </div>
-
-              <!-- Control Bar -->
-              <div id="lp-video-control-bar" class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3 pt-6 flex flex-col gap-2 transition-opacity duration-300 z-20">
-                <!-- Progress Scrubber -->
-                <div class="relative w-full flex items-center">
-                  <input type="range" id="lp-video-progress" min="0" max="100" value="0" step="0.1" oninput="onLpVideoScrubInput(this.value)" onchange="onLpVideoScrubChange(this.value)" class="w-full h-1.5 bg-white/20 rounded-lg appearance-none cursor-pointer accent-indigo-500 hover:h-2.5 transition-all">
-                </div>
-
-                <div class="flex items-center justify-between text-xs text-white">
-                  <div class="flex items-center gap-2.5 sm:gap-3">
-                    <button type="button" id="lp-video-play-btn" onclick="togglePlayLpVideo()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors" title="Воспроизвести / Пауза">
-                      <span id="lp-video-play-icon" class="material-symbols-outlined text-[20px]">play_arrow</span>
-                    </button>
-                    <div class="font-mono text-[11px] text-slate-300">
-                      <span id="lp-video-time-cur">00:00</span> / <span id="lp-video-time-total">00:00</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 pl-1">
-                      <button type="button" onclick="toggleLpVideoMute()" class="w-7 h-7 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center text-slate-300 hover:text-white transition-colors" title="Звук">
-                        <span id="lp-video-mute-icon" class="material-symbols-outlined text-[18px]">volume_up</span>
-                      </button>
-                      <input type="range" id="lp-video-vol" min="0" max="1" step="0.05" value="1" oninput="setLpVideoVolume(this.value)" class="w-14 sm:w-16 h-1 bg-white/20 rounded accent-indigo-500 cursor-pointer hidden sm:inline-block">
-                    </div>
-                  </div>
-
-                  <div class="flex items-center gap-2">
-                    <select id="lp-video-speed" onchange="setLpVideoSpeed(this.value)" class="bg-dark-900/90 border border-white/20 text-slate-200 text-[11px] rounded-lg px-2 py-0.5 outline-none font-mono cursor-pointer" title="Скорость">
-                      <option value="0.75">0.75x</option>
-                      <option value="1" selected>1.0x</option>
-                      <option value="1.25">1.25x</option>
-                      <option value="1.5">1.5x</option>
-                      <option value="2">2.0x</option>
-                    </select>
-                    ${b.video_captions ? '<button type="button" id="lp-video-captions" aria-pressed="false" aria-label="Русские субтитры" class="rounded-lg px-2 py-1 bg-white/10 text-xs font-semibold">CC</button>' : ''}
-                    <span id="lp-video-badge-status" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono hidden sm:inline-block">${videoLabel}</span>
-                    <button type="button" onclick="toggleLpVideoFullscreen()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors" title="На весь экран">
-                      <span class="material-symbols-outlined text-[18px]">fullscreen</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <p id="lp-video-status" role="status" class="text-sm text-amber-300"></p>
-
-            <!-- Timecodes Bar -->
-            <div class="p-4 rounded-2xl bg-dark-850/80 border border-white/10 space-y-2.5">
-              <div class="text-xs font-bold text-white uppercase tracking-wider flex items-center justify-between">
-                <div class="flex items-center gap-1.5">
-                  <span class="material-symbols-outlined text-indigo-400 text-[16px]">schedule</span>
-                  <span>${isDemo ? 'Таймкоды демонстрационного ролика:' : 'Таймкоды видео-лекции:'}</span>
-                </div>
-                <span class="text-[11px] text-indigo-400 font-mono">Кликните для перехода</span>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                ${timecodesHtml}
-              </div>
-            </div>
+          <!-- Interactive Topic Game Sub-view -->
+          <div id="lp-theory-game-box" class="space-y-4">
+            <div id="lp-topic-game-mount"></div>
             ${cheatsheetHtml}
           </div>
 
@@ -928,138 +802,24 @@
     }
 
     // ==========================================
-    // LP VIDEO CONTROLS & LIFECYCLE
+    // LP TOPIC GAME LIFECYCLE
     // ==========================================
-    let isLpVideoScrubbing = false;
-
     function switchLpTheoryView(view) {
-      const vTab = document.getElementById('lp-tab-video');
+      const gTab = document.getElementById('lp-tab-game');
       const tTab = document.getElementById('lp-tab-text');
-      const vBox = document.getElementById('lp-theory-video-box');
+      const gBox = document.getElementById('lp-theory-game-box');
       const tBox = document.getElementById('lp-theory-text-box');
 
-      if (view === 'video') {
-        if (vTab) vTab.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2';
+      if (view === 'game') {
+        if (gTab) gTab.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2';
         if (tTab) tTab.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-transparent text-slate-400 hover:text-white transition-all flex items-center gap-2';
-        if (vBox) vBox.classList.remove('hidden');
+        if (gBox) gBox.classList.remove('hidden');
         if (tBox) tBox.classList.add('hidden');
       } else {
         if (tTab) tTab.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2';
-        if (vTab) vTab.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-transparent text-slate-400 hover:text-white transition-all flex items-center gap-2';
+        if (gTab) gTab.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-transparent text-slate-400 hover:text-white transition-all flex items-center gap-2';
         if (tBox) tBox.classList.remove('hidden');
-        if (vBox) vBox.classList.add('hidden');
-      }
-    }
-
-    function formatLpTime(sec) {
-      if (!sec || isNaN(sec)) return '00:00';
-      const s = Math.floor(sec);
-      const m = Math.floor(s / 60);
-      const remS = s % 60;
-      return `${m < 10 ? '0' : ''}${m}:${remS < 10 ? '0' : ''}${remS}`;
-    }
-
-    function togglePlayLpVideo() {
-      const vid = document.getElementById('lp-lecture-video');
-      if (!vid) return;
-
-      if (vid.paused) {
-        if (vid.error) vid.load();
-        playLpVideo(vid);
-      } else {
-        vid.pause();
-        syncLpVideoUi();
-      }
-    }
-
-    function showLpVideoError(vid) {
-      if (!vid.isConnected) return;
-      document.getElementById('lp-video-status').textContent =
-        'Не удалось запустить видео. Попробуйте ещё раз или откройте конспект.';
-      syncLpVideoUi();
-    }
-
-    function playLpVideo(vid) {
-      vid.play().catch(error => {
-        if (error.name !== 'AbortError') showLpVideoError(vid);
-      });
-    }
-
-    function syncLpVideoUi() {
-      const vid = document.getElementById('lp-lecture-video');
-      if (!vid) return;
-
-      const overlay = document.getElementById('lp-video-center-overlay');
-      const playIcon = document.getElementById('lp-video-play-icon');
-      const centerPlayIcon = document.getElementById('lp-video-center-play-icon');
-
-      if (vid.paused) {
-        if (overlay) overlay.classList.remove('opacity-0', 'pointer-events-none');
-        if (playIcon) playIcon.textContent = 'play_arrow';
-        if (centerPlayIcon) centerPlayIcon.textContent = 'play_arrow';
-      } else {
-        if (overlay) overlay.classList.add('opacity-0', 'pointer-events-none');
-        if (playIcon) playIcon.textContent = 'pause';
-        if (centerPlayIcon) centerPlayIcon.textContent = 'pause';
-      }
-    }
-
-    function seekLpLectureTime(sec) {
-      const vid = document.getElementById('lp-lecture-video');
-      if (!vid) return;
-
-      const dur = vid.duration;
-      let target = sec;
-      if (dur && !isNaN(dur) && dur > 0) {
-        target = Math.min(sec, Math.max(0, dur - 0.5));
-      }
-      vid.currentTime = target;
-      playLpVideo(vid);
-    }
-
-    function onLpVideoScrubInput(val) {
-      isLpVideoScrubbing = true;
-      const vid = document.getElementById('lp-lecture-video');
-      if (!vid || !vid.duration) return;
-      const curEl = document.getElementById('lp-video-time-cur');
-      if (curEl) curEl.textContent = formatLpTime((parseFloat(val) / 100) * vid.duration);
-    }
-
-    function onLpVideoScrubChange(val) {
-      const vid = document.getElementById('lp-lecture-video');
-      if (vid && vid.duration) {
-        vid.currentTime = (parseFloat(val) / 100) * vid.duration;
-      }
-      isLpVideoScrubbing = false;
-    }
-
-    function setLpVideoSpeed(speed) {
-      const vid = document.getElementById('lp-lecture-video');
-      if (vid) vid.playbackRate = parseFloat(speed);
-    }
-
-    function toggleLpVideoMute() {
-      const vid = document.getElementById('lp-lecture-video');
-      if (!vid) return;
-      vid.muted = !vid.muted;
-      const icon = document.getElementById('lp-video-mute-icon');
-      if (icon) icon.textContent = vid.muted ? 'volume_off' : (vid.volume < 0.5 ? 'volume_down' : 'volume_up');
-    }
-
-    function setLpVideoVolume(val) {
-      const vid = document.getElementById('lp-lecture-video');
-      if (!vid) return;
-      vid.volume = parseFloat(val);
-      vid.muted = (vid.volume === 0);
-    }
-
-    function toggleLpVideoFullscreen() {
-      const box = document.getElementById('lp-theory-video-box');
-      if (!box) return;
-      if (!document.fullscreenElement) {
-        if (box.requestFullscreen) box.requestFullscreen();
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
+        if (gBox) gBox.classList.add('hidden');
       }
     }
 
@@ -1076,78 +836,32 @@
       return syncBlockState(state || { interactive_done: true }, true);
     }
 
-    function setupLpVideoEventListeners(videoUrl, introductoryVideo = false) {
-      const vid = document.getElementById('lp-lecture-video');
-      const isDemo = videoUrl === lpDemoVideoUrl;
-      const videoLabel = isDemo ? 'Демо' : introductoryVideo ? '10 сек · Объяснение' : 'Видео';
-      const captions = document.getElementById('lp-video-captions');
-      captions?.addEventListener('click', () => {
-        const track = vid.textTracks[0];
-        if (!track) return;
-        track.mode = track.mode === 'showing' ? 'disabled' : 'showing';
-        captions.setAttribute('aria-pressed', String(track.mode === 'showing'));
-      });
-      isLpVideoScrubbing = false;
+    function mountLpTopicGame(block) {
+      if (!window.TopicGameEngine || !document.getElementById('lp-topic-game-mount')) return;
+      const blkId = (block && block.id) || 'b3_theory';
+      const blkProg = savedProgress[blkId] || {};
+      const blkState = blkProg.state || getCurrentBlockState() || {};
+      const alreadyCompleted = Boolean(blkProg.completed && (blkState.game_completed || blkState.gameCompleted));
 
-      vid.addEventListener('playing', () => {
-        document.getElementById('lp-video-status').textContent = '';
-        syncLpVideoUi();
-      });
-
-      vid.addEventListener('pause', () => syncLpVideoUi());
-
-      vid.addEventListener('canplay', () => {
-        const badge = document.getElementById('lp-video-badge-status');
-        if (badge && !badge.textContent.includes('Просмотрено')) {
-          badge.textContent = videoLabel;
-          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono hidden sm:inline-block';
+      window.TopicGameEngine.mount({
+        containerId: 'lp-topic-game-mount',
+        spec: (currentLesson && currentLesson.course_slug) || 'it',
+        taskNum: (currentLesson && currentLesson.order_num) || 1,
+        title: (currentLesson && currentLesson.title) || block.title,
+        chunks: block.chunks || [],
+        summary: block.summary || '',
+        initialGame: block.game || null,
+        savedState: blkState,
+        alreadyCompleted: alreadyCompleted,
+        onStateChange: (st) => {
+          syncBlockState({ ...getCurrentBlockState(), ...st }, false);
+        },
+        onComplete: (res) => {
+          syncBlockState({ ...getCurrentBlockState(), ...res, game_completed: true }, true);
+          const nextBtn = document.getElementById('lp-next-btn');
+          if (nextBtn) nextBtn.disabled = false;
         }
       });
-
-      vid.addEventListener('waiting', () => {
-        const badge = document.getElementById('lp-video-badge-status');
-        if (badge && !badge.textContent.includes('Просмотрено')) {
-          badge.textContent = 'Загрузка...';
-          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono hidden sm:inline-block';
-        }
-      });
-
-      vid.addEventListener('error', () => showLpVideoError(vid));
-
-      vid.addEventListener('loadedmetadata', () => {
-        const tot = document.getElementById('lp-video-time-total');
-        const totOverlay = document.getElementById('lp-video-time-total-overlay');
-        const fmt = formatLpTime(vid.duration);
-        if (tot) tot.textContent = fmt;
-        if (totOverlay) totOverlay.textContent = fmt;
-      });
-
-      vid.addEventListener('timeupdate', () => {
-        if (isLpVideoScrubbing) return;
-        const curEl = document.getElementById('lp-video-time-cur');
-        const scrub = document.getElementById('lp-video-progress');
-        if (curEl) curEl.textContent = formatLpTime(vid.currentTime);
-        if (scrub && vid.duration) {
-          scrub.value = ((vid.currentTime / vid.duration) * 100).toFixed(1);
-        }
-      });
-
-      vid.addEventListener('ended', () => {
-        if (!vid.isConnected) return;
-        syncLpVideoUi();
-        if (isDemo) return;
-        const badge = document.getElementById('lp-video-badge-status');
-        if (badge) {
-          badge.textContent = introductoryVideo ? '✓ Введение просмотрено' : '✓ Просмотрено (+20 XP)';
-          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-mono';
-        }
-        if (!introductoryVideo && currentLesson && currentLesson.blocks) {
-          const blk = currentLesson.blocks[currentBlockIdx];
-          if (blk) saveBlockProgress(blk.id, true);
-        }
-      });
-
-      vid.src = videoUrl;
     }
 
     function renderInteractiveWidgetBlock(b) {
@@ -1911,7 +1625,7 @@
         container.scrollTop = container.scrollHeight;
       } catch (err) {
         document.getElementById(loadingId)?.remove();
-        const fallbackMsg = 'Рекомендация AI-Тьютора: Для решения этой задачи разберите видео-демонстрацию на вкладке «Видео-лекция» и проверьте параметры в конспекте.';
+        const fallbackMsg = 'Рекомендация AI-Тьютора: Для решения этой задачи пройдите интерактивную игру по теме и проверьте правила в шпаргалке.';
         container.innerHTML += `
           <div class="flex items-start gap-2.5 animate-fade-in">
             <div class="w-7 h-7 rounded-lg bg-indigo-600/30 border border-indigo-500/40 flex-shrink-0 flex items-center justify-center text-indigo-300">

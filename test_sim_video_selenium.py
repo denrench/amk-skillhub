@@ -49,58 +49,40 @@ def run_test():
         guards = driver.find_elements(By.ID, "edu-auth-guard")
         assert len(guards) == 0 or not guards[0].is_displayed(), "Auth guard shouldn't be active for logged-in user!"
 
-        # 3. Check video element existence
-        vid = driver.find_element(By.ID, "active-lecture-video")
-        assert vid is not None, "Video element #active-lecture-video not found!"
-        print("[OK] Found #active-lecture-video in DOM")
+        # 3. Check Topic Game Stage 1 instead of static video
+        mount_shell = driver.find_element(By.CSS_SELECTOR, "#sim-topic-game-mount .tge-shell")
+        assert mount_shell is not None, "Topic Game shell not mounted in #sim-topic-game-mount!"
+        assert len(driver.find_elements(By.ID, "active-lecture-video")) == 0, "Stale #active-lecture-video should be removed!"
+        print("[OK] Found Topic Game shell in #sim-topic-game-mount")
 
-        # Check currentSrc / src
-        src = driver.execute_script("return arguments[0].currentSrc || arguments[0].src;", vid)
-        print(f"[OK] Video source: {src}")
-        assert "sample-lesson.mp4" in src or "flower.mp4" in src or ".mp4" in src, f"Unexpected source: {src}"
+        round_lbl = driver.find_element(By.ID, "tge-round-label").text
+        score_txt = driver.find_element(By.ID, "tge-score-pill").text
+        print(f"[OK] Round HUD: '{round_lbl}', Score: '{score_txt}'")
+        assert "раунд 1 из 3" in round_lbl.lower(), f"Expected 3-round game, got '{round_lbl}'"
 
-        # 4. Trigger play
-        print("Triggering togglePlayLectureVideo()...")
-        driver.execute_script("togglePlayLectureVideo();")
-        time.sleep(2)
+        # 4. Toggle Hint via real UI button click & Check Unique Rounds State
+        driver.find_element(By.CSS_SELECTOR, "#sim-topic-game-mount .tge-btn-hint").click()
+        time.sleep(0.25)
+        hints = driver.find_elements(By.CSS_SELECTOR, "#sim-topic-game-mount .tge-hint-box")
+        assert len(hints) == 1 and len(hints[0].text.strip()) > 5, "Hint box failed to toggle!"
+        st = driver.execute_script("return TopicGameEngine.getState('sim-topic-game-mount');")
+        assert st and len(st.get("game", {}).get("rounds", [])) == 3, f"Invalid game state: {st}"
 
-        is_paused = driver.execute_script("return arguments[0].paused;", vid)
-        cur_time = driver.execute_script("return arguments[0].currentTime;", vid)
-        print(f"[OK] Video state: paused={is_paused}, currentTime={cur_time:.2f}s")
-        assert not is_paused, "Video failed to start playing!"
-        assert cur_time >= 0.05, f"Video currentTime did not advance: {cur_time}"
+        # 5. Switch to Notes tab and back to Topic Game
+        driver.execute_script("switchTheoryView('text');")
+        time.sleep(0.3)
+        assert not driver.execute_script("return document.getElementById('theory-text-container').classList.contains('hidden');")
+        assert driver.execute_script("return document.getElementById('theory-game-container').classList.contains('hidden');")
+        driver.execute_script("switchTheoryView('game');")
+        time.sleep(0.3)
+        assert not driver.execute_script("return document.getElementById('theory-game-container').classList.contains('hidden');")
 
-        # 5. Test Speed Change
-        print("Testing playback speed change to 1.5x...")
-        driver.execute_script("setVideoSpeed(1.5);")
-        time.sleep(0.5)
-        rate = driver.execute_script("return arguments[0].playbackRate;", vid)
-        print(f"[OK] Video playbackRate: {rate}")
-        assert rate == 1.5, f"Expected playbackRate 1.5, got {rate}"
+        # 6. Verify tools badge & non-empty notes body
+        tools_txt = driver.find_element(By.ID, "theory-tools-badge").text
+        body_txt = driver.find_element(By.ID, "theory-content-body").get_attribute("textContent")
+        assert len(tools_txt.strip()) > 0 and len(body_txt.strip()) > 10, "Tools badge or notes body empty!"
 
-        # 6. Test Seek Timecode
-        print("Testing seekLectureTime(15)...")
-        driver.execute_script("seekLectureTime(15);")
-        time.sleep(1)
-        cur_time_after_seek = driver.execute_script("return arguments[0].currentTime;", vid)
-        print(f"[OK] Video currentTime after seek(15): {cur_time_after_seek:.2f}s")
-        assert cur_time_after_seek >= 14.0, f"Seek did not jump to ~15s: {cur_time_after_seek}"
-
-        # 7. Test Pause
-        print("Testing pause via togglePlayLectureVideo()...")
-        driver.execute_script("togglePlayLectureVideo();")
-        time.sleep(0.5)
-        is_paused_now = driver.execute_script("return arguments[0].paused;", vid)
-        print(f"[OK] Video paused state: {is_paused_now}")
-        assert is_paused_now, "Video should be paused after toggling play/pause again!"
-
-        # 8. Check Video Title and Description were populated
-        v_title = driver.find_element(By.ID, "lecture-video-title").text
-        v_desc = driver.find_element(By.ID, "lecture-video-desc").text
-        print(f"[OK] Rendered Video Title: '{v_title}'")
-        assert len(v_title) > 5, "Video title was not populated!"
-
-        # 9. Check browser console logs
+        # 7. Check browser console logs
         logs = driver.get_log("browser")
         severe_errors = [l for l in logs if l['level'] == 'SEVERE' and 'favicon' not in l['message']]
         print(f"[OK] Browser severe errors count: {len(severe_errors)}")
@@ -108,7 +90,7 @@ def run_test():
             print("  [ERROR]", err['message'])
         assert len(severe_errors) == 0, f"Found severe errors: {severe_errors}"
 
-        print("\n=== [SUCCESS] SIMULATOR VIDEO TESTS PASSED WITH 100% REAL BROWSER ASSERTIONS! ===")
+        print("\n=== [SUCCESS] SIMULATOR TOPIC GAME TESTS PASSED WITH 100% REAL BROWSER ASSERTIONS! ===")
 
     finally:
         driver.quit()

@@ -4,7 +4,7 @@ from selenium.webdriver.edge.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
-def check_starter_video(driver, wait):
+def check_starter_lesson_game_and_practice(driver, wait):
     lesson_id = driver.execute_async_script("""
         const done = arguments[0];
         fetch('/api/lessons?specialty_slug=autoelectric')
@@ -18,16 +18,10 @@ def check_starter_video(driver, wait):
     driver.get(f"http://127.0.0.1:5000/lesson_player.html?lesson_id={lesson_id}&specialty=autoelectric&task=3")
     wait.until(lambda browser: browser.find_element(By.CSS_SELECTOR, "body.starter-lesson"))
     driver.find_element(By.ID, "step-btn-2").click()
-    video = driver.find_element(By.CSS_SELECTOR, ".starter-video")
-    driver.find_element(By.CSS_SELECTOR, "[data-play]").click()
-    wait.until(lambda browser: browser.execute_script(
-        "return !arguments[0].paused && arguments[0].currentTime > 0.1;", video
-    ))
-    assert driver.execute_script("return arguments[0].currentSrc;", video).endswith(
-        "/assets/starter-lesson/overview.mp4"
-    )
-    driver.find_element(By.CSS_SELECTOR, "[data-time='18']").click()
-    wait.until(lambda browser: browser.execute_script("return arguments[0].currentTime >= 18;", video))
+    wait.until(lambda browser: browser.find_element(By.CSS_SELECTOR, "#lp-topic-game-mount .tge-shell"))
+    assert len(driver.find_elements(By.CSS_SELECTOR, ".starter-video")) == 0, "Stale starter video must be replaced by Topic Game!"
+    driver.find_element(By.ID, "step-btn-3").click()
+    wait.until(lambda browser: "стартер" in browser.find_element(By.ID, "lp-block-canvas").text.lower())
 
 def run_test():
     options = Options()
@@ -72,70 +66,43 @@ def run_test():
         print(f"[OK] Lesson Title: '{h1_title}'")
         assert len(h1_title) > 5, "Lesson title not loaded!"
 
-        # 2. Jump directly to Theory & Video Block (index 2)
-        print("Jumping directly to Block 2 (Theory & Video)...")
+        # 2. Jump directly to Topic Game Block (index 2)
+        print("Jumping directly to Block 2 (Topic Game & Notes)...")
         driver.execute_script("jumpToBlock(2);")
         time.sleep(1)
 
-        # 3. Check Video element
-        vid = driver.find_element(By.ID, "lp-lecture-video")
-        assert vid is not None, "Video element #lp-lecture-video not found!"
-        src = driver.execute_script("return arguments[0].currentSrc || arguments[0].src;", vid)
-        print(f"[OK] Lp Video source: {src}")
+        # 3. Check Topic Game shell & absence of video element
+        shell = driver.find_element(By.CSS_SELECTOR, "#lp-topic-game-mount .tge-shell")
+        assert shell is not None, "Topic Game not mounted in #lp-topic-game-mount!"
+        assert len(driver.find_elements(By.ID, "lp-lecture-video")) == 0, "Stale #lp-lecture-video still present!"
+        lbl = driver.find_element(By.ID, "tge-round-label").text
+        assert "раунд 1 из 3" in lbl.lower(), f"Unexpected round label: {lbl}"
+        print(f"[OK] LP Topic Game mounted: '{lbl}'")
 
-        # 4. Play video
-        print("Playing lesson video...")
-        driver.find_element(By.ID, "lp-video-center-play-icon").click()
-        wait.until(lambda browser: browser.execute_script(
-            "return !arguments[0].paused && arguments[0].currentTime > 0.05;", vid
-        ))
-        assert driver.execute_script("return arguments[0].currentSrc;", vid) == src
+        # 4. Hint toggle & Cheatsheet presence
+        driver.execute_script("TopicGameEngine.toggleHint('lp-topic-game-mount');")
+        time.sleep(0.3)
+        hints = driver.find_elements(By.CSS_SELECTOR, "#lp-topic-game-mount .tge-hint-box")
+        assert len(hints) == 1, "Hint failed to display"
+        cheatsheet = driver.find_element(By.CSS_SELECTOR, "#lp-theory-game-box details")
+        assert "Шпаргалка темы" in cheatsheet.text
 
-        is_paused = driver.execute_script("return arguments[0].paused;", vid)
-        cur_time = driver.execute_script("return arguments[0].currentTime;", vid)
-        print(f"[OK] Video state: paused={is_paused}, currentTime={cur_time:.2f}s")
-        assert not is_paused, "Lesson player video failed to play!"
-        assert cur_time >= 0.05, "Current time did not advance!"
-
-        # 5. Speed switch
-        print("Setting speed to 1.5x...")
-        driver.execute_script("setLpVideoSpeed(1.5);")
-        time.sleep(0.5)
-        rate = driver.execute_script("return arguments[0].playbackRate;", vid)
-        assert rate == 1.5, f"Expected 1.5x speed, got {rate}"
-        print(f"[OK] Video rate: {rate}")
-
-        # 6. Seek within the actual clip, which can be shorter than the old demo.
-        target = driver.execute_script("return arguments[0].duration / 2;", vid)
-        driver.execute_script("seekLpLectureTime(arguments[0]);", target)
-        wait.until(lambda browser: browser.execute_script(
-            "return arguments[0].currentTime >= arguments[1] - 0.5;", vid, target
-        ))
-        cur_after_seek = driver.execute_script("return arguments[0].currentTime;", vid)
-        print(f"[OK] Time after seek({target:.2f}): {cur_after_seek:.2f}s")
-
-        # 7. Pause video
-        driver.find_element(By.ID, "lp-video-play-btn").click()
-        is_paused_now = driver.execute_script("return arguments[0].paused;", vid)
-        assert is_paused_now, "Video should be paused!"
-        print("[OK] Video successfully paused")
-
-        # 8. Sub-tab toggle: switch to notes and back
+        # 5. Sub-tab toggle: switch to notes and back
         print("Switching to text notes sub-tab...")
         driver.execute_script("switchLpTheoryView('text');")
         time.sleep(0.5)
         t_box_hidden = driver.execute_script("return document.getElementById('lp-theory-text-box').classList.contains('hidden');")
-        v_box_hidden = driver.execute_script("return document.getElementById('lp-theory-video-box').classList.contains('hidden');")
-        assert not t_box_hidden and v_box_hidden, "Notes should be visible and video hidden!"
+        g_box_hidden = driver.execute_script("return document.getElementById('lp-theory-game-box').classList.contains('hidden');")
+        assert not t_box_hidden and g_box_hidden, "Notes should be visible and game hidden!"
         print("[OK] Notes tab active")
 
-        driver.execute_script("switchLpTheoryView('video');")
+        driver.execute_script("switchLpTheoryView('game');")
         time.sleep(0.5)
-        v_box_hidden_again = driver.execute_script("return document.getElementById('lp-theory-video-box').classList.contains('hidden');")
-        assert not v_box_hidden_again, "Video tab should be visible again!"
-        print("[OK] Video tab reactivated")
+        g_box_hidden_again = driver.execute_script("return document.getElementById('lp-theory-game-box').classList.contains('hidden');")
+        assert not g_box_hidden_again, "Game tab should be visible again!"
+        print("[OK] Topic Game tab reactivated")
 
-        # 9. Test Fallback Mode (e.g. GitHub Pages offline mode)
+        # 6. Test Fallback Mode (e.g. GitHub Pages offline mode)
         print("\nTesting GitHub Pages offline/curriculum fallback mode...")
         driver.get("http://127.0.0.1:5000/lesson_player.html?lesson_id=999&specialty=it")
         time.sleep(2)
@@ -143,31 +110,15 @@ def run_test():
         print(f"[OK] Fallback lesson title: '{fallback_title}'")
         assert len(fallback_title) > 0 and "не удалось" not in fallback_title.lower(), "Fallback lesson failed to load!"
 
-        # Jump directly to theory block (block 2, zero-indexed)
         driver.execute_script("jumpToBlock(2);")
         time.sleep(1)
-        fallback_vid = driver.find_element(By.ID, "lp-lecture-video")
-        assert fallback_vid is not None, "Fallback lesson video element not found!"
-        driver.find_element(By.ID, "lp-video-play-btn").click()
-        wait.until(lambda browser: browser.execute_script(
-            "return !arguments[0].paused && arguments[0].currentTime > 0.05;", fallback_vid
-        ))
-        fallback_src = driver.execute_script("return arguments[0].currentSrc;", fallback_vid)
-        assert fallback_src.endswith("/assets/lesson-intros/it-3.mp4"), fallback_src
-        print("[OK] Local fallback lesson video played!")
+        fb_shell = driver.find_element(By.CSS_SELECTOR, "#lp-topic-game-mount .tge-shell")
+        assert fb_shell is not None, "Fallback lesson Topic Game not mounted!"
+        fb_state = driver.execute_script("return TopicGameEngine.getState('lp-topic-game-mount');")
+        assert fb_state and len(fb_state.get("game", {}).get("rounds", [])) == 3
+        print("[OK] Local fallback lesson Topic Game verified!")
 
-        # Simulate an invalid media response and retry with a real click.
-        driver.execute_script("arguments[0].src = 'data:video/mp4,invalid';", fallback_vid)
-        status = driver.find_element(By.ID, "lp-video-status")
-        wait.until(lambda _: "Не удалось запустить видео" in status.text)
-        driver.find_element(By.ID, "lp-video-play-btn").click()
-        wait.until(lambda browser: browser.execute_script(
-            "return Boolean(arguments[0].error);", fallback_vid
-        ))
-        assert "Не удалось запустить видео" in status.text
-        assert fallback_vid.get_dom_attribute("src") == "data:video/mp4,invalid"
-
-        # 10. Verify severe JS console errors
+        # 7. Verify severe JS console errors
         logs = driver.get_log("browser")
         severe_errors = [l for l in logs if l['level'] == 'SEVERE' and 'favicon' not in l['message'] and '999' not in l['message']]
         print(f"[OK] Browser severe errors count: {len(severe_errors)}")
@@ -175,8 +126,8 @@ def run_test():
             print("  [ERROR]", err['message'])
         assert len(severe_errors) == 0, f"Found severe errors: {severe_errors}"
 
-        check_starter_video(driver, wait)
-        print("\n=== [SUCCESS] LESSON_PLAYER VIDEO & FALLBACK TESTS PASSED 100%! ===")
+        check_starter_lesson_game_and_practice(driver, wait)
+        print("\n=== [SUCCESS] LESSON_PLAYER TOPIC GAME & FALLBACK TESTS PASSED 100%! ===")
 
     finally:
         driver.quit()

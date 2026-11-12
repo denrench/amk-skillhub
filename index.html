@@ -3,11 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="AMK SkillHub — цифровая образовательная платформа нового поколения. 10-секундные видео-схемы, живые тренажёры и ежедневный рост по 5 специальностям АМК.">
+  <meta name="description" content="AMK SkillHub — цифровая образовательная платформа нового поколения. 60 уникальных интерактивных игр по темам, живые тренажёры и ежедневный рост по 5 специальностям АМК.">
   <meta name="theme-color" content="#f4f7fb">
   <title>AMK SkillHub · Цифровая платформа АМК</title>
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg">
   <link rel="stylesheet" href="css/academy.css">
+  <script src="js/topic-games-60.js" defer></script>
+  <script src="js/topic-game-engine.js" defer></script>
 </head>
 <body>
   <canvas id="global-3d-canvas" class="global-3d-canvas" aria-hidden="true"></canvas>
@@ -39,7 +41,7 @@
               <span>EDU SPACE · АМК · 60 интерактивных уроков</span>
             </div>
             <h1>Знания, которые <span class="hero-highlight">можно применить</span></h1>
-            <p>Интерактивная мастерская нового поколения: живые тренажёры, 10-секундные видео-схемы сути и пошаговое ежедневное открытие модулей.</p>
+            <p>Интерактивная мастерская нового поколения: 60 уникальных интерактивных игр по темам вместо скучных видеолекций, живые тренажёры и пошаговое ежедневное открытие модулей.</p>
             <div class="landing-cta-row">
               <a class="button primary" href="learn.html">Открыть учебник</a>
               <a class="button" href="tasks.html">Перейти в практикум</a>
@@ -70,19 +72,17 @@
             </div>
 
             <div class="studio-body" id="studio-panel" role="tabpanel" aria-labelledby="tab-it">
-              <div class="studio-stage">
-                <video id="studio-video" src="assets/lesson-intros/it-1.mp4" poster="assets/lesson-intros/it-1.jpg" autoplay muted loop playsinline preload="metadata" aria-label="10-секундная визуальная схема темы">
-                  <track id="studio-track" kind="captions" src="assets/lesson-intros/it-1.vtt" srclang="ru" label="Русский" default>
-                </video>
+              <div class="studio-stage is-game" id="studio-stage">
+                <div id="studio-game-mount" aria-live="polite"></div>
               </div>
 
               <div class="studio-inspector">
                 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
                   <p class="eyebrow" id="studio-eyebrow">Модуль 01 · Веб-дизайн</p>
-                  <span class="sim-pill" id="studio-stage-badge">IT · 10 СЕК ВИДЕО-СХЕМА</span>
+                  <span class="sim-pill" id="studio-stage-badge">IT · ИГРА ПО ТЕМЕ №1</span>
                 </div>
                 <h2 id="studio-title">Композиция, сетка 8px и живая вёрстка</h2>
-                <p class="muted" id="studio-desc">Разберите логику отступов и визуальной иерархии в коротком ролике, затем сразу закрепите на интерактивном тренажёре.</p>
+                <p class="muted" id="studio-desc">Освойте логику отступов и визуальной иерархии в живом мини-симуляторе прямо здесь, затем пройдите все 3 раунда в уроке.</p>
                 <ul class="studio-meta-list">
                   <li><span class="studio-meta-key">ИНТЕРАКТИВ</span><span id="studio-lab">Песочница сетки и Flexbox</span></li>
                   <li><span class="studio-meta-key">РАСПИСАНИЕ</span><span>День 1 сразу · День 2 на следующий день</span></li>
@@ -128,8 +128,8 @@
             <span>IT, графический дизайн, автодело и HVAC</span>
           </div>
           <div class="kpi-cell">
-            <strong data-count="10" data-suffix=" секунд">10 секунд</strong>
-            <span>Наглядная видео-схема сути темы вместо сухой теории</span>
+            <strong data-count="60" data-suffix=" игр">60 игр</strong>
+            <span>Уникальная интерактивная мини-игра на каждую тему без повторов</span>
           </div>
           <div class="kpi-cell">
             <strong>День 1 → 12</strong>
@@ -156,8 +156,8 @@
         </article>
         <article class="pipeline-card">
           <span class="pipeline-step">02</span>
-          <h3>Суть за 10 секунд</h3>
-          <p class="muted">Анимированная схема показывает задачу «До», внутренний принцип работы и правильное решение «После».</p>
+          <h3>Суть темы в игре</h3>
+          <p class="muted">Уникальная 3-раундовая мини-игра для каждого урока: реальный кейс, поиск дефекта, замер прибором или сборка узла.</p>
         </article>
         <article class="pipeline-card">
           <span class="pipeline-step">03</span>
@@ -549,67 +549,52 @@
     (function () {
       const PREVIEW_DATA = {
         it: {
-          video: 'assets/lesson-intros/it-1.mp4',
-          poster: 'assets/lesson-intros/it-1.jpg',
-          vtt: 'assets/lesson-intros/it-1.vtt',
           eyebrow: 'Модуль 01 · Веб-дизайн',
           title: 'Композиция, сетка 8px и живая вёрстка',
-          desc: 'Разберите логику отступов и визуальной иерархии в 10-секундном ролике, затем сразу закрепите на интерактивном тренажёре.',
+          desc: 'Освойте логику отступов и визуальной иерархии в живом мини-симуляторе прямо здесь, затем пройдите все 3 раунда в уроке.',
           lab: 'Песочница сетки и Flexbox',
           tools: 'Figma · HTML/CSS · Шпаргалка',
-          badge: 'IT · 10 СЕК ВИДЕО-СХЕМА',
+          badge: 'IT · ИГРА ПО ТЕМЕ №1',
           learnUrl: 'learn.html?course=it&lesson=1',
           simUrl: 'tasks.html?specialty=it'
         },
         graphic_design: {
-          video: 'assets/lesson-intros/graphic_design-1.mp4',
-          poster: 'assets/lesson-intros/graphic_design-1.jpg',
-          vtt: 'assets/lesson-intros/graphic_design-1.vtt',
           eyebrow: 'Модуль 01 · Графический дизайн',
           title: 'Контраст, цвет CMYK/RGB и типографика',
-          desc: 'Наглядный 10-секундный разбор цветовых моделей и допечатной подготовки, дополненный лабораторией смешения каналов.',
+          desc: 'Настройте цветовые модели и допечатные параметры в интерактивной лаборатории темы и проверьте баланс на макете.',
           lab: 'Лаборатория CMYK / Контраст',
           tools: 'Vector · CMYK · Шпаргалка Prepress',
-          badge: 'DESIGN · 10 СЕК ВИДЕО-СХЕМА',
+          badge: 'DESIGN · ИГРА ПО ТЕМЕ №1',
           learnUrl: 'learn.html?course=graphic_design&lesson=1',
           simUrl: 'tasks.html?specialty=graphic_design'
         },
         autoelectric: {
-          video: 'assets/lesson-intros/autoelectric-1.mp4',
-          poster: 'assets/lesson-intros/autoelectric-1.jpg',
-          vtt: 'assets/lesson-intros/autoelectric-1.vtt',
           eyebrow: 'Модуль 01 · Автоэлектрика',
           title: 'Диагностика цепи питания и мультиметр 12.6 В',
-          desc: 'За 10 секунд увидьте путь тока в цепи запуска, утечку напряжения и эталонные замеры под нагрузкой.',
+          desc: 'Подбирайте сечение кабеля по закону Ома и ищите обрыв/просадку напряжения в цепи на виртуальном стенде.',
           lab: 'Симулятор мультиметра и цепи DIN',
           tools: 'Мультиметр · Схемы 12V · Шпаргалка',
-          badge: 'AUTO ELECTRIC · 10 СЕК СХЕМА',
+          badge: 'AUTO ELECTRIC · ИГРА ПО ТЕМЕ №1',
           learnUrl: 'learn.html?course=autoelectric&lesson=1',
           simUrl: 'tasks.html?specialty=autoelectric'
         },
         hvac: {
-          video: 'assets/lesson-intros/hvac-1.mp4',
-          poster: 'assets/lesson-intros/hvac-1.jpg',
-          vtt: 'assets/lesson-intros/hvac-1.vtt',
           eyebrow: 'Модуль 01 · Холодильное оборудование',
           title: 'Холодильный цикл и расчёт перегрева Superheat',
-          desc: 'Динамическая схема контура высокого и низкого давления объясняет кипение хладагента R600a и контроль перегрева за 10 секунд.',
+          desc: 'Сортируйте узлы термодинамического контура и диагностируйте контур R600a в интерактивной игре урока.',
           lab: 'Манометрический стенд и Superheat',
           tools: 'R600a · Вакуумирование · Шпаргалка',
-          badge: 'HVAC · 10 СЕК ТЕРМО-СХЕМА',
+          badge: 'HVAC · ИГРА ПО ТЕМЕ №1',
           learnUrl: 'learn.html?course=hvac&lesson=1',
           simUrl: 'tasks.html?specialty=hvac'
         },
         automechanic: {
-          video: 'assets/lesson-intros/automechanic-1.mp4',
-          poster: 'assets/lesson-intros/automechanic-1.jpg',
-          vtt: 'assets/lesson-intros/automechanic-1.vtt',
           eyebrow: 'Модуль 01 · Автомеханика',
           title: 'Кинематика ДВС, фазы ГРМ и зазоры микрометром',
-          desc: '10-секундный разбор тактов работы двигателя, совмещения меток ГРМ и допусков при дефектовке узлов.',
+          desc: 'Найдите ошибку в последовательности тактов и выставьте фазы ГРМ без повреждения клапанов на интерактивном стенде.',
           lab: 'Порядок затяжки и стенд ДВС',
           tools: 'Динамометр · Фазы ГРМ · Шпаргалка',
-          badge: 'MECHANIC · 10 СЕК КИНЕМАТИКА',
+          badge: 'MECHANIC · ИГРА ПО ТЕМЕ №1',
           learnUrl: 'learn.html?course=automechanic&lesson=1',
           simUrl: 'tasks.html?specialty=automechanic'
         }
@@ -617,8 +602,6 @@
 
       const tabs = Array.from(document.querySelectorAll('.studio-tab'));
       const panel = document.getElementById('studio-panel');
-      const video = document.getElementById('studio-video');
-      const track = document.getElementById('studio-track');
       const badge = document.getElementById('studio-stage-badge');
       const eyebrow = document.getElementById('studio-eyebrow');
       const title = document.getElementById('studio-title');
@@ -627,10 +610,26 @@
       const tools = document.getElementById('studio-tools');
       const learnLink = document.getElementById('studio-link');
       const simLink = document.getElementById('studio-sim-link');
+      let activeCourseKey = 'it';
+
+      function mountStudioPreviewGame(courseKey) {
+        const item = PREVIEW_DATA[courseKey];
+        if (!item || !window.TopicGameEngine || !document.getElementById('studio-game-mount')) return;
+        window.TopicGameEngine.mount({
+          containerId: 'studio-game-mount',
+          spec: courseKey,
+          taskNum: 1,
+          title: item.title,
+          summary: item.desc,
+          singleRoundPreview: true,
+          fullLessonUrl: item.learnUrl
+        });
+      }
 
       function selectCourse(courseKey) {
         const item = PREVIEW_DATA[courseKey];
         if (!item) return;
+        activeCourseKey = courseKey;
         tabs.forEach(function (btn) {
           const active = btn.getAttribute('data-course') === courseKey;
           btn.setAttribute('aria-selected', active ? 'true' : 'false');
@@ -638,12 +637,6 @@
             panel.setAttribute('aria-labelledby', btn.id);
           }
         });
-        if (video) {
-          video.poster = item.poster;
-          video.src = item.video;
-          if (track) track.src = item.vtt;
-          video.play().catch(function () {});
-        }
         if (badge) badge.textContent = item.badge;
         if (eyebrow) eyebrow.textContent = item.eyebrow;
         if (title) title.textContent = item.title;
@@ -652,7 +645,12 @@
         if (tools) tools.textContent = item.tools;
         if (learnLink) learnLink.href = item.learnUrl;
         if (simLink) simLink.href = item.simUrl;
+        mountStudioPreviewGame(courseKey);
       }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        mountStudioPreviewGame(activeCourseKey);
+      });
 
       tabs.forEach(function (btn, idx) {
         btn.addEventListener('click', function () {

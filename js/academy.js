@@ -110,12 +110,12 @@
       if (done) doneCount += 1;
       else if (!foundPending) { firstPending = number; foundPending = true; }
       return `<a class="lesson-row" style="--reveal-delay:${index * 28}ms" href="${href(slug, number)}"><span class="course-num">${String(number).padStart(2, '0')}</span>
-        <strong>${marked ? '★ ' : ''}${title}</strong><small data-lesson-key="${key}">${done ? 'Пройдено' : 'Текст и практика'}</small></a>`;
+        <strong>${marked ? '★ ' : ''}${title}</strong><small data-lesson-key="${key}">${done ? 'Пройдено' : 'Игра и практика'}</small></a>`;
     }).join('');
     const pct = Math.round((doneCount / Math.max(1, list.length)) * 100);
     root.innerHTML = `
       <div class="container catalog-head stack"><p class="eyebrow">5 специальностей / 60 уроков</p><h1>Учебник</h1>
-      <p class="muted">Выберите направление. В каждом уроке есть объяснение, разобранный пример и задача с обратной связью.</p></div>
+      <p class="muted">Выберите направление. В каждом уроке тема осваивается через уникальную интерактивную игру на 3 раунда, объяснение, пример и тест.</p></div>
       <div class="container section catalog-layout">
         <nav class="catalog-menu" aria-label="Специальности">${Object.entries(courses).map(([id, entry]) =>
           `<a href="${href(id)}"${id === slug ? ' aria-current="page"' : ''}>${entry[0]}</a>`).join('')}</nav>
@@ -140,9 +140,12 @@
     const choices = requested % 2 ? [incorrect, correct] : [correct, incorrect];
     const hasModel = models.has(key);
     const next = requested < data[slug].length ? href(slug, requested + 1) : href(slug);
-    const mediaBase = key === 'autoelectric:3'
-      ? { mp4: 'assets/starter-lesson/overview.mp4', jpg: 'assets/starter-lesson/poster.jpg', vtt: 'assets/starter-lesson/captions-ru.vtt' }
-      : { mp4: `assets/lesson-intros/${slug}-${requested}.mp4`, jpg: `assets/lesson-intros/${slug}-${requested}.jpg`, vtt: `assets/lesson-intros/${slug}-${requested}.vtt` };
+    const gameStoreKey = `eduspace_academy_game_${slug}_${requested}`;
+    let savedGameState = {};
+    try {
+      savedGameState = JSON.parse(localStorage.getItem(gameStoreKey) || '{}') || {};
+    } catch {}
+    const gameDone = Boolean(savedGameState && (savedGameState.game_completed || savedGameState.gameCompleted));
     const safety = ['autoelectric', 'automechanic', 'hvac'].includes(slug)
       ? '<p class="muted">Учебный пример для разбора. Действия на оборудовании выполняют по инструкции производителя под руководством преподавателя.</p>'
       : '';
@@ -153,7 +156,7 @@
         <p class="eyebrow">${course[0]} / Урок ${String(requested).padStart(2, '0')} из ${data[slug].length}</p>
         <h1>${title}</h1>
         <div class="lesson-progress-chips" aria-label="Этапы урока">
-          <span class="lesson-step-chip" data-done="true">01 · Видео-схема 10 сек</span>
+          <span class="lesson-step-chip" id="chip-game-step" data-done="${gameDone ? 'true' : 'false'}">01 · Интерактивная игра-тема</span>
           <span class="lesson-step-chip" data-done="true">02 · Объяснение и пример</span>
           <span class="lesson-step-chip" id="chip-quiz-step" data-done="false">03 · Проверка знаний</span>
           <button type="button" class="button lesson-bookmark-btn" id="lesson-bookmark-btn" aria-pressed="${bookmarks.includes(key) ? 'true' : 'false'}" style="min-height:32px;padding:0.2rem 0.7rem;font-size:0.78rem;">${bookmarks.includes(key) ? '★ В закладках' : '☆ В закладки'}</button>
@@ -161,20 +164,18 @@
       </div></div>
       <div class="container lesson-layout">
         <nav class="catalog-menu lesson-nav" aria-label="Разделы урока">
-          <a href="#visual">0. Видео-схема 10 сек</a><a href="#explanation">1. Объяснение</a><a href="#example">2. Пример</a><a href="#exercise">3. Задание</a>
+          <a href="#visual">0. Игра по теме</a><a href="#explanation">1. Объяснение</a><a href="#example">2. Пример</a><a href="#exercise">3. Задание</a>
           ${hasModel ? '<a href="#model">4. 3D-модель</a>' : ''}
         </nav>
         <article>
           <section id="visual" class="lesson-visual-card">
             <div class="lesson-visual-head">
-              <span class="eyebrow">10-секундная визуальная схема темы</span>
-              <span class="lesson-visual-meta">ПРОБЛЕМА «ДО» → МЕХАНИКА → ЭТАЛОН «ПОСЛЕ»</span>
+              <span class="eyebrow">01 · Интерактивное освоение темы</span>
+              <span class="lesson-visual-meta">3 УНИКАЛЬНЫХ РАУНДА · СИТУАЦИЯ → МЕХАНИКА → ПРАВИЛО</span>
             </div>
-            <video class="academy-media" controls autoplay muted loop playsinline preload="auto" poster="${mediaBase.jpg}" src="${mediaBase.mp4}" aria-label="Видео-разбор темы урока">
-              <track kind="captions" src="${mediaBase.vtt}" srclang="ru" label="Русские субтитры" default>
-            </video>
+            <div id="academy-topic-game-mount"></div>
             <div class="actions">
-              <a class="button primary" href="lesson_player.html?catalog=1&amp;specialty=${slug}&amp;lesson=${requested}">Открыть интерактивный тренажёр урока →</a>
+              <a class="button primary" href="lesson_player.html?catalog=1&amp;specialty=${slug}&amp;task=${requested}">Открыть полный 8-этапный урок →</a>
             </div>
           </section>
           <section id="explanation" class="card"><p class="eyebrow">01 / Разберитесь</p><h2>Главная идея</h2><p data-concept></p></section>
@@ -190,6 +191,37 @@
           ${course[2] ? `<p class="muted"><a href="${course[2]}">Справочный материал по направлению</a></p>` : ''}
         </article>
       </div>`;
+    const gameChip = root.querySelector('#chip-game-step');
+    if (window.TopicGameEngine && document.getElementById('academy-topic-game-mount')) {
+      window.TopicGameEngine.mount({
+        containerId: 'academy-topic-game-mount',
+        spec: slug,
+        taskNum: requested,
+        title: title,
+        summary: concept,
+        chunks: [
+          { heading: 'Главная идея', text: concept, callout: { text: explanation } },
+          { heading: 'Разбор примера', text: example, callout: { text: correct } }
+        ],
+        savedState: savedGameState,
+        alreadyCompleted: gameDone,
+        onComplete: (res) => {
+          try {
+            localStorage.setItem(gameStoreKey, JSON.stringify(res || { game_completed: true }));
+          } catch {}
+          if (gameChip) gameChip.dataset.done = 'true';
+          if (window.PrismFX) {
+            window.PrismFX.play('good');
+            const mountEl = document.getElementById('academy-topic-game-mount');
+            if (mountEl) {
+              const r = mountEl.getBoundingClientRect();
+              window.PrismFX.burst(r.left + r.width * 0.5, r.top + 80, 24, true);
+              window.PrismFX.spawnFloat(r.left + r.width * 0.5, r.top + 60, '+25 XP ✓', true);
+            }
+          }
+        }
+      });
+    }
     root.querySelector('[data-concept]').textContent = concept;
     root.querySelector('[data-example]').textContent = example;
     root.querySelector('[data-question]').textContent = question;

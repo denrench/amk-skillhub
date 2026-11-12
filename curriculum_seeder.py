@@ -1,8 +1,8 @@
 """
 EduSpace Interactive Curriculum Seeder & Lesson Schema Definition
-Generates high quality, 8-block modular educational lessons for all 5 college specialties (50 total).
+Generates high quality, 8-block modular educational lessons for all 5 college specialties (60 total).
 Complies with Bloom's Taxonomy & Kolb's Experiential Learning Cycle:
-Hook -> Objectives -> Theory -> Interactive Widget -> Inline Check -> Practical Application -> Assessment Quiz -> Summary & XP Reward
+Hook -> Objectives -> Interactive Topic Game -> Interactive Widget -> Inline Check -> Practical Application -> Assessment Quiz -> Summary & XP Reward
 """
 import json
 import os
@@ -208,30 +208,24 @@ def _build_interactive_widget(item, spec, num):
             "steps": steps
         }
 
-def _generate_lesson_video_data(spec, num, clean_title, tools, summary):
-    spec_embed_map = {
-        'it': 'https://www.youtube.com/embed/videoseries?list=PLillGF-RfqbZTASqIvh744ZdRRQKb8gkU',
-        'graphic_design': 'https://www.youtube.com/embed/videoseries?list=PLW-zSkCnZ-gA5Jn6gZtUa6ElSTZsLPeMm',
-        'autoelectric': 'https://www.youtube.com/embed/videoseries?list=PLtKz_47wG_E_P7n9aI7xK8_C4Q5W5xZ',
-        'hvac': 'https://www.youtube.com/embed/videoseries?list=PLm8bS8P7gT3_HVAC_Cooling_Basics',
-        'automechanic': 'https://www.youtube.com/embed/videoseries?list=PLuPq6q3LqX7_Mechanic_Engine_Tech'
-    }
+_TOPIC_GAMES_CACHE = None
 
-    timecodes = [
-        {"sec": 0, "time_str": "00:00", "title": f"1. Проблема «До»: {clean_title[:36]}"},
-        {"sec": 3, "time_str": "00:03", "title": f"2. Как это работает: {tools[:34] if tools else 'Принцип действия'}"},
-        {"sec": 7, "time_str": "00:07", "title": "3. Эталон «После» и ключевое правило"}
-    ]
-
-    return {
-        "video_url": "assets/sample-lesson.mp4",
-        "video_title": f"Видео-разбор (10 сек): {clean_title}",
-        "video_duration": "00:10",
-        "video_poster": "assets/eduspace-logo.svg",
-        "embed_url": spec_embed_map.get(spec, "assets/sample-lesson.mp4"),
-        "timecodes": timecodes,
-        "transcript": summary
-    }
+def _load_topic_games():
+    global _TOPIC_GAMES_CACHE
+    if _TOPIC_GAMES_CACHE is not None:
+        return _TOPIC_GAMES_CACHE
+    tg_path = os.path.join(BASE_DIR, 'js', 'topic-games-60.js')
+    if not os.path.exists(tg_path):
+        _TOPIC_GAMES_CACHE = {}
+        return _TOPIC_GAMES_CACHE
+    with open(tg_path, 'r', encoding='utf-8') as f:
+        raw = f.read()
+    m = re.search(r'window\.EDU_TOPIC_GAMES\s*=\s*(\{.*\})\s*;?\s*$', raw, re.DOTALL)
+    if m:
+        _TOPIC_GAMES_CACHE = json.loads(m.group(1))
+    else:
+        _TOPIC_GAMES_CACHE = {}
+    return _TOPIC_GAMES_CACHE
 
 def _build_8_block_lesson(item, spec, num):
     title = item.get("title", f"Урок {num}")
@@ -249,7 +243,8 @@ def _build_8_block_lesson(item, spec, num):
     theory_raw = item.get("theory", "")
     chunks = _parse_theory_chunks(theory_raw, clean_title, tools)
     interactive_widget = _build_interactive_widget(item, spec, num)
-    video_data = _generate_lesson_video_data(spec, num, clean_title, tools, summary)
+    games_catalog = _load_topic_games()
+    topic_game = (games_catalog.get(spec) or {}).get(str(num))
     
     quiz = item.get("quiz", [])
     first_q = quiz[0] if quiz else {
@@ -293,14 +288,9 @@ def _build_8_block_lesson(item, spec, num):
         {
             "id": "b3_theory",
             "type": "theory",
-            "title": f"Теория и Видео-объяснение: {clean_title[:50]}",
-            "video_url": video_data["video_url"],
-            "video_title": video_data["video_title"],
-            "video_duration": video_data["video_duration"],
-            "video_poster": video_data["video_poster"],
-            "embed_url": video_data["embed_url"],
-            "timecodes": video_data["timecodes"],
-            "transcript": video_data["transcript"],
+            "title": f"Интерактивный симулятор темы: {clean_title[:50]}",
+            "summary": summary,
+            "game": topic_game,
             "cheatsheet": [
                 f"Инструмент / стандарт: {tools or 'профильный регламент АМК'}",
                 criteria[0] if criteria else f"Контроль ключевых допусков по теме «{clean_title[:45]}»",
@@ -403,7 +393,7 @@ def generate_default_courses():
         })
     return courses
 
-# Eagerly load all 50 courses
+# Eagerly load all 60 courses/lessons
 DEFAULT_COURSES = generate_default_courses()
 
 def seed_interactive_curriculum(cursor):
@@ -481,11 +471,11 @@ def seed_interactive_curriculum(cursor):
 if __name__ == '__main__':
     import sqlite3
     db_path = os.path.join(BASE_DIR, 'database.db')
-    print(f"[SEED] Seeding interactive curriculum with videos to {db_path}...")
+    print(f"[SEED] Seeding interactive curriculum with 60 topic games to {db_path}...")
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     seed_interactive_curriculum(cur)
     conn.commit()
     conn.close()
-    print("[SEED SUCCESS] Successfully seeded all 60 lessons with video lectures and dynamic timecodes into database.db!")
+    print("[SEED SUCCESS] Successfully seeded all 60 lessons with bespoke interactive topic games into database.db!")
 

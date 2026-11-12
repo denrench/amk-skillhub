@@ -967,6 +967,13 @@ button.button { cursor: pointer; }
   aspect-ratio: 16 / 9;
 }
 
+.studio-stage.is-game {
+  aspect-ratio: auto;
+  overflow: visible;
+  background: transparent;
+  border: none;
+}
+
 .studio-stage video {
   width: 100%;
   height: 100%;
