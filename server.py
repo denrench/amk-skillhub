@@ -150,6 +150,14 @@ _RATE_BUCKETS = {}
 
 @app.before_request
 def _enforce_rate_limit():
+    if request.method in ('POST', 'PUT', 'DELETE'):
+        origin = request.headers.get('Origin')
+        if origin and not app.testing:
+            allowed_hosts = {request.host, 'localhost:5000', '127.0.0.1:5000', 'denrench.github.io', 'amk-skillhub.onrender.com'}
+            orig_host = origin.split('://')[-1].split('/')[0]
+            if orig_host and orig_host not in allowed_hosts:
+                return jsonify({"success": False, "error": "CSRF_ORIGIN_MISMATCH", "message": "Cross-origin state modification rejected"}), 403
+
     if app.testing or request.method != 'POST':
         return None
     path = request.path or ''
@@ -166,6 +174,14 @@ def _enforce_rate_limit():
             bucket.append(now)
             _RATE_BUCKETS[key] = bucket
     return None
+
+
+@app.after_request
+def _set_security_headers(response):
+    response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+    response.headers.setdefault('X-Frame-Options', 'SAMEORIGIN')
+    response.headers.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
+    return response
 
 
 def verify_and_migrate_password(conn, user_row, candidate_password: str) -> bool:
