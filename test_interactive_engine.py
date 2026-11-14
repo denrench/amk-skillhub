@@ -20,8 +20,8 @@ assert res.status_code == 200
 lessons_data = res.get_json()
 assert lessons_data.get('success') is True
 lessons = lessons_data.get('lessons', [])
-assert len(lessons) == 60, f"Expected exactly 60 seeded lessons across 5 courses, got {len(lessons)}"
-print(f"[OK] Test 2: Lessons API returns {len(lessons)} interactive lessons (12 per specialty)")
+assert len(lessons) == 100, f"Expected exactly 100 seeded lessons across 5 courses, got {len(lessons)}"
+print(f"[OK] Test 2: Lessons API returns {len(lessons)} interactive lessons (20 per specialty)")
 
 # 3. Check All 50 Lessons Have Valid 8 Blocks, Sequential Traversal & Verify Specialty Aliases
 expected_types = ['hook', 'objectives', 'theory', 'interactive', 'inline_check', 'practical', 'assessment', 'summary']
@@ -39,7 +39,7 @@ for les_item in lessons:
 
     # Verify sequential traversal pointers
     order_num = les.get('order_num', 1)
-    if order_num < 12:
+    if order_num < 20:
         assert les.get('next_lesson_id') is not None, f"Lesson {lid} (order {order_num}) must have next_lesson_id"
     else:
         assert les.get('next_lesson_id') is None, f"Lesson {lid} (order {order_num}) is last in course, next_lesson_id must be None"
@@ -54,10 +54,10 @@ for cid in range(1, 6):
     assert r_mods.status_code == 200
     mods = r_mods.get_json().get('modules', [])
     assert len(mods) == 1, f"Course {cid} should have exactly 1 module, got {len(mods)}"
-    assert len(mods[0].get('lessons', [])) == 12, f"Course {cid} module 1 should have 12 lessons"
+    assert len(mods[0].get('lessons', [])) == 20, f"Course {cid} module 1 should have 20 lessons"
 
 # Verify specialty alias endpoints
-for alias, expected_count in [('power', 12), ('mechanics', 12), ('logistics', 12), ('accounting', 12)]:
+for alias, expected_count in [('power', 20), ('mechanics', 20), ('logistics', 20), ('accounting', 20)]:
     r_alias = client.get(f'/api/lessons?specialty={alias}')
     assert r_alias.status_code == 200
     assert len(r_alias.get_json().get('lessons', [])) == expected_count, f"Alias {alias} expected {expected_count} lessons"

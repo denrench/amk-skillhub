@@ -268,8 +268,8 @@ def _build_8_block_lesson(item, spec, num):
             "correct": first_q["correct"]
         })
         
-    xp = 60 if num < 5 else (75 if num < 12 else 100)
-    lesson_type = "visual" if num in (1, 2) else ("practical" if num < 9 else ("simulation" if num < 12 else "exam"))
+    xp = 60 if num < 5 else (75 if num < 18 else (85 if num < 20 else 100))
+    lesson_type = "visual" if num in (1, 2) else ("practical" if num < 15 else ("simulation" if num < 20 else "exam"))
     
     blocks = [
         {
@@ -345,14 +345,14 @@ def _build_8_block_lesson(item, spec, num):
     }
 
 def generate_default_courses():
-    """Assembles all 50 interactive lessons across 5 specialties."""
+    """Assembles all 100 interactive lessons across 5 specialties (5 x 20)."""
     raw_catalog = _load_raw_catalog_lessons()
     courses = []
     for meta in COURSES_METADATA:
         slug = meta["slug"]
         items = raw_catalog.get(slug, [])
         lessons = []
-        for idx in range(1, 13):
+        for idx in range(1, 21):
             item = next((it for it in items if it.get("num") == idx), None)
             if not item:
                 item = {

@@ -114,7 +114,7 @@
     }).join('');
     const pct = Math.round((doneCount / Math.max(1, list.length)) * 100);
     root.innerHTML = `
-      <div class="container catalog-head stack"><p class="eyebrow">5 специальностей / 60 уроков</p><h1>Учебник</h1>
+      <div class="container catalog-head stack"><p class="eyebrow">5 специальностей / 100 уроков</p><h1>Учебник</h1>
       <p class="muted">Выберите направление. В каждом уроке тема осваивается через уникальную интерактивную игру на 3 раунда, объяснение, пример и тест.</p></div>
       <div class="container section catalog-layout">
         <nav class="catalog-menu" aria-label="Специальности">${Object.entries(courses).map(([id, entry]) =>

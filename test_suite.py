@@ -91,7 +91,7 @@ class TestFullLmsSuite(unittest.TestCase):
         for slug in ('it', 'graphic_design', 'autoelectric', 'hvac', 'automechanic'):
             rt = self.app.get(f'/api/tasks?specialty={slug}')
             self.assertEqual(rt.status_code, 200)
-            self.assertEqual(rt.get_json()['count'], 12, f"Course {slug} must have 12 lessons")
+            self.assertEqual(rt.get_json()['count'], 20, f"Course {slug} must have 20 lessons")
 
     def test_03_strict_fio_validation(self):
         r_bad_fio1 = self.app.post('/api/auth/register', json={

@@ -798,3 +798,45 @@ input[type="range"]::-webkit-slider-thumb:hover {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* EduSpace 3.0 Shared Keyframes & Micro-Interactions */
+@keyframes eduFloatY {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes eduNeonPulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(56, 189, 248, 0.2); }
+  50% { box-shadow: 0 0 24px rgba(56, 189, 248, 0.45); }
+}
+
+@keyframes eduRippleAnim {
+  from { transform: scale(0); opacity: 0.4; }
+  to { transform: scale(2.5); opacity: 0; }
+}
+
+.reveal-hidden {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-visible {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+.edu-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.32);
+  transform: scale(0);
+  animation: eduRippleAnim 0.55s ease-out forwards;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-hidden, .reveal-visible { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .edu-ripple { animation: none !important; }
+}

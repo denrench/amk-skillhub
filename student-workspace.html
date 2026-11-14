@@ -448,7 +448,7 @@
             <div class="w-full bg-dark-950 h-2 rounded-full mt-2 overflow-hidden border border-white/5">
               <div id="stat-progress-bar" class="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
-            <span class="text-[11px] text-slate-400 block mt-2" id="stat-progress-sub">0 из 12 уроков зачтено</span>
+            <span class="text-[11px] text-slate-400 block mt-2" id="stat-progress-sub">0 из 20 уроков зачтено</span>
           </div>
         </div>
 
@@ -473,7 +473,7 @@
             </div>
           </div>
           <div>
-            <div class="font-extrabold text-2xl text-white" id="stat-unlocked-val">1 из 12</div>
+            <div class="font-extrabold text-2xl text-white" id="stat-unlocked-val">1 из 20</div>
             <span class="text-[11px] text-slate-400 block mt-2" id="stat-unlocked-sub">11 уроков откроются по дням</span>
           </div>
         </div>
@@ -679,7 +679,7 @@
       // 4 KPI Cards
       document.getElementById('stat-progress-val').textContent = `${stats.progress_percent}%`;
       document.getElementById('stat-progress-bar').style.width = `${stats.progress_percent}%`;
-      document.getElementById('stat-progress-sub').textContent = `${stats.passed_count} из 12 уроков зачтено`;
+      document.getElementById('stat-progress-sub').textContent = `${stats.passed_count} из 20 уроков зачтено`;
 
       if (stats.avg_score > 0) {
         document.getElementById('stat-grade-val').textContent = `${stats.avg_score} / 100`;
@@ -689,8 +689,8 @@
         document.getElementById('stat-grade-sub').textContent = 'Оценок пока нет (старт с нуля)';
       }
 
-      document.getElementById('stat-unlocked-val').textContent = `${unlockedCnt} из 12`;
-      document.getElementById('stat-unlocked-sub').textContent = lockedCnt > 0 ? `Ещё ${lockedCnt} откроются по графику` : 'Все 12 уроков курса открыты!';
+      document.getElementById('stat-unlocked-val').textContent = `${unlockedCnt} из 20`;
+      document.getElementById('stat-unlocked-sub').textContent = lockedCnt > 0 ? `Ещё ${lockedCnt} откроются по графику` : 'Все 20 уроков курса открыты!';
 
       document.getElementById('stat-xp-val').textContent = `${stats.xp} XP`;
       document.getElementById('stat-xp-sub').textContent = `Уровень ${stats.level} • ${stats.passed_count >= 8 ? 'Дипломник курса' : (stats.passed_count >= 3 ? 'Уверенный практик' : 'Старт обучения')}`;
@@ -841,5 +841,6 @@
 
     document.addEventListener('DOMContentLoaded', initStudentDashboard);
   </script>
+  <script src="js/eduspace-animations.js" defer></script>
 </body>
 </html>

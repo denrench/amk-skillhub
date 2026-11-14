@@ -8,6 +8,7 @@ Python 3 + Flask + SQLite3
 import os
 import re
 import time
+import threading
 import json
 import random
 import sqlite3
@@ -120,7 +121,19 @@ HOSTED = bool(os.environ.get('RENDER')) or os.environ.get('APP_ENV') == 'product
 SESSION_SECRET = os.environ.get('SESSION_SECRET') or os.environ.get('SECRET_KEY')
 if HOSTED and SESSION_SECRET and len(SESSION_SECRET) < 32:
     SESSION_SECRET = None
-app.config['SECRET_KEY'] = SESSION_SECRET or secrets.token_hex(32)
+if not SESSION_SECRET:
+    _secret_file = os.path.join(BASE_DIR, '.secret_key')
+    try:
+        if os.path.exists(_secret_file):
+            with open(_secret_file, 'r', encoding='utf-8') as _sf:
+                SESSION_SECRET = _sf.read().strip()
+        if not SESSION_SECRET or len(SESSION_SECRET) < 32:
+            SESSION_SECRET = secrets.token_hex(32)
+            with open(_secret_file, 'w', encoding='utf-8') as _sf:
+                _sf.write(SESSION_SECRET)
+    except Exception:
+        SESSION_SECRET = secrets.token_hex(32)
+app.config['SECRET_KEY'] = SESSION_SECRET
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
@@ -130,6 +143,29 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 
 SUPPORT_PHONE = os.environ.get('SUPPORT_PHONE', '+7 707 907 97 64')
 SUPPORT_EMAIL = os.environ.get('SUPPORT_EMAIL', 'support@amk.kz')
+
+_RATE_LOCK = threading.Lock()
+_RATE_BUCKETS = {}
+
+
+@app.before_request
+def _enforce_rate_limit():
+    if app.testing or request.method != 'POST':
+        return None
+    path = request.path or ''
+    if path in ('/api/login', '/api/register') or path.startswith('/api/ai/'):
+        ip = request.headers.get('X-Forwarded-For', request.remote_addr or 'local').split(',')[0].strip()
+        key = f"{ip}:{path}"
+        now = time.time()
+        window = 60.0
+        limit = 45
+        with _RATE_LOCK:
+            bucket = [ts for ts in _RATE_BUCKETS.get(key, []) if now - ts < window]
+            if len(bucket) >= limit:
+                return jsonify({"success": False, "message": "Слишком много запросов. Повторите через минуту."}), 429
+            bucket.append(now)
+            _RATE_BUCKETS[key] = bucket
+    return None
 
 
 def verify_and_migrate_password(conn, user_row, candidate_password: str) -> bool:
@@ -1646,7 +1682,7 @@ def check_and_unlock_achievements(conn, user_id):
         ("high_five", passed_count >= 5),
         ("perfect_score", max_score >= 100),
         ("streak_master", streak >= 3),
-        ("course_champion", passed_count >= 12),
+        ("course_champion", passed_count >= 20),
     ]
 
     for ach_id, condition in checks:
@@ -3340,7 +3376,7 @@ def get_gradebook_matrix():
     for st in students:
         cells = {}
         scores = []
-        for num in range(1, 13):
+        for num in range(1, 21):
             c_info = cell_map.get((st['id'], num))
             if c_info:
                 cells[str(num)] = c_info
@@ -3457,7 +3493,7 @@ def create_or_update_task():
     title = (data.get('title') or '').strip()
     description = (data.get('description') or '').strip()
     difficulty = (data.get('difficulty') or 'Средний').strip()
-    unlock_day = max(1, min(12, int(data.get('unlock_day') or task_number)))
+    unlock_day = max(1, min(20, int(data.get('unlock_day') or task_number)))
     tools_required = (data.get('tools_required') or 'Практикум EDU SPACE').strip()
     starter_code = data.get('starter_code') or '// Введите ваше решение\n'
 

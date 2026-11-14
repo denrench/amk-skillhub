@@ -2089,3 +2089,97 @@ body[data-mood="cyber"] .hero-highlight {
     transform: none !important;
   }
 }
+
+
+/* ==========================================================================
+   EDUSPACE 3.0 — MOTION, REVEAL, 3D CARD TILT & MICRO-INTERACTIONS
+   ========================================================================== */
+@keyframes eduFloatY {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes eduShimmerSweep {
+  0% { transform: translateX(-120%) skewX(-18deg); }
+  100% { transform: translateX(220%) skewX(-18deg); }
+}
+
+@keyframes eduNeonPulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(56, 189, 248, 0.22), 0 0 28px rgba(99, 102, 241, 0.12); }
+  50% { box-shadow: 0 0 24px rgba(56, 189, 248, 0.48), 0 0 42px rgba(99, 102, 241, 0.26); }
+}
+
+@keyframes eduRippleAnim {
+  from { transform: scale(0); opacity: 0.45; }
+  to { transform: scale(2.6); opacity: 0; }
+}
+
+@keyframes eduBadgePop {
+  0% { transform: scale(0.85); opacity: 0; }
+  70% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.reveal-hidden {
+  opacity: 0;
+  transform: translateY(22px) scale(0.985);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1), transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-visible {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+.edu-tilt-card {
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.edu-tilt-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(56, 189, 248, 0.16), transparent 60%);
+}
+
+.edu-tilt-card:hover::after {
+  opacity: 1;
+}
+
+.edu-float {
+  animation: eduFloatY 4.5s ease-in-out infinite;
+}
+
+.edu-neon-pulse {
+  animation: eduNeonPulse 3.2s ease-in-out infinite;
+}
+
+.edu-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(0);
+  animation: eduRippleAnim 0.55s ease-out forwards;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-hidden, .reveal-visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .edu-float, .edu-neon-pulse, .edu-ripple {
+    animation: none !important;
+  }
+  .edu-tilt-card {
+    transition: none !important;
+  }
+}

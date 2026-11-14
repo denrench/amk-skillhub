@@ -10,3 +10,5 @@ database.db-journal
 /database.db
 /database.db-wal
 /database.db-shm
+
+.secret_key

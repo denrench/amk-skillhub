@@ -1,4 +1,4 @@
-// EDU SPACE — Официальный учебный каталог 5 профессий (5 курсов × 12 уроков = 60 модулей)
+// EDU SPACE — Официальный учебный каталог 5 профессий (5 курсов × 20 уроков = 100 модулей)
 // Алматинский многопрофильный колледж (АМК)
 // UTF-8 Clean Encoding
 
@@ -53,7 +53,8 @@ window.EDU_COURSES = [
           12
         ]
       }
-    ]
+    ],
+    "lessons_count": 20
   },
   {
     "slug": "graphic_design",
@@ -99,7 +100,8 @@ window.EDU_COURSES = [
           12
         ]
       }
-    ]
+    ],
+    "lessons_count": 20
   },
   {
     "slug": "autoelectric",
@@ -145,7 +147,8 @@ window.EDU_COURSES = [
           12
         ]
       }
-    ]
+    ],
+    "lessons_count": 20
   },
   {
     "slug": "hvac",
@@ -191,7 +194,8 @@ window.EDU_COURSES = [
           12
         ]
       }
-    ]
+    ],
+    "lessons_count": 20
   },
   {
     "slug": "automechanic",
@@ -237,7 +241,8 @@ window.EDU_COURSES = [
           12
         ]
       }
-    ]
+    ],
+    "lessons_count": 20
   }
 ];
 
@@ -1274,6 +1279,795 @@ window.EDU_LESSONS = {
           "title": "Публикация на GitHub Pages и защита"
         }
       ]
+    },
+    {
+      "num": 13,
+      "title": "Урок 13. CSS Grid Layout: двумерные сетки, grid-template-areas и адаптивные карточки",
+      "difficulty": "Средний",
+      "time_limit": "75 мин",
+      "tools": "CSS Grid, DevTools Grid Inspector, VS Code",
+      "summary": "Проектирование сложных двумерных макетов дашбордов и каталогов с помощью CSS Grid, fr-единиц и minmax().",
+      "theory": "<h4>1. Отличие CSS Grid от Flexbox</h4>\n<p>Flexbox работает вдоль одной оси (строка или столбец), тогда как <strong>CSS Grid</strong> управляет одновременно строками и колонками, позволяя строить сложные модульные сетки без лишних обёрток.</p>\n<h4>2. Ключевые свойства контейнера</h4>\n<ul>\n<li><code>display: grid;</code> — активирует сеточный контекст.</li>\n<li><code>grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));</code> — создаёт автоматически перестраиваемую адаптивную сетку карточек без медиа-запросов.</li>\n<li><code>gap: 24px;</code> — задаёт единый интервал между строками и колонками.</li>\n<li><code>grid-template-areas</code> — именованные области макета (header, sidebar, main, footer).</li>\n</ul>\n<h4>3. Типовые ошибки при работе с CSS Grid</h4>\n<ul>\n<li><strong>Переполнение треков (Overflow):</strong> использование <code>1fr</code> вместо <code>minmax(0, 1fr)</code> позволяет длинному тексту или <code>&lt;pre&gt;</code> растянуть колонку шире экрана.</li>\n<li><strong>Смешение auto-fit и auto-fill:</strong> <code>auto-fit</code> схлопывает пустые колонки и растягивает карточки, а <code>auto-fill</code> сохраняет пустые слоты сетки.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>В каталоге курсов на мобильном экране 375 px одна карточка выходила за правый край. Замена <code>repeat(3, 1fr)</code> на <code>repeat(auto-fit, minmax(min(100%, 260px), 1fr))</code> полностью устранила горизонтальный скролл.</p>",
+      "quiz": [
+        {
+          "q": "Какая единица измерения в CSS Grid распределяет свободное пространство пропорционально?",
+          "options": [
+            "fr",
+            "em",
+            "vw",
+            "pt"
+          ],
+          "correct": 0,
+          "explain": "Единица fr (fraction) делит доступное пространство контейнера на доли."
+        },
+        {
+          "q": "Какая конструкция создаёт адаптивную сетку карточек не уже 260px?",
+          "options": [
+            "repeat(auto-fit, minmax(260px, 1fr))",
+            "flex-wrap: 260px",
+            "grid-auto: 260px",
+            "columns: auto 260px"
+          ],
+          "correct": 0,
+          "explain": "repeat(auto-fit, minmax(260px, 1fr)) автоматически подбирает число колонок."
+        },
+        {
+          "q": "Какое свойство задаёт отступы между ячейками Grid?",
+          "options": [
+            "gap",
+            "cell-padding",
+            "grid-margin",
+            "border-spacing"
+          ],
+          "correct": 0,
+          "explain": "Свойство gap задаёт промежутки между строками и колонками."
+        },
+        {
+          "q": "Почему в CSS Grid рекомендуется писать minmax(0, 1fr) вместо простого 1fr?",
+          "options": [
+            "Чтобы длинный контент внутри ячейки не растягивал колонку за пределы контейнера",
+            "Чтобы отключить gap",
+            "Чтобы Grid стал Flexbox",
+            "Для ускорения загрузки шрифтов"
+          ],
+          "correct": 0,
+          "explain": "По умолчанию минимум трека равен auto (min-content), а 0 позволяет сжимать ячейку."
+        }
+      ],
+      "task_prompt": "Напишите CSS-правило для контейнера .catalog-grid: включите display: grid, настройте колонки через repeat(auto-fit, minmax(260px, 1fr)) и задайте gap: 24px.",
+      "criteria": [
+        "Использован display: grid",
+        "Применена функция repeat(auto-fit, minmax(...))",
+        "Задан отступ gap",
+        "Учтена защита от горизонтального переполнения на узких экранах"
+      ],
+      "starter_code": ".catalog-grid {\n  /* Ваш CSS Grid код */\n}",
+      "eval_type": "code_tokens",
+      "required_tokens": [
+        "display: grid",
+        "grid-template-columns",
+        "minmax",
+        "gap"
+      ],
+      "min_length": 45,
+      "video_url": "assets/lesson-intros/it-13.mp4",
+      "video_title": "Урок 13. CSS Grid Layout",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/it-13.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 14,
+      "title": "Урок 14. CSS-анимации, переходы (@keyframes, transition) и аппаратное ускорение GPU",
+      "difficulty": "Средний",
+      "time_limit": "75 мин",
+      "tools": "CSS3 Transitions, @keyframes, Chrome Performance Panel",
+      "summary": "Создание плавных 60fps микровзаимодействий, ключевых кадров @keyframes и учёт prefers-reduced-motion.",
+      "theory": "<h4>1. Transition vs @keyframes</h4>\n<p><code>transition</code> анимирует переход между двумя состояниями (например, <code>:hover</code>), а <code>@keyframes</code> описывает многошаговые зацикленные сценарии.</p>\n<h4>2. Производительность 60 FPS</h4>\n<ul>\n<li>Анимируйте только композитные свойства: <code>transform</code> и <code>opacity</code> — они обрабатываются на GPU без пересчёта геометрии (Reflow).</li>\n<li>Избегайте анимации <code>width</code>, <code>height</code>, <code>top</code>, <code>left</code>.</li>\n<li>Всегда добавляйте <code>@media (prefers-reduced-motion: reduce)</code> для доступности.</li>\n</ul>\n<h4>3. Отладка 60 FPS в DevTools</h4>\n<ul>\n<li>Избегайте <code>will-change: transform</code> на сотнях карточек сразу — это переполняет видеопамять GPU.</li>\n<li>Используйте кубические кривые <code>cubic-bezier(0.22, 1, 0.36, 1)</code> для естественного торможения вместо линейного движения.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Анимация <code>height</code> у выпадающего меню вызывала падение FPS до 18 на бюджетных смартфонах. Переход на <code>transform: scaleY()</code> и <code>opacity</code> вернул стабильные 60 FPS.</p>",
+      "quiz": [
+        {
+          "q": "Какие два CSS-свойства анимируются на GPU без пересчёта макета (Reflow)?",
+          "options": [
+            "transform и opacity",
+            "width и margin",
+            "top и left",
+            "padding и border"
+          ],
+          "correct": 0,
+          "explain": "transform и opacity обрабатываются на уровне композитинга GPU."
+        },
+        {
+          "q": "Какое правило задаёт ключевые кадры многошаговой анимации?",
+          "options": [
+            "@keyframes",
+            "@transition",
+            "@frames",
+            "@animate"
+          ],
+          "correct": 0,
+          "explain": "@keyframes определяет промежуточные состояния анимации."
+        },
+        {
+          "q": "Какой медиа-запрос отключает анимации для пользователей с вестибулярной чувствительностью?",
+          "options": [
+            "prefers-reduced-motion: reduce",
+            "no-animation: true",
+            "motion: off",
+            "reduced-fps: 0"
+          ],
+          "correct": 0,
+          "explain": "prefers-reduced-motion: reduce — стандарт доступности WCAG."
+        },
+        {
+          "q": "Какая проблема возникает при массовом применении will-change: transform ко всем элементам страницы?",
+          "options": [
+            "Чрезмерное потребление видеопамяти GPU и падение производительности",
+            "Исчезновение текста",
+            "Блокировка JavaScript",
+            "Отключение CSS Grid"
+          ],
+          "correct": 0,
+          "explain": "Каждый слой will-change создаёт отдельный композитный буфер в памяти GPU."
+        }
+      ],
+      "task_prompt": "Создайте @keyframes floatUp и примените плавный transition с transform к карточке .card:hover (сдвиг вверх translateY(-6px)).",
+      "criteria": [
+        "Объявлен блок @keyframes",
+        "Использовано свойство transform",
+        "Задан плавный transition",
+        "Добавлен медиа-запрос @media (prefers-reduced-motion: reduce)"
+      ],
+      "starter_code": "@keyframes floatUp {\n  from { opacity: 0; transform: translateY(16px); }\n  to { opacity: 1; transform: translateY(0); }\n}\n.card {\n  /* Добавьте transition и :hover */\n}",
+      "eval_type": "code_tokens",
+      "required_tokens": [
+        "@keyframes",
+        "transform",
+        "transition",
+        "translatey"
+      ],
+      "min_length": 60,
+      "video_url": "assets/lesson-intros/it-14.mp4",
+      "video_title": "Урок 14. CSS-анимации, переходы (@keyframes, transition) и аппаратное ускорение GPU",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/it-14.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 15,
+      "title": "Урок 15. JavaScript ES6+: работа с массивами, объектами и шаблонами (map, filter, destructuring)",
+      "difficulty": "Средний",
+      "time_limit": "80 мин",
+      "tools": "JavaScript ES6+, Node.js / Browser Console",
+      "summary": "Функциональная обработка данных каталога и списков студентов без мутации исходных массивов.",
+      "theory": "<h4>1. Декларативные методы массивов</h4>\n<ul>\n<li><code>array.filter(fn)</code> — возвращает новый массив элементов, прошедших условие.</li>\n<li><code>array.map(fn)</code> — преобразует каждый элемент в новую структуру или HTML-разметку.</li>\n<li><code>array.reduce(fn, init)</code> — сворачивает массив в итоговую сумму (например, подсчёт общего XP).</li>\n</ul>\n<h4>2. Деструктуризация и шаблонные строки</h4>\n<p><code>const { title, xp } = lesson;</code> позволяет быстро извлекать поля объекта, а обратные кавычки <code>`...${title}...`</code> формируют чистый HTML.</p>\n<h4>3. Иммутабельность и чистые функции</h4>\n<ul>\n<li>В отличие от <code>.sort()</code> и <code>.splice()</code>, которые мутируют исходный массив, <code>.map()</code> и <code>.filter()</code> всегда возвращают новый массив.</li>\n<li>Для безопасного чтения вложенных полей используйте опциональную цепочку <code>lesson?.quiz?.[0]?.q ?? 'Нет вопроса'</code>.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>При подсчёте суммарного XP студента по 20 урокам <code>lessons.reduce((acc, l) => acc + (l.xp || 0), 0)</code> заменяет громоздкий цикл и исключает ошибку <code>NaN</code>.</p>",
+      "quiz": [
+        {
+          "q": "Какой метод массива возвращает новый массив той же длины с преобразованными элементами?",
+          "options": [
+            "map()",
+            "filter()",
+            "forEach()",
+            "find()"
+          ],
+          "correct": 0,
+          "explain": "map() всегда возвращает новый массив той же длины."
+        },
+        {
+          "q": "Что вернёт [10, 20, 30].filter(x => x > 15)?",
+          "options": [
+            "[20, 30]",
+            "[10]",
+            "true",
+            "50"
+          ],
+          "correct": 0,
+          "explain": "filter оставляет элементы, для которых предикат вернул true."
+        },
+        {
+          "q": "Для чего используется reduce()?",
+          "options": [
+            "Для вычисления единого итогового значения из массива",
+            "Для сортировки строк",
+            "Для удаления первого элемента",
+            "Для копирования DOM"
+          ],
+          "correct": 0,
+          "explain": "reduce() аккумулирует элементы массива в одно значение."
+        },
+        {
+          "q": "Какой метод массива мутирует исходный массив на месте (в отличие от map и filter)?",
+          "options": [
+            "sort() / splice()",
+            "map()",
+            "filter()",
+            "slice()"
+          ],
+          "correct": 0,
+          "explain": "sort() изменяет исходный массив; перед сортировкой делайте копию [...arr].sort()."
+        }
+      ],
+      "task_prompt": "Напишите JS-код, который фильтрует массив lessons по свойству xp >= 75 с помощью .filter() и преобразует в названия через .map().",
+      "criteria": [
+        "Использован метод .filter()",
+        "Использован метод .map()",
+        "Применены стрелочные функции ES6",
+        "Исходный массив не мутируется при обработке данных"
+      ],
+      "starter_code": "const lessons = [{ title: 'Grid', xp: 75 }, { title: 'HTML', xp: 60 }];\n// Отфильтруйте и преобразуйте массив",
+      "eval_type": "code_tokens",
+      "required_tokens": [
+        ".filter(",
+        ".map(",
+        "=>",
+        "xp"
+      ],
+      "min_length": 50,
+      "video_url": "assets/lesson-intros/it-15.mp4",
+      "video_title": "Урок 15. JavaScript ES6+",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/it-15.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 16,
+      "title": "Урок 16. Асинхронный JavaScript: Fetch API, JSON, async/await и обработка ошибок",
+      "difficulty": "Продвинутый",
+      "time_limit": "85 мин",
+      "tools": "Fetch API, REST JSON, Chrome Network Tab",
+      "summary": "Загрузка реальных данных с бэкенда Flask через fetch(), парсинг JSON и перехват сетевых ошибок в try/catch.",
+      "theory": "<h4>1. Протокол клиент-серверного обмена</h4>\n<p>Современные веб-приложения запрашивают данные у API без перезагрузки страницы (AJAX / Fetch API).</p>\n<h4>2. Паттерн async / await + try / catch</h4>\n<pre><code>async function loadCourses() {\n  try {\n    const res = await fetch('/api/courses/manage');\n    if (!res.ok) throw new Error('HTTP ' + res.status);\n    const data = await res.json();\n    return data;\n  } catch (err) {\n    console.error(err);\n  }\n}</code></pre>\n<h4>3. Таймауты, отмена запросов и обработка 401/403</h4>\n<ul>\n<li>Используйте <code>AbortController</code>, чтобы отменять зависшие запросы через 5–8 секунд и не блокировать интерфейс.</li>\n<li>При получении статуса <code>401 Unauthorized</code> перенаправляйте пользователя на страницу входа <code>auth.html</code>.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Если студент нажал «Сохранить» дважды при слабом Wi-Fi, блокировка кнопки (<code>disabled = true</code> в блоке <code>try</code> и снятие в <code>finally</code>) предотвращает дублирующие POST-запросы.</p>",
+      "quiz": [
+        {
+          "q": "Что проверяет свойство response.ok в Fetch API?",
+          "options": [
+            "Успешный HTTP-статус (200–299)",
+            "Скорость интернета",
+            "Валидность JSON",
+            "Наличие cookie"
+          ],
+          "correct": 0,
+          "explain": "fetch не выбрасывает ошибку при 404/500 — нужно проверять response.ok."
+        },
+        {
+          "q": "Какой метод преобразует тело ответа в JavaScript-объект?",
+          "options": [
+            "await res.json()",
+            "JSON.stringify(res)",
+            "res.toObject()",
+            "res.parse()"
+          ],
+          "correct": 0,
+          "explain": "Метод res.json() асинхронно читает и парсит JSON."
+        },
+        {
+          "q": "Какая конструкция перехватывает ошибки внутри async-функции?",
+          "options": [
+            "try { ... } catch (e) { ... }",
+            "if (error)",
+            "switch (err)",
+            "break"
+          ],
+          "correct": 0,
+          "explain": "Блок try/catch перехватывает отклонённые промисы при использовании await."
+        },
+        {
+          "q": "В каком блоке рекомендуется снимать состояние загрузки (loading/disabled) с кнопки после fetch()?",
+          "options": [
+            "В блоке finally { ... }",
+            "Только в try",
+            "Только в catch",
+            "Вне функции"
+          ],
+          "correct": 0,
+          "explain": "finally выполняется гарантированно — как при успехе, так и при сетевой ошибке."
+        }
+      ],
+      "task_prompt": "Напишите асинхронную функцию async function fetchProfile(), которая делает fetch('/api/profile'), проверяет res.ok, парсит await res.json() и оборачивает запрос в try/catch.",
+      "criteria": [
+        "Объявлена async function",
+        "Вызван await fetch(...)",
+        "Проверено res.ok и вызван res.json()",
+        "Есть блок try / catch",
+        "Предусмотрена проверка response.status и информативный вывод ошибки"
+      ],
+      "starter_code": "async function fetchProfile() {\n  // Реализуйте безопасный запрос\n}",
+      "eval_type": "code_tokens",
+      "required_tokens": [
+        "async",
+        "await",
+        "fetch(",
+        ".json()",
+        "try",
+        "catch"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/it-16.mp4",
+      "video_title": "Урок 16. Асинхронный JavaScript",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/it-16.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 17,
+      "title": "Урок 17. Web-безопасность: защита от XSS (escapeHtml), CSRF и безопасная работа с DOM",
+      "difficulty": "Продвинутый",
+      "time_limit": "80 мин",
+      "tools": "OWASP Top 10, textContent vs innerHTML, CSP",
+      "summary": "Предотвращение Stored/Reflected XSS-атак при выводе пользовательских данных в интерфейсах LMS.",
+      "theory": "<h4>1. Почему опасен innerHTML?</h4>\n<p>Если вставить в <code>innerHTML</code> строку от пользователя вроде <code>&lt;img src=x onerror=alert(1)&gt;</code>, браузер выполнит вредоносный JavaScript.</p>\n<h4>2. Правила безопасного рендеринга</h4>\n<ul>\n<li>Используйте <code>element.textContent</code> вместо <code>innerHTML</code> для чистого текста.</li>\n<li>При генерации шаблонов обязательно экранируйте спецсимволы (<code>&amp;</code>, <code>&lt;</code>, <code>&gt;</code>, <code>&quot;</code>) функцией <code>escapeHtml()</code>.</li>\n<li>Проверяйте ссылки на протокол <code>https://</code>, блокируя <code>javascript:</code> URI.</li>\n</ul>\n<h4>3. Content Security Policy (CSP) и атрибуты</h4>\n<ul>\n<li>Экранирование <code>&lt;</code> и <code>&gt;</code> спасает внутри тегов, но внутри атрибута <code>href=\"...\"</code> нужно дополнительно валидировать протокол (<code>http:</code>, <code>https:</code>, относительный путь <code>/</code>).</li>\n<li>Заголовок <code>Content-Security-Policy: default-src 'self'</code> запрещает выполнение инлайн-скриптов даже при случайном пропуске экранирования.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>В журнале преподавателя имя студента <code>&lt;img src=x onerror=alert(1)&gt;</code> до внедрения <code>escapeHtml()</code> выполняло скрипт. После санитизации оно отображается как безопасный текст.</p>",
+      "quiz": [
+        {
+          "q": "Какое свойство DOM безопасно вставляет текст без интерпретации HTML-тегов?",
+          "options": [
+            "textContent",
+            "innerHTML",
+            "outerHTML",
+            "insertAdjacentHTML"
+          ],
+          "correct": 0,
+          "explain": "textContent трактует любые символы как обычный текст."
+        },
+        {
+          "q": "Какой символ нужно экранировать в первую очередь, чтобы закрыть HTML-теги?",
+          "options": [
+            "< и >",
+            "$ и %",
+            "# и @",
+            "+ и ="
+          ],
+          "correct": 0,
+          "explain": "Замена < на &lt; и > на &gt; не даёт браузеру создать тег."
+        },
+        {
+          "q": "Какой протокол в href представляет угрозу XSS?",
+          "options": [
+            "javascript:",
+            "https:",
+            "mailto:",
+            "tel:"
+          ],
+          "correct": 0,
+          "explain": "Ссылки вида javascript:... выполняют код при клике."
+        },
+        {
+          "q": "Почему одного экранирования < и > недостаточно для атрибута href='...'?",
+          "options": [
+            "Атакующий может передать URI вида javascript:alert(1) без угловых скобок",
+            "Атрибут href не поддерживает UTF-8",
+            "Браузер сам добавляет <script>",
+            "HTTPS блокирует href"
+          ],
+          "correct": 0,
+          "explain": "Для ссылок нужна отдельная проверка безопасного протокола (safeUrl)."
+        }
+      ],
+      "task_prompt": "Напишите функцию escapeHtml(str), которая заменяет &, <, >, \" на HTML-сущности, и безопасно вставьте имя студента в DOM.",
+      "criteria": [
+        "Реализована замена < на &lt; и > на &gt;",
+        "Экранирован символ &",
+        "Использовано безопасное экранирование перед выводом",
+        "Экранированы также кавычки \" и ' для защиты атрибутов"
+      ],
+      "starter_code": "function escapeHtml(str) {\n  return String(str)\n    // Добавьте цепочку .replace()\n}",
+      "eval_type": "code_tokens",
+      "required_tokens": [
+        "&amp;",
+        "&lt;",
+        "&gt;",
+        "replace"
+      ],
+      "min_length": 55,
+      "video_url": "assets/lesson-intros/it-17.mp4",
+      "video_title": "Урок 17. Web-безопасность",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/it-17.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 18,
+      "title": "Урок 18. Основы WebGL и 3D в браузере: Three.js (Scene, Camera, Mesh, Light)",
+      "difficulty": "Продвинутый",
+      "time_limit": "90 мин",
+      "tools": "Three.js, WebGLRenderer, PerspectiveCamera",
+      "summary": "Создание интерактивной 3D-сцены в браузере: геометрия, PBR-материалы, освещение и цикл анимации requestAnimationFrame.",
+      "theory": "<h4>1. Четыре кита Three.js</h4>\n<ul>\n<li><code>THREE.Scene</code> — 3D-мир, куда добавляются объекты и свет.</li>\n<li><code>THREE.PerspectiveCamera</code> — «глаз» наблюдателя (угол обзора FOV, пропорции aspect, ближняя/дальняя плоскости).</li>\n<li><code>THREE.WebGLRenderer</code> — отрисовщик, рисующий сцену на <code>&lt;canvas&gt;</code>.</li>\n<li><code>THREE.Mesh(geometry, material)</code> — 3D-объект из каркаса (Geometry) и поверхности (Material).</li>\n</ul>\n<h4>3. Утечки памяти в WebGL и ResizeObserver</h4>\n<ul>\n<li>При закрытии 3D-модели обязательно вызывайте <code>geometry.dispose()</code>, <code>material.dispose()</code>, <code>renderer.dispose()</code> и <code>cancelAnimationFrame(rafId)</code>.</li>\n<li>Подстраивайте камеру при изменении размера окна: <code>camera.aspect = w / h; camera.updateProjectionMatrix();</code>.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>При переключении между 20 уроками в <code>lesson_player.html</code> без очистки старых WebGL-контекстов браузер достигал лимита 16 контекстов и падал. Вызов функции <code>dispose()</code> полностью решил проблему.</p>",
+      "quiz": [
+        {
+          "q": "Из каких двух компонентов создаётся THREE.Mesh?",
+          "options": [
+            "Geometry и Material",
+            "Scene и Camera",
+            "Light и Canvas",
+            "Vector и Matrix"
+          ],
+          "correct": 0,
+          "explain": "Mesh объединяет форму (Geometry) и внешний вид (Material)."
+        },
+        {
+          "q": "Какой тип материала реагирует на источники света и тени?",
+          "options": [
+            "MeshStandardMaterial",
+            "MeshBasicMaterial",
+            "LineBasicMaterial",
+            "SpriteMaterial"
+          ],
+          "correct": 0,
+          "explain": "MeshStandardMaterial поддерживает физически корректное освещение (PBR)."
+        },
+        {
+          "q": "Какая функция браузера запускает плавный цикл 3D-анимации?",
+          "options": [
+            "requestAnimationFrame",
+            "setInterval",
+            "setTimeout",
+            "fetch"
+          ],
+          "correct": 0,
+          "explain": "requestAnimationFrame синхронизируется с частотой обновления экрана (60/120 Гц)."
+        },
+        {
+          "q": "Что нужно сделать при размонтировании Three.js сцены, чтобы не допустить утечки видеопамяти?",
+          "options": [
+            "Вызвать dispose() у геометрий, материалов и рендерера и остановить requestAnimationFrame",
+            "Обнулить window.THREE",
+            "Скрыть canvas через display:none",
+            "Перезагрузить страницу"
+          ],
+          "correct": 0,
+          "explain": "WebGL-буферы в GPU не очищаются сборщиком мусора JS автоматически."
+        }
+      ],
+      "task_prompt": "Напишите фрагмент инициализации Three.js: создайте THREE.Scene, THREE.PerspectiveCamera, THREE.BoxGeometry, THREE.MeshStandardMaterial и функцию animate() с requestAnimationFrame.",
+      "criteria": [
+        "Созданы Scene и PerspectiveCamera",
+        "Создан Mesh из BoxGeometry и MeshStandardMaterial",
+        "Реализован цикл requestAnimationFrame",
+        "Добавлено освещение (Directional/AmbientLight) и очистка ресурсов"
+      ],
+      "starter_code": "const scene = new THREE.Scene();\n// Добавьте камеру, куб и цикл animate()",
+      "eval_type": "code_tokens",
+      "required_tokens": [
+        "three.scene",
+        "perspectivecamera",
+        "boxgeometry",
+        "requestanimationframe"
+      ],
+      "min_length": 75,
+      "video_url": "assets/lesson-intros/it-18.mp4",
+      "video_title": "Урок 18. Основы WebGL и 3D в браузере",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/it-18.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 19,
+      "title": "Урок 19. Backend-интеграция: Flask REST API, SQLite/PostgreSQL и валидация данных",
+      "difficulty": "Продвинутый",
+      "time_limit": "90 мин",
+      "tools": "Python 3.12, Flask, SQLite Parameterized Queries",
+      "summary": "Проектирование защищённых серверных маршрутов, параметризованных SQL-запросов и возврат корректных HTTP-кодов.",
+      "theory": "<h4>1. Защита от SQL-инъекций</h4>\n<p>Никогда не склеивайте пользовательский ввод в SQL через f-строки! Используйте плейсхолдеры <code>?</code> (SQLite) или <code>%s</code> (PostgreSQL): <code>cursor.execute(\"SELECT * FROM users WHERE id = ?\", (user_id,))</code>.</p>\n<h4>2. Стандарты HTTP-ответов REST API</h4>\n<ul>\n<li><code>200 OK</code> / <code>201 Created</code> — успешное чтение / создание ресурса.</li>\n<li><code>400 Bad Request</code> — ошибка валидации входного JSON.</li>\n<li><code>401 Unauthorized</code> / <code>403 Forbidden</code> — нет сессии или недостаточно прав (RBAC).</li>\n</ul>\n<h4>3. Идемпотентность и транзакции БД</h4>\n<ul>\n<li>Начисление XP за урок должно быть <strong>идемпотентным</strong>: таблица транзакций с уникальным ключом <code>(user_id, source_type, source_id)</code> гарантирует, что двойной клик не начислит награду дважды.</li>\n<li>Всегда возвращайте структурированный JSON <code>{\"success\": false, \"message\": \"...\"}</code> при ошибках 400/403/404.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>В <code>server.py</code> проверка роли запрашивается напрямую из таблицы <code>users</code> в БД, чтобы даже при понижении прав админом старая сессия не сохраняла доступ.</p>",
+      "quiz": [
+        {
+          "q": "Как правильно передавать параметры в SQL-запрос в Python?",
+          "options": [
+            "Через плейсхолдеры ? и кортеж параметров",
+            "Через f-строки f'WHERE id={id}'",
+            "Через конкатенацию +",
+            "Через base64"
+          ],
+          "correct": 0,
+          "explain": "Параметризованные запросы полностью исключают SQL-инъекции."
+        },
+        {
+          "q": "Какой HTTP-статус возвращается при нехватке прав роли (например, студент открыл админку)?",
+          "options": [
+            "403 Forbidden",
+            "200 OK",
+            "404 Not Found",
+            "500 Server Error"
+          ],
+          "correct": 0,
+          "explain": "403 означает, что пользователь авторизован, но доступ запрещён."
+        },
+        {
+          "q": "Какая функция Flask формирует JSON-ответ с заголовком application/json?",
+          "options": [
+            "jsonify()",
+            "json_send()",
+            "to_json()",
+            "render_json()"
+          ],
+          "correct": 0,
+          "explain": "jsonify() сериализует словарь и выставляет корректный Content-Type."
+        },
+        {
+          "q": "Что гарантирует идемпотентность начисления XP при повторном POST-запросе?",
+          "options": [
+            "Составное ограничение UNIQUE(user_id, source_type, source_id) в базе данных",
+            "Задержка time.sleep(1)",
+            "Проверка на клиенте в localStorage",
+            "Отключение транзакций"
+          ],
+          "correct": 0,
+          "explain": "Ограничение целостности на уровне СУБД надёжно защищает даже при гонке параллельных запросов."
+        }
+      ],
+      "task_prompt": "Напишите Flask-маршрут @app.route('/api/notes', methods=['POST']), который извлекает request.get_json(), валидирует поле title, выполняет параметризованный INSERT с '?' и возвращает jsonify(...) со статусом 201.",
+      "criteria": [
+        "Использован декоратор @app.route с POST",
+        "Вызван request.get_json()",
+        "Использован параметризованный SQL с ?",
+        "Возвращён jsonify(..., 201)",
+        "Реализована валидация пустых полей с возвратом HTTP 400"
+      ],
+      "starter_code": "@app.route('/api/notes', methods=['POST'])\ndef create_note():\n    # Ваш код\n",
+      "eval_type": "code_tokens",
+      "required_tokens": [
+        "@app.route",
+        "get_json",
+        "?",
+        "jsonify"
+      ],
+      "min_length": 75,
+      "video_url": "assets/lesson-intros/it-19.mp4",
+      "video_title": "Урок 19. Backend-интеграция",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/it-19.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 20,
+      "title": "Урок 20. Выпускная квалификационная защита: Full-Stack Web-сервис с 3D-превью и API",
+      "difficulty": "Экзамен",
+      "time_limit": "120 мин",
+      "tools": "HTML5, CSS Grid, ES6+ Fetch, Three.js, Flask API",
+      "summary": "Итоговая аттестация: объединение адаптивного фронтенда, анимаций, 3D-витрины и защищённого REST API в единый продукт.",
+      "theory": "<h4>1. Чек-лист готовности к Production</h4>\n<ul>\n<li><strong>Семантика и A11y:</strong> корректные landmark-теги, <code>aria-label</code>, поддержка клавиатуры и <code>prefers-reduced-motion</code>.</li>\n<li><strong>Производительность:</strong> сжатые WebP/SVG ассеты, GPU-анимации <code>transform/opacity</code>, отсутствие блокирующих скриптов.</li>\n<li><strong>Безопасность:</strong> серверная проверка сессии, RBAC, параметризованный SQL и <code>escapeHtml()</code> на клиенте.</li>\n</ul>\n<h4>3. Метрики качества перед релизом</h4>\n<ul>\n<li><strong>Zero Console Errors:</strong> в консоли браузера не должно быть 404 на ассеты или необработанных промисов.</li>\n<li><strong>7-Viewport Check:</strong> проверка вёрстки от <code>375px</code> (iPhone SE) до <code>1440px</code> (Desktop).</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Итоговый проект проходит автоматический аудит: 0 XSS-векторов, 100% покрытие RBAC, плавные 60 FPS анимации и корректная работа в офлайн/онлайн режимах.</p>",
+      "quiz": [
+        {
+          "q": "Что обязательно должно выполняться перед публикацией проекта в продакшен?",
+          "options": [
+            "Проверка безопасности (XSS/SQLi), адаптивности и статус-кодов API",
+            "Отключение HTTPS",
+            "Удаление try/catch",
+            "Хранение паролей в открытом виде"
+          ],
+          "correct": 0,
+          "explain": "Комплексный QA-аудит гарантирует надёжность и безопасность."
+        },
+        {
+          "q": "Какой инструмент проверяет отсутствие горизонтального скролла на мобильных экранах?",
+          "options": [
+            "DevTools Device Toolbar (375px)",
+            "Notepad",
+            "Ping",
+            "FTP"
+          ],
+          "correct": 0,
+          "explain": "Эмуляция мобильных вьюпортов 375px и 390px выявляет переполнения."
+        },
+        {
+          "q": "Как обеспечивается 100% защита от подмены user_id на клиенте?",
+          "options": [
+            "Сервер берёт user_id только из защищённой session",
+            "Скрытое поле input hidden",
+            "Проверка в localStorage",
+            "Отключение кнопки"
+          ],
+          "correct": 0,
+          "explain": "Клиентским данным доверять нельзя — источник истины только серверная сессия."
+        },
+        {
+          "q": "Какой комплекс проверок подтверждает готовность Full-Stack проекта к продакшену?",
+          "options": [
+            "Аудит безопасности (RBAC/XSS/SQLi), адаптивность (375–1440px), обработка ошибок API и отсутствие ошибок в консоли",
+            "Только проверка главной страницы на мониторе разработчика",
+            "Удаление всех тестов",
+            "Запуск с debug=True"
+          ],
+          "correct": 0,
+          "explain": "Только сквозная проверка всех слоёв гарантирует стабильную работу в продакшене."
+        }
+      ],
+      "task_prompt": "Опишите архитектуру вашего дипломного веб-приложения: укажите сетку CSS Grid, анимацию @keyframes, вызов fetch() с обработкой ошибок и меры защиты (escapeHtml / параметризованный SQL).",
+      "criteria": [
+        "Указана адаптивная сетка CSS Grid",
+        "Описан асинхронный fetch() к API",
+        "Упомянуты меры безопасности XSS и SQLi",
+        "Включены анимации или 3D-сцена",
+        "Указаны критерии тестирования (адаптивность, статус-коды, консоль без ошибок)"
+      ],
+      "starter_code": "/* Архитектурная спецификация дипломного проекта */\n",
+      "eval_type": "code_tokens",
+      "required_tokens": [
+        "grid",
+        "fetch",
+        "escapehtml",
+        "sql"
+      ],
+      "min_length": 80,
+      "video_url": "assets/lesson-intros/it-20.mp4",
+      "video_title": "Урок 20. Выпускная квалификационная защита",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/it-20.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
     }
   ],
   "graphic_design": [
@@ -2308,6 +3102,782 @@ window.EDU_LESSONS = {
           "title": "Чек-лист защиты проекта перед комиссией"
         }
       ]
+    },
+    {
+      "num": 13,
+      "title": "Урок 13. Дизайн-система и токены: переменные цвета, типографическая шкала и UI-кит",
+      "difficulty": "Средний",
+      "time_limit": "75 мин",
+      "tools": "Figma Variables, Design Tokens, Style Guide",
+      "summary": "Построение масштабируемой дизайн-системы с семантическими токенами цвета, отступов и состояний компонентов.",
+      "theory": "<h4>1. Что такое Design Tokens?</h4>\n<p>Дизайн-токены — это именованные переменные (<code>color.bg.primary</code>, <code>space.md = 16px</code>, <code>radius.lg = 16px</code>), связывающие макет в Figma с кодом разработчика.</p>\n<h4>2. Семантическая архитектура</h4>\n<ul>\n<li><strong>Примитивы:</strong> <code>indigo-500: #6366f1</code>.</li>\n<li><strong>Семантика:</strong> <code>action-primary</code>, <code>surface-card</code>, <code>text-muted</code> — позволяют мгновенно переключать Light/Dark темы.</li>\n</ul>\n<h4>3. Типовые ошибки при создании UI-кита</h4>\n<ul>\n<li>Использование 12 оттенков серого без системы вместо 4–5 фиксированных токенов.</li>\n<li>Отсутствие состояний <code>Hover</code>, <code>Active</code>, <code>Disabled</code>, <code>Error</code> у компонентов.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Перевод 18 страниц портала на единые переменные цвета и радиусов сократил время сборки новых экранов в 3 раза.</p>",
+      "quiz": [
+        {
+          "q": "Зачем нужны семантические токены вместо прямых HEX-кодов?",
+          "options": [
+            "Для централизованной смены тем и консистентности UI",
+            "Чтобы увеличить вес файла",
+            "Чтобы отключить шрифты",
+            "Только для печати CMYK"
+          ],
+          "correct": 0,
+          "explain": "Семантические токены позволяют обновлять палитру во всём продукте из одной точки."
+        },
+        {
+          "q": "Какой базовый шаг отступов чаще всего используют в UI-системах?",
+          "options": [
+            "4px / 8px сетка",
+            "7px",
+            "13px",
+            "19px"
+          ],
+          "correct": 0,
+          "explain": "Кратность 4px и 8px идеально масштабируется на всех экранах."
+        },
+        {
+          "q": "Что такое UI-кит (UI Kit)?",
+          "options": [
+            "Библиотека переиспользуемых компонентов и состояний",
+            "Растровый фильтр Photoshop",
+            "Шрифт без засечек",
+            "Формат печати A3"
+          ],
+          "correct": 0,
+          "explain": "UI Kit содержит кнопки, инпуты, карточки и правила их применения."
+        },
+        {
+          "q": "Какие обязательные состояния должен иметь компонент кнопки в UI-ките?",
+          "options": [
+            "Default, Hover, Active/Pressed, Focus, Disabled",
+            "Только Default",
+            "Только Hover",
+            "Print и CMYK"
+          ],
+          "correct": 0,
+          "explain": "Полная матрица состояний делает интерфейс предсказуемым для клавиатуры и мыши."
+        }
+      ],
+      "task_prompt": "Опишите структуру дизайн-системы для образовательного портала: задайте 3 семантических цветовых токена (фон, акцент, текст), типографическую шкалу (H1, H2, Body) и базовый шаг сетки.",
+      "criteria": [
+        "Указаны семантические токены цвета",
+        "Задана иерархия шрифтов",
+        "Определена модульная сетка отступов",
+        "Предусмотрены состояния интерактивных элементов (Default/Hover/Disabled)"
+      ],
+      "starter_code": "Дизайн-система AMK:\n1. Токены цвета:\n2. Типографика:\n3. Сетка:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "токен",
+        "сетк",
+        "типографик"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/graphic_design-13.mp4",
+      "video_title": "Урок 13. Дизайн-система и токены",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/graphic_design-13.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 14,
+      "title": "Урок 14. Инфографика и визуализация данных: диаграммы, иконки и сторителлинг в цифрах",
+      "difficulty": "Средний",
+      "time_limit": "75 мин",
+      "tools": "Adobe Illustrator, Figma Charts, DataViz",
+      "summary": "Превращение сухих статистических таблиц в понятную, честную и эстетичную визуальную инфографику.",
+      "theory": "<h4>1. Правила честной визуализации</h4>\n<ul>\n<li>Ось Y столбчатых диаграмм всегда должна начинаться с <strong>нуля</strong>, чтобы не искажать пропорции.</li>\n<li>Выбор графика: <strong>Line</strong> — для динамики во времени, <strong>Bar</strong> — для сравнения категорий, <strong>Donut</strong> — для долей (не более 5 сегментов).</li>\n<li>Соотношение «чернила к данным» (Data-Ink Ratio): убирайте лишний визуальный шум и 3D-тени, мешающие чтению цифр.</li>\n</ul>\n<h4>3. Типовые искажения в DataViz</h4>\n<ul>\n<li>3D-круговые диаграммы искажают углы ближних сегментов, делая их визуально больше дальних.</li>\n<li>Использование радужной палитры вместо 1–2 акцентных цветов и нейтрального серого фона.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>В отчёте успеваемости выделение целевой группы ярким Indigo на фоне приглушённых серых столбцов ускорило чтение отчёта на 40%.</p>",
+      "quiz": [
+        {
+          "q": "С какого значения должна начинаться ось Y в столбчатой диаграмме?",
+          "options": [
+            "С нуля (0)",
+            "С минимального значения ряда",
+            "С 50%",
+            "С произвольного числа"
+          ],
+          "correct": 0,
+          "explain": "Обрезанная ось Y визуально искажает разницу между столбцами."
+        },
+        {
+          "q": "Какой тип графика лучше всего показывает изменение показателя за 12 месяцев?",
+          "options": [
+            "Линейный график (Line Chart)",
+            "Круговая диаграмма (Pie)",
+            "Радар",
+            "Облако тегов"
+          ],
+          "correct": 0,
+          "explain": "Линейный график наглядно передаёт тренд во времени."
+        },
+        {
+          "q": "Сколько сегментов рекомендуется максимум для круговой/кольцевой диаграммы?",
+          "options": [
+            "До 5–6 сегментов",
+            "20 сегментов",
+            "50 сегментов",
+            "1 сегмент"
+          ],
+          "correct": 0,
+          "explain": "При большом числе долей круговая диаграмма становится нечитаемой."
+        },
+        {
+          "q": "Почему в деловой инфографике избегают 3D-эффектов на круговых и столбчатых диаграммах?",
+          "options": [
+            "Перспектива искажает реальную площадь и высоту значений",
+            "Они не печатаются на бумаге",
+            "Их нельзя сохранить в PDF",
+            "Они увеличивают контраст"
+          ],
+          "correct": 0,
+          "explain": "Искажение пропорций нарушает точность восприятия данных."
+        }
+      ],
+      "task_prompt": "Разработайте концепцию инфографики для отчёта колледжа: выберите тип диаграммы для динамики успеваемости и диаграммы для распределения специальностей, обоснуйте выбор цвета и акцентов.",
+      "criteria": [
+        "Выбран корректный тип графика для динамики",
+        "Указан тип графика для долей",
+        "Соблюдено правило нулевой оси и чистоты данных",
+        "Выбрана лаконичная цветовая палитра (акцент + нейтральные тона)"
+      ],
+      "starter_code": "Концепция инфографики:\n- Динамика за год:\n- Доли специальностей:\n- Визуальные акценты:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "график",
+        "диаграмм",
+        "цвет"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/graphic_design-14.mp4",
+      "video_title": "Урок 14. Инфографика и визуализация данных",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/graphic_design-14.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 15,
+      "title": "Урок 15. Моушн-дизайн и микроанимации интерфейсов: тайминг, easing-кривые и Lottie/SVG",
+      "difficulty": "Средний",
+      "time_limit": "80 мин",
+      "tools": "After Effects / Figma Smart Animate, Cubic-Bezier",
+      "summary": "Проектирование осмысленной динамики интерфейса: кривые Безье, 12 принципов анимации и экспорт лёгких векторных анимаций.",
+      "theory": "<h4>1. Кривые ускорения (Easing)</h4>\n<p>В природе объекты не двигаются с постоянной линейной скоростью. Используйте <code>ease-out</code> (быстрый старт, плавная остановка) для появления элементов и <code>ease-in</code> для их исчезновения.</p>\n<h4>2. Тайминг в UI</h4>\n<ul>\n<li>Микровзаимодействия (кнопки, тумблеры): <code>150–250 мс</code>.</li>\n<li>Модальные окна и переходы карточек: <code>250–400 мс</code>.</li>\n<li>Формат <strong>Lottie (JSON)</strong> позволяет переносить векторную анимацию из After Effects на сайт в 10 раз легче видео.</li>\n</ul>\n<h4>3. Баланс информативности и визуального шума</h4>\n<ul>\n<li>Не анимируйте всё одновременно: движение должно вести взгляд к главному изменению на экране (фокус внимания).</li>\n<li>Соблюдайте правило преемственности: откуда элемент выехал, туда же он должен логично возвращаться при закрытии.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Микроанимация начисления XP (+60 XP всплывает вверх и растворяется за 650 мс) даёт мгновенное дофаминовое подтверждение прогресса.</p>",
+      "quiz": [
+        {
+          "q": "Какая кривая ускорения лучше всего подходит для появления UI-панели?",
+          "options": [
+            "ease-out (быстрый старт, мягкое торможение)",
+            "linear",
+            "step-end",
+            "bounce-infinite"
+          ],
+          "correct": 0,
+          "explain": "ease-out ощущается отзывчивым и естественным."
+        },
+        {
+          "q": "Какой формат экспортирует векторную анимацию After Effects в компактный JSON для веба?",
+          "options": [
+            "Lottie",
+            "BMP",
+            "TIFF",
+            "WAV"
+          ],
+          "correct": 0,
+          "explain": "Lottie рендерит вектор по JSON без потери качества на Retina."
+        },
+        {
+          "q": "Какая оптимальная длительность анимации наведения на кнопку?",
+          "options": [
+            "150–250 мс",
+            "2000 мс",
+            "10 мс",
+            "5000 мс"
+          ],
+          "correct": 0,
+          "explain": "Свыше 400 мс интерфейс начинает казаться медленным."
+        },
+        {
+          "q": "Что произойдёт, если длительность анимации открытия меню превысит 600–800 мс?",
+          "options": [
+            "Интерфейс будет ощущаться медленным и заторможенным",
+            "Повысится FPS",
+            "Улучшится SEO",
+            "Уменьшится нагрузка на CPU"
+          ],
+          "correct": 0,
+          "explain": "В UI оптимальный диапазон отклика — 150–350 мс."
+        }
+      ],
+      "task_prompt": "Опишите сценарий анимации карточки курса при наведении и клике: укажите длительность в мс, тип кривой ускорения (ease-out / cubic-bezier) и изменяемые параметры (scale, shadow, glow).",
+      "criteria": [
+        "Указан тайминг в миллисекундах",
+        "Выбрана кривая ускорения",
+        "Описаны визуальные параметры анимации",
+        "Учтена поддержка prefers-reduced-motion для доступности"
+      ],
+      "starter_code": "Сценарий моушн-дизайна:\n1. Состояние Hover:\n2. Клик / Переход:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "мс",
+        "ease",
+        "анимац"
+      ],
+      "min_length": 65,
+      "video_url": "assets/lesson-intros/graphic_design-15.mp4",
+      "video_title": "Урок 15. Моушн-дизайн и микроанимации интерфейсов",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/graphic_design-15.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 16,
+      "title": "Урок 16. 3D-графика для дизайнера: основы моделирования, материалы PBR и студийное освещение",
+      "difficulty": "Продвинутый",
+      "time_limit": "85 мин",
+      "tools": "Blender / Three.js, Three-Point Lighting, PBR",
+      "summary": "Постановка трёхточечного света (Key, Fill, Rim), настройка шероховатости (Roughness) и металличности (Metalness) для презентации упаковки.",
+      "theory": "<h4>1. Классическая схема трёхточечного света</h4>\n<ul>\n<li><strong>Key Light (Рисующий):</strong> основной источник, формирующий объём и тени.</li>\n<li><strong>Fill Light (Заполняющий):</strong> смягчает глубокие тени с противоположной стороны.</li>\n<li><strong>Rim / Back Light (Контровой):</strong> отделяет силуэт 3D-модели от тёмного фона ярким контуром.</li>\n</ul>\n<h4>2. Свойства PBR-материалов</h4>\n<p><code>Roughness</code> управляет матовостью (0 = зеркало, 1 = мел), а <code>Metalness</code> — диэлектрик или металл.</p>\n<h4>3. Типология материалов и текстур</h4>\n<ul>\n<li><strong>Матовый картон:</strong> <code>Roughness = 0.75–0.9</code>, <code>Metalness = 0</code>.</li>\n<li><strong>Золотое тиснение (фольга):</strong> <code>Roughness = 0.15–0.25</code>, <code>Metalness = 0.9–1.0</code>.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Добавление слабого голубого Rim-света сзади коробки на тёмном фоне сразу отделило чёрную упаковку от фона и подчеркнуло вырубку.</p>",
+      "quiz": [
+        {
+          "q": "Какой источник света в трёхточечной схеме отделяет силуэт объекта от фона?",
+          "options": [
+            "Rim Light (Контровой свет)",
+            "Key Light",
+            "Ambient Occlusion",
+            "Fog"
+          ],
+          "correct": 0,
+          "explain": "Контровой свет создаёт световую кромку по краю объекта."
+        },
+        {
+          "q": "За что отвечает параметр Roughness в PBR-материале?",
+          "options": [
+            "За шероховатость (матовость или глянец поверхности)",
+            "За прозрачность",
+            "За вес модели",
+            "За количество полигонов"
+          ],
+          "correct": 0,
+          "explain": "Чем ниже Roughness, тем чётче блики и отражения."
+        },
+        {
+          "q": "Какое значение Metalness задаётся для матового картона упаковки?",
+          "options": [
+            "0 (диэлектрик)",
+            "1.0",
+            "5.0",
+            "-1"
+          ],
+          "correct": 0,
+          "explain": "Бумага и пластик — неметаллы, их Metalness равен 0."
+        },
+        {
+          "q": "Какие значения PBR подходят для полированного металлического тиснения (фольги)?",
+          "options": [
+            "Metalness ~ 0.9–1.0, Roughness ~ 0.15–0.25",
+            "Metalness = 0, Roughness = 1",
+            "Metalness = 0.5, Opacity = 0",
+            "Только AmbientLight"
+          ],
+          "correct": 0,
+          "explain": "Высокий Metalness и низкий Roughness дают чёткие металлические блики."
+        }
+      ],
+      "task_prompt": "Составьте техническое задание на 3D-рендер упаковки продукта: опишите настройку Key/Fill/Rim света, значения Roughness и Metalness для матового картона с золотым тиснением.",
+      "criteria": [
+        "Описаны все 3 источника света",
+        "Указаны параметры Roughness/Metalness для картона и фольги",
+        "Обоснован выбор ракурса камеры",
+        "Указан фон и ракурс камеры (FOV / композиция кадра)"
+      ],
+      "starter_code": "ТЗ на 3D-сцену:\n- Освещение:\n- Материалы PBR:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "свет",
+        "roughness",
+        "metalness"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/graphic_design-16.mp4",
+      "video_title": "Урок 16. 3D-графика для дизайнера",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/graphic_design-16.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 17,
+      "title": "Урок 17. Фотореалистичные мокапы (Mockups) и презентация продукта в среде",
+      "difficulty": "Средний",
+      "time_limit": "75 мин",
+      "tools": "Adobe Photoshop Smart Objects, Perspective Warp, Blend Modes",
+      "summary": "Наложение айдентики и интерфейсов на реальные носители через смарт-объекты, искажение перспективы и режимы наложения Multiply/Screen.",
+      "theory": "<h4>1. Смарт-объекты (Smart Objects)</h4>\n<p>Смарт-объект позволяет редактировать макет внутри отдельного контейнера: при сохранении автоматически обновляются все искажения перспективы, тени и текстуры бумаги на основном мокапе.</p>\n<h4>2. Режимы наложения для реализма</h4>\n<ul>\n<li><code>Multiply</code> — пропускает тени и фактуру ткани/бумаги сквозь принт.</li>\n<li><code>Screen</code> — идеально для бликов стекла и экранов смартфонов.</li>\n</ul>\n<h4>3. Частые ошибки на мокапах</h4>\n<ul>\n<li>Наклейка выглядит «приклеенной поверх» из-за отсутствия светотени и обрезки по контуру с помощью <strong>Clipping Mask</strong>.</li>\n<li>Игнорирование перспективы цилиндрических поверхностей (этикетка на стакане должна слегка изгибаться по дуге <code>Warp -> Arc</code>).</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Использование связки <code>Smart Object + Clipping Mask + Multiply (85%)</code> сделало презентацию мерча колледжа неотличимой от студийной фотосъёмки.</p>",
+      "quiz": [
+        {
+          "q": "Какая технология Photoshop позволяет обновлять дизайн на мокапе в 1 клик с сохранением перспективы?",
+          "options": [
+            "Smart Objects (Смарт-объекты)",
+            "Magic Wand",
+            "Flatten Image",
+            "Posterize"
+          ],
+          "correct": 0,
+          "explain": "Смарт-объект хранит исходный макет отдельно от трансформаций."
+        },
+        {
+          "q": "Какой режим наложения используют, чтобы фактура и тени бумаги проявились поверх цветного принта?",
+          "options": [
+            "Multiply (Умножение)",
+            "Difference",
+            "Dissolve",
+            "Invert"
+          ],
+          "correct": 0,
+          "explain": "Multiply сохраняет тёмные тени носителя."
+        },
+        {
+          "q": "Зачем проверять мокап в контексте реального окружения?",
+          "options": [
+            "Оценить масштаб, читаемость и контраст в реальных условиях",
+            "Чтобы скрыть ошибки сетки",
+            "Для уменьшения DPI",
+            "Чтобы удалить слои"
+          ],
+          "correct": 0,
+          "explain": "Мокап тестирует дизайн в среде использования."
+        },
+        {
+          "q": "Зачем на цилиндрическом стаканчике применяют деформацию Warp (Arc) к смарт-объекту?",
+          "options": [
+            "Чтобы графика естественно огибала кривизну цилиндра",
+            "Чтобы перевести файл в CMYK",
+            "Чтобы уменьшить размер файла",
+            "Чтобы удалить фон"
+          ],
+          "correct": 0,
+          "explain": "Плоский прямоугольник на цилиндре сразу выдаёт фальшивый коллаж."
+        }
+      ],
+      "task_prompt": "Опишите пошаговый алгоритм создания мокапа фирменного стаканчика или смартфона в Photoshop: смарт-объект, деформация (Warp/Perspective) и настройка теней/бликов.",
+      "criteria": [
+        "Упомянуто преобразование в Smart Object",
+        "Описано искажение по форме носителя",
+        "Применены режимы наложения Multiply/Screen для света и тени",
+        "Применена обтравочная маска (Clipping Mask) по контуру носителя"
+      ],
+      "starter_code": "Пайплайн сборки мокапа:\n1.\n2.\n3.",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "смарт",
+        "перспектив",
+        "multiply"
+      ],
+      "min_length": 65,
+      "video_url": "assets/lesson-intros/graphic_design-17.mp4",
+      "video_title": "Урок 17. Фотореалистичные мокапы (Mockups) и презентация продукта в среде",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/graphic_design-17.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 18,
+      "title": "Урок 18. UX-исследования, User Flow и прототипирование интерактивных сценариев",
+      "difficulty": "Продвинутый",
+      "time_limit": "80 мин",
+      "tools": "Figma Prototype, User Flow, CJM, Usability Testing",
+      "summary": "Построение пользовательских сценариев (User Flow), поиск узких мест (pain points) и кликабельное прототипирование переходов.",
+      "theory": "<h4>1. От эмпатии к интерфейсу</h4>\n<ul>\n<li><strong>User Persona &amp; JTBD (Jobs To Be Done):</strong> какую задачу пользователь «нанимает» решить наш интерфейс?</li>\n<li><strong>User Flow:</strong> пошаговая блок-схема пути от входа до целевого действия (регистрация, выбор курса, сдача задания).</li>\n<li><strong>Юзабилити-тест:</strong> правило 5 пользователей выявляет до 85% проблем интерфейса.</li>\n</ul>\n<h4>3. Метрики эффективности UX</h4>\n<ul>\n<li><strong>Time on Task:</strong> время от входа до успешного завершения целевого действия.</li>\n<li><strong>Error Rate:</strong> доля пользователей, совершивших ошибку на шаге формы.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Сокращение регистрации с 7 полей до 3 обязательных + автоопределение группы по специальности снизило отвал абитуриентов на 35%.</p>",
+      "quiz": [
+        {
+          "q": "Что отражает схема User Flow?",
+          "options": [
+            "Последовательность экранов и решений пользователя на пути к цели",
+            "Цветовую палитру бренда",
+            "Список шрифтов",
+            "Смету типографии"
+          ],
+          "correct": 0,
+          "explain": "User Flow показывает логику переходов и ветвлений сценария."
+        },
+        {
+          "q": "Сколько участников достаточно для качественного юзабилити-теста по методике Якоба Нильсена?",
+          "options": [
+            "5 пользователей",
+            "500 пользователей",
+            "1 разработчик",
+            "100 дизайнеров"
+          ],
+          "correct": 0,
+          "explain": "5 человек находят ~85% критических ошибок юзабилити."
+        },
+        {
+          "q": "Что такое кликабельный прототип в Figma?",
+          "options": [
+            "Связанные переходами экраны для проверки логики до разработки",
+            "Распечатанный буклет",
+            "Финальный SQL-код",
+            "Логотип в SVG"
+          ],
+          "correct": 0,
+          "explain": "Прототип имитирует работу реального приложения."
+        },
+        {
+          "q": "Какая метрика измеряет долю пользователей, успешно дошедших до конца сценария?",
+          "options": [
+            "Task Completion Rate (Конверсия выполнения задачи)",
+            "DPI",
+            "FPS",
+            "Bitrate"
+          ],
+          "correct": 0,
+          "explain": "Completion Rate — ключевой показатель понятности User Flow."
+        }
+      ],
+      "task_prompt": "Спроектируйте User Flow для сценария «Студент записывается на курс и проходит первый урок»: опишите 4–5 шагов, возможную ошибку пользователя и состояние успеха.",
+      "criteria": [
+        "Описаны последовательные шаги сценария",
+        "Учтено состояние ошибки/валидации",
+        "Указан финальный экран успеха",
+        "Определена метрика успеха сценария"
+      ],
+      "starter_code": "User Flow сценария:\nШаг 1:\nШаг 2:\nОбработка ошибки:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "шаг",
+        "сценари",
+        "ошибк"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/graphic_design-18.mp4",
+      "video_title": "Урок 18. UX-исследования, User Flow и прототипирование интерактивных сценариев",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/graphic_design-18.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 19,
+      "title": "Урок 19. Доступность в дизайне (WCAG 2.1): контрастность, дальтонизм и инклюзивная типографика",
+      "difficulty": "Продвинутый",
+      "time_limit": "75 мин",
+      "tools": "Contrast Checker, WCAG AA/AAA, Color Blindness Simulator",
+      "summary": "Проверка контрастности текста по стандарту WCAG AA (4.5:1), дублирование цветовых статусов иконками и читаемые кегли.",
+      "theory": "<h4>1. Стандарты контраста WCAG 2.1</h4>\n<ul>\n<li><strong>Уровень AA (норма):</strong> коэффициент контрастности текста и фона не ниже <code>4.5:1</code> (для крупного заголовка — <code>3:1</code>).</li>\n<li><strong>Не полагайтесь только на цвет:</strong> статус «Ошибка» или «Успех» должен сопровождаться иконкой и текстом, чтобы его различали люди с дальтонизмом.</li>\n<li><strong>Фокус и кликабельность:</strong> минимальная область нажатия на мобильных — <code>44×44 px</code>.</li>\n</ul>\n<h4>3. Типографика и фокус с клавиатуры</h4>\n<ul>\n<li>Минимальный размер основного текста для чтения с экрана — <code>15–16 px</code> при межстрочном интервале <code>1.45–1.6</code>.</li>\n<li>Видимое кольцо фокуса <code>:focus-visible</code> обязательно для навигации клавишей <code>Tab</code>.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Проверка контрастности светло-серого текста <code>#64748b</code> на тёмном фоне <code>#090d16</code> показала 3.8:1 (недостаточно). Замена на <code>#94a3b8</code> подняла контраст до 6.9:1 (полный WCAG AA).</p>",
+      "quiz": [
+        {
+          "q": "Какой минимальный коэффициент контрастности обычного текста требует стандарт WCAG AA?",
+          "options": [
+            "4.5 : 1",
+            "1.5 : 1",
+            "2.0 : 1",
+            "10 : 1"
+          ],
+          "correct": 0,
+          "explain": "4.5:1 гарантирует читаемость для людей со сниженным зрением."
+        },
+        {
+          "q": "Почему нельзя передавать статус ошибки только красным цветом?",
+          "options": [
+            "Люди с нарушением цветовосприятия могут не отличить красный от зелёного",
+            "Красный цвет медленнее грузится",
+            "Это запрещено в CMYK",
+            "Красный не работает на OLED"
+          ],
+          "correct": 0,
+          "explain": "Цвет нужно дублировать иконкой или текстовой подписью."
+        },
+        {
+          "q": "Какой минимальный размер области нажатия (Tap Target) рекомендован для мобильных интерфейсов?",
+          "options": [
+            "44×44 px",
+            "12×12 px",
+            "100×100 px",
+            "8×8 px"
+          ],
+          "correct": 0,
+          "explain": "44×44 px исключает случайные промахи пальцем."
+        },
+        {
+          "q": "Почему нельзя убирать outline: none без замены на :focus-visible?",
+          "options": [
+            "Пользователи, работающие с клавиатуры, теряют понимание, какой элемент сейчас активен",
+            "Увеличивается вес CSS",
+            "Перестаёт работать мышь",
+            "Ломается Flexbox"
+          ],
+          "correct": 0,
+          "explain": "Видимый фокус — базовое требование доступности WCAG 2.1."
+        }
+      ],
+      "task_prompt": "Проведите аудит доступности тёмной темы: укажите пары цветов с контрастом >= 4.5:1, способ дублирования статусов без цвета и минимальный размер кнопок на мобильных.",
+      "criteria": [
+        "Указан порог контрастности 4.5:1",
+        "Описано дублирование цвета иконкой/текстом",
+        "Задан размер интерактивных кнопок >= 44px",
+        "Учтена читаемость шрифта (размер >= 16px и межстрочный интервал)"
+      ],
+      "starter_code": "Аудит доступности WCAG:\n1. Контрастность:\n2. Статусы без цвета:\n3. Мобильные тач-зоны:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "4.5",
+        "контраст",
+        "иконк"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/graphic_design-19.mp4",
+      "video_title": "Урок 19. Доступность в дизайне (WCAG 2.1)",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/graphic_design-19.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 20,
+      "title": "Урок 20. Итоговый дипломный проект: комплексный брендбук, 3D-упаковка и интерактивный кейс",
+      "difficulty": "Экзамен",
+      "time_limit": "120 мин",
+      "tools": "Figma, Illustrator, Photoshop, 3D Mockup / Behance Case",
+      "summary": "Финальная защита дизайн-проекта: от концепции и дизайн-системы до 3D-презентации и допечатной/веб-спецификации.",
+      "theory": "<h4>1. Структура сильного кейса в портфолио</h4>\n<ol>\n<li><strong>Задача и исследование:</strong> бизнес-цель, аудитория, референсы.</li>\n<li><strong>Визуальная система:</strong> логотип, сетки, цветовые токены (RGB/CMYK), типографика.</li>\n<li><strong>Носители и 3D:</strong> интерфейс, упаковка с вырубкой (Dieline), реалистичные мокапы.</li>\n<li><strong>Спецификация (Handoff):</strong> готовые гайдлайны для типографии и разработчиков.</li>\n</ol>\n<h4>3. Чек-лист передачи в разработку и печать</h4>\n<ul>\n<li><strong>Для разработчиков:</strong> очищенные SVG-иконки, токены в CSS/JSON, состояния всех кнопок, адаптив 375/768/1440 px.</li>\n<li><strong>Для типографии:</strong> PDF/X-1a, профиль CMYK Coated FOGRA39, вылеты 3 мм, суммарное покрытие красок (TIL) не выше 300%.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Полный кейс включает не только красивые рендеры, но и техническую документацию, по которой верстальщик и печатник сдают тираж без единой правки.</p>",
+      "quiz": [
+        {
+          "q": "Что обязательно должно входить в спецификацию для типографии (Prepress)?",
+          "options": [
+            "CMYK-цвета, вылеты (bleeds) 2–5 мм, шрифты в кривых, 300 dpi",
+            "RGB и 72 ppi",
+            "Только ссылка на Figma",
+            "GIF-анимация"
+          ],
+          "correct": 0,
+          "explain": "Типография требует CMYK, 300 dpi, вылеты под обрез и кривые."
+        },
+        {
+          "q": "Какой аспект отличает профессиональный кейс на Behance от набора картинок?",
+          "options": [
+            "Логика процесса: проблема -> исследование -> система -> результат",
+            "Большое количество случайных фильтров",
+            "Отсутствие текста",
+            "Использование Comic Sans"
+          ],
+          "correct": 0,
+          "explain": "Сторителлинг показывает мышление дизайнера."
+        },
+        {
+          "q": "Для чего проверяют дизайн на соответствие WCAG на финальном этапе?",
+          "options": [
+            "Чтобы продукт был удобен и читаем для всех пользователей",
+            "Для удорожания печати",
+            "Чтобы уменьшить разрешение",
+            "Для конвертации в SVG"
+          ],
+          "correct": 0,
+          "explain": "Инклюзивность — обязательный стандарт современного дизайна."
+        },
+        {
+          "q": "Что означает параметр TIL (Total Ink Limit) <= 300% в допечатной подготовке?",
+          "options": [
+            "Ограничение суммы четырёх красок CMYK, чтобы бумага не промокла и не отмарывала",
+            "Максимальную яркость монитора",
+            "Количество страниц в буклете",
+            "Скорость работы принтера"
+          ],
+          "correct": 0,
+          "explain": "Превышение 300–320% краски приводит к смазыванию оттиска в типографии."
+        }
+      ],
+      "task_prompt": "Составьте презентационную структуру вашего дипломного кейса: опишите бренд, цветовые модели для веба и печати, 3D-носитель/мокап и передачу дизайн-системы в разработку.",
+      "criteria": [
+        "Описаны носители и айдентика",
+        "Разделены форматы для веба (RGB/SVG) и печати (CMYK/300dpi)",
+        "Включён этап 3D/мокап-презентации и дизайн-токены",
+        "Описан формат передачи макетов разработчикам и в типографию (Handoff)"
+      ],
+      "starter_code": "Дипломный дизайн-кейс:\n1. Концепция:\n2. Айдентика и токены:\n3. Носители и Prepress:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "cmyk",
+        "токен",
+        "мокап"
+      ],
+      "min_length": 80,
+      "video_url": "assets/lesson-intros/graphic_design-20.mp4",
+      "video_title": "Урок 20. Итоговый дипломный проект",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/graphic_design-20.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
     }
   ],
   "autoelectric": [
@@ -3340,6 +4910,782 @@ window.EDU_LESSONS = {
           "sec": 45,
           "time_str": "00:45",
           "title": "Оформление экспертного заключения диагноста"
+        }
+      ]
+    },
+    {
+      "num": 13,
+      "title": "Урок 13. Осциллограф в автодиагностике: снятие осциллограмм ДПКВ, ДПРВ и синхронизация фаз ГРМ",
+      "difficulty": "Средний",
+      "time_limit": "80 мин",
+      "tools": "Мотор-тестер / Осциллограф (USB Autoscope), щуп-игла",
+      "summary": "Чтение индуктивных (AC) и Холла (прямоугольных 0–5В) сигналов датчиков коленвала и распредвала, выявление растяжения цепи ГРМ.",
+      "theory": "<h4>1. Зачем автоэлектрику осциллограф?</h4>\n<p>Мультиметр показывает усреднённое напряжение, а <strong>осциллограф</strong> рисует мгновенную форму сигнала в реальном времени (в миллисекундах).</p>\n<h4>2. Сравнение типов ДПКВ и ДПРВ</h4>\n<ul>\n<li><strong>Индуктивный ДПКВ:</strong> генерирует синусоиду переменного тока (амплитуда растёт с оборотами, пропуск 2 зубьев на задающем диске 60-2 даёт маркер ВМТ).</li>\n<li><strong>Датчик Холла (ДПРВ):</strong> выдаёт чёткий прямоугольный меандр <code>0 В — 5 В</code> (или <code>0–12 В</code>).</li>\n</ul>\n<h4>3. Типовые дефекты на осциллограммах ДПКВ/ДПРВ</h4>\n<ul>\n<li><strong>Биение задающего диска:</strong> синусоида «дышит» по амплитуде — возможен удар по шкиву или грязь на зубьях.</li>\n<li><strong>Помехи от высоковольтной части:</strong> острые «иголки» на сигнале говорят об обрыве экрана кабеля или пробое свечных колпачков.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Двигатель глох на горячую без ошибок по сканеру. Осциллограф показал срыв амплитуды ДПКВ при нагреве до 90°C — межвитковый обрыв катушки датчика.</p>",
+      "quiz": [
+        {
+          "q": "Какую форму сигнала выдаёт исправный индуктивный ДПКВ на зубчатом венце 60-2?",
+          "options": [
+            "Синусоиду с пропуском двух зубьев (маркер ВМТ)",
+            "Постоянные 12 В",
+            "Прямоугольный ШИМ 5 В",
+            "Отрицательный ноль"
+          ],
+          "correct": 0,
+          "explain": "Индуктивный датчик наводит переменную синусоиду при прохождении зубьев."
+        },
+        {
+          "q": "Что показывает одновременная осциллограмма ДПКВ + ДПРВ?",
+          "options": [
+            "Фазовое рассогласование (растяжение цепи или перескок ремня ГРМ)",
+            "Давление в шинах",
+            "Износ тормозных колодок",
+            "Уровень омывателя"
+          ],
+          "correct": 0,
+          "explain": "Сдвиг фронтов ДПРВ относительно маркера ДПКВ выявляет сбой фаз ГРМ."
+        },
+        {
+          "q": "Какая амплитуда прямоугольного сигнала типична для датчика Холла?",
+          "options": [
+            "0–5 В (или 0–12 В)",
+            "220 В AC",
+            "0.1 мВ",
+            "1000 В"
+          ],
+          "correct": 0,
+          "explain": "Цифровой датчик Холла переключается между опорным напряжением и массой."
+        },
+        {
+          "q": "Что означает «плавающая» амплитуда синусоиды на осциллограмме индуктивного ДПКВ на ровных оборотах?",
+          "options": [
+            "Механическое биение задающего диска или люфт/зазор датчика",
+            "Неисправность генератора",
+            "Забитый топливный фильтр",
+            "Села батарейка в ключе"
+          ],
+          "correct": 0,
+          "explain": "Амплитуда индуктивного датчика напрямую зависит от воздушного зазора до зубьев."
+        }
+      ],
+      "task_prompt": "Опишите методику подключения 2-канального осциллографа к ДПКВ и ДПРВ и диагностику растяжения цепи ГРМ по эталонной осциллограмме.",
+      "criteria": [
+        "Указано подключение каналов и общей массы",
+        "Описана форма сигналов (синусоида / меандр)",
+        "Объяснён принцип выявления сдвига фаз ГРМ",
+        "Описана проверка массы и экранирования сигнального провода"
+      ],
+      "starter_code": "Протокол осциллографирования:\n1. Подключение:\n2. Анализ формы:\n3. Вывод по фазам:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "осциллограф",
+        "дпкв",
+        "фаз"
+      ],
+      "min_length": 75,
+      "video_url": "assets/lesson-intros/autoelectric-13.mp4",
+      "video_title": "Урок 13. Осциллограф в автодиагностике",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/autoelectric-13.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 14,
+      "title": "Урок 14. Высоковольтные цепи зажигания (COP/DIS): диагностика катушек, свечей и пробоя изоляции",
+      "difficulty": "Средний",
+      "time_limit": "75 мин",
+      "tools": "Емкостной/индуктивный датчик, мегомметр, разрядник",
+      "summary": "Анализ времени горения искры, напряжения пробоя, затухающих колебаний и поиск пропусков воспламенения без повреждения ЭБУ.",
+      "theory": "<h4>1. Параметры вторичного напряжения зажигания</h4>\n<ul>\n<li><strong>Напряжение пробоя:</strong> обычно <code>8–15 кВ</code> (при увеличенном зазоре свечи или бедной смеси резко растёт).</li>\n<li><strong>Время горения искры:</strong> норма <code>1.0–1.8 мс</code>. Короткое горение или отсутствие затухающих колебаний указывает на межвитковое замыкание катушки.</li>\n<li><strong>Запрещено:</strong> проверять искру «на воздух» без разрядника на современных авто — это пробивает выходной ключ (IGBT) в ЭБУ.</li>\n</ul>\n<h4>3. Чтение пробоя и накопления энергии</h4>\n<ul>\n<li>Время накопления (Dwell time) катушки COP составляет обычно <code>2.0–3.5 мс</code>.</li>\n<li>Слишком высокое напряжение пробоя (>18 кВ) указывает на изношенный увеличенный зазор свечи или обрыв высоковольтного провода.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Появились пропуски в 3-м цилиндре только под нагрузкой. Внешне катушка была целой, но под резиновым наконечником обнаружилась белая дорожка углеродного пробоя на корпус колодца.</p>",
+      "quiz": [
+        {
+          "q": "Что означает отсутствие затухающих колебаний после линии горения на осциллограмме зажигания?",
+          "options": [
+            "Межвитковое замыкание первичной или вторичной обмотки катушки",
+            "Идеальная работа свечи",
+            "Забитый воздушный фильтр",
+            "Низкий уровень масла"
+          ],
+          "correct": 0,
+          "explain": "Межвитковое замыкание мгновенно гасит остаточную энергию контура."
+        },
+        {
+          "q": "Почему нельзя снимать наконечник катушки на работающем двигателе без разрядника?",
+          "options": [
+            "Скачок самоиндукции может пробить катушку или ключ ЭБУ",
+            "Сгорит стартер",
+            "Заблокируется АКПП",
+            "Упадёт давление в шинах"
+          ],
+          "correct": 0,
+          "explain": "Без пути разряда напряжение возрастает до 30–40 кВ и пробивает изоляцию."
+        },
+        {
+          "q": "Какое среднее время горения искры на холостом ходу считается нормой?",
+          "options": [
+            "1.0–1.8 мс",
+            "0.05 мс",
+            "15 мс",
+            "100 мс"
+          ],
+          "correct": 0,
+          "explain": "Длительность горения 1.0–1.8 мс обеспечивает уверенное воспламенение."
+        },
+        {
+          "q": "К чему приводит увеличенный сверх нормы зазор на электродах свечи зажигания?",
+          "options": [
+            "К росту напряжения пробоя и перегреву/пробою изоляции катушки",
+            "К снижению расхода масла",
+            "К росту давления в шинах",
+            "К отключению ABS"
+          ],
+          "correct": 0,
+          "explain": "Высокое пробивное напряжение ищет слабый путь через изолятор наконечника."
+        }
+      ],
+      "task_prompt": "Составьте алгоритм проверки индивидуальной катушки зажигания (COP) с интегрированным коммутатором: проверка питания, управляющего импульса, времени горения и свечного зазора.",
+      "criteria": [
+        "Описана проверка питания +12В и массы",
+        "Указана проверка управляющего импульса",
+        "Приведены нормы времени горения и запрет проверки без разрядника",
+        "Учтён осмотр резиновых наконечников на следы углеродного пробоя"
+      ],
+      "starter_code": "Диагностика катушки COP:\n1. Первичная цепь:\n2. Вторичный разряд:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "катушк",
+        "искр",
+        "разрядник"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/autoelectric-14.mp4",
+      "video_title": "Урок 14. Высоковольтные цепи зажигания (COP/DIS)",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/autoelectric-14.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 15,
+      "title": "Урок 15. Шина LIN, FlexRay и диагностика мультиплексных кузовных сетей (BCM, стеклоподъёмники)",
+      "difficulty": "Средний",
+      "time_limit": "75 мин",
+      "tools": "Мультиметр, осциллограф, сканер OBD-II, схемы BCM",
+      "summary": "Однопроводная шина LIN (Local Interconnect Network): ведущий/ведомые узлы, уровни напряжения 12В и поиск обрывов в дверных жгутах.",
+      "theory": "<h4>1. Отличие LIN от CAN</h4>\n<p><strong>LIN</strong> — бюджетная однопроводная шина со скоростью до <code>20 кбит/с</code>, управляющая периферией: датчиком IBS на АКБ, генератором, стеклоподъёмниками, сервоприводами климата.</p>\n<h4>2. Диагностические признаки</h4>\n<ul>\n<li>В покое (рецессивный уровень) на проводе LIN около <code>11–12 В</code> (напряжение бортсети).</li>\n<li>При передаче данных (доминантный уровень) сигнал просаживается к массе <code>~0–1 В</code>.</li>\n<li>Частая поломка — перелом провода в гофре водительской двери или заливание блока BCM.</li>\n</ul>\n<h4>3. Конфликты на шине и «засыпание» авто</h4>\n<ul>\n<li>Неисправный дверной модуль на шине LIN может постоянно «будить» блок BCM, вызывая паразитную утечку тока <code>0.5–1.5 А</code> и разряд АКБ за ночь.</li>\n<li>При отключении подозреваемого узла по очереди ток утечки падает до нормы <code>0.02–0.05 А</code> через 15–30 минут.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>На автомобиле за ночь садился новый аккумулятор. Осциллограф на шине LIN показал непрерывные пакеты от залитого водой блока зеркала — отключение разъёма вернуло авто в спящий режим.</p>",
+      "quiz": [
+        {
+          "q": "Сколько сигнальных проводов используется в шине LIN?",
+          "options": [
+            "1 провод (плюс общая масса)",
+            "2 витых провода",
+            "4 оптических волокна",
+            "3 фазных провода"
+          ],
+          "correct": 0,
+          "explain": "LIN — однопроводная шина с архитектурой Master-Slave."
+        },
+        {
+          "q": "Какое напряжение в покое должно быть на исправной шине LIN?",
+          "options": [
+            "Около напряжения АКБ (~12 В)",
+            "2.5 В",
+            "0 В",
+            "24 В"
+          ],
+          "correct": 0,
+          "explain": "LIN подтянута к напряжению батареи (Vbat)."
+        },
+        {
+          "q": "Какие узлы чаще всего общаются по шине LIN?",
+          "options": [
+            "Датчик АКБ (IBS), генератор, стеклоподъёмники, заслонки печки",
+            "ABS и подушки безопасности",
+            "Форсунки прямого впрыска",
+            "Турбина"
+          ],
+          "correct": 0,
+          "explain": "LIN обслуживает некритичные по задержке кузовные и вспомогательные узлы."
+        },
+        {
+          "q": "Какой ток покоя считается нормой после полного засыпания всех кузовных блоков автомобиля?",
+          "options": [
+            "До 0.03–0.05 А (30–50 мА)",
+            "1.5 А",
+            "5.0 А",
+            "0.5 А"
+          ],
+          "correct": 0,
+          "explain": "Ток выше 50–80 мА разрядит АКБ за несколько дней простоя."
+        }
+      ],
+      "task_prompt": "Опишите пошаговый поиск неисправности при отказе всех стеклоподъёмников по шине LIN: проверка предохранителя BCM, замер напряжения на проводе LIN и проверка гофры двери.",
+      "criteria": [
+        "Указана проверка питания блока Master (BCM)",
+        "Приведён замер напряжения покоя ~12В и импульсов",
+        "Учтён осмотр жгута в гофре двери",
+        "Описана проверка тока утечки и «засыпания» шины"
+      ],
+      "starter_code": "Поиск обрыва LIN:\n1. Питание BCM:\n2. Замер сигнала LIN:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "lin",
+        "12",
+        "bcm"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/autoelectric-15.mp4",
+      "video_title": "Урок 15. Шина LIN, FlexRay и диагностика мультиплексных кузовных сетей (BCM, стеклоподъёмники)",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/autoelectric-15.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 16,
+      "title": "Урок 16. Топливные коррекции (STFT / LTFT) и диагностика лямбда-зонда (O2 / Широкополосный AFR)",
+      "difficulty": "Продвинутый",
+      "time_limit": "85 мин",
+      "tools": "OBD-II сканер (Live Data), дымогенератор, газоанализатор",
+      "summary": "Чтение краткосрочных (STFT) и долгосрочных (LTFT) топливных коррекций, поиск подсоса воздуха и проверка датчиков кислорода.",
+      "theory": "<h4>1. Что показывают STFT и LTFT?</h4>\n<p>Норма суммы <code>STFT + LTFT</code> укладывается в <code>±5%</code> (допустимо до <code>±10%</code>).</p>\n<ul>\n<li><strong>Плюсовые коррекции (+15%..+25%):</strong> смесь <em>бедная</em> — ЭБУ доливает топливо. Причины: подсос неучтённого воздуха, низкое давление топлива, забитые форсунки.</li>\n<li><strong>Минусовые коррекции (-15%..-25%):</strong> смесь <em>богатая</em> — текут форсунки, завышает ДМРВ, забит воздушный фильтр.</li>\n</ul>\n<h4>2. Проверка подсоса воздуха</h4>\n<p>Если на ХХ коррекции +20%, а на 3000 об/мин падают к 0% — это классический <strong>подсос воздуха</strong> после ДМРВ.</p>\n<h4>3. Широкополосный датчик AFR vs Циркониевый</h4>\n<ul>\n<li>Обычный циркониевый зонд видит только факт «богато/бедно» около лямбда = 1.0 (14.7:1).</li>\n<li><strong>Широкополосный датчик (AFR, 5–6 проводов)</strong> точно измеряет состав смеси в широком диапазоне и проверяется по току накачки (мА) и значению Lambda в сканере.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>После замены ДМРВ на дешёвый аналог LTFT ушёл в -18%. Сравнение показаний расхода воздуха на ХХ (норма ~2.2–3.0 г/с для 2.0 л) выявило завышение сигнала новым датчиком.</p>",
+      "quiz": [
+        {
+          "q": "О чём говорит положительная топливная коррекция LTFT = +22% на холостом ходу, падающая до 0% на высоких оборотах?",
+          "options": [
+            "О подсосе неучтённого воздуха во впускной коллектор",
+            "О течи форсунок",
+            "О забитом катализаторе",
+            "О неисправном генераторе"
+          ],
+          "correct": 0,
+          "explain": "На ХХ разрежение максимально, и подсос воздуха сильнее всего обедняет смесь."
+        },
+        {
+          "q": "В каких пределах переключается исправный циркониевый датчик кислорода (Bank 1 Sensor 1)?",
+          "options": [
+            "От 0.1 В (бедная) до 0.9 В (богатая)",
+            "От 5 В до 12 В",
+            "Постоянно 2.5 В",
+            "От -12 В до +12 В"
+          ],
+          "correct": 0,
+          "explain": "Циркониевый зонд генерирует от 0.1 до 0.9 В."
+        },
+        {
+          "q": "Что означает отрицательная коррекция -18%?",
+          "options": [
+            "Смесь богатая, ЭБУ убавляет подачу топлива",
+            "Смесь бедная",
+            "Подсос воздуха",
+            "Обрыв массы"
+          ],
+          "correct": 0,
+          "explain": "Минус означает уменьшение длительности впрыска."
+        },
+        {
+          "q": "Какое стехиометрическое соотношение воздух/топливо соответствует Lambda = 1.0 для бензина?",
+          "options": [
+            "14.7 : 1",
+            "5.0 : 1",
+            "30.0 : 1",
+            "1.0 : 1"
+          ],
+          "correct": 0,
+          "explain": "14.7 кг воздуха на 1 кг бензина — точка идеального сгорания."
+        }
+      ],
+      "task_prompt": "Проанализируйте кейс: код ошибки P0171 (Бедная смесь), LTFT = +24% на ХХ, на 3000 об/мин LTFT = +2%. Назовите вероятную причину и способ подтверждения дымогенератором.",
+      "criteria": [
+        "Верно определена причина (подсос воздуха)",
+        "Объяснено поведение LTFT на ХХ и оборотах",
+        "Описана опрессовка впуска дымогенератором",
+        "Указано сравнение STFT/LTFT на холостом ходу и под нагрузкой"
+      ],
+      "starter_code": "Анализ кода P0171:\n1. Диагноз по LTFT:\n2. Проверка:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "подсос",
+        "ltft",
+        "дымогенератор"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/autoelectric-16.mp4",
+      "video_title": "Урок 16. Топливные коррекции (STFT / LTFT) и диагностика лямбда-зонда (O2 / Широкополосный AFR)",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/autoelectric-16.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 17,
+      "title": "Урок 17. Системы безопасности SRS (Airbag) и ABS/ESP: датчики колёс и безопасная работа с пиропатронами",
+      "difficulty": "Продвинутый",
+      "time_limit": "80 мин",
+      "tools": "Диагностический сканер, осциллограф, эмулятор резистор 2.2 Ом",
+      "summary": "Техника безопасности при ремонте SRS (снятие клеммы АКБ, ожидание 10 мин), проверка активных датчиков ABS (MRE) и колец задающих.",
+      "theory": "<h4>1. Безопасность при работе с SRS Airbag</h4>\n<ul>\n<li>Перед любыми работами с разъёмами подушек отключите <strong>минус АКБ</strong> и выждите <strong>10–15 минут</strong> для разряда конденсаторов блока SRS.</li>\n<li><strong>Категорически запрещено</strong> прозванивать омметром сам пиропатрон подушки — ток мультиметра может вызвать срабатывание!</li>\n</ul>\n<h4>2. Датчики ABS</h4>\n<p>Современные активные датчики ABS работают по токовому протоколу (<code>7 мА / 14 мА</code>) и читаются с самого начала движения.</p>\n<h4>3. Диагностика через эквивалент-эмулятор</h4>\n<ul>\n<li>Чтобы отделить неисправность проводки от самой подушки, вместо отключённого пиропатрона в разъём вставляют проверочный резистор <code>2.2 Ом</code>: если ошибка ушла в историю — виноват пиропатрон или его контактная группа.</li>\n<li>Активные датчики ABS питаются от 12 В; при прозвонке мультиметром в режиме диода нужно знать распиновку, чтобы не сжечь чип.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Лампа Airbag загоралась только при повороте руля. Проверка осциллографом показала кратковременный обрыв в подрулевом шлейфе (Clockspring) в крайнем положении.</p>",
+      "quiz": [
+        {
+          "q": "Почему категорически запрещено измерять сопротивление пиропатрона подушки безопасности мультиметром?",
+          "options": [
+            "Тестовый ток мультиметра может инициировать взрыв пиропатрона",
+            "Мультиметр разрядит АКБ",
+            "Подушка потеряет цвет",
+            "Сгорит предохранитель прикуривателя"
+          ],
+          "correct": 0,
+          "explain": "Провода проверяются только при отключённом пиропатроне, с использованием эмулятора."
+        },
+        {
+          "q": "Сколько нужно ждать после снятия клеммы АКБ перед разборкой цепи SRS?",
+          "options": [
+            "10–15 минут для разряда резервных конденсаторов",
+            "1 секунду",
+            "24 часа",
+            "Не нужно ждать"
+          ],
+          "correct": 0,
+          "explain": "В блоке SRS стоят мощные конденсаторы автономного питания."
+        },
+        {
+          "q": "Каким сигналом обменивается активный датчик ABS с блоком?",
+          "options": [
+            "Токовыми импульсами 7 мА / 14 мА",
+            "Синусоидой 220 В",
+            "Оптическим лучом",
+            "Давлением воздуха"
+          ],
+          "correct": 0,
+          "explain": "Магниторезистивные датчики модулируют ток потребления 7/14 мА."
+        },
+        {
+          "q": "Какой номинал проверочного резистора обычно используют для тестовой имитации исправного пиропатрона при поиске обрыва в проводке SRS?",
+          "options": [
+            "~2.0–2.4 Ом (типично 2.2 Ом)",
+            "100 кОм",
+            "0.00 Ом (перемычка)",
+            "10 МОм"
+          ],
+          "correct": 0,
+          "explain": "Штатное сопротивление цепи запала пиропатрона лежит в районе 2–3 Ом (перемычка даст ошибку КЗ)."
+        }
+      ],
+      "task_prompt": "Опишите безопасный регламент диагностики ошибки высокого сопротивления водительской подушки безопасности (подрулевой шлейф / спираль Clockspring).",
+      "criteria": [
+        "Указано отключение АКБ и пауза 10–15 мин",
+        "Упомянут запрет прозвонки самого пиропатрона",
+        "Описана проверка подрулевого шлейфа",
+        "Указан контроль сопротивления разъёмов и шлейфа без риска срабатывания"
+      ],
+      "starter_code": "Регламент SRS:\n1. Подготовка и ТБ:\n2. Проверка шлейфа:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "акб",
+        "пиропатрон",
+        "шлейф"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/autoelectric-17.mp4",
+      "video_title": "Урок 17. Системы безопасности SRS (Airbag) и ABS/ESP",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/autoelectric-17.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 18,
+      "title": "Урок 18. Иммобилайзер, бесключевой доступ (Keyless Go) и программирование транспондеров",
+      "difficulty": "Продвинутый",
+      "time_limit": "80 мин",
+      "tools": "Тестер накачки антенны иммобилайзера, диагностический сканер",
+      "summary": "Принцип работы RFID-транспондера, проверка петли-антенны замка зажигания, синхронизация BCM и ЭБУ двигателя.",
+      "theory": "<h4>1. Как работает иммобилайзер?</h4>\n<p>При включении зажигания блок иммобилайзера подаёт импульс на <strong>рамку-антенну</strong> вокруг замка. Индукционное поле питает чип-транспондер в ключе, который отвечает криптокодом. Если код верен — блок разрешает ЭБУ подачу топлива и искры.</p>\n<h4>2. Быстрая проверка</h4>\n<p>Индикаторная катушка со светодиодом, надетая на замок зажигания, при повороте ключа должна кратковременно мигнуть — это подтверждает наличие <strong>накачки антенны</strong>.</p>\n<h4>3. Ключевые факторы сбоя Keyless Go</h4>\n<ul>\n<li>Низкий заряд батарейки CR2032 в смарт-ключе (< 2.8 В) часто приводит к работе только при прикладывании ключа вплотную к кнопке Start/Stop.</li>\n<li>Мощные радиопомехи рядом с вышками или нештатная сигнализация с автозапуском (обходчик иммобилайзера) нередко блокируют штатную антенну.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>После установки нештатной сигнализации авто перестало видеть второй ключ. Осмотр выявил смещённую петлю нештатного обходчика, экранирующую штатную антенну замка.</p>",
+      "quiz": [
+        {
+          "q": "Откуда берёт питание пассивный чип-транспондер внутри обычного ключа без батарейки?",
+          "options": [
+            "От электромагнитного поля антенны-рамки замка зажигания",
+            "От солнечной панели",
+            "От механической пружины",
+            "От Bluetooth телефона"
+          ],
+          "correct": 0,
+          "explain": "Рамка-антенна передаёт энергию индуктивным способом (RFID)."
+        },
+        {
+          "q": "Что показывает мигание проверочной катушки со светодиодом у замка зажигания?",
+          "options": [
+            "Наличие сигнала накачки от блока иммобилайзера",
+            "Уровень топлива",
+            "Заряд стартера",
+            "Работу кондиционера"
+          ],
+          "correct": 0,
+          "explain": "Отсутствие накачки указывает на обрыв антенны или неисправность блока IMMO."
+        },
+        {
+          "q": "Что обычно блокирует ЭБУ при нераспознанном ключе?",
+          "options": [
+            "Впрыск топлива и/или импульсы зажигания",
+            "Работу фар",
+            "Печку салона",
+            "Стеклоочистители"
+          ],
+          "correct": 0,
+          "explain": "Двигатель схватывает на 1–2 секунды и глохнет либо не заводится."
+        },
+        {
+          "q": "Почему смарт-ключ Keyless Go с севшей батарейкой всё равно может завести авто при прикладывании к кнопке Start/Stop?",
+          "options": [
+            "Внутри брелока есть резервный пассивный RFID-транспондер, питающийся от катушки кнопки",
+            "Кнопка заряжает батарейку по Wi-Fi",
+            "Двигатель заводится без иммобилайзера",
+            "Срабатывает датчик дождя"
+          ],
+          "correct": 0,
+          "explain": "Аварийный индуктивный контур работает даже при полностью разряженной батарейке."
+        }
+      ],
+      "task_prompt": "Опишите диагностический план, если автомобиль крутит стартером, но не заводится и мигает лампа иммобилайзера (Security): проверка накачки антенны, чтение ошибок IMMO/BCM и проверка запасного ключа.",
+      "criteria": [
+        "Упомянута проверка запасным ключом",
+        "Описана проверка накачки антенны",
+        "Указано чтение ошибок и синхронизации IMMO-ЭБУ",
+        "Учтена проверка батарейки смарт-ключа и влияния нештатных обходчиков"
+      ],
+      "starter_code": "Диагностика IMMO:\n1. Первичная проверка:\n2. Тест антенны:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "антенн",
+        "ключ",
+        "иммобилайзер"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/autoelectric-18.mp4",
+      "video_title": "Урок 18. Иммобилайзер, бесключевой доступ (Keyless Go) и программирование транспондеров",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/autoelectric-18.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 19,
+      "title": "Урок 19. Электрооборудование гибридных и электромобилей (HV): техника безопасности 400В, инвертор и DC-DC",
+      "difficulty": "Продвинутый",
+      "time_limit": "90 мин",
+      "tools": "Диэлектрические перчатки (1000В), мегомметр, сервисная чека (Service Plug)",
+      "summary": "Оранжевые высоковольтные жгуты, отключение сервисного разъёма ВВБ, измерение сопротивления изоляции и принцип DC-DC преобразователя.",
+      "theory": "<h4>1. Правила безопасности высокого напряжения (HV)</h4>\n<ul>\n<li>Все цепи <code>200–800 В</code> маркируются строго <strong>оранжевым цветом</strong>.</li>\n<li>Перед работой: наденьте диэлектрические перчатки до 1000 В (проверенные на герметичность), снимите <strong>Service Plug</strong> (сервисную чеку ВВБ), выждите 10 минут и убедитесь мультиметром CAT III в <code>0 В</code> на клеммах инвертора.</li>\n</ul>\n<h4>2. Как заряжается 12В АКБ в электромобиле?</h4>\n<p>Вместо привычного генератора используется <strong>DC-DC преобразователь</strong>, понижающий 400В ВВБ в 14В для бортовой сети.</p>\n<h4>3. Нормы сопротивления изоляции (HV Isolation)</h4>\n<ul>\n<li>По стандарту SAE J1766 / ISO 6469 сопротивление изоляции высоковольтной шины относительно кузова должно быть не ниже <code>500 Ом/В</code> (для системы 400 В это минимум <code>200 кОм</code>, на практике норма &gt; <code>10–50 МОм</code>).</li>\n<li>Частая причина ошибки изоляции (P0AA6) — попадание влаги в разъём компрессора кондиционера с электроприводом (он тоже высоковольтный!).</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Гибрид заблокировал запуск из-за утечки изоляции. Поочерёдное отключение потребителей (при снятом Service Plug!) и замер мегомметром указали на пробитую обмотку HV-компрессора кондиционера.</p>",
+      "quiz": [
+        {
+          "q": "Каким цветом стандартизированы высоковольтные жгуты в гибридах и электромобилях?",
+          "options": [
+            "Оранжевым",
+            "Синим",
+            "Зелёным",
+            "Белым"
+          ],
+          "correct": 0,
+          "explain": "Оранжевая гофра предупреждает о смертельно опасном напряжении."
+        },
+        {
+          "q": "Какой узел заменяет генератор и заряжает 12В аккумулятор в электромобиле?",
+          "options": [
+            "DC-DC преобразователь",
+            "Трамблёр",
+            "Карбюратор",
+            "Вакуумный усилитель"
+          ],
+          "correct": 0,
+          "explain": "DC-DC конвертер понижает постоянное напряжение тяговой батареи до ~14 В."
+        },
+        {
+          "q": "Каким прибором проверяют утечку высокого напряжения на кузов?",
+          "options": [
+            "Мегомметром (тест сопротивления изоляции)",
+            "Ареометром",
+            "Стробоскопом",
+            "Штангенциркулем"
+          ],
+          "correct": 0,
+          "explain": "Мегомметр подаёт 500 В для проверки сопротивления изоляции (норма > 10 МОм)."
+        },
+        {
+          "q": "Какой узел климатической системы в гибридах и электромобилях обычно питается от высоковольтной шины (200–400В)?",
+          "options": [
+            "Электрический компрессор кондиционера и PTC-обогреватель",
+            "Только моторчик стеклоочистителя",
+            "Магнитола",
+            "Подсветка бардачка"
+          ],
+          "correct": 0,
+          "explain": "Компрессор кондиционера и высоковольтный отопитель — частые источники утечки изоляции."
+        }
+      ],
+      "task_prompt": "Составьте безопасный регламент обесточивания высоковольтной системы электромобиля перед замером сопротивления изоляции мегомметром.",
+      "criteria": [
+        "Указаны диэлектрические перчатки 1000В",
+        "Описано извлечение Service Plug и пауза 10 мин",
+        "Указан контрольный замер 0 В и тест мегомметром",
+        "Приведены пороговые нормы сопротивления изоляции в МОм"
+      ],
+      "starter_code": "Регламент HV-безопасности:\n1. СИЗ и отключение:\n2. Контроль и замер изоляции:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "перчатк",
+        "service plug",
+        "изоляц"
+      ],
+      "min_length": 75,
+      "video_url": "assets/lesson-intros/autoelectric-19.mp4",
+      "video_title": "Урок 19. Электрооборудование гибридных и электромобилей (HV)",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/autoelectric-19.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 20,
+      "title": "Урок 20. Комплексная компьютерная диагностика (OBD-II + Осциллограф) и сдача электрооборудования",
+      "difficulty": "Экзамен",
+      "time_limit": "120 мин",
+      "tools": "Сканер OBD-II, USB-осциллограф, мультиметр, токовые клещи",
+      "summary": "Итоговый экзамен автоэлектрика: корреляция кодов неисправностей DTC, параметров Live Data, осциллограмм и оформление акта дефектовки.",
+      "theory": "<h4>1. Методика системной диагностики</h4>\n<ol>\n<li>Опрос всех блоков (Topology Scan) и сохранение Freeze Frame (стоп-кадра условий ошибки).</li>\n<li>Проверка базового питания, масс и шины CAN до замены каких-либо датчиков.</li>\n<li>Инструментальное подтверждение: осциллограмма или замер падения напряжения под нагрузкой.</li>\n</ol>\n<h4>3. Приоритет цепей при поиске сложных сбоев</h4>\n<ul>\n<li>Правило №1: <strong>сначала питание, массы и шина связи</strong>, затем исполнительные механизмы и датчики.</li>\n<li>При падении напряжения на массовом проводе блока выше <code>0.1–0.2 В</code> под нагрузкой все датчики этого блока начинают «врать» одновременно.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Автомобиль выдавал 12 ошибок по разным датчикам. Замер падения напряжения между минусом АКБ и корпусом ЭБУ выявил 1.4 В из-за окисленной массы на лонжероне — зачистка контакта устранила все 12 ошибок.</p>",
+      "quiz": [
+        {
+          "q": "Что содержит стоп-кадр (Freeze Frame) в памяти ЭБУ?",
+          "options": [
+            "Параметры работы двигателя в момент фиксации ошибки (обороты, температура, нагрузка)",
+            "Фотографию водителя",
+            "Маршрут навигатора",
+            "Список заправок"
+          ],
+          "correct": 0,
+          "explain": "Freeze Frame помогает воспроизвести условия возникновения неисправности."
+        },
+        {
+          "q": "Почему нельзя сразу менять датчик по коду ошибки «Низкий уровень сигнала»?",
+          "options": [
+            "Причиной может быть обрыв провода, окисление разъёма или потеря питания/массы",
+            "Датчик нельзя откручивать",
+            "Ошибка исчезнет сама через год",
+            "Нужно сначала поменять шины"
+          ],
+          "correct": 0,
+          "explain": "Код DTC указывает на цепь или симптом, а не на 100% поломку самого датчика."
+        },
+        {
+          "q": "Что обязательно фиксируется в итоговом акте дефектовки?",
+          "options": [
+            "Коды DTC, результаты замеров (В/Ом/осциллограммы) и перечень работ",
+            "Только марка масла",
+            "Цвет кузова",
+            "Прогноз погоды"
+          ],
+          "correct": 0,
+          "explain": "Документирование замеров доказывает точность диагноза."
+        },
+        {
+          "q": "Какое падение напряжения на исправном силовом/массовом проводе под нагрузкой считается допустимым?",
+          "options": [
+            "Не более 0.1–0.2 В",
+            "3.5 В",
+            "6.0 В",
+            "12.0 В"
+          ],
+          "correct": 0,
+          "explain": "Падение выше 0.2–0.5 В говорит о сильном окислении контакта или переломе жил провода."
+        }
+      ],
+      "task_prompt": "Оформите итоговый диагностический протокол на сложный отказ (троение двигателя + ошибки по шине CAN): опишите шаги со сканером, мультиметром, осциллографом и итоговое заключение.",
+      "criteria": [
+        "Описано чтение DTC и Freeze Frame",
+        "Включены замеры питания/CAN/осциллографа",
+        "Сформулирован вердикт и рекомендации по ремонту",
+        "Включена проверка падения напряжения на цепях питания и масс"
+      ],
+      "starter_code": "Итоговый протокол АМК-Сервис:\n1. Данные сканера (DTC / Live Data):\n2. Инструментальные замеры:\n3. Заключение:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "dtc",
+        "осциллограф",
+        "can"
+      ],
+      "min_length": 80,
+      "video_url": "assets/lesson-intros/autoelectric-20.mp4",
+      "video_title": "Урок 20. Комплексная компьютерная диагностика (OBD-II + Осциллограф) и сдача электрооборудования",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/autoelectric-20.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
         }
       ]
     }
@@ -4387,6 +6733,783 @@ window.EDU_LESSONS = {
           "title": "Оформление паспорта ГТО и сдача комиссии"
         }
       ]
+    },
+    {
+      "num": 13,
+      "title": "Урок 13. Промышленные сплит-системы, VRF/VRV-мультизональные системы и расчёт трасс",
+      "difficulty": "Средний",
+      "time_limit": "80 мин",
+      "tools": "Рефнеты (Y-ответвители), трубогиб, расчётная таблица фреона",
+      "summary": "Архитектура мультизональных систем VRF/VRV: монтаж рефнетов в горизонте, маслоподъёмные петли и дозаправка хладагента по длине трассы.",
+      "theory": "<h4>1. Особенности систем VRF/VRV</h4>\n<p>К одному мощному наружному блоку подключаются десятки внутренних блоков через медную магистраль и медные тройники — <strong>рефнеты</strong>.</p>\n<h4>2. Жёсткие правила монтажа</h4>\n<ul>\n<li>Рефнеты устанавливаются строго <strong>горизонтально</strong> (отклонение до ±15°) или вертикально, чтобы масло и жидкий фреон распределялись равномерно.</li>\n<li>При перепаде высот более 5 м на всасывающей газовой линии делают <strong>маслоподъёмную петлю</strong> для возврата масла в компрессор.</li>\n</ul>\n<h4>3. Критические ошибки монтажа VRF/VRV</h4>\n<ul>\n<li>Запайка медных труб VRF <strong>без поддува азота</strong> образует внутри чёрную окалину, которая мгновенно забивает сетки ЭРВ и убивает инверторный компрессор!</li>\n<li>Использование обычных сантехнических тройников вместо сертифицированных рефнетов вызывает гидравлический дисбаланс и свист фреона.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>После монтажа системы на 8 внутренних блоков два дальних блока не охлаждали. Причиной оказался рефнет, установленный под углом 45° — весь жидкий фреон уходил в нижнюю ветку.</p>",
+      "quiz": [
+        {
+          "q": "Как называется специальный Y-образный медный разветвитель в системах VRF/VRV?",
+          "options": [
+            "Рефнет",
+            "Термостат",
+            "Ресивер",
+            "Манометр"
+          ],
+          "correct": 0,
+          "explain": "Рефнеты обеспечивают равномерное деление потока хладагента."
+        },
+        {
+          "q": "Для чего на вертикальных стояках газовой линии устанавливают маслоподъёмную петлю?",
+          "options": [
+            "Для возврата компрессорного масла в наружный блок при низких нагрузках",
+            "Для слива конденсата",
+            "Для охлаждения кабеля",
+            "Для сброса воздуха"
+          ],
+          "correct": 0,
+          "explain": "При падении скорости газа масло стекает вниз — петля создаёт пробку для его подъёма."
+        },
+        {
+          "q": "Как рассчитывается дополнительная заправка фреона в VRF?",
+          "options": [
+            "По суммарной длине и диаметру жидкостных труб",
+            "На глаз по шуму",
+            "Всегда ровно 100 г",
+            "По весу пульта"
+          ],
+          "correct": 0,
+          "explain": "Точная масса добавки считается в граммах на каждый метр жидкостной трубы."
+        },
+        {
+          "q": "Зачем при пайке медных трубопроводов VRF/VRV внутрь трубы подают слабый поток сухого азота?",
+          "options": [
+            "Чтобы исключить образование медной окалины внутри трубы",
+            "Для охлаждения припоя",
+            "Чтобы проверить давление",
+            "Для ускорения плавления флюса"
+          ],
+          "correct": 0,
+          "explain": "Без защитной среды азота кислород воздуха окисляет нагретую медь в хлопья окалины."
+        }
+      ],
+      "task_prompt": "Опишите правила монтажа рефнетов, необходимость маслоподъёмной петли и порядок расчёта дозаправки фреона R410A для трассы длиной 35 метров.",
+      "criteria": [
+        "Указана правильная ориентация рефнета",
+        "Объяснена роль маслоподъёмной петли",
+        "Описан расчёт дозаправки по жидкостной линии",
+        "Упомянута обязательная пайка в среде сухого азота"
+      ],
+      "starter_code": "Спецификация VRF-трассы:\n1. Установка рефнетов:\n2. Масловозврат:\n3. Расчёт фреона:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "рефнет",
+        "масло",
+        "фреон"
+      ],
+      "min_length": 75,
+      "video_url": "assets/lesson-intros/hvac-13.mp4",
+      "video_title": "Урок 13. Промышленные сплит-системы, VRF/VRV-мультизональные системы и расчёт трасс",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/hvac-13.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 14,
+      "title": "Урок 14. Инверторные компрессоры (BLDC) и силовые платы IPM: диагностика обмоток и датчиков",
+      "difficulty": "Средний",
+      "time_limit": "80 мин",
+      "tools": "Мультиметр, инвертор-тестер, мегомметр, тепловизор",
+      "summary": "Проверка трёхфазных инверторных компрессоров: равенство сопротивления обмоток U-V-W, тест силового модуля IPM и термисторов NTC.",
+      "theory": "<h4>1. Отличие инверторного компрессора от On/Off</h4>\n<p>В BLDC-компрессоре нет пусковых/рабочих обмоток и конденсатора — у него <strong>три одинаковые обмотки (U, V, W)</strong>, питаемые частотным преобразователем (IPM-модулем).</p>\n<h4>2. Критерии исправности</h4>\n<ul>\n<li>Сопротивление между парами <code>U-V</code>, <code>V-W</code>, <code>U-W</code> должно быть абсолютно <strong>одинаковым</strong> (обычно 0.8–3.0 Ом).</li>\n<li>Сопротивление каждой клеммы на корпус компрессора — не менее <code>2–10 МОм</code> (отсутствие пробоя).</li>\n</ul>\n<h4>3. Диагностика инверторной платы IPM</h4>\n<ul>\n<li>Перед подключением новой платы IPM обязательно проверьте сопротивление обмоток компрессора и отсутствие заклинивания ротора, иначе новая плата сгорит в первую секунду!</li>\n<li>На шине постоянного тока (DC-Bus) после диодного моста и конденсаторов напряжение составляет около <code>310 В</code> (при сети 220 В) — разряжайте конденсаторы перед касанием.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Кондиционер уходил в ошибку инвертора. Тест показал пробой одного из шести IGBT-транзисторов в модуле IPM и перекос сопротивления на одной из обмоток компрессора.</p>",
+      "quiz": [
+        {
+          "q": "Каким должно быть соотношение сопротивлений между клеммами U-V, V-W и U-W у исправного инверторного компрессора?",
+          "options": [
+            "Абсолютно равным (симметричным)",
+            "Различаться в 3 раза",
+            "Равно нулю (0.0 Ом)",
+            "Бесконечность"
+          ],
+          "correct": 0,
+          "explain": "Все три фазы BLDC-статора имеют одинаковое число витков."
+        },
+        {
+          "q": "Какой узел платы наружного блока формирует 3-фазное переменное напряжение для инверторного компрессора?",
+          "options": [
+            "Силовой модуль IPM (IGBT)",
+            "Термистор NTC",
+            "Трёхходовой клапан",
+            "Капиллярная трубка"
+          ],
+          "correct": 0,
+          "explain": "IPM (Intelligent Power Module) инвертирует постоянный ток шины DC в 3 фазы."
+        },
+        {
+          "q": "Что означает сопротивление 50 кОм между клеммой U и медной трубой корпуса?",
+          "options": [
+            "Пробой изоляции обмотки на корпус (компрессор неисправен)",
+            "Нормальное состояние",
+            "Не хватает фреона",
+            "Засор фильтра"
+          ],
+          "correct": 0,
+          "explain": "Изоляция должна измеряться мегаомами."
+        },
+        {
+          "q": "Какое напряжение постоянного тока присутствует на электролитических конденсаторах DC-шины инверторной платы при питании 220В AC?",
+          "options": [
+            "Около 310 В DC (220 * √2)",
+            "12 В DC",
+            "24 В DC",
+            "1000 В DC"
+          ],
+          "correct": 0,
+          "explain": "Выпрямленное амплитудное напряжение сети 220В составляет ~310В постоянного тока."
+        }
+      ],
+      "task_prompt": "Составьте карту проверки инверторного компрессора и платы IPM при ошибке перегрузки по току: замеры U-V-W, изоляции на корпус и проверка диодного моста/IPM.",
+      "criteria": [
+        "Указан замер равенства обмоток U-V-W",
+        "Описана проверка пробоя на корпус мегомметром",
+        "Упомянута проверка силового модуля IPM",
+        "Указана техника безопасности работы с высоким DC-напряжением платы"
+      ],
+      "starter_code": "Диагностика BLDC и IPM:\n1. Обмотки U-V-W:\n2. Изоляция на корпус:\n3. Плата IPM:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "u-v",
+        "изоляц",
+        "ipm"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/hvac-14.mp4",
+      "video_title": "Урок 14. Инверторные компрессоры (BLDC) и силовые платы IPM",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/hvac-14.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 15,
+      "title": "Урок 15. Электронные расширительные вентили (ЭРВ / EEV) и точное регулирование перегрева",
+      "difficulty": "Продвинутый",
+      "time_limit": "80 мин",
+      "tools": "Магнитный тест-индикатор ЭРВ, мультиметр, манометрический коллектор",
+      "summary": "Устройство шагового двигателя ЭРВ (5/6 проводов), проверка обмоток катушки и заклинивания иглы дросселя.",
+      "theory": "<h4>1. Преимущество ЭРВ перед капиллярной трубкой и ТРВ</h4>\n<p><strong>ЭРВ</strong> управляется шаговым электродвигателем от контроллера (обычно <code>0–500 шагов</code>), что позволяет точно поддерживать целевой перегрев на испарителе во всём диапазоне нагрузок.</p>\n<h4>2. Диагностика катушки ЭРВ</h4>\n<p>Отсоедините разъём катушки и прозвоните обмотки относительно общего провода (обычно красный/серый): сопротивление каждой из 4 катушек должно быть одинаковым (~40–50 Ом).</p>\n<h4>3. Влияние датчиков температуры на логику ЭРВ</h4>\n<ul>\n<li>Контроллер рассчитывает перегрев в реальном времени по разнице датчика температуры трубы на выходе испарителя и датчика насыщения/давления всасывания.</li>\n<li>Если термистор NTC ушёл в обрыв или «врёт» на 5°C, ЭРВ либо закроет подачу (обмерзание), либо полностью откроется (гидроудар компрессора!).</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>На промышленном шкафу перегрев упал до 0 К, компрессор покрылся инеем. Замер сопротивления термистора испарителя выявил смещение характеристики — замена NTC восстановила нормальный перегрев 6 К.</p>",
+      "quiz": [
+        {
+          "q": "Какой привод перемещает запорную иглу внутри электронного расширительного вентиля (ЭРВ)?",
+          "options": [
+            "Шаговый электродвигатель",
+            "Сильфон с газом",
+            "Биметаллическая пружина",
+            "Давление масла"
+          ],
+          "correct": 0,
+          "explain": "Контроллер подаёт импульсы на обмотки шагового двигателя ЭРВ."
+        },
+        {
+          "q": "Как можно убедиться в механическом вращении ротора ЭРВ при подаче питания?",
+          "options": [
+            "Снять катушку и приложить магнитный индикатор или прокрутить вручную магнитом",
+            "Нагреть горелкой",
+            "Ударить молотком",
+            "Замкнуть 220 В"
+          ],
+          "correct": 0,
+          "explain": "Магнитный тестер визуализирует вращение поля катушки."
+        },
+        {
+          "q": "Что произойдёт при заклинивании ЭРВ в закрытом положении?",
+          "options": [
+            "Давление всасывания упадёт в вакуум, испаритель обмёрзнет на входе, перегрев резко вырастет",
+            "Давление нагнетания упадёт до нуля",
+            "Компрессор зальёт жидким фреоном",
+            "Включится обогрев"
+          ],
+          "correct": 0,
+          "explain": "Фреон перестаёт поступать в испаритель."
+        },
+        {
+          "q": "Чем опасен «зависший» в полностью открытом положении ЭРВ?",
+          "options": [
+            "Заливом компрессора жидким хладагентом и гидроударом",
+            "Перегревом конденсатора",
+            "Отключением пульта",
+            "Уменьшением длины трассы"
+          ],
+          "correct": 0,
+          "explain": "Избыток жидкого фреона не успевает выкипеть в испарителе и попадает в цилиндры/спирали компрессора."
+        }
+      ],
+      "task_prompt": "Опишите методику диагностики заклинившего ЭРВ: проверка сопротивления обмоток катушки, измерение перегрева на всасывании и проверка шагов открытия магнитным тестером.",
+      "criteria": [
+        "Указана проверка сопротивления обмоток шагового двигателя",
+        "Описаны симптомы по давлению и перегреву",
+        "Упомянут тест вращения магнитного поля",
+        "Учтена проверка термисторов NTC, управляющих перегревом"
+      ],
+      "starter_code": "Проверка ЭРВ:\n1. Электрическая часть (катушка):\n2. Симптомы в контуре:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "эрв",
+        "обмот",
+        "перегрев"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/hvac-15.mp4",
+      "video_title": "Урок 15. Электронные расширительные вентили (ЭРВ / EEV) и точное регулирование перегрева",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/hvac-15.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 16,
+      "title": "Урок 16. Промышленные чиллеры и фанкойлы: гидравлический контур, гликоль и защита от размораживания",
+      "difficulty": "Продвинутый",
+      "time_limit": "85 мин",
+      "tools": "Реле протока (Flow Switch), рефрактометр гликоля, манометры",
+      "summary": "Взаимодействие фреонового и водяного контуров через пластинчатый теплообменник, настройка реле протока и антифриза.",
+      "theory": "<h4>1. Защита пластинчатого испарителя чиллера</h4>\n<p>Если циркуляционный насос остановится, вода в пластинчатом теплообменнике мгновенно замёрзнет и разорвёт пластины — фреон попадёт в воду, а вода убьёт компрессор!</p>\n<h4>2. Три рубежа защиты</h4>\n<ul>\n<li><strong>Реле протока (Flow Switch):</strong> блокирует пуск компрессора без циркуляции воды.</li>\n<li><strong>Датчик температуры воды на выходе</strong> (авария при <code>&lt; +2°C</code>).</li>\n<li><strong>Пропилен-/этиленгликоль:</strong> проверяется рефрактометром на температуру кристаллизации.</li>\n</ul>\n<h4>3. Балансировка гидравлики и защита насоса</h4>\n<ul>\n<li>Перепад температур воды на входе и выходе испарителя чиллера в номинале составляет обычно <code>ΔT = 5°C</code> (например, вход +12°C / выход +7°C).</li>\n<li>Забитый сетчатый фильтр-грязевик снижает проток, ΔT растёт до 10–12°C, и срабатывает защита от заморозки.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Чиллер останавливался по ошибке Low Water Temp. Промывка сетчатого фильтра перед пластинчатым теплообменником восстановила номинальную разницу температур 5°C.</p>",
+      "quiz": [
+        {
+          "q": "Какой датчик предотвращает запуск компрессора чиллера при остановке водяного насоса?",
+          "options": [
+            "Реле протока (Flow Switch)",
+            "Датчик освещённости",
+            "Термостат оттайки",
+            "Датчик CO2"
+          ],
+          "correct": 0,
+          "explain": "Без подтверждения протока воды контроллер не разрешает старт компрессора."
+        },
+        {
+          "q": "Каким прибором проверяют концентрацию гликоля (температуру замерзания) в контуре?",
+          "options": [
+            "Рефрактометром",
+            "Омметром",
+            "Анемометром",
+            "Тахометром"
+          ],
+          "correct": 0,
+          "explain": "Рефрактометр по преломлению света точно определяет точку замерзания раствора."
+        },
+        {
+          "q": "Чем опасна перемычка вместо неисправного реле протока?",
+          "options": [
+            "Размораживанием пластинчатого теплообменника и попаданием воды в компрессор",
+            "Уменьшением шума",
+            "Снижением расхода воды",
+            "Ростом КПД"
+          ],
+          "correct": 0,
+          "explain": "Шунтирование защиты — грубейшее нарушение, ведущее к гибели агрегата."
+        },
+        {
+          "q": "Какой перепад температур воды (вход / выход) на испарителе чиллера является стандартным расчётным режимом?",
+          "options": [
+            "5°C (например, +12°C -> +7°C)",
+            "25°C",
+            "0.2°C",
+            "40°C"
+          ],
+          "correct": 0,
+          "explain": "Дельта 5 К обеспечивает оптимальный теплосъём без риска подмерзания."
+        }
+      ],
+      "task_prompt": "Опишите алгоритм весеннего запуска чиллера: проверка фильтра-грязевика воды, тест реле протока, замер концентрации гликоля рефрактометром и контроль перепада температур воды.",
+      "criteria": [
+        "Указана проверка реле протока",
+        "Упомянут контроль гликоля рефрактометром",
+        "Описана защита пластинчатого теплообменника",
+        "Указан расчётный перепад температур воды ΔT ~ 5°C"
+      ],
+      "starter_code": "Регламент запуска чиллера:\n1. Гидравлика и защита:\n2. Замеры параметров:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "реле протока",
+        "гликол",
+        "теплообменник"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/hvac-16.mp4",
+      "video_title": "Урок 16. Промышленные чиллеры и фанкойлы",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/hvac-16.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 17,
+      "title": "Урок 17. Тепловые насосы воздух-вода и четырёхходовой клапан: режим обогрева и оттайка (Defrost)",
+      "difficulty": "Средний",
+      "time_limit": "75 мин",
+      "tools": "Манометрический коллектор, инфракрасный термометр, токовые клещи",
+      "summary": "Реверсирование холодильного цикла четырёхходовым клапаном, диагностика его перепуска и логика цикла размораживания наружного блока.",
+      "theory": "<h4>1. Как работает четырёхходовой клапан?</h4>\n<p>При подаче напряжения на соленоид пилотное давление перекидывает золотник: испаритель и конденсатор меняются ролями, и тепло переносится с улицы в помещение.</p>\n<h4>2. Признак перепуска клапана</h4>\n<p>Если клапан завис в среднем положении, горячий газ нагнетания перетекает прямо во всасывание: падает производительность, нагнетание и всасывание выравниваются, а все 4 трубки клапана имеют близкую температуру.</p>\n<h4>3. Условия корректного переключения 4-ходового клапана</h4>\n<ul>\n<li>Для перекидывания золотника пилотом необходима минимальная <strong>разница давлений</strong> между нагнетанием и всасыванием (обычно не менее 3–4 бар) — при сильной утечке фреона клапан не переключается!</li>\n<li>Никогда не паяйте корпус 4-ходового клапана без обмотки влажной ветошью/термопастой — тефлоновый золотник внутри расплавится.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Тепловой насос перестал переходить в оттайку. Проверка показала обрыв катушки соленоида 220В на 4-ходовом клапане — замена съёмной катушки заняла 10 минут без вскрытия контура.</p>",
+      "quiz": [
+        {
+          "q": "Какой узел меняет направление движения хладагента для перехода из режима охлаждения в обогрев?",
+          "options": [
+            "Четырёхходовой реверсивный клапан",
+            "Обратный клапан",
+            "Фильтр-осушитель",
+            "Смотровое стекло"
+          ],
+          "correct": 0,
+          "explain": "Четырёхходовой клапан переключает нагнетание и всасывание между теплообменниками."
+        },
+        {
+          "q": "Что происходит во время цикла оттайки (Defrost) наружного блока теплового насоса?",
+          "options": [
+            "Вентилятор наружного блока останавливается, система кратковременно переходит в режим охлаждения для растопки льда",
+            "Включается максимальный обдув улицы",
+            "Сбрасывается весь фреон",
+            "Отключается питание дома"
+          ],
+          "correct": 0,
+          "explain": "Горячий газ растапливает шубу инея на уличном теплообменнике."
+        },
+        {
+          "q": "Как диагностировать внутренний перепуск в четырёхходовом клапане?",
+          "options": [
+            "По низкой разнице давлений и замеру температуры на всех 4 патрубках клапана",
+            "По цвету корпуса",
+            "По уровню шума пульта",
+            "По напряжению в розетке"
+          ],
+          "correct": 0,
+          "explain": "Разница температур между линиями всасывания и нагнетания резко сокращается."
+        },
+        {
+          "q": "Почему при критической нехватке фреона четырёхходовой клапан может не переключиться?",
+          "options": [
+            "Не хватает перепада давлений между нагнетанием и всасыванием для сдвига золотника",
+            "Замерзает катушка соленоида",
+            "Отключается вентилятор",
+            "Сгорает провод"
+          ],
+          "correct": 0,
+          "explain": "Клапан работает за счёт дифференциала давлений собственного контура."
+        }
+      ],
+      "task_prompt": "Опишите диагностику четырёхходового клапана в тепловом насосе, который плохо греет зимой: проверка катушки соленоида, замер температур на 4 трубках и тест переключения режимов.",
+      "criteria": [
+        "Указана проверка питания катушки клапана",
+        "Описан метод замера температур на 4 патрубках",
+        "Объяснены признаки перепуска или заклинивания",
+        "Упомянута защита внутреннего золотника от перегрева при пайке"
+      ],
+      "starter_code": "Диагностика 4-ходового клапана:\n1. Соленоид:\n2. Термометрия патрубков:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "клапан",
+        "патруб",
+        "обогрев"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/hvac-17.mp4",
+      "video_title": "Урок 17. Тепловые насосы воздух-вода и четырёхходовой клапан",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/hvac-17.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 18,
+      "title": "Урок 18. Холодильные камеры с контроллерами Eliwell / Dixell: настройка дифференциала и оттайки",
+      "difficulty": "Средний",
+      "time_limit": "75 мин",
+      "tools": "Контроллер Dixell XR60CX / Eliwell ID974, датчики Pb1/Pb2",
+      "summary": "Программирование параметров Setpoint, Hy (гистерезис), параметров оттайки ТЭНами (id, Md, dt) и времени каплепадения.",
+      "theory": "<h4>1. Основные параметры контроллера</h4>\n<ul>\n<li><code>Set</code> — целевая температура в камере (например, <code>+2°C</code> или <code>-18°C</code>).</li>\n<li><code>Hy</code> (дифференциал / гистерезис) — разница между отключением и повторным включением компрессора (обычно <code>2.0°C</code>), защищает от частого тактования.</li>\n<li><code>Pb1</code> — датчик объёма камеры; <code>Pb2</code> — датчик испарителя (завершает оттайку по температуре <code>+8..+12°C</code>).</li>\n</ul>\n<h4>3. Защита компрессора задержкой пуска (AC / OD)</h4>\n<ul>\n<li>Параметр минимальной паузы между остановкой и пуском компрессора (обычно <code>3–5 минут</code>) позволяет давлениям выровняться и не перегружает пусковую обмотку.</li>\n<li>Калибровка датчика <code>Cal</code> компенсирует погрешность длинного кабеля датчика.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>В мясной витрине компрессор включался каждые 40 секунд. Увеличение дифференциала <code>Hy</code> с 0.5°C до 2.5°C и настройка задержки пуска <code>AC = 3 мин</code> спасли компрессор от сгорания.</p>",
+      "quiz": [
+        {
+          "q": "За что отвечает параметр Hy (дифференциал) в холодильном контроллере?",
+          "options": [
+            "Задаёт температурный диапазон между выключением и включением компрессора",
+            "Устанавливает яркость дисплея",
+            "Регулирует скорость вентилятора",
+            "Сбрасывает пароль"
+          ],
+          "correct": 0,
+          "explain": "Слишком малый дифференциал вызывает частые пуски и перегрев компрессора."
+        },
+        {
+          "q": "Куда устанавливается датчик Pb2?",
+          "options": [
+            "Непосредственно в ламели испарителя для контроля окончания оттайки",
+            "На улицу",
+            "В щит питания",
+            "На компрессор"
+          ],
+          "correct": 0,
+          "explain": "Pb2 фиксирует момент, когда лёд на испарителе полностью растаял."
+        },
+        {
+          "q": "Зачем нужно время каплепадения (dripping time) после оттайки?",
+          "options": [
+            "Чтобы вода успела стечь в дренаж до включения вентиляторов и компрессора",
+            "Чтобы сэкономить свет",
+            "Чтобы нагреть продукты",
+            "Для продувки азотом"
+          ],
+          "correct": 0,
+          "explain": "Иначе капли воды намерзнут на крыльчатку вентилятора."
+        },
+        {
+          "q": "Зачем в контроллере задаётся минимальное время задержки повторного пуска компрессора (3–5 мин)?",
+          "options": [
+            "Чтобы давления в контуре выровнялись и компрессор не пускался под высокой нагрузкой",
+            "Чтобы разморозить продукты",
+            "Для экономии памяти контроллера",
+            "Чтобы прогреть масло до 100°C"
+          ],
+          "correct": 0,
+          "explain": "Попытка пуска против высокого давления нагнетания вызывает заклинивание и срабатывание тепловой защиты."
+        }
+      ],
+      "task_prompt": "Настройте параметры контроллера для низкотемпературной камеры (-18°C): задайте Set, Hy, период оттайки, температуру завершения оттайки по Pb2 и время каплепадения.",
+      "criteria": [
+        "Указаны Set (-18°C) и гистерезис Hy",
+        "Описана роль датчика испарителя Pb2",
+        "Учтено время каплепадения перед пуском вентилятора",
+        "Задана задержка повторного пуска компрессора (Anti-Short Cycle)"
+      ],
+      "starter_code": "Карта параметров контроллера:\n- Set / Hy:\n- Оттайка и Pb2:\n- Каплепадение:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "гистерезис",
+        "pb2",
+        "оттайк"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/hvac-18.mp4",
+      "video_title": "Урок 18. Холодильные камеры с контроллерами Eliwell / Dixell",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/hvac-18.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 19,
+      "title": "Урок 19. Рекуперация, сбор и регенерация хладагента: работа со станцией эвакуации (Recovery)",
+      "difficulty": "Продвинутый",
+      "time_limit": "80 мин",
+      "tools": "Станция рекуперации, двухвентильный баллон, весы, очки",
+      "summary": "Экологичный сбор фреона без выброса в атмосферу, правило заполнения баллона не более 80% и продувка станции (Purge).",
+      "theory": "<h4>1. Почему нельзя стравливать фреон в воздух?</h4>\n<p>Фреоны (особенно R404A, R410A) обладают высоким потенциалом глобального потепления (GWP), а при попадании в лёгкие в замкнутом помещении вытесняют кислород.</p>\n<h4>2. Правило 80% объёма баллона</h4>\n<p>Жидкий фреон при нагреве сильно расширяется! Баллон для сбора никогда не заполняют более чем на <strong>80%</strong> его паспортной массы, иначе при нагреве сработает предохранительный клапан или произойдёт разрыв.</p>\n<h4>3. Методы ускорения эвакуации</h4>\n<ul>\n<li>Использование метода <strong>Push-Pull</strong> (жидкостной сбор) ускоряет перекачку фреона на крупных чиллерах в 3–4 раза.</li>\n<li>Вентили сервисных шлангов с депрессором предотвращают ожог рук жидким фреоном при отсоединении.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Перед заменой сгоревшего компрессора обязателен сбор старого фреона в отдельный маркированный баллон (так как в нём присутствуют кислоты сгоревшего масла, которые нельзя смешивать с чистым газом).</p>",
+      "quiz": [
+        {
+          "q": "На сколько процентов максимум разрешено заполнять баллон при сборе жидкого хладагента?",
+          "options": [
+            "Не более 80% от максимальной вместимости",
+            "На 100% до упора",
+            "На 10%",
+            "На 120%"
+          ],
+          "correct": 0,
+          "explain": "20% газовой подушки необходимы для теплового расширения жидкости."
+        },
+        {
+          "q": "Какой прибор обязателен под баллоном во время эвакуации фреона?",
+          "options": [
+            "Электронные заправочные весы",
+            "Мегомметр",
+            "Анемометр",
+            "Шумомер"
+          ],
+          "correct": 0,
+          "explain": "Весы контролируют массу собранного хладагента и не допускают переполнения."
+        },
+        {
+          "q": "Зачем в конце сбора переводят станцию в режим Purge (Самоочистка)?",
+          "options": [
+            "Чтобы выдавить остатки жидкого фреона из станции в баллон",
+            "Чтобы накачать воздух в систему",
+            "Чтобы слить масло на пол",
+            "Чтобы нагреть компрессор"
+          ],
+          "correct": 0,
+          "explain": "Purge очищает саму станцию перед отключением шлангов."
+        },
+        {
+          "q": "Почему нельзя смешивать фреон, собранный из контура со сгоревшим компрессором, с чистым баллоном?",
+          "options": [
+            "Продукты горения и кислоты отравят весь чистый хладагент",
+            "Баллон изменит цвет",
+            "Упадёт напряжение",
+            "Фреон станет легче воздуха"
+          ],
+          "correct": 0,
+          "explain": "Загрязнённый кислотой фреон подлежит только утилизации или глубокой регенерации."
+        }
+      ],
+      "task_prompt": "Опишите пошаговый процесс сбора фреона R404A из холодильной витрины с помощью станции рекуперации, весов и двухвентильного баллона с соблюдением ТБ.",
+      "criteria": [
+        "Указано использование весов и лимит 80%",
+        "Описано подключение станции через коллектор",
+        "Упомянут режим Purge и средства защиты",
+        "Учтена сегрегация загрязнённого хладагента от чистого"
+      ],
+      "starter_code": "Протокол рекуперации:\n1. Подготовка и весы:\n2. Процесс сбора и Purge:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "рекуперац",
+        "80%",
+        "вес"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/hvac-19.mp4",
+      "video_title": "Урок 19. Рекуперация, сбор и регенерация хладагента",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/hvac-19.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 20,
+      "title": "Урок 20. Комплексная пусконаладка промышленного ХО, паспортизация и расчёт энергоэффективности (COP)",
+      "difficulty": "Экзамен",
+      "time_limit": "120 мин",
+      "tools": "Манометры, термометры, вакуумметр, токовые клещи, паспорт ГТО",
+      "summary": "Итоговая квалификационная защита инженера-холодильщика: опрессовка азотом, глубокое вакуумирование, перегрев/переохлаждение и расчёт COP.",
+      "theory": "<h4>1. Четыре обязательных этапа сдачи объекта</h4>\n<ol>\n<li><strong>Опрессовка сухим азотом (OFN):</strong> проверка герметичности на проектное давление (для R410A до 38–42 бар).</li>\n<li><strong>Глубокое вакуумирование:</strong> достижение остаточного давления <code>&lt; 500 микрон</code> с тестом на удержание вакуума.</li>\n<li><strong>Заправка по весам и пуск:</strong> контроль перегрева (5–8 К) и переохлаждения (4–7 К).</li>\n<li><strong>Энергоаудит:</strong> оценка холодильного коэффициента <code>COP = Q_холода / P_эл</code>.</li>\n</ol>\n<h4>3. Баланс теплосъёма и переохлаждение</h4>\n<ul>\n<li><strong>Перегрев (Superheat = 5–8 К):</strong> гарантирует, что в компрессор не попадёт жидкость.</li>\n<li><strong>Переохлаждение (Subcooling = 4–7 К):</strong> подтверждает, что в дроссель поступает чистая жидкость без пузырьков газа.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>При сдаче холодильной камеры с переохлаждением 1 К и пузырями в смотровом стекле была выполнена дозаправка по весам до переохлаждения 5 К, что подняло холодопроизводительность и COP на 18%.</p>",
+      "quiz": [
+        {
+          "q": "Каким газом выполняется опрессовка фреоновой трассы на герметичность?",
+          "options": [
+            "Сухим бескислородным азотом",
+            "Кислородом",
+            "Пропаном",
+            "Сжатым воздухом с компрессора"
+          ],
+          "correct": 0,
+          "explain": "Кислород при контакте с маслом взрывоопасен, а воздух содержит влагу."
+        },
+        {
+          "q": "Какое остаточное давление вакуумирования считается эталонным для систем на синтетических маслах POE?",
+          "options": [
+            "Менее 500 микрон",
+            "50 000 микрон",
+            "1 бар",
+            "10 бар"
+          ],
+          "correct": 0,
+          "explain": "Глубокий вакуум < 500 мкм полностью удаляет влагу и неконденсируемые газы."
+        },
+        {
+          "q": "Что показывает коэффициент COP холодильной машины?",
+          "options": [
+            "Отношение полученной холодопроизводительности к затраченной электрической мощности",
+            "Массу фреона в кг",
+            "Длину медной трубы",
+            "Уровень шума в дБ"
+          ],
+          "correct": 0,
+          "explain": "Чем выше COP, тем экономичнее установка."
+        },
+        {
+          "q": "Что означает слишком низкое переохлаждение (0–1 К) и пузыри в смотровом стекле при нормальном конденсаторе?",
+          "options": [
+            "Недостаток хладагента (недозаправка) в контуре",
+            "Перезаправка фреоном",
+            "Грязный воздушный фильтр",
+            "Отключение ТЭНа оттайки"
+          ],
+          "correct": 0,
+          "explain": "В конденсаторе не успевает сформироваться достаточный столб жидкого хладагента."
+        }
+      ],
+      "task_prompt": "Составьте итоговый акт пусконаладки холодильной установки: укажите давление опрессовки азотом, целевой вакуум в микронах, норму перегрева/переохлаждения и формулу расчёта COP.",
+      "criteria": [
+        "Указана опрессовка азотом",
+        "Указан целевой вакуум < 500 микрон",
+        "Приведены нормы перегрева/переохлаждения и COP",
+        "Описан тест удержания вакуума (Decay Test) после вакуумирования"
+      ],
+      "starter_code": "Акт пусконаладки ХО:\n1. Опрессовка и вакуум:\n2. Заправка и режим:\n3. COP и заключение:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "азот",
+        "микрон",
+        "перегрев",
+        "cop"
+      ],
+      "min_length": 80,
+      "video_url": "assets/lesson-intros/hvac-20.mp4",
+      "video_title": "Урок 20. Комплексная пусконаладка промышленного ХО, паспортизация и расчёт энергоэффективности (COP)",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/hvac-20.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
     }
   ],
   "automechanic": [
@@ -5430,6 +8553,782 @@ window.EDU_LESSONS = {
           "sec": 45,
           "time_str": "00:45",
           "title": "Подписание заказ-наряда и выдача автомобиля"
+        }
+      ]
+    },
+    {
+      "num": 13,
+      "title": "Урок 13. Турбонаддув и интеркулер: устройство турбокомпрессора, вестгейт и диагностика утечек буста",
+      "difficulty": "Средний",
+      "time_limit": "80 мин",
+      "tools": "Опрессовщик впуска (дымогенератор), манометр наддува, эндоскоп",
+      "summary": "Принцип работы турбины, клапана сброса (Wastegate / Blow-off), проверка люфта крыльчатки и поиск негерметичности патрубков наддува.",
+      "theory": "<h4>1. Как работает турбокомпрессор?</h4>\n<p>Отработавшие газы раскручивают турбинное колесо, которое на одном валу вращает компрессорную крыльчатку, сжимающую воздух во впуск. <strong>Интеркулер</strong> охлаждает сжатый воздух, повышая его плотность.</p>\n<h4>2. Проверка при дефектовке</h4>\n<ul>\n<li><strong>Осевой люфт</strong> вала крыльчатки должен быть практически <strong>нулевым</strong> (допуск сотые доли мм); лёгкий радиальный люфт допустим до выборки масляным клином.</li>\n<li>Утечка в патрубке интеркулера вызывает шипение, чёрный дым и ошибку <code>P0299</code> (недодув).</li>\n</ul>\n<h4>3. Геометрия турбины (VNT/VGT) и масляное голодание</h4>\n<ul>\n<li>Закоксовывание лопаток изменяемой геометрии VGT на дизеле вызывает передув (<code>P0234</code>) и уход двигателя в аварийный режим.</li>\n<li>После замены турбины обязательно замените масло, фильтр и промойте маслоподающую трубку; перед первым пуском заполните картридж чистым маслом и прокрутите стартером без запуска.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Новая турбина вышла из строя через 10 минут после установки из-за забитой нагаром маслоподающей трубки и сухого пуска без прокачки масла.</p>",
+      "quiz": [
+        {
+          "q": "Зачем в системе турбонаддува устанавливается интеркулер?",
+          "options": [
+            "Для охлаждения сжатого воздуха и повышения его плотности",
+            "Для подогрева масла",
+            "Для глушения звука выхлопа",
+            "Для фильтрации топлива"
+          ],
+          "correct": 0,
+          "explain": "Холодный воздух плотнее и содержит больше кислорода в том же объёме."
+        },
+        {
+          "q": "Какой люфт вала турбины является критическим и требует немедленного ремонта?",
+          "options": [
+            "Ощутимый осевой (продольный) люфт или касание крыльчаткой корпуса",
+            "Лёгкий радиальный люфт 0.05 мм без масла",
+            "Вращение от руки без заеданий",
+            "Отсутствие люфта"
+          ],
+          "correct": 0,
+          "explain": "Осевой люфт быстро разрушает упорный подшипник и крыльчатку."
+        },
+        {
+          "q": "Что регулирует клапан Wastegate (вестгейт)?",
+          "options": [
+            "Максимальное давление наддува путём перепуска части выхлопных газов мимо турбины",
+            "Давление в шинах",
+            "Уровень антифриза",
+            "Скорость стеклоочистителей"
+          ],
+          "correct": 0,
+          "explain": "Вестгейт ограничивает обороты турбины на заданном давлении."
+        },
+        {
+          "q": "Что обязательно нужно сделать перед первым запуском двигателя после установки новой турбины?",
+          "options": [
+            "Заменить масло/масляный фильтр, проверить подачу и прокачать масло в картридж до старта",
+            "Сразу дать 5000 об/мин для притирки",
+            "Отключить интеркулер",
+            "Залить герметик в масло"
+          ],
+          "correct": 0,
+          "explain": "Работа ротора на сухую даже в течение 3 секунд уничтожает подшипники скольжения."
+        }
+      ],
+      "task_prompt": "Опишите алгоритм дефектовки при жалобе на потерю тяги и код P0299 (недодув турбины): опрессовка впуска, проверка люфта вала, проверка актуатора вестгейта.",
+      "criteria": [
+        "Описана опрессовка впуска и интеркулера",
+        "Указана проверка осевого и радиального люфта",
+        "Упомянута проверка клапана Wastegate",
+        "Описан регламент замены масла и безопасного первого запуска новой турбины"
+      ],
+      "starter_code": "Дефектовка турбонаддува:\n1. Проверка герметичности:\n2. Осмотр турбины и актуатора:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "турбин",
+        "люфт",
+        "интеркулер"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/automechanic-13.mp4",
+      "video_title": "Урок 13. Турбонаддув и интеркулер",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/automechanic-13.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 14,
+      "title": "Урок 14. Топливная система Common Rail (Дизель) и GDI (Бензин): ТНВД, форсунки и обратный слив",
+      "difficulty": "Продвинутый",
+      "time_limit": "85 мин",
+      "tools": "Колбы для теста обратного слива, сканер давления в рампе, динамометрический ключ",
+      "summary": "Диагностика системы высокого давления Common Rail (до 2000 бар): тест форсунок на слив в обратку, регулятор давления и чистота сборки.",
+      "theory": "<h4>1. Высокое давление Common Rail</h4>\n<p>В отличие от старых систем, здесь ТНВД нагнетает топливо в общую рампу под давлением <code>300–2200 бар</code>, а пьезо- или электромагнитные форсунки открываются по команде ЭБУ.</p>\n<h4>2. Тест обратного слива</h4>\n<p>Если двигатель долго крутит стартером и не запускается, подключают мерные колбы к обратке форсунок: форсунка, сливающая в 3–5 раз больше остальных, сбрасывает давление из рампы.</p>\n<p><strong>Опасно:</strong> при работающем дизеле запрещено откручивать трубки высокого давления — струя под 1500 бар пробивает кожу!</p>\n<h4>3. Прописка кодов форсунок (IMA / QR-код)</h4>\n<ul>\n<li>После установки новой или отремонтированной форсунки Common Rail её индивидуальный коррекционный код (IMA) обязательно прописывают сканером в ЭБУ для ровного холостого хода.</li>\n<li>Стружка в топливном фильтре указывает на разрушение кулачков ТНВД и требует полной промывки бака, магистралей и рампы.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>При замене форсунок в колодце оставили старую нагарную шайбу — прорыв газов за 2 недели закоксовал форсунку так, что потребовался съёмник с обратным молотком.</p>",
+      "quiz": [
+        {
+          "q": "Что выявляет тест форсунок Common Rail с мерными колбами на обратном сливе?",
+          "options": [
+            "Изношенную форсунку, сбрасывающую давление из топливной рампы",
+            "Износ сцепления",
+            "Состояние свечей накала",
+            "Давление в расширительном бачке"
+          ],
+          "correct": 0,
+          "explain": "Сверхнормативный слив в обратку не даёт ТНВД набрать пусковое давление."
+        },
+        {
+          "q": "Почему смертельно опасно искать утечку дизеля рукой на работающем Common Rail?",
+          "options": [
+            "Давление до 2000 бар пробивает кожу и вызывает тяжёлую травму",
+            "Дизель заморозит руку",
+            "Сработает подушка безопасности",
+            "Сгорит генератор"
+          ],
+          "correct": 0,
+          "explain": "Осмотр выполняют только в очках, используя картон для поиска струи на заглушенном/защищённом узле."
+        },
+        {
+          "q": "Какую роль играет медная шайба под дизельной форсункой?",
+          "options": [
+            "Герметизирует камеру сгорания от прорыва газов и отводит тепло",
+            "Служит предохранителем",
+            "Увеличивает давление",
+            "Смазывает распредвал"
+          ],
+          "correct": 0,
+          "explain": "Медная шайба одноразовая — её меняют при каждом снятии форсунки."
+        },
+        {
+          "q": "Зачем после замены дизельной форсунки Common Rail её код прописывают в ЭБУ сканером?",
+          "options": [
+            "Для учёта индивидуальных допусков производительности и плавной работы на ХХ",
+            "Для увеличения давления наддува",
+            "Для отключения иммобилайзера",
+            "Для сброса пробега"
+          ],
+          "correct": 0,
+          "explain": "Каждый экземпляр форсунки имеет микроотклонения подачи, компенсируемые ЭБУ по коду."
+        }
+      ],
+      "task_prompt": "Опишите процедуру теста обратного слива форсунок Common Rail и правила замены медных уплотнительных шайб с очисткой колодца форсунки.",
+      "criteria": [
+        "Описан тест мерными колбами",
+        "Указана техника безопасности высокого давления",
+        "Упомянута замена одноразовой медной шайбы и чистка колодца",
+        "Упомянута проверка на металлическую стружку и прописка IMA-кода"
+      ],
+      "starter_code": "Диагностика Common Rail:\n1. Тест обратки:\n2. Безопасность и монтаж форсунки:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "обрат",
+        "давлен",
+        "шайб"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/automechanic-14.mp4",
+      "video_title": "Урок 14. Топливная система Common Rail (Дизель) и GDI (Бензин)",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/automechanic-14.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 15,
+      "title": "Урок 15. Автоматические трансмиссии (АКПП, вариатор CVT, робот DSG): замена ATF и диагностика",
+      "difficulty": "Средний",
+      "time_limit": "80 мин",
+      "tools": "Установка замены ATF, сканер температуры АКПП, динамометрический ключ",
+      "summary": "Контроль уровня и температуры жидкости ATF (обычно +35..+45°C), отличие масел ATF/CVT/DSG и адаптация сцеплений.",
+      "theory": "<h4>1. Почему нельзя путать жидкости трансмиссий?</h4>\n<ul>\n<li><strong>Классическая АКПП (гидротрансформатор):</strong> жидкость <code>ATF</code> с модификаторами скольжения для фрикционов.</li>\n<li><strong>Вариатор (CVT):</strong> специальная жидкость <code>CVTF</code> с высоким коэффициентом трения «металл-по-металлу» для ремня и конусов.</li>\n</ul>\n<h4>2. Выставление уровня по температуре</h4>\n<p>Уровень в большинстве современных АКПП выставляется через контрольную переливную пробку строго при работающем двигателе и температуре масла <code>+35..+45°C</code> по сканеру.</p>\n<h4>3. Сброс адаптаций и риски полной аппаратной замены</h4>\n<ul>\n<li>При пробеге свыше 150 тыс. км без истории обслуживания резкая аппаратная промывка под давлением может смыть отложения и забить каналы гидроблока — предпочтительна мягкая частичная замена в 2 этапа.</li>\n<li>После ремонта или замены масла выполняется сброс адаптаций давления и дорожная обкатка.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Уровень в АКПП выставили на холодную (+15°C) вместо +40°C — при прогреве вспенившееся масло выбило через сапун и вызвало пинки при переключении.</p>",
+      "quiz": [
+        {
+          "q": "При каком условии выставляется уровень масла через контрольную пробку на большинстве современных АКПП?",
+          "options": [
+            "При работающем двигателе и температуре ATF +35..+45°C",
+            "На холодном заглушенном двигателе -20°C",
+            "При 120°C",
+            "На скорости 100 км/ч"
+          ],
+          "correct": 0,
+          "explain": "Тепловое расширение ATF сильно влияет на уровень, а насос должен заполнить гидроблок."
+        },
+        {
+          "q": "Что произойдёт при заливке обычной ATF в ременной вариатор CVT?",
+          "options": [
+            "Проскальзывание и быстрый износ ремня и конусов",
+            "Увеличение ресурса вдвое",
+            "Снижение расхода бензина",
+            "Ничего не изменится"
+          ],
+          "correct": 0,
+          "explain": "CVT требует специальной жидкости с фрикционными присадками для стали."
+        },
+        {
+          "q": "Зачем проверяют магниты в поддоне АКПП при замене фильтра?",
+          "options": [
+            "Оценить наличие крупной металлической стружки (износ подшипников/шестерён)",
+            "Чтобы помыть колёса",
+            "Для проверки октанового числа",
+            "Для балансировки"
+          ],
+          "correct": 0,
+          "explain": "Лёгкий серый налёт — норма, а крупная стружка сигнализирует о разрушении узла."
+        },
+        {
+          "q": "Почему уровень ATF нельзя выставлять на заглушенном двигателе (на большинствах АКПП без щупа)?",
+          "options": [
+            "Насос не работает, масло стекает в поддон и уровень кажется завышенным",
+            "Масло замерзает",
+            "Блокируется руль",
+            "Сгорают соленоиды"
+          ],
+          "correct": 0,
+          "explain": "При работающем ДВС насос заполняет гидротрансформатор и пакеты фрикционов."
+        }
+      ],
+      "task_prompt": "Составьте регламент частичной замены масла и фильтра в АКПП: проверка магнитов в поддоне, подбор допуска жидкости и выставление уровня по температуре со сканером.",
+      "criteria": [
+        "Указан осмотр поддона и магнитов на стружку",
+        "Упомянут подбор точного допуска ATF/CVTF",
+        "Описано выставление уровня при работающем ДВС и +35..+45°C",
+        "Учтена проверка на отсутствие эмульсии (попадания антифриза через теплообменник)"
+      ],
+      "starter_code": "Регламент сервиса АКПП:\n1. Слив и инспекция поддона:\n2. Залив и контроль уровня:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "магнит",
+        "температур",
+        "уровен"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/automechanic-15.mp4",
+      "video_title": "Урок 15. Автоматические трансмиссии (АКПП, вариатор CVT, робот DSG)",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/automechanic-15.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 16,
+      "title": "Урок 16. Развал-схождение (УУК): кастер, развал, схождение и 3D-стенд геометрии колёс",
+      "difficulty": "Средний",
+      "time_limit": "75 мин",
+      "tools": "3D-стенд развал-схождения, мишени, депрессор педали тормоза, люфт-детектор",
+      "summary": "Физика углов установки колёс (развал, схождение, кастер), обязательная проверка подвески и давления в шинах перед регулировкой.",
+      "theory": "<h4>1. Три главных угла установки колёс</h4>\n<ul>\n<li><strong>Схождение (Toe):</strong> угол между плоскостями вращения колёс (вид сверху). Сильнее всего влияет на <em>износ протектора</em>.</li>\n<li><strong>Развал (Camber):</strong> наклон колеса в вертикальной плоскости (вид спереди).</li>\n<li><strong>Кастер (Caster):</strong> продольный наклон оси поворота стойки — обеспечивает самовозврат руля и курсовую устойчивость.</li>\n</ul>\n<h4>2. Подготовка к 3D-стенду</h4>\n<p>Нельзя делать развал-схождение при люфтах в шаровых/наконечниках или разном давлении в шинах!</p>\n<h4>3. Компенсация биения дисков и загрузка</h4>\n<ul>\n<li>Перед замером стенд выполняет <strong>прокатку (компенсацию биения дисков)</strong>, чтобы исключить кривизну колёсного диска из расчёта углов.</li>\n<li>Нарушение заднего схождения вызывает «увод» руля и рысканье кормы на скользкой дороге.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Клиент жаловался на «съеденную» за месяц внутреннюю кромку передних шин. Диагностика выявила люфт в рулевой тяге; после замены тяги и регулировки схождения в допуск износ прекратился.</p>",
+      "quiz": [
+        {
+          "q": "Какой угол установки колёс быстрее всего «съедает» протектор шины при нарушении?",
+          "options": [
+            "Схождение (Toe)",
+            "Кастер",
+            "Давление запаски",
+            "Вылет диска"
+          ],
+          "correct": 0,
+          "explain": "При нарушенном схождении колесо буквально волочится боком по асфальту."
+        },
+        {
+          "q": "Какой угол отвечает за стабилизацию и самовозврат руля в прямолинейное положение?",
+          "options": [
+            "Кастер (Caster)",
+            "Схождение задней оси",
+            "Развал",
+            "Диаметр ступицы"
+          ],
+          "correct": 0,
+          "explain": "Положительный кастер создаёт стабилизирующий момент."
+        },
+        {
+          "q": "Что обязательно проверяют ДО установки 3D-мишеней на колёса?",
+          "options": [
+            "Люфты в ходовой/рулевой и давление воздуха во всех шинах",
+            "Уровень масла в КПП",
+            "Заряд АКБ",
+            "Чистоту салона"
+          ],
+          "correct": 0,
+          "explain": "Любой люфт или спущенное колесо делают замер стенда бессмысленным."
+        },
+        {
+          "q": "Зачем на 3D-стенде развал-схождения выполняют процедуру прокатки автомобиля вперёд-назад?",
+          "options": [
+            "Для компенсации биения колёсных дисков и точности крепления захватов",
+            "Для прогрева тормозов",
+            "Для проверки сцепления",
+            "Для зарядки АКБ"
+          ],
+          "correct": 0,
+          "explain": "Стенд вычисляет истинную ось вращения колеса независимо от кривизны обода."
+        }
+      ],
+      "task_prompt": "Опишите порядок подготовки автомобиля к регулировке УУК на 3D-стенде и объясните влияние схождения, развала и кастера на управляемость и износ шин.",
+      "criteria": [
+        "Указана предварительная проверка люфтов и давления в шинах",
+        "Верно описаны схождение, развал и кастер",
+        "Упомянута калибровка руля в ноль",
+        "Упомянута процедура компенсации биения и проверка задней оси"
+      ],
+      "starter_code": "Регламент 3D УУК:\n1. Предварительный осмотр:\n2. Назначение углов:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "схожден",
+        "развал",
+        "кастер"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/automechanic-16.mp4",
+      "video_title": "Урок 16. Развал-схождение (УУК)",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/automechanic-16.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 17,
+      "title": "Урок 17. Эндоскопия цилиндров, пневмотест (Leak-down) и безразборная дефектовка ДВС",
+      "difficulty": "Продвинутый",
+      "time_limit": "80 мин",
+      "tools": "Видеоэндоскоп HD, пневмотестер утечек, компрессометр",
+      "summary": "Оценка состояния хона цилиндров и клапанов эндоскопом, поиск точного места потери компрессии с помощью пневмотеста в ВМТ.",
+      "theory": "<h4>1. Чем пневмотест лучше компрессометра?</h4>\n<p>Компрессометр показывает только факт низкой компрессии, а <strong>пневмотестер (Leak-down)</strong> подаёт сжатый воздух в цилиндр в ВМТ такта сжатия и показывает процент утечки и её точное направление:</p>\n<ul>\n<li>Шипит в <strong>маслозаливную горловину</strong> — изношены поршневые кольца.</li>\n<li>Шипит в <strong>выхлопную трубу</strong> — прогорел выпускной клапан.</li>\n<li>Шипит во <strong>впуск</strong> — неплотность впускного клапана; пузыри в <strong>антифризе</strong> — пробита прокладка ГБЦ.</li>\n</ul>\n<h4>3. Нагар на поршнях и задиры</h4>\n<ul>\n<li>Блестящие «отмытые» участки на днище поршня — верный признак попадания антифриза в камеру сгорания.</li>\n<li>Разрушение керамического катализатора часто засасывает абразивную пыль обратно в цилиндры через перекрытие клапанов, вызывая вертикальные задиры.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Компрессия в 2-м цилиндре упала до 5 бар. Пневмотест дал 65% утечки с сильным шипением в выхлопную трубу — при снятии ГБЦ подтвердился прогар выпускного клапана.</p>",
+      "quiz": [
+        {
+          "q": "О чём говорит выход воздуха из маслозаливной горловины при пневмотесте цилиндра в ВМТ?",
+          "options": [
+            "О потере герметичности поршневых колец или задирах цилиндра",
+            "О прогаре выпускного клапана",
+            "О трещине радиатора",
+            "О забитом катализаторе"
+          ],
+          "correct": 0,
+          "explain": "Воздух прорывается мимо поршневых колец в картер двигателя."
+        },
+        {
+          "q": "Что показывает сетка «хона» на стенках цилиндра при видеоэндоскопии?",
+          "options": [
+            "Сохранность заводской микроструктуры, удерживающей масляную плёнку",
+            "Трещину коленвала",
+            "Износ ремня ГРМ",
+            "Уровень тормозной жидкости"
+          ],
+          "correct": 0,
+          "explain": "Отсутствие хона («зеркало») или вертикальные задиры говорят об износе ЦПГ."
+        },
+        {
+          "q": "Если при пневмотесте пошли пузыри в расширительном бачке ОЖ, что неисправно?",
+          "options": [
+            "Прокладка ГБЦ или трещина в головке/блоке цилиндров",
+            "Свеча зажигания",
+            "Топливный насос",
+            "Датчик детонации"
+          ],
+          "correct": 0,
+          "explain": "Сжатый воздух из камеры сгорания прорывается в рубашку охлаждения."
+        },
+        {
+          "q": "О чём говорит идеально чистое, «отмытое» от нагара днище одного из поршней при эндоскопии?",
+          "options": [
+            "О попадании антифриза в этот цилиндр (паровая очистка)",
+            "Об идеальном качестве бензина",
+            "О новой свече",
+            "О высоком давлении масла"
+          ],
+          "correct": 0,
+          "explain": "Тосол/антифриз при сгорании превращается в пар и отмывает нагар до блеска металла."
+        }
+      ],
+      "task_prompt": "Опишите алгоритм безразборной дефектовки двигателя с низким давлением в 3-м цилиндре с помощью видеоэндоскопа и пневмотестера (Leak-down).",
+      "criteria": [
+        "Указана установка поршня в ВМТ такта сжатия",
+        "Описана интерпретация утечек (картер / впуск / выпуск / ОЖ)",
+        "Упомянут осмотр хона и клапанов эндоскопом",
+        "Описана интерпретация состояния нагара и стенок цилиндра"
+      ],
+      "starter_code": "Безразборная диагностика ДВС:\n1. Видеоэндоскопия:\n2. Пневмотест (Leak-down):",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "эндоскоп",
+        "пневмотест",
+        "вмт"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/automechanic-17.mp4",
+      "video_title": "Урок 17. Эндоскопия цилиндров, пневмотест (Leak-down) и безразборная дефектовка ДВС",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/automechanic-17.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 18,
+      "title": "Урок 18. Система охлаждения и смазки ДВС: опрессовка, замер давления масла и промывка радиаторов",
+      "difficulty": "Средний",
+      "time_limit": "75 мин",
+      "tools": "Механический манометр давления масла, опрессовщик СОД, тестер CO2 в ОЖ",
+      "summary": "Проверка давления масла на горячую, диагностика прорыва газов в антифриз (тест CO2) и проверка клапана крышки расширительного бачка.",
+      "theory": "<h4>1. Почему нельзя доверять только лампочке «маслёнки»?</h4>\n<p>Аварийный датчик срабатывает при <code>0.3–0.5 бар</code>, когда двигатель уже испытывает масляное голодание. Для точного диагноза вкручивают <strong>механический манометр</strong> и замеряют давление на прогретом масле (<code>90°C</code>) на ХХ и при 2000–3000 об/мин.</p>\n<h4>2. Проверка перегрева</h4>\n<p>Неисправный клапан крышки бачка не держит избыточное давление <code>1.1–1.4 бар</code>, из-за чего антифриз закипает раньше времени при 100°C.</p>\n<h4>3. Разница между давлением на ХХ и под нагрузкой</h4>\n<ul>\n<li>Типичная норма давления масла на прогретом ДВС (90°C): не менее <code>0.8–1.2 бар</code> на ХХ и <code>3.0–4.5 бар</code> на 3000 об/мин.</li>\n<li>Забитая «шуба» из пуха и грязи между радиаторами кондиционера и охлаждения — самая частая причина летнего перегрева.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Вентилятор охлаждения работал постоянно, но мотор кипел в пробке. Разбор пакета радиаторов выявил плотный войлок из тополиного пуха между сотами.</p>",
+      "quiz": [
+        {
+          "q": "Как точно проверить реальное давление масла в системе смазки ДВС?",
+          "options": [
+            "Вкрутить механический манометр вместо датчика давления на прогретом ДВС",
+            "Посмотреть на щуп",
+            "Открыть крышку бачка ОЖ",
+            "Послушать стартер"
+          ],
+          "correct": 0,
+          "explain": "Только механический манометр даёт точное значение в барах на разных оборотах."
+        },
+        {
+          "q": "Зачем в системе охлаждения поддерживается избыточное давление ~1.2 бара?",
+          "options": [
+            "Для повышения температуры кипения антифриза до ~120°C",
+            "Чтобы быстрее прогревался салон",
+            "Для охлаждения тормозов",
+            "Чтобы не замерзал омыватель"
+          ],
+          "correct": 0,
+          "explain": "Под давлением точка кипения жидкости сдвигается вверх."
+        },
+        {
+          "q": "Что выявляет химический тест (колба с реагентом) на горловине расширительного бачка?",
+          "options": [
+            "Наличие выхлопных газов (CO2) в антифризе при пробое прокладки ГБЦ",
+            "Плотность электролита",
+            "Влагу в тормозной жидкости",
+            "Износ цепи"
+          ],
+          "correct": 0,
+          "explain": "Реагент меняет цвет при контакте с отработавшими газами."
+        },
+        {
+          "q": "Где чаще всего скапливается плотный слой пуха и грязи, вызывающий перегрев двигателя летом?",
+          "options": [
+            "В зазоре между радиатором кондиционера и основным радиатором охлаждения",
+            "Внутри расширительного бачка",
+            "На крышке маслозаливной горловины",
+            "В выхлопной трубе"
+          ],
+          "correct": 0,
+          "explain": "Снаружи радиаторы кажутся чистыми, а между ними образуется непродуваемая пробка."
+        }
+      ],
+      "task_prompt": "Составьте карту диагностики перегрева двигателя и падения давления масла: проверка крышки бачка и опрессовка СОД, тест CO2 и замер давления масла механическим манометром.",
+      "criteria": [
+        "Описана опрессовка системы охлаждения и проверка крышки",
+        "Упомянут химический тест на CO2",
+        "Описан замер давления масла манометром на горячем ДВС",
+        "Приведены числовые нормы давления масла на ХХ и повышенных оборотах"
+      ],
+      "starter_code": "Диагностика СОД и смазки:\n1. Система охлаждения:\n2. Давление масла:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "манометр",
+        "опрессов",
+        "антифриз"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/automechanic-18.mp4",
+      "video_title": "Урок 18. Система охлаждения и смазки ДВС",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/automechanic-18.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 19,
+      "title": "Урок 19. Выхлопная система, катализатор, сажевый фильтр (DPF) и измерение противодавления",
+      "difficulty": "Средний",
+      "time_limit": "75 мин",
+      "tools": "Манометр противодавления выхлопа, эндоскоп, пирометр, сканер",
+      "summary": "Проверка забитости катализатора манометром вместо первого лямбда-зонда, контроль дифференциального давления DPF и принудительная регенерация.",
+      "theory": "<h4>1. Симптомы забитого катализатора</h4>\n<p>Двигатель ровно работает на холостом ходу, но «захлёбывается» и не раскручивается выше 3000 об/мин под нагрузкой, а выпускной коллектор раскаляется.</p>\n<h4>2. Замер противодавления</h4>\n<p>Вместо верхнего датчика кислорода вкручивают переходник с манометром (шкала до 1 бар). На исправной системе на ХХ давление близко к <code>0–0.05 бар</code>, а на 2500–3000 об/мин не превышает <code>0.2–0.3 бар</code>.</p>\n<h4>3. Пирометрия катализатора и регенерация DPF</h4>\n<ul>\n<li>Исправный прогретый катализатор дожигает остатки топлива, поэтому температура на его выходе на <code>30–80°C выше</code>, чем на входе. Если выход холоднее входа — катализатор пуст или мёртв.</li>\n<li>Принудительную сервисную регенерацию DPF выполняют только на открытой площадке при исправном масле (без разжижения дизелем!).</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>После неудачных попыток прожига DPF уровень масла на щупе вырос на 2 см — несгоревшая солярка при регенерации стекала по стенкам цилиндров в поддон.</p>",
+      "quiz": [
+        {
+          "q": "Куда подключают манометр для измерения противодавления катализатора?",
+          "options": [
+            "В отверстие верхнего (первого) датчика кислорода",
+            "В расширительный бачок",
+            "В маслозаливную горловину",
+            "В тормозной суппорт"
+          ],
+          "correct": 0,
+          "explain": "Первый лямбда-зонд расположен непосредственно перед сотами катализатора."
+        },
+        {
+          "q": "Какое противодавление перед катализатором на 2500 об/мин указывает на его сильную забитость?",
+          "options": [
+            "Выше 0.4–0.5 бар",
+            "0.02 бар",
+            "0.00 бар",
+            "-0.5 бар"
+          ],
+          "correct": 0,
+          "explain": "Высокое противодавление запирает выхлопные газы в цилиндрах."
+        },
+        {
+          "q": "Какой датчик контролирует степень заполнения сажевого фильтра DPF на дизеле?",
+          "options": [
+            "Датчик дифференциального давления (до и после фильтра)",
+            "Датчик дождя",
+            "Датчик положения руля",
+            "Датчик детонации"
+          ],
+          "correct": 0,
+          "explain": "ЭБУ сравнивает давление на входе и выходе DPF."
+        },
+        {
+          "q": "Какое соотношение температур до и после прогретого исправного катализатора подтверждает его работу?",
+          "options": [
+            "Температура на выходе выше температуры на входе за счёт экзотермической реакции",
+            "На выходе на 200°C холоднее",
+            "Всегда 20°C",
+            "Температура равна температуре ОЖ"
+          ],
+          "correct": 0,
+          "explain": "Окисление CO и CH в сотах катализатора выделяет дополнительное тепло."
+        }
+      ],
+      "task_prompt": "Опишите порядок проверки подозрения на разрушение и забитость катализатора: замер противодавления манометром и осмотр состояния сот видеоэндоскопом.",
+      "criteria": [
+        "Указано подключение манометра вместо 1-го лямбда-зонда",
+        "Приведены пороговые значения в барах",
+        "Описан визуальный осмотр сот эндоскопом",
+        "Упомянут контроль уровня/разжижения масла при регенерации DPF"
+      ],
+      "starter_code": "Диагностика выхлопа:\n1. Замер противодавления:\n2. Эндоскопия сот:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "противодавлен",
+        "катализатор",
+        "манометр"
+      ],
+      "min_length": 70,
+      "video_url": "assets/lesson-intros/automechanic-19.mp4",
+      "video_title": "Урок 19. Выхлопная система, катализатор, сажевый фильтр (DPF) и измерение противодавления",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/automechanic-19.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
+        }
+      ]
+    },
+    {
+      "num": 20,
+      "title": "Урок 20. Квалификационный экзамен: полный капитальный ремонт, затяжка ГБЦ и финальный контроль ОТК",
+      "difficulty": "Экзамен",
+      "time_limit": "120 мин",
+      "tools": "Динамометрический ключ, угломер затяжки, нутромер, микрометр, лист ОТК",
+      "summary": "Финальная аттестация автомеханика: спиральная протяжка ГБЦ с доворотом на угол, дефектовка ЦПГ микрометром/нутромером и выходной контроль автомобиля.",
+      "theory": "<h4>1. Сборка и затяжка ответственных соединений</h4>\n<ul>\n<li>Болты ГБЦ затягиваются строго <strong>от центра к краям</strong> (крест-накрест или по спирали) в 3–4 этапа с финальным доворотом на угол (например, <code>40 Н·м + 90° + 90°</code>).</li>\n<li>Одноразовые «тянущиеся» болты ГБЦ подлежат обязательной замене при сборке.</li>\n</ul>\n<h4>2. Выходной лист ОТК</h4>\n<p>Перед выдачей клиенту проверяются: отсутствие течей, давление масла, затяжка колёсных болтов динамометрическим ключом, тормозной стенд и контрольный заезд.</p>\n<h4>3. Контроль зазоров и плоскостности</h4>\n<ul>\n<li>Перед установкой ГБЦ обязательно проверяется лекальной линейкой и щупом на коробление (обычно допуск не более <code>0.05 мм</code>).</li>\n<li>После капремонта выполняется прогрев до срабатывания вентиляторов, контроль отсутствия пузырей воздуха в СОД и повторный замер давления масла.</li>\n</ul>\n<h4>4. Производственный кейс АМК</h4>\n<p>Опытный механик при финальной проверке ОТК всегда делает отметку краской-маркером на затянутых ответственных болтах подвески и рулевой, исключая человеческий фактор.</p>",
+      "quiz": [
+        {
+          "q": "В каком порядке затягивают болты головки блока цилиндров (ГБЦ)?",
+          "options": [
+            "От центра к краям по спирали или крест-накрест в несколько этапов",
+            "От краёв к центру сразу до упора",
+            "В случайном порядке",
+            "Только с одной стороны"
+          ],
+          "correct": 0,
+          "explain": "Схема от центра к краям равномерно обжимает прокладку без коробления ГБЦ."
+        },
+        {
+          "q": "Каким инструментом измеряют эллипсность и конусность цилиндра при капремонте?",
+          "options": [
+            "Индикаторным нутромером",
+            "Рулеткой",
+            "Компрессометром",
+            "Мультиметром"
+          ],
+          "correct": 0,
+          "explain": "Нутромер измеряет внутренний диаметр с точностью до 0.01 мм."
+        },
+        {
+          "q": "Что обязательно проверяется на этапе ОТК перед выдачей авто после ремонта ходовой?",
+          "options": [
+            "Затяжка колёсных болтов тарированным динамометрическим ключом",
+            "Уровень омывайки",
+            "Настройка радио",
+            "Давление в запаске на глаз"
+          ],
+          "correct": 0,
+          "explain": "Недотянутое или перетянутое колесо — прямая угроза безопасности движения."
+        },
+        {
+          "q": "Какой максимальный зазор под лекальной линейкой обычно допускается при проверке привалочной плоскости ГБЦ без фрезеровки?",
+          "options": [
+            "До 0.05 мм",
+            "До 1.5 мм",
+            "До 5.0 мм",
+            "До 0.8 мм"
+          ],
+          "correct": 0,
+          "explain": "Коробление свыше 0.05 мм требует шлифовки/фрезеровки плоскости ГБЦ."
+        }
+      ],
+      "task_prompt": "Оформите итоговый лист сборки и контроля ОТК: опишите измерение цилиндров нутромером, порядок затяжки ГБЦ с доворотом на угол и финальную приёмку автомобиля.",
+      "criteria": [
+        "Указан замер ЦПГ нутромером/микрометром",
+        "Описана поэтапная затяжка ГБЦ от центра к краям",
+        "Включён финальный чек-лист ОТК (давление масла, течи, колёса)",
+        "Включена маркировка ответственного крепежа и контрольный тест-драйв"
+      ],
+      "starter_code": "Выпускной лист ОТК АМК:\n1. Дефектовка и сборка ГБЦ:\n2. Контрольные замеры и выдача:",
+      "eval_type": "text_keywords",
+      "required_tokens": [
+        "гбц",
+        "динамометр",
+        "отк"
+      ],
+      "min_length": 80,
+      "video_url": "assets/lesson-intros/automechanic-20.mp4",
+      "video_title": "Урок 20. Квалификационный экзамен",
+      "video_duration": "00:45",
+      "video_poster": "assets/lesson-intros/automechanic-20.jpg",
+      "embed_url": "",
+      "timecodes": [
+        {
+          "sec": 0,
+          "time_str": "00:00",
+          "title": "Введение и постановка производственной задачи"
+        },
+        {
+          "sec": 15,
+          "time_str": "00:15",
+          "title": "Разбор инструментария и ключевых нормативов"
+        },
+        {
+          "sec": 30,
+          "time_str": "00:30",
+          "title": "Практическая демонстрация и проверка результата"
+        },
+        {
+          "sec": 42,
+          "time_str": "00:42",
+          "title": "Критерии приёмки и начисление XP"
         }
       ]
     }

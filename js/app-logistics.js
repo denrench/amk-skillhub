@@ -627,7 +627,7 @@
           enrolled: enrolledSet.has(c.slug),
           completed_lessons: passed,
           total_lessons: 12,
-          progress_percent: Math.min(100, Math.round((passed / 12) * 100))
+          progress_percent: Math.min(100, Math.round((passed / 20) * 100))
         });
       });
 
@@ -699,7 +699,7 @@
         statistics: {
           total_submitted: specSubs.length,
           passed_count: passedNums.size,
-          progress_percent: Math.min(100, Math.round((passedNums.size / 12) * 100)),
+          progress_percent: Math.min(100, Math.round((passedNums.size / 20) * 100)),
           avg_score: avgScore,
           gpa,
           xp,
@@ -1000,7 +1000,7 @@
       return reply(200, {
         success: true,
         current_study_day: db.current_study_day,
-        progress_percent: Math.min(100, Math.round((done / 12) * 100)),
+        progress_percent: Math.min(100, Math.round((done / 20) * 100)),
         completed_count: done,
         avg_score: avg,
         tasks_available: Math.min(12, db.current_study_day),
@@ -1851,7 +1851,7 @@
               <div class="flex-1 bg-dark-950/80 h-2 rounded-full overflow-hidden max-w-xs border border-white/5">
                 <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-full rounded-full" style="width:${pct}%"></div>
               </div>
-              <span class="text-[11px] font-bold text-slate-300">${done}/12 уроков (${pct}%)</span>
+              <span class="text-[11px] font-bold text-slate-300">${done}/20 уроков (${pct}%)</span>
             </div>
           </div>
           <button type="button" onclick="window.EduSpace.switchActiveCourse('${c.slug}')" class="px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 transition-all ${isCurrent ? 'bg-white/10 hover:bg-white/20 text-white border border-white/15' : 'bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-glow-indigo'}">
@@ -1930,7 +1930,7 @@
       <div class="grid grid-cols-3 gap-3 text-center">
         <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30">
           <div class="text-[11px] text-indigo-300 font-bold">${tr('modal.grades.passedLabel', 'Зачтено по курсу')}</div>
-          <div class="text-xl font-extrabold text-indigo-200 mt-0.5">${stats.passed_count} / 12</div>
+          <div class="text-xl font-extrabold text-indigo-200 mt-0.5">${stats.passed_count} / 20</div>
         </div>
         <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
           <div class="text-[11px] text-emerald-300 font-bold">${tr('modal.grades.gpaLabel', 'Средний балл / GPA')}</div>
@@ -2728,7 +2728,7 @@
         { id: 'perfect_score', title: 'Высший балл (100/100)', desc: 'Идеальная оценка от куратора курса', xp: 100, icon: 'military_tech', color: '#f59e0b' },
         { id: 'streak_master', title: 'Хранитель серии', desc: 'Серия непрерывного обучения 3+ дня', xp: 100, icon: 'local_fire_department', color: '#ef4444' },
         { id: 'color_architect', title: 'Архитектор цвета', desc: 'Завершена интерактивная миссия колористики', xp: 200, icon: 'palette', color: '#ec4899' },
-        { id: 'course_champion', title: 'Покоритель курса', desc: 'Успешно сданы все 12 уроков курса', xp: 300, icon: 'workspace_premium', color: '#a855f7' }
+        { id: 'course_champion', title: 'Покоритель курса', desc: 'Успешно сданы все 20 уроков курса', xp: 300, icon: 'workspace_premium', color: '#a855f7' }
       ];
 
       const container = document.getElementById('achievements-modal-list');
