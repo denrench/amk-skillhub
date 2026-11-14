@@ -126,10 +126,54 @@
     });
   }
 
+  function initProgressBars() {
+    const bars = document.querySelectorAll('[data-progress], .progress-fill, .skill-progress-fill');
+    if (!bars.length) return;
+    bars.forEach((bar) => {
+      const target = bar.dataset.progress || bar.style.width || '';
+      if (!target || target === '0%' || reduceMotion) return;
+      bar.dataset.targetWidth = target;
+      bar.style.width = '0%';
+      bar.style.transition = 'width 0.9s cubic-bezier(0.22, 1, 0.36, 1)';
+    });
+    if (reduceMotion || !('IntersectionObserver' in window)) return;
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting && e.target.dataset.targetWidth) {
+          requestAnimationFrame(() => {
+            e.target.style.width = e.target.dataset.targetWidth;
+          });
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    bars.forEach((b) => obs.observe(b));
+  }
+
+  function initHeroEntrance() {
+    if (reduceMotion) return;
+    const heroEls = document.querySelectorAll('main h1, .hero-title, .hero-subtitle, .hero-actions, .hero-badge');
+    heroEls.forEach((el, idx) => {
+      if (el.classList.contains('reveal-hidden')) return;
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(16px)';
+      el.style.transition = 'opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)';
+      el.style.transitionDelay = `${idx * 75}ms`;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        });
+      });
+    });
+  }
+
   function init() {
+    initHeroEntrance();
     initScrollReveal();
     initCardTilt();
     initCounters();
+    initProgressBars();
     initRipples();
   }
 

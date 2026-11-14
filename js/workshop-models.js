@@ -464,11 +464,29 @@ window.WorkshopModels = (() => {
         explodeFactor += (targetExplode - explodeFactor) * 0.1;
 
         meshes.forEach((mesh, idx) => {
+          const [label, , shape] = parts[idx];
           const base = basePositions[idx];
           const radial = base.clone().normalize().multiplyScalar(explodeFactor * 0.65);
+
+          let liveY = 0;
+          if (label.includes('Поршень')) {
+            liveY = Math.sin(t * 3.6) * 0.32;
+          } else if (shape === 'sphere') {
+            liveY = Math.sin(t * 2.1 + idx) * 0.06;
+          } else if (shape === 'wave') {
+            liveY = Math.sin(t * 2.8 + idx) * 0.035;
+          }
+
+          if (shape === 'torus' || label.includes('турбин') || label.includes('Турбин') || label.includes('улитка') || label.includes('Колесо') || label.includes('диск')) {
+            mesh.rotation.z = t * 1.4;
+          } else if (label.includes('Спектральный куб') || label.includes('Печатный блок')) {
+            mesh.rotation.y = t * 0.7;
+            mesh.rotation.x = Math.sin(t * 0.8) * 0.15;
+          }
+
           mesh.position.set(
             base.x + radial.x,
-            base.y + radial.y + explodeFactor * (idx * 0.18) + (idx === selectedIndex ? Math.sin(t * 3.2) * 0.05 : 0),
+            base.y + radial.y + explodeFactor * (idx * 0.18) + liveY + (idx === selectedIndex ? Math.sin(t * 3.2) * 0.05 : 0),
             base.z + radial.z
           );
           if (idx === selectedIndex) {
