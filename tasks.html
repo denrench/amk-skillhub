@@ -1331,7 +1331,7 @@
           <span>/</span>
           <span class="breadcrumbs-current" data-i18n="header.breadcrumbModules">Модули</span>
           <span id="current-day-label" class="has-tooltip" data-tip="По учебному расписанию каждый новый день открывает следующий модуль" data-i18n-attr="data-tip:header.studyDayTooltip" style="margin-left:8px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text-secondary);font-size:var(--fs-12);font-weight:600;">
-            День 1 из 12
+            День 1 из 20
           </span>
         </nav>
 
@@ -1402,23 +1402,23 @@
                 <div class="course-dropdown-menu" role="listbox" aria-label="Выбор специальности">
                   <button type="button" role="option" data-spec="it" onclick="changeSpecialty('it')" class="course-dropdown-item is-active">
                     <span data-i18n="course.catalog.it.shortTitle">Web Design</span>
-                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">20</span>
                   </button>
                   <button type="button" role="option" data-spec="graphic_design" onclick="changeSpecialty('graphic_design')" class="course-dropdown-item">
                     <span data-i18n="course.catalog.graphic_design.shortTitle">Графический дизайн</span>
-                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">20</span>
                   </button>
                   <button type="button" role="option" data-spec="autoelectric" onclick="changeSpecialty('autoelectric')" class="course-dropdown-item">
                     <span data-i18n="course.catalog.autoelectric.shortTitle">Автоэлектрика</span>
-                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">20</span>
                   </button>
                   <button type="button" role="option" data-spec="hvac" onclick="changeSpecialty('hvac')" class="course-dropdown-item">
                     <span data-i18n="course.catalog.hvac.shortTitle">Холодильное оборудование</span>
-                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">20</span>
                   </button>
                   <button type="button" role="option" data-spec="automechanic" onclick="changeSpecialty('automechanic')" class="course-dropdown-item">
                     <span data-i18n="course.catalog.automechanic.shortTitle">Автомеханика</span>
-                    <span style="font-size:var(--fs-12);color:var(--text-muted);">12</span>
+                    <span style="font-size:var(--fs-12);color:var(--text-muted);">20</span>
                   </button>
                 </div>
               </div>
@@ -1451,7 +1451,7 @@
               <div id="course-progress-bar" class="progress-fill"></div>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:var(--fs-12);color:var(--text-secondary);">
-              <span id="course-progress-count">0 из 12 зачтено · Следующий шаг: Урок 1</span>
+              <span id="course-progress-count">0 из 20 зачтено · Следующий шаг: Урок 1</span>
             </div>
             <div style="padding-top:6px;border-top:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:var(--fs-12);flex-wrap:wrap;">
               <span style="color:var(--text-muted);" data-i18n="nav.roadmap">Дорожная карта</span>
@@ -1487,7 +1487,7 @@
             </button>
             <button type="button" role="tab" aria-selected="false" data-filter="all" onclick="applyStatusFilter('all')" class="seg-btn">
               <span data-i18n="filter.all">Все</span>
-              <span id="cnt-all">12</span>
+              <span id="cnt-all">20</span>
             </button>
           </div>
 
@@ -1674,20 +1674,21 @@
       document.getElementById('course-main-desc').textContent = locDesc || course.description;
       document.getElementById('breadcrumb-course-name').textContent = locShort || course.short_title || course.title;
       document.getElementById('header-textbook-link').href = `learn.html?course=${currentSpec}`;
+      const totalCourseLessons = tasksData.length || 20;
       document.getElementById('current-day-label').textContent = window.I18n.t('header.studyDayBadge', {
         day: currentStudyDay,
-        total: 12
+        total: totalCourseLessons
       });
 
       const passed = tasksData.filter(t => t.status_code === 'graded').length;
-      const pct = Math.min(100, Math.round((passed / 12) * 100));
+      const pct = Math.min(100, Math.round((passed / totalCourseLessons) * 100));
       const nextTask = tasksData.find(t => !t.is_locked && t.status_code !== 'graded') || tasksData[0];
       const nextNum = nextTask ? nextTask.task_number : 1;
 
       animateProgressCounter(pct);
       document.getElementById('course-progress-count').textContent = window.I18n.t('course.progress.summary', {
         done: passed,
-        total: 12,
+        total: totalCourseLessons,
         next: nextNum
       });
 
@@ -1909,7 +1910,7 @@
             <div class="reveal reveal--up is-visible" style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:var(--sp-4);text-align:center;color:var(--text-secondary);">
               <p style="margin:0 0 12px;font-size:var(--fs-16);font-weight:700;color:var(--text-primary);">${escapeHtml(window.I18n.t('filter.emptyTitle'))}</p>
               <button type="button" onclick="applyStatusFilter('all')" class="btn-secondary-outline" style="min-height:36px;padding:6px 14px;font-size:var(--fs-12);">
-                ${escapeHtml(window.I18n.t('filter.showAllBtn', { total: 12 }))}
+                ${escapeHtml(window.I18n.t('filter.showAllBtn', { total: tasksData.length || 20 }))}
               </button>
             </div>
           `;

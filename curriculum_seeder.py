@@ -277,7 +277,10 @@ def _build_8_block_lesson(item, spec, num):
             "type": "hook",
             "title": f"Кейс: {clean_title[:65]}",
             "badge": "Реальная ситуация",
-            "content": summary
+            "content": summary,
+            "tools": tools or "Профильный инструментарий АМК",
+            "difficulty": item.get("difficulty", "Профессиональный"),
+            "time_limit": item.get("time_limit", "60 мин")
         },
         {
             "id": "b2_objectives",
@@ -314,7 +317,10 @@ def _build_8_block_lesson(item, spec, num):
             "type": "practical",
             "title": f"Практическое задание: {clean_title[:50]}",
             "task_description": item.get("task_prompt", summary),
+            "prompt": item.get("task_prompt", summary),
+            "tools": tools or "Профильный инструментарий АМК",
             "guidelines": criteria[:4],
+            "criteria": criteria[:4],
             "starter_code": item.get("starter_code", "// Ваше решение по заданию")
         },
         {
@@ -398,7 +404,8 @@ DEFAULT_COURSES = generate_default_courses()
 
 def seed_interactive_curriculum(cursor):
     """Inserts default interactive courses, modules, and 8-block lessons into SQLite/Postgres DB."""
-    for c in DEFAULT_COURSES:
+    valid_lesson_ids = []
+    for c_idx, c in enumerate(DEFAULT_COURSES, 1):
         cursor.execute("""
         INSERT INTO courses (slug, code, title, description, is_published)
         VALUES (?, ?, ?, ?, 1)
@@ -438,32 +445,26 @@ def seed_interactive_curriculum(cursor):
                 module_id = cursor.lastrowid
                 
             for l_idx, les in enumerate(mod["lessons"], 1):
+                target_id = (c_idx - 1) * 20 + l_idx
+                valid_lesson_ids.append(target_id)
                 content_json_str = json.dumps(les["blocks"], ensure_ascii=False)
                 cursor.execute("""
-                SELECT id FROM lessons WHERE course_id = ? AND (order_num = ? OR title = ?)
-                """, (course_id, l_idx, les["title"]))
-                les_row = cursor.fetchone()
-                if les_row:
-                    cursor.execute("""
-                    UPDATE lessons SET
-                        module_id = ?,
-                        title = ?,
-                        lesson_type = ?,
-                        order_num = ?,
-                        xp_reward = ?,
-                        unlock_day = ?,
-                        is_published = 1,
-                        content_json = ?
-                    WHERE id = ?
-                    """, (module_id, les["title"], les["lesson_type"], l_idx, les["xp_reward"], les["unlock_day"], content_json_str, les_row[0]))
-                else:
-                    cursor.execute("""
-                    INSERT INTO lessons (course_id, module_id, title, lesson_type, order_num, xp_reward, unlock_day, is_published, content_json)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, 1, ?)
-                    """, (course_id, module_id, les["title"], les["lesson_type"], l_idx, les["xp_reward"], les["unlock_day"], content_json_str))
+                INSERT INTO lessons (id, course_id, module_id, title, lesson_type, order_num, xp_reward, unlock_day, is_published, content_json)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    course_id = excluded.course_id,
+                    module_id = excluded.module_id,
+                    title = excluded.title,
+                    lesson_type = excluded.lesson_type,
+                    order_num = excluded.order_num,
+                    xp_reward = excluded.xp_reward,
+                    unlock_day = excluded.unlock_day,
+                    is_published = 1,
+                    content_json = excluded.content_json
+                """, (target_id, course_id, module_id, les["title"], les["lesson_type"], l_idx, les["xp_reward"], les["unlock_day"], content_json_str))
 
-    # Clean out any orphaned modules referencing deleted courses
     try:
+        cursor.execute("DELETE FROM lessons WHERE id > 100")
         cursor.execute("DELETE FROM course_modules WHERE course_id NOT IN (SELECT id FROM courses)")
     except Exception:
         pass

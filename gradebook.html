@@ -523,7 +523,7 @@
       <section id="teacher-panel-matrix" class="bg-dark-850/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
         <div class="p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-extrabold text-lg text-white">Электронный журнал успеваемости по модулям 1–12</h2>
+            <h2 class="font-extrabold text-lg text-white">Электронный журнал успеваемости по модулям 1–20</h2>
             <p class="text-xs text-slate-400 mt-0.5">Отображаются все зарегистрированные студенты и их актуальные баллы по выбранному направлению.</p>
           </div>
           <select id="matrix-course-select" onchange="loadGradebookMatrix()" class="px-3.5 py-2 rounded-xl border border-white/15 text-xs font-bold bg-dark-900 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
@@ -585,15 +585,15 @@
                 </select>
               </div>
               <div>
-                <label class="block font-bold text-slate-300 mb-1">Номер урока (1–12)</label>
-                <input type="number" id="ct-num" min="1" max="12" value="1" class="w-full px-3 py-2 rounded-xl border border-white/15 bg-dark-900 text-white font-bold" />
+                <label class="block font-bold text-slate-300 mb-1">Номер урока (1–20)</label>
+                <input type="number" id="ct-num" min="1" max="20" value="1" class="w-full px-3 py-2 rounded-xl border border-white/15 bg-dark-900 text-white font-bold" />
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <label class="block font-bold text-slate-300 mb-1">День открытия модуля</label>
-                <input type="number" id="ct-day" min="1" max="12" value="1" class="w-full px-3 py-2 rounded-xl border border-white/15 bg-dark-900 text-white font-bold" />
+                <input type="number" id="ct-day" min="1" max="20" value="1" class="w-full px-3 py-2 rounded-xl border border-white/15 bg-dark-900 text-white font-bold" />
               </div>
               <div>
                 <label class="block font-bold text-slate-300 mb-1">Сложность</label>
@@ -893,7 +893,7 @@
               ${regDateStr}
             </td>
             <td class="p-4">
-              <div class="font-bold text-slate-200 text-xs">Сдано: ${submitted} / 12</div>
+              <div class="font-bold text-slate-200 text-xs">Сдано: ${submitted} / 20</div>
               <div class="text-[11px] text-slate-400 mt-0.5">Средний балл: <span class="font-bold text-emerald-400">${avg}</span></div>
             </td>
             <td class="p-4 text-right">
@@ -1076,7 +1076,7 @@
             </div>
             <div class="p-3 bg-dark-950/60 rounded-xl border border-white/10">
               <span class="text-slate-400 block text-[10px] uppercase font-bold">Сдано практических работ</span>
-              <span class="font-bold text-indigo-400 text-xs">${Number(st.submitted_count || 0)} из 12 модулей</span>
+              <span class="font-bold text-indigo-400 text-xs">${Number(st.submitted_count || 0)} из 20 модулей</span>
             </div>
             <div class="p-3 bg-dark-950/60 rounded-xl border border-white/10">
               <span class="text-slate-400 block text-[10px] uppercase font-bold">Средний балл GPA</span>
@@ -1323,7 +1323,7 @@
         const st = r.student || {};
         let cells = '';
         let total = 0, count = 0;
-        for (let n = 1; n <= 12; n++) {
+        for (let n = 1; n <= 20; n++) {
           const c = r.cells[String(n)];
           const sc = c && c.score != null ? c.score : '—';
           if (c && c.score != null) { total += c.score; count++; }
@@ -1373,12 +1373,12 @@
                 <th rowspan="2" style="width: 25px;">№</th>
                 <th rowspan="2">ФИО Студента</th>
                 <th rowspan="2" style="width: 50px;">Группа</th>
-                <th colspan="12">Практические модули (1..12)</th>
+                <th colspan="20">Практические модули (1..20)</th>
                 <th rowspan="2" style="width: 55px;">Ср. балл</th>
                 <th rowspan="2" style="width: 70px;">Итог</th>
               </tr>
               <tr>
-                <th>М1</th><th>М2</th><th>М3</th><th>М4</th><th>М5</th><th>М6</th><th>М7</th><th>М8</th><th>М9</th><th>М10</th><th>М11</th><th>М12</th>
+                <th>М1</th><th>М2</th><th>М3</th><th>М4</th><th>М5</th><th>М6</th><th>М7</th><th>М8</th><th>М9</th><th>М10</th><th>М11</th><th>М12</th><th>М13</th><th>М14</th><th>М15</th><th>М16</th><th>М17</th><th>М18</th><th>М19</th><th>М20</th>
               </tr>
             </thead>
             <tbody>
@@ -1396,13 +1396,13 @@
             </div>
           </div>
           <script>window.onload = function() { window.print(); };<\/script>
-          <script src="js/eduspace-animations.js" defer></script>
-</body>
+        </body>
         </html>
       `);
       printWin.document.close();
     }
 
   </script>
+  <script src="js/eduspace-animations.js" defer></script>
 </body>
 </html>

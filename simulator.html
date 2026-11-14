@@ -578,7 +578,7 @@
 
       const params = new URLSearchParams(window.location.search);
       activeSpecialty = params.get('specialty') || user.specialty_slug || 'it';
-      activeTaskNumber = Math.max(1, Math.min(12, parseInt(params.get('task') || params.get('task_id') || '1', 10) || 1));
+      activeTaskNumber = Math.max(1, Math.min(20, parseInt(params.get('task') || params.get('task_id') || '1', 10) || 1));
 
       const course = window.EduSpace.getCourseBySlug(activeSpecialty);
       document.getElementById('sidebar-course-title').textContent = `${course.code} — ${course.short_title}`;
@@ -593,7 +593,7 @@
 
       // Render Sidebar Outline
       const passedCount = tasks.filter(t => t.status_code === 'graded').length;
-      document.getElementById('sidebar-progress-label').textContent = `${passedCount} / 12 зачтено`;
+      document.getElementById('sidebar-progress-label').textContent = `${passedCount} / ${tasks.length || 20} зачтено`;
 
       const outlineEl = document.getElementById('sidebar-lessons-outline');
       outlineEl.innerHTML = tasks.map(t => {
@@ -660,24 +660,25 @@
       }
 
       // Stage 1: Interactive Topic Game & Theory Notes
-      document.getElementById('theory-tools-badge').textContent = activeTaskServer.tools_required;
+      document.getElementById('theory-tools-badge').textContent = (activeTaskServer && activeTaskServer.tools_required) || (activeLessonCatalog && activeLessonCatalog.tools) || 'Профильный инструмент АМК';
       document.getElementById('theory-content-body').innerHTML =
-        (activeLessonCatalog && activeLessonCatalog.theory) || `<p>${activeTaskServer.description}</p>`;
+        (activeLessonCatalog && activeLessonCatalog.theory) || `<p>${(activeTaskServer && activeTaskServer.description) || (activeLessonCatalog && activeLessonCatalog.summary) || ''}</p>`;
 
       mountSimulatorTopicGame();
 
       // Stage 2: Quiz
+      const totalQuizQs = (activeLessonCatalog && Array.isArray(activeLessonCatalog.quiz) && activeLessonCatalog.quiz.length) ? activeLessonCatalog.quiz.length : 4;
       currentQuizScore = Number(activeTaskServer.quiz_score || 0);
-      document.getElementById('quiz-tab-badge').textContent = `${currentQuizScore}/3`;
+      document.getElementById('quiz-tab-badge').textContent = `${currentQuizScore}/${totalQuizQs}`;
       if (currentQuizScore > 0) {
-        document.getElementById('quiz-score-pill').textContent = `Сохранено: ${currentQuizScore} из 3`;
+        document.getElementById('quiz-score-pill').textContent = `Сохранено: ${currentQuizScore} из ${totalQuizQs}`;
         document.getElementById('quiz-score-pill').className = 'px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold';
       }
       renderQuizQuestions();
 
       // Stage 3: Practice
-      document.getElementById('practice-prompt-text').textContent = activeTaskServer.description;
-      const criteria = (activeLessonCatalog && activeLessonCatalog.criteria) || ['Корректное выполнение практической задачи', 'Прохождение автоматических проверок'];
+      document.getElementById('practice-prompt-text').textContent = (activeTaskServer && activeTaskServer.description) || (activeLessonCatalog && (activeLessonCatalog.task_prompt || activeLessonCatalog.summary)) || 'Выполните практическое задание по спецификации урока.';
+      const criteria = (activeLessonCatalog && Array.isArray(activeLessonCatalog.criteria) && activeLessonCatalog.criteria.length) ? activeLessonCatalog.criteria : ['Корректное выполнение практической задачи', 'Прохождение автоматических проверок'];
       document.getElementById('practice-criteria-list').innerHTML = criteria.map(c => `<li>${c.replace(/</g, '&lt;')}</li>`).join('');
 
       const savedDraft = activeTaskServer.draft_code || localStorage.getItem(`eduspace_draft_${user.id}_${activeSpecialty}_${activeTaskNumber}`);
@@ -746,7 +747,7 @@
       });
 
       if (unanswered) {
-        showToast('Пожалуйста, выберите вариант ответа во всех 3 вопросах квиза', 'warning');
+        showToast(`Пожалуйста, выберите вариант ответа во всех ${questions.length} вопросах квиза`, 'warning');
         return;
       }
 
@@ -766,8 +767,8 @@
       });
 
       currentQuizScore = correctCnt;
-      document.getElementById('quiz-tab-badge').textContent = `${correctCnt}/3`;
-      document.getElementById('quiz-score-pill').textContent = `Результат: ${correctCnt} из 3`;
+      document.getElementById('quiz-tab-badge').textContent = `${correctCnt}/${questions.length}`;
+      document.getElementById('quiz-score-pill').textContent = `Результат: ${correctCnt} из ${questions.length}`;
       document.getElementById('quiz-score-pill').className = 'px-3 py-1 rounded-full text-xs font-bold ' + (
         correctCnt >= 2 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
       );
@@ -785,7 +786,7 @@
           }
         });
       }
-      showToast(`Квиз проверен: ${correctCnt} из 3 правильных ответов!`, correctCnt >= 2 ? 'success' : 'info');
+      showToast(`Квиз проверен: ${correctCnt} из ${questions.length} правильных ответов!`, correctCnt >= 2 ? 'success' : 'info');
     }
 
     function onCodeEdited() {
@@ -1192,8 +1193,7 @@
       let htmlDoc = code;
       if (!code.includes('<html') && !code.includes('<body') && !code.includes('<!DOCTYPE')) {
         const sEnd = '<' + '/script>';
-        htmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;padding:16px;color:#1e293b;}</style><script src="js/vendor/three.min.js">${sEnd}<script src="js/eduspace-3d-engine.js">${sEnd}</head><body>${code}  <script src="js/eduspace-animations.js" defer></script>
-</body></html>`;
+        htmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;padding:16px;color:#1e293b;}</style><script src="js/vendor/three.min.js">${sEnd}<script src="js/eduspace-3d-engine.js">${sEnd}</head><body>${code}</body></html>`;
       }
       iframe.srcdoc = htmlDoc;
     }
@@ -1534,5 +1534,6 @@
     </div>
   </div>
 
+  <script src="js/eduspace-animations.js" defer></script>
 </body>
 </html>

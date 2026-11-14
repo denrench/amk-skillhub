@@ -211,7 +211,7 @@
   }
 
   function getUserStudyDay(userOrUid, db) {
-    const platformDay = (db && Number(db.current_study_day)) ? Math.max(1, Math.min(12, Number(db.current_study_day))) : 1;
+    const platformDay = (db && Number(db.current_study_day)) ? Math.max(1, Math.min(20, Number(db.current_study_day))) : 1;
     let u = null;
     if (userOrUid && typeof userOrUid === 'object') {
       u = userOrUid;
@@ -234,7 +234,7 @@
       const regMidnight = new Date(regDt.getFullYear(), regDt.getMonth(), regDt.getDate()).getTime();
       const daysByCalendar = Math.max(0, Math.round((nowMidnight - regMidnight) / 86400000));
       const daysElapsed = Math.max(daysBy24h, daysByCalendar);
-      const userDay = Math.max(1, Math.min(12, daysElapsed + 1));
+      const userDay = Math.max(1, Math.min(20, daysElapsed + 1));
       return Math.max(platformDay, userDay);
     } catch (e) {
       return platformDay;
@@ -753,7 +753,7 @@
       let globalId = 1;
       for (const sSlug of slugs) {
         const catLessons = (window.EDU_LESSONS && window.EDU_LESSONS[sSlug]) || [];
-        for (let i = 1; i <= 12; i++) {
+        for (let i = 1; i <= 20; i++) {
           const customKey = `${sSlug}:${i}`;
           const custom = db.custom_tasks[customKey];
           const base = catLessons.find(x => Number(x.num) === i) || {
@@ -1003,8 +1003,8 @@
         progress_percent: Math.min(100, Math.round((done / 20) * 100)),
         completed_count: done,
         avg_score: avg,
-        tasks_available: Math.min(12, db.current_study_day),
-        tasks_locked: Math.max(0, 12 - db.current_study_day),
+        tasks_available: Math.min(20, db.current_study_day),
+        tasks_locked: Math.max(0, 20 - db.current_study_day),
         is_fresh_start: done === 0 && db.current_study_day === 1
       });
     }
@@ -1030,7 +1030,7 @@
 
     if (path === '/api/teacher/advance_day' && method === 'POST') {
       const target = body.day !== undefined ? Number(body.day) : db.current_study_day + 1;
-      db.current_study_day = Math.max(1, Math.min(12, target));
+      db.current_study_day = Math.max(1, Math.min(20, target));
       saveLocalDB(db);
 
       return reply(200, {
@@ -1198,7 +1198,7 @@
       const rows = students.map(st => {
         const cells = {};
         const scores = [];
-        for (let n = 1; n <= 12; n++) {
+        for (let n = 1; n <= 20; n++) {
           const s = db.submissions.find(x => x.user_id === st.id && x.specialty_slug === spec && x.task_number === n);
 
           if (s) {
@@ -1261,7 +1261,7 @@
 
     if (path === '/api/teacher/create_task' && method === 'POST') {
       const spec = (body.specialty_slug || 'it').trim().toLowerCase();
-      const num = Math.max(1, Math.min(12, Number(body.task_number || 1)));
+      const num = Math.max(1, Math.min(20, Number(body.task_number || 1)));
 
       if (!body.title || !body.description) {
         return reply(400, { success: false, message: 'Заполните название и описание задания.' });
@@ -1270,7 +1270,7 @@
         title: body.title.trim(),
         description: body.description.trim(),
         difficulty: body.difficulty || 'Средний',
-        unlock_day: Math.max(1, Math.min(12, Number(body.unlock_day || num))),
+        unlock_day: Math.max(1, Math.min(20, Number(body.unlock_day || num))),
         tools_required: body.tools_required || 'Практикум EDU SPACE',
         starter_code: body.starter_code || '// Введите решение\n'
       };
@@ -2591,7 +2591,7 @@
                 <div class="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5 flex-wrap">
                   <span style="color: ${st.rank_color}">${st.rank_name} (Ур. ${st.level})</span>
                   <span>•</span>
-                  <span>Заданий: ${st.passed_tasks}/12</span>
+                  <span>Заданий: ${st.passed_tasks}/20</span>
                   <span>•</span>
                   <span>🏆 Достижений: ${st.achievements_count}</span>
                 </div>
