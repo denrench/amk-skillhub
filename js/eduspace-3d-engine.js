@@ -42,6 +42,37 @@ window.EduSpace3D = (function () {
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.25;
     }
+    try {
+      const envCanvas = document.createElement('canvas');
+      envCanvas.width = 256;
+      envCanvas.height = 128;
+      const ectx = envCanvas.getContext('2d');
+      const bgGrad = ectx.createLinearGradient(0, 0, 0, 128);
+      bgGrad.addColorStop(0.0, '#1e293b');
+      bgGrad.addColorStop(0.45, '#475569');
+      bgGrad.addColorStop(0.55, '#0f172a');
+      bgGrad.addColorStop(1.0, '#090d16');
+      ectx.fillStyle = bgGrad;
+      ectx.fillRect(0, 0, 256, 128);
+      ectx.fillStyle = '#ffffff';
+      ectx.fillRect(28, 12, 68, 22);
+      ectx.fillStyle = '#e0f2fe';
+      ectx.fillRect(148, 16, 76, 18);
+      ectx.fillStyle = '#93c5fd';
+      ectx.fillRect(92, 48, 52, 8);
+      const rawEnvTex = new THREE.CanvasTexture(envCanvas);
+      rawEnvTex.mapping = THREE.EquirectangularReflectionMapping;
+      if (THREE.sRGBEncoding !== undefined) rawEnvTex.encoding = THREE.sRGBEncoding;
+      if (typeof THREE.PMREMGenerator === 'function') {
+        const pmrem = new THREE.PMREMGenerator(renderer);
+        pmrem.compileEquirectangularShader();
+        scene.environment = pmrem.fromEquirectangular(rawEnvTex).texture;
+        rawEnvTex.dispose();
+        pmrem.dispose();
+      } else {
+        scene.environment = rawEnvTex;
+      }
+    } catch (e) {}
     container.style.position = container.style.position || 'relative';
     container.style.cursor = 'grab';
     container.style.touchAction = 'none';

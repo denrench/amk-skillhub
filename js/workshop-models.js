@@ -760,8 +760,44 @@ window.WorkshopModels = (() => {
         }
         if (renderer.toneMapping !== undefined && T.ACESFilmicToneMapping !== undefined) {
           renderer.toneMapping = T.ACESFilmicToneMapping;
-          renderer.toneMappingExposure = 1.22;
+          renderer.toneMappingExposure = 1.24;
         }
+
+        // Procedural Studio Softbox Environment Map for realistic PBR metal/glass reflections
+        try {
+          const envCanvas = document.createElement('canvas');
+          envCanvas.width = 256;
+          envCanvas.height = 128;
+          const ectx = envCanvas.getContext('2d');
+          const bgGrad = ectx.createLinearGradient(0, 0, 0, 128);
+          bgGrad.addColorStop(0.0, '#1e293b');
+          bgGrad.addColorStop(0.45, '#475569');
+          bgGrad.addColorStop(0.55, '#0f172a');
+          bgGrad.addColorStop(1.0, '#090d16');
+          ectx.fillStyle = bgGrad;
+          ectx.fillRect(0, 0, 256, 128);
+          // Studio softbox highlights
+          ectx.fillStyle = '#ffffff';
+          ectx.fillRect(28, 12, 68, 22);
+          ectx.fillStyle = '#e0f2fe';
+          ectx.fillRect(148, 16, 76, 18);
+          ectx.fillStyle = '#93c5fd';
+          ectx.fillRect(92, 48, 52, 8);
+          ectx.fillStyle = '#f8fafc';
+          ectx.fillRect(10, 42, 24, 14);
+          const rawEnvTex = new T.CanvasTexture(envCanvas);
+          rawEnvTex.mapping = T.EquirectangularReflectionMapping;
+          if (T.sRGBEncoding !== undefined) rawEnvTex.encoding = T.sRGBEncoding;
+          if (typeof T.PMREMGenerator === 'function') {
+            const pmrem = new T.PMREMGenerator(renderer);
+            pmrem.compileEquirectangularShader();
+            scene.environment = pmrem.fromEquirectangular(rawEnvTex).texture;
+            rawEnvTex.dispose();
+            pmrem.dispose();
+          } else {
+            scene.environment = rawEnvTex;
+          }
+        } catch (e) {}
 
         const keyLight = new T.DirectionalLight(0xffffff, 2.1);
         keyLight.position.set(4.5, 6.5, 5.0);
@@ -770,6 +806,14 @@ window.WorkshopModels = (() => {
         const rimLight = new T.PointLight(0x38bdf8, 1.4, 22);
         rimLight.position.set(0, 4.5, -5.0);
         scene.add(keyLight, fillLight, rimLight, new T.HemisphereLight(0xffffff, 0x1e293b, 1.2));
+
+        const floorDisc = new T.Mesh(
+          new T.CircleGeometry(2.6, 48),
+          new T.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.35, roughness: 0.65, transparent: true, opacity: 0.72 })
+        );
+        floorDisc.rotation.x = -Math.PI / 2;
+        floorDisc.position.y = -0.15;
+        scene.add(floorDisc);
 
         const grid = new T.GridHelper(6.5, 14, 0x38bdf8, 0x1e293b);
         grid.position.y = -0.14;
@@ -829,6 +873,9 @@ window.WorkshopModels = (() => {
                   child.userData.explodeDir = worldPos.clone().sub(new T.Vector3(0, 0.6, 0)).normalize();
                   if (child.material) {
                     child.material = child.material.clone();
+                    if (child.material.envMapIntensity !== undefined) {
+                      child.material.envMapIntensity = 1.25;
+                    }
                   }
                   gltfMeshes.push(child);
                 }
