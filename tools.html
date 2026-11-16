@@ -48,7 +48,11 @@
   </script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/starter-lesson.css"/>
   <link rel="stylesheet" href="css/workshop.css">
+  <script src="js/vendor/three.min.js"></script>
+  <script src="js/workshop-models.js"></script>
+  <script src="js/lesson-interactives.js"></script>
   <script src="js/prism-fx.js" defer></script>
 </head>
 <body class="workshop bg-dark-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
@@ -132,9 +136,16 @@
       </button>
       <button type="button" onclick="switchToolsTab('web')" id="tab-btn-web" class="tool-tab px-5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all">
         <span class="material-symbols-outlined text-[18px]">code</span>
-        <span>Шпаргалка Web & CSS Flex/Grid</span>
+        <span>Шпаргалка Web &amp; CSS Flex/Grid</span>
+      </button>
+      <button type="button" onclick="switchToolsTab('design')" id="tab-btn-design" class="tool-tab px-5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all">
+        <span class="material-symbols-outlined text-[18px]">palette</span>
+        <span>Графический дизайн: CMYK &amp; Prepress</span>
       </button>
     </div>
+
+    <!-- DYNAMIC 3D MODEL FOR SELECTED TOOL / PROFESSION -->
+    <div id="tools-course-3d-mount" class="mb-8"></div>
 
     <!-- ========================================================================= -->
     <!-- TAB 1: OBD-II SCANNER -->
@@ -358,6 +369,13 @@
       </div>
     </div>
 
+    <!-- ========================================================================= -->
+    <!-- TAB 5: GRAPHIC DESIGN & PREPRESS LAB -->
+    <!-- ========================================================================= -->
+    <div id="tool-pane-design" class="hidden space-y-6">
+      <div id="tools-design-interactive-mount" class="p-6 rounded-3xl bg-dark-900 border border-white/10"></div>
+    </div>
+
   </main>
 
   <!-- Footer -->
@@ -431,20 +449,52 @@
       filterObdCodes();
     }
 
+    let disposeTools3D = null;
+    const TOOL_TAB_TO_SPEC = {
+      obd: 'autoelectric',
+      hvac: 'hvac',
+      torque: 'automechanic',
+      web: 'it',
+      design: 'graphic_design'
+    };
+
+    function mountTools3DForTab(tab) {
+      const spec = TOOL_TAB_TO_SPEC[tab] || 'autoelectric';
+      const m3d = document.getElementById('tools-course-3d-mount');
+      if (m3d && window.WorkshopModels) {
+        disposeTools3D?.();
+        const def = window.WorkshopModels.forCourse(spec, 0);
+        disposeTools3D = window.WorkshopModels.show(m3d, def, { courseSlug: spec, allowModelSwitch: true });
+      }
+      if (tab === 'design' && window.LessonInteractives) {
+        const dMount = document.getElementById('tools-design-interactive-mount');
+        if (dMount && !dMount.hasChildNodes()) {
+          window.LessonInteractives.renderTopicLab(
+            dMount,
+            { course_slug: 'graphic_design', order_num: 2, title: 'Цветовой профиль CMYK vs RGB и Prepress' },
+            {},
+            () => {}
+          );
+        }
+      }
+    }
+
     function switchToolsTab(tab) {
       document.querySelectorAll('.tool-tab').forEach(b => {
         b.className = 'tool-tab px-5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all';
       });
-      document.getElementById('tool-pane-obd').classList.add('hidden');
-      document.getElementById('tool-pane-hvac').classList.add('hidden');
-      document.getElementById('tool-pane-torque').classList.add('hidden');
-      document.getElementById('tool-pane-web').classList.add('hidden');
+      ['obd', 'hvac', 'torque', 'web', 'design'].forEach(k => {
+        const p = document.getElementById('tool-pane-' + k);
+        if (p) p.classList.add('hidden');
+      });
 
       const btn = document.getElementById('tab-btn-' + tab);
       if (btn) btn.className = 'tool-tab px-5 py-3 rounded-2xl bg-cyan-600 text-white font-bold text-xs shadow-glow-cyan flex items-center gap-2 whitespace-nowrap transition-all';
 
       const pane = document.getElementById('tool-pane-' + tab);
       if (pane) pane.classList.remove('hidden');
+
+      mountTools3DForTab(tab);
     }
 
     // HVAC Saturation Formula Approximator
@@ -554,6 +604,7 @@
       filterObdCodes();
       selectEngine('toyota');
       calculateHvac();
+      mountTools3DForTab('obd');
     });
   </script>
   <script src="js/eduspace-animations.js" defer></script>

@@ -7,8 +7,14 @@
   <title>Личный кабинет студента · AMK SkillHub</title>
   <link rel="icon" href="assets/eduspace-logo.svg">
   <link rel="stylesheet" href="css/academy.css">
+  <link rel="stylesheet" href="css/starter-lesson.css">
+  <link rel="stylesheet" href="css/workshop.css">
+  <script src="js/vendor/three.min.js" defer></script>
   <script src="js/academy-lessons.js" defer></script>
   <script src="js/courses-catalog.js" defer></script>
+  <script src="js/workshop-models.js" defer></script>
+  <script src="js/eduspace-3d-engine.js" defer></script>
+  <script src="js/lesson-interactives.js" defer></script>
   <script src="js/academy-student.js" defer></script>
   <script src="js/prism-fx.js" defer></script>
 </head>
@@ -66,7 +72,7 @@
             </div>
             <div class="dashboard-progress">
               <span class="dashboard-count" data-count>—</span>
-              <progress data-progress aria-label="Прогресс учебника" max="12" value="0" hidden></progress>
+              <progress data-progress aria-label="Прогресс учебника" max="20" value="0" hidden></progress>
               <span>уроков в текущем курсе</span>
             </div>
           </section>
@@ -96,6 +102,7 @@
       </div>
       <p class="container notice" data-dashboard-status role="status"></p>
     </div>
+    <section class="container section" id="student-course-3d-hub" aria-label="Интерактивный 3D-стенд и симулятор профессии"></section>
   </main>
   <footer class="footer"><div class="container"><a href="index.html" class="brand"><img class="brand-logo" src="assets/eduspace-logo.svg" alt="" width="30" height="30"> AMK SkillHub</a><a href="learn.html">Открыть учебник</a></div></footer>
   <noscript><p class="container">Включите JavaScript, чтобы открыть кабинет.</p></noscript>

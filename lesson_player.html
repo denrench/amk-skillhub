@@ -739,65 +739,91 @@
         return;
       }
       if (block.id === 'b4_interactive') {
+        const specSlug = currentLesson.course_slug || currentLesson.specialty_slug || 'it';
+        const orderNum = currentLesson.order_num || currentLesson.task_number || 1;
         const model = window.WorkshopModels?.forLesson(currentLesson);
-        if (model) {
-          disposeLessonModel = window.WorkshopModels.show(canvas, model);
-          if (window.LessonInteractives?.mentorCard) {
-            const note = document.createElement('div');
-            note.className = 'mt-4';
-            note.innerHTML = window.LessonInteractives.mentorCard(
-              currentLesson.course_slug || 'it',
-              'Нажимайте на узлы 3D-модели в списке справа и поворачивайте стенд, чтобы разобрать назначение каждого элемента.'
-            );
-            canvas.appendChild(note);
-          }
-          return;
-        }
-        const topicCfg = window.LessonInteractives?.getTopicConfig(currentLesson.course_slug || 'it', currentLesson.order_num || 1);
-        if (topicCfg) {
-          const hasExtra = (block.cards && block.cards.length) || (block.pairs && block.pairs.length) || (block.steps && block.steps.length);
-          if (!hasExtra) {
-            window.LessonInteractives.renderTopicLab(canvas, currentLesson, block, state => {
-              awardInteractiveBonus(state);
-            });
-            return;
-          }
-          canvas.innerHTML = `
-            <div class="space-y-4">
-              <div class="flex flex-wrap items-center gap-2 bg-dark-950/80 p-1.5 rounded-2xl border border-white/10 w-fit">
-                <button type="button" id="int-tab-lab" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all">🔬 Тренажёр по теме</button>
-                <button type="button" id="int-tab-drill" class="px-4 py-2 rounded-xl text-xs font-bold bg-transparent text-slate-400 hover:text-white transition-all">🧩 Закрепление</button>
+        const topicCfg = window.LessonInteractives?.getTopicConfig(specSlug, orderNum);
+        const hasExtra = (block.cards && block.cards.length) || (block.pairs && block.pairs.length) || (block.steps && block.steps.length);
+
+        canvas.innerHTML = `
+          <div class="space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-dark-950/85 p-2 rounded-2xl border border-white/10">
+              <div class="flex flex-wrap items-center gap-2" role="tablist" aria-label="Режимы интерактивного блока">
+                <button type="button" id="int-tab-3d" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all">🧊 3D-модель и визуал узла</button>
+                <button type="button" id="int-tab-lab" class="px-4 py-2 rounded-xl text-xs font-bold bg-transparent text-slate-400 hover:text-white transition-all">🔬 Тренажёр профессии</button>
+                ${hasExtra ? `<button type="button" id="int-tab-drill" class="px-4 py-2 rounded-xl text-xs font-bold bg-transparent text-slate-400 hover:text-white transition-all">🧩 Закрепление</button>` : ''}
               </div>
-              <div id="int-stage"></div>
+              <span class="px-3 py-1 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 text-[11px] font-bold">
+                Курс: ${specSlug.toUpperCase()} · Модуль №${orderNum}
+              </span>
             </div>
-          `;
-          const stage = canvas.querySelector('#int-stage');
-          const tLab = canvas.querySelector('#int-tab-lab');
-          const tDrill = canvas.querySelector('#int-tab-drill');
-          const showLab = () => {
-            tLab.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all';
-            tDrill.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-transparent text-slate-400 hover:text-white transition-all';
-            window.LessonInteractives.renderTopicLab(stage, currentLesson, block, state => awardInteractiveBonus(state));
-          };
-          const showDrill = () => {
-            tDrill.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all';
-            tLab.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-transparent text-slate-400 hover:text-white transition-all';
-            if (block.widget_type === 'sequence') {
-              window.LessonInteractives.renderSortableSequence(stage, block, currentLesson.course_slug || 'it', state => awardInteractiveBonus(state));
-            } else {
-              stage.innerHTML = renderInteractiveWidgetBlock(block);
-              attachInteractiveListeners(block);
+            <div id="int-stage"></div>
+          </div>
+        `;
+
+        const stage = canvas.querySelector('#int-stage');
+        const t3d = canvas.querySelector('#int-tab-3d');
+        const tLab = canvas.querySelector('#int-tab-lab');
+        const tDrill = canvas.querySelector('#int-tab-drill');
+
+        const setActiveTabBtn = (activeBtn) => {
+          [t3d, tLab, tDrill].forEach(btn => {
+            if (!btn) return;
+            btn.className = (btn === activeBtn)
+              ? 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all'
+              : 'px-4 py-2 rounded-xl text-xs font-bold bg-transparent text-slate-400 hover:text-white transition-all';
+          });
+        };
+
+        const show3d = () => {
+          disposeLessonModel?.();
+          disposeLessonModel = null;
+          setActiveTabBtn(t3d);
+          if (model && window.WorkshopModels) {
+            disposeLessonModel = window.WorkshopModels.show(stage, model, { courseSlug: specSlug, allowModelSwitch: true });
+            if (window.LessonInteractives?.mentorCard) {
+              const note = document.createElement('div');
+              note.className = 'mt-4';
+              note.innerHTML = window.LessonInteractives.mentorCard(
+                specSlug,
+                'Вращайте 3D-модель мышью, управляйте ползунком телеметрии, переключайте все 5 3D-узлов курса или перейдите во вкладку «🔬 Тренажёр профессии».'
+              );
+              stage.appendChild(note);
             }
-          };
-          tLab.addEventListener('click', showLab);
-          tDrill.addEventListener('click', showDrill);
-          showLab();
-          return;
-        }
-        if (block.widget_type === 'sequence' && window.LessonInteractives?.renderSortableSequence) {
-          window.LessonInteractives.renderSortableSequence(canvas, block, currentLesson.course_slug || 'it', state => awardInteractiveBonus(state));
-          return;
-        }
+          } else if (topicCfg && window.LessonInteractives) {
+            window.LessonInteractives.renderTopicLab(stage, currentLesson, block, state => awardInteractiveBonus(state));
+          }
+        };
+
+        const showLab = () => {
+          disposeLessonModel?.();
+          disposeLessonModel = null;
+          setActiveTabBtn(tLab);
+          if (topicCfg && window.LessonInteractives) {
+            window.LessonInteractives.renderTopicLab(stage, currentLesson, block, state => awardInteractiveBonus(state));
+          } else {
+            stage.innerHTML = renderInteractiveWidgetBlock(block);
+            attachInteractiveListeners(block);
+          }
+        };
+
+        const showDrill = () => {
+          disposeLessonModel?.();
+          disposeLessonModel = null;
+          setActiveTabBtn(tDrill);
+          if (block.widget_type === 'sequence' && window.LessonInteractives?.renderSortableSequence) {
+            window.LessonInteractives.renderSortableSequence(stage, block, specSlug, state => awardInteractiveBonus(state));
+          } else {
+            stage.innerHTML = renderInteractiveWidgetBlock(block);
+            attachInteractiveListeners(block);
+          }
+        };
+
+        t3d?.addEventListener('click', show3d);
+        tLab?.addEventListener('click', showLab);
+        tDrill?.addEventListener('click', showDrill);
+        show3d();
+        return;
       }
 
       switch (block.type) {

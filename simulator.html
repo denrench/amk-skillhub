@@ -101,8 +101,11 @@
   <script src="js/interactive-simulators.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/starter-lesson.css"/>
   <script src="js/vendor/three.min.js"></script>
+  <script src="js/workshop-models.js"></script>
   <script src="js/eduspace-3d-engine.js"></script>
+  <script src="js/lesson-interactives.js"></script>
   <link rel="stylesheet" href="css/workshop.css">
   <script src="js/prism-fx.js" defer></script>
 </head>
@@ -135,11 +138,18 @@
         </div>
       </a>
 
-      <div class="px-2 pb-3 mb-3 border-b border-white/10">
-        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Активный курс</div>
-        <div class="font-bold text-xs text-white mt-0.5" id="sidebar-course-title">Загрузка курса...</div>
-        <div class="flex items-center justify-between text-[11px] text-slate-400 mt-2">
-          <span id="sidebar-progress-label">0 / 10 пройдено</span>
+      <div class="px-2 pb-3 mb-3 border-b border-white/10 space-y-2">
+        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Активный курс (смена направления)</div>
+        <div class="font-bold text-xs text-white" id="sidebar-course-title">Загрузка курса...</div>
+        <select id="sim-course-selector" onchange="window.location.href='simulator.html?specialty=' + this.value + '&task=1'" class="w-full px-2.5 py-1.5 rounded-xl bg-dark-900 border border-white/15 text-xs font-bold text-indigo-300 focus:outline-none focus:border-indigo-500">
+          <option value="it">💻 Веб-дизайн (IT)</option>
+          <option value="graphic_design">🎨 Графический дизайн</option>
+          <option value="autoelectric">⚡ Автоэлектрика</option>
+          <option value="hvac">❄️ Холодильное (HVAC)</option>
+          <option value="automechanic">🔧 Автомеханика</option>
+        </select>
+        <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+          <span id="sidebar-progress-label">0 / 20 пройдено</span>
           <a href="tasks.html" class="text-indigo-400 font-bold hover:underline">Все курсы</a>
         </div>
       </div>
@@ -283,12 +293,16 @@
         <!-- ================= STAGE 1: INTERACTIVE TOPIC GAME & THEORY ================= -->
         <section id="stage-panel-theory" class="bg-dark-850/80 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-white/10 shadow-xl space-y-6">
           
-          <!-- Sub-tab switcher: Topic Game vs Lecture Notes -->
+          <!-- Sub-tab switcher: Topic Game vs Lecture Notes vs 3D Model -->
           <div class="flex flex-wrap items-center justify-between border-b border-white/10 pb-4 gap-3">
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
               <button type="button" id="tab-sub-game" onclick="switchTheoryView('game')" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px]">sports_esports</span>
                 <span>Игра по теме</span>
+              </button>
+              <button type="button" id="tab-sub-3d" onclick="switchTheoryView('3d')" class="px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">view_in_ar</span>
+                <span>3D-модель узла (5 стендов)</span>
               </button>
               <button type="button" id="tab-sub-text" onclick="switchTheoryView('text')" class="px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px]">menu_book</span>
@@ -301,6 +315,11 @@
           <!-- Topic Game View -->
           <div id="theory-game-container" class="space-y-4">
             <div id="sim-topic-game-mount"></div>
+          </div>
+
+          <!-- 3D Model View -->
+          <div id="theory-3d-container" class="hidden">
+            <div id="sim-stage1-3d-mount"></div>
           </div>
 
           <!-- Text View -->
@@ -475,7 +494,7 @@
           </div>
 
           <!-- Specialized Interactive Workbench (Custom for each specialty) -->
-          
+          <div id="specialty-interactive-workbench" class="bg-dark-850/80 backdrop-blur-xl rounded-3xl border border-white/10 p-6 shadow-2xl"></div>
 
           <!-- Code / Solution Editor + Console + Submission -->
           <div class="bg-dark-850/80 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden">
@@ -582,6 +601,8 @@
 
       const course = window.EduSpace.getCourseBySlug(activeSpecialty);
       document.getElementById('sidebar-course-title').textContent = `${course.code} — ${course.short_title}`;
+      const courseSel = document.getElementById('sim-course-selector');
+      if (courseSel) courseSel.value = activeSpecialty;
       document.getElementById('back-to-catalog-link').href = `tasks.html?specialty=${activeSpecialty}`;
       document.getElementById('sim-task-badge').textContent = `Урок №${activeTaskNumber} • ${course.short_title}`;
       document.getElementById('editor-file-label').textContent =
@@ -1227,22 +1248,34 @@
     }
 
   
+    let disposeSimStage1Model = null;
+
     function switchTheoryView(view) {
       const gBtn = document.getElementById('tab-sub-game');
+      const mBtn = document.getElementById('tab-sub-3d');
       const tBtn = document.getElementById('tab-sub-text');
       const gBox = document.getElementById('theory-game-container');
+      const mBox = document.getElementById('theory-3d-container');
       const tBox = document.getElementById('theory-text-container');
 
-      if (view === 'game') {
-        if (gBtn) gBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2';
-        if (tBtn) tBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2';
-        if (gBox) gBox.classList.remove('hidden');
-        if (tBox) tBox.classList.add('hidden');
-      } else {
-        if (tBtn) tBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2';
-        if (gBtn) gBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2';
-        if (tBox) tBox.classList.remove('hidden');
-        if (gBox) gBox.classList.add('hidden');
+      const activeCls = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-glow-indigo transition-all flex items-center gap-2';
+      const idleCls = 'px-4 py-2 rounded-xl text-xs font-bold bg-white/5 text-slate-400 hover:text-white border border-white/10 transition-all flex items-center gap-2';
+
+      if (gBtn) gBtn.className = (view === 'game') ? activeCls : idleCls;
+      if (mBtn) mBtn.className = (view === '3d') ? activeCls : idleCls;
+      if (tBtn) tBtn.className = (view === 'text') ? activeCls : idleCls;
+
+      if (gBox) gBox.classList.toggle('hidden', view !== 'game');
+      if (mBox) mBox.classList.toggle('hidden', view !== '3d');
+      if (tBox) tBox.classList.toggle('hidden', view !== 'text');
+
+      if (view === '3d' && window.WorkshopModels) {
+        const mountEl = document.getElementById('sim-stage1-3d-mount');
+        if (mountEl) {
+          disposeSimStage1Model?.();
+          const def = window.WorkshopModels.forLesson({ course_slug: activeSpecialty, order_num: activeTaskNumber }) || window.WorkshopModels.forCourse(activeSpecialty, 0);
+          disposeSimStage1Model = window.WorkshopModels.show(mountEl, def, { courseSlug: activeSpecialty, allowModelSwitch: true });
+        }
       }
     }
 

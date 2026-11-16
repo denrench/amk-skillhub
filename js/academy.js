@@ -8,13 +8,13 @@
     hvac: ['Холодильное оборудование', 'Контуры, диагностика и сервис', null],
     automechanic: ['Автомеханика', 'Двигатель, ходовая часть и ТО', null],
   };
-  const models = new Set(['it:7', 'graphic_design:8', 'autoelectric:3', 'autoelectric:8', 'hvac:1', 'automechanic:1']);
   const params = new URLSearchParams(location.search);
   const selected = params.get('course');
   const slug = Object.hasOwn(courses, selected) ? selected : 'it';
   const course = courses[slug];
   const requested = Number(params.get('lesson'));
   const lesson = Number.isInteger(requested) && requested > 0 ? data[slug][requested - 1] : null;
+  let disposeActiveModel = null;
 
   const storeKey = 'skillhub.academy.completed.v1';
   const markKey = 'skillhub.academy.bookmarks.v1';
@@ -40,7 +40,7 @@
       if (!response.ok) return;
       const progData = await response.json();
       accountProgress = new Set(progData.completed || []);
-      const unlockedDay = Number(progData.current_study_day || 12);
+      const unlockedDay = Number(progData.current_study_day || 20);
       root.querySelectorAll('[data-lesson-key]').forEach(marker => {
         const key = marker.dataset.lessonKey || '';
         const num = Number(key.split(':')[1] || 1);
@@ -97,6 +97,61 @@
     } catch {}
   }
 
+  function mountCourseInteractiveHub(containerEl, activeSpec, defaultLessonNum = 1) {
+    if (!containerEl) return;
+    disposeActiveModel?.();
+    disposeActiveModel = null;
+
+    containerEl.innerHTML = `
+      <div style="margin:1.1rem 0 1.4rem;padding:1.1rem;border-radius:18px;background:#0f172a;color:#f8fafc;border:1px solid rgba(56,189,248,0.28);box-shadow:0 16px 36px rgba(15,23,42,0.18);">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;">
+          <div>
+            <span style="font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:#38bdf8;">Цифровой двойник и интерактив направления · ${course[0]}</span>
+            <h3 style="margin:3px 0 0;font-size:1.15rem;color:#ffffff;">Интерактивный 3D-стенд и тренажёр по теме курса</h3>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;" role="group" aria-label="Режим стенда курса">
+            <button type="button" id="acad-hub-tab-3d" class="button primary" style="min-height:34px;padding:0.3rem 0.85rem;font-size:0.8rem;">🧊 3D-модели профессии (5 узлов)</button>
+            <button type="button" id="acad-hub-tab-lab" class="button" style="min-height:34px;padding:0.3rem 0.85rem;font-size:0.8rem;background:rgba(255,255,255,0.08);color:#e2e8f0;border-color:rgba(255,255,255,0.18);">🔬 Интерактивный тренажёр курса</button>
+          </div>
+        </div>
+        <div id="acad-hub-3d-stage"></div>
+        <div id="acad-hub-lab-stage" hidden></div>
+      </div>
+    `;
+
+    const stage3d = containerEl.querySelector('#acad-hub-3d-stage');
+    const stageLab = containerEl.querySelector('#acad-hub-lab-stage');
+    const btn3d = containerEl.querySelector('#acad-hub-tab-3d');
+    const btnLab = containerEl.querySelector('#acad-hub-tab-lab');
+
+    if (window.WorkshopModels && stage3d) {
+      const def = window.WorkshopModels.forLesson({ course_slug: activeSpec, order_num: defaultLessonNum }) || window.WorkshopModels.forCourse(activeSpec, 0);
+      disposeActiveModel = window.WorkshopModels.show(stage3d, def, { courseSlug: activeSpec, allowModelSwitch: true });
+    }
+
+    if (window.LessonInteractives && stageLab) {
+      window.LessonInteractives.renderTopicLab(
+        stageLab,
+        { course_slug: activeSpec, order_num: defaultLessonNum, title: course[0] },
+        {},
+        () => {}
+      );
+    }
+
+    btn3d?.addEventListener('click', () => {
+      stage3d.hidden = false;
+      stageLab.hidden = true;
+      btn3d.className = 'button primary';
+      btnLab.className = 'button';
+    });
+    btnLab?.addEventListener('click', () => {
+      stage3d.hidden = true;
+      stageLab.hidden = false;
+      btnLab.className = 'button primary';
+      btn3d.className = 'button';
+    });
+  }
+
   function catalog() {
     const list = data[slug];
     let doneCount = 0;
@@ -110,12 +165,12 @@
       if (done) doneCount += 1;
       else if (!foundPending) { firstPending = number; foundPending = true; }
       return `<a class="lesson-row" style="--reveal-delay:${index * 28}ms" href="${href(slug, number)}"><span class="course-num">${String(number).padStart(2, '0')}</span>
-        <strong>${marked ? '★ ' : ''}${title}</strong><small data-lesson-key="${key}">${done ? 'Пройдено' : 'Игра и практика'}</small></a>`;
+        <strong>${marked ? '★ ' : ''}${title}</strong><small data-lesson-key="${key}">${done ? 'Пройдено' : '3D + Игра + Практика'}</small></a>`;
     }).join('');
     const pct = Math.round((doneCount / Math.max(1, list.length)) * 100);
     root.innerHTML = `
-      <div class="container catalog-head stack"><p class="eyebrow">5 специальностей / 100 уроков</p><h1>Учебник</h1>
-      <p class="muted">Выберите направление. В каждом уроке тема осваивается через уникальную интерактивную игру на 3 раунда, объяснение, пример и тест.</p></div>
+      <div class="container catalog-head stack"><p class="eyebrow">5 специальностей / 100 уроков / 25 3D-моделей</p><h1>Учебник</h1>
+      <p class="muted">Выберите направление. Для каждого курса автоматически загружается профильный 3D-стенд и интерактивный тренажёр профессии, а каждый урок включает игру на 3 раунда, 3D-модель, разбор и практику.</p></div>
       <div class="container section catalog-layout">
         <nav class="catalog-menu" aria-label="Специальности">${Object.entries(courses).map(([id, entry]) =>
           `<a href="${href(id)}"${id === slug ? ' aria-current="page"' : ''}>${entry[0]}</a>`).join('')}</nav>
@@ -130,15 +185,17 @@
           </div>
           <a class="button primary" href="${href(slug, firstPending)}">${doneCount ? `Продолжить с урока ${firstPending} →` : 'Начать с урока 1 →'}</a>
         </div>
+        <div id="academy-course-3d-hub"></div>
         <div>${rows}</div></section>
       </div>`;
+    mountCourseInteractiveHub(document.getElementById('academy-course-3d-hub'), slug, firstPending);
   }
 
   function renderLesson() {
     const [title, concept, example, question, correct, incorrect, explanation] = lesson;
     const key = `${slug}:${requested}`;
     const choices = requested % 2 ? [incorrect, correct] : [correct, incorrect];
-    const hasModel = models.has(key);
+    const hasModel = true;
     const next = requested < data[slug].length ? href(slug, requested + 1) : href(slug);
     const gameStoreKey = `eduspace_academy_game_${slug}_${requested}`;
     let savedGameState = {};
@@ -158,14 +215,14 @@
         <div class="lesson-progress-chips" aria-label="Этапы урока">
           <span class="lesson-step-chip" id="chip-game-step" data-done="${gameDone ? 'true' : 'false'}">01 · Интерактивная игра-тема</span>
           <span class="lesson-step-chip" data-done="true">02 · Объяснение и пример</span>
-          <span class="lesson-step-chip" id="chip-quiz-step" data-done="false">03 · Проверка знаний</span>
+          <span class="lesson-step-chip" data-done="true">03 · 3D-модель и тренажёр</span>
+          <span class="lesson-step-chip" id="chip-quiz-step" data-done="false">04 · Проверка знаний</span>
           <button type="button" class="button lesson-bookmark-btn" id="lesson-bookmark-btn" aria-pressed="${bookmarks.includes(key) ? 'true' : 'false'}" style="min-height:32px;padding:0.2rem 0.7rem;font-size:0.78rem;">${bookmarks.includes(key) ? '★ В закладках' : '☆ В закладки'}</button>
         </div>
       </div></div>
       <div class="container lesson-layout">
         <nav class="catalog-menu lesson-nav" aria-label="Разделы урока">
-          <a href="#visual">0. Игра по теме</a><a href="#explanation">1. Объяснение</a><a href="#example">2. Пример</a><a href="#exercise">3. Задание</a>
-          ${hasModel ? '<a href="#model">4. 3D-модель</a>' : ''}
+          <a href="#visual">0. Игра по теме</a><a href="#explanation">1. Объяснение</a><a href="#example">2. Пример</a><a href="#model">3. 3D-модель и тренажёр</a><a href="#exercise">4. Задание</a>
         </nav>
         <article>
           <section id="visual" class="lesson-visual-card">
@@ -180,17 +237,25 @@
           </section>
           <section id="explanation" class="card"><p class="eyebrow">01 / Разберитесь</p><h2>Главная идея</h2><p data-concept></p></section>
           <section id="example" class="card example"><p class="eyebrow">02 / Посмотрите решение</p><h2>Разбор примера</h2><p data-example></p>${safety}</section>
-          <section id="exercise" class="card"><p class="eyebrow">03 / Примените знания</p><h2>Проверьте себя</h2><p data-question></p>
+          ${hasModel ? `<section id="model" class="card">
+            <p class="eyebrow">03 / Интерактивный 3D-стенд и симулятор профессии</p>
+            <h2>3D-модель узла и практический тренажёр по теме</h2>
+            <p class="muted">Вращайте 3D-модель, включайте взрыв-схему, меняйте рабочие параметры на слайдере телеметрии и отработайте навык в тренажёре.</p>
+            <div id="academy-lesson-3d-hub"></div>
+            <div class="actions" style="margin-top:0.75rem;">
+              <a class="button" href="lesson_player.html?catalog=1&amp;specialty=${slug}&amp;task=${requested}&amp;view=model">Открыть на весь экран в 8-этапном плеере →</a>
+            </div>
+          </section>` : ''}
+          <section id="exercise" class="card"><p class="eyebrow">04 / Примените знания</p><h2>Проверьте себя</h2><p data-question></p>
             <div class="stack" data-choices></div>
             <p class="answer-result" role="status" hidden></p>
             <p data-sync class="muted" role="status"></p>
             <div class="actions" data-next hidden><a class="button dark" href="${next}">${requested < data[slug].length ? 'Следующий урок →' : 'Вернуться к программе'}</a></div>
           </section>
-          ${hasModel ? `<section id="model" class="card"><h2>Исследуйте модель</h2><p class="muted">Выберите детали, чтобы увидеть их назначение в учебной схеме.</p>
-          <div><a class="button" href="lesson_player.html?catalog=1&amp;specialty=${slug}&amp;task=${requested}&amp;view=model">Открыть интерактивный стенд</a></div></section>` : ''}
           ${course[2] ? `<p class="muted"><a href="${course[2]}">Справочный материал по направлению</a></p>` : ''}
         </article>
       </div>`;
+    mountCourseInteractiveHub(document.getElementById('academy-lesson-3d-hub'), slug, requested);
     const gameChip = root.querySelector('#chip-game-step');
     if (window.TopicGameEngine && document.getElementById('academy-topic-game-mount')) {
       window.TopicGameEngine.mount({

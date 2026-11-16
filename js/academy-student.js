@@ -98,11 +98,88 @@
     }
   }
 
+  let disposeStudent3D = null;
+
+  function mountStudentCourse3DHub(initialSlug = 'it') {
+    const host = document.getElementById('student-course-3d-hub');
+    if (!host) return;
+    let activeSlug = initialSlug;
+    let activeTab = '3d';
+
+    const courseLabels = {
+      it: '💻 Веб-дизайн (IT)',
+      graphic_design: '🎨 Графический дизайн',
+      autoelectric: '⚡ Автоэлектрика',
+      hvac: '❄️ Холодильное (HVAC)',
+      automechanic: '🔧 Автомеханика'
+    };
+
+    function draw() {
+      disposeStudent3D?.();
+      disposeStudent3D = null;
+
+      host.innerHTML = `
+        <div class="card" style="background:#0f172a;color:#f8fafc;border:1px solid rgba(56,189,248,0.28);padding:1.4rem;border-radius:20px;">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;">
+            <div>
+              <p class="eyebrow" style="color:#38bdf8;margin:0;">Интерактивный 3D-стенд и симулятор профессии</p>
+              <h2 style="margin:4px 0 0;color:#ffffff;font-size:1.35rem;">Какой курс выбран — такой 3D-стенд и тренажёр активен</h2>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;" role="group" aria-label="Выбор направления">
+              ${Object.entries(courseLabels).map(([k, lbl]) => `
+                <button type="button" class="button ${k === activeSlug ? 'primary' : ''}" data-st-course="${k}" style="min-height:34px;padding:0.3rem 0.75rem;font-size:0.78rem;">${lbl}</button>
+              `).join('')}
+            </div>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+            <button type="button" id="st-hub-btn-3d" class="button ${activeTab === '3d' ? 'primary' : ''}" style="min-height:34px;padding:0.3rem 0.85rem;font-size:0.8rem;">🧊 3D-модели курса (5 узлов)</button>
+            <button type="button" id="st-hub-btn-lab" class="button ${activeTab === 'lab' ? 'primary' : ''}" style="min-height:34px;padding:0.3rem 0.85rem;font-size:0.8rem;">🔬 Интерактивный тренажёр по теме</button>
+            <a class="button" href="tasks.html?specialty=${activeSlug}" style="min-height:34px;padding:0.3rem 0.85rem;font-size:0.8rem;margin-left:auto;">Все 20 модулей курса →</a>
+          </div>
+          <div id="st-hub-3d-mount" ${activeTab === '3d' ? '' : 'hidden'}></div>
+          <div id="st-hub-lab-mount" ${activeTab === 'lab' ? '' : 'hidden'}></div>
+        </div>
+      `;
+
+      const m3d = host.querySelector('#st-hub-3d-mount');
+      const mLab = host.querySelector('#st-hub-lab-mount');
+      if (activeTab === '3d' && window.WorkshopModels && m3d) {
+        const def = window.WorkshopModels.forCourse(activeSlug, 0);
+        disposeStudent3D = window.WorkshopModels.show(m3d, def, { courseSlug: activeSlug, allowModelSwitch: true });
+      } else if (activeTab === 'lab' && window.LessonInteractives && mLab) {
+        window.LessonInteractives.renderTopicLab(
+          mLab,
+          { course_slug: activeSlug, order_num: 1, title: courseLabels[activeSlug] },
+          {},
+          () => {}
+        );
+      }
+
+      host.querySelectorAll('[data-st-course]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          activeSlug = btn.getAttribute('data-st-course') || 'it';
+          draw();
+        });
+      });
+      host.querySelector('#st-hub-btn-3d')?.addEventListener('click', () => {
+        activeTab = '3d';
+        draw();
+      });
+      host.querySelector('#st-hub-btn-lab')?.addEventListener('click', () => {
+        activeTab = 'lab';
+        draw();
+      });
+    }
+
+    draw();
+  }
+
   function showSignIn() {
     gateStatus.textContent = staticHost
-      ? 'Кабинет доступен на сервере аккаунтов. Учебник можно читать без входа.'
+      ? 'Кабинет доступен на сервере аккаунтов. Учебник и 3D-стенды ниже можно использовать без входа.'
       : 'Войдите, чтобы увидеть свой прогресс и задания.';
     element('[data-gate-actions]').hidden = false;
+    mountStudentCourse3DHub('it');
   }
 
   async function start() {
@@ -123,10 +200,12 @@
       gate.hidden = true;
       dashboard.hidden = false;
       logout.hidden = false;
+      mountStudentCourse3DHub(slug);
       await Promise.all([showReading(slug, title), showPractice(slug, user.id), showNotices()]);
     } catch {
       gateStatus.textContent = 'Сервер аккаунтов временно недоступен.';
       element('[data-reload]').hidden = false;
+      mountStudentCourse3DHub('it');
     }
   }
 

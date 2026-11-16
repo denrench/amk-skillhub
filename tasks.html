@@ -20,11 +20,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
 
   <link rel="stylesheet" href="css/tailwind.min.css"/>
+  <script src="js/vendor/three.min.js"></script>
   <script src="js/courses-catalog.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/app-logistics.js"></script>
+  <script src="js/workshop-models.js"></script>
+  <script src="js/eduspace-3d-engine.js"></script>
+  <script src="js/lesson-interactives.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/starter-lesson.css"/>
   <link rel="stylesheet" href="css/workshop.css"/>
 
   <style>
@@ -1462,6 +1467,9 @@
           </div>
         </section>
 
+        <!-- DYNAMIC COURSE 3D DIGITAL TWIN & INTERACTIVE WORKBENCH -->
+        <section id="tasks-course-3d-showcase" class="reveal reveal--up is-visible" aria-label="Интерактивный 3D-стенд и симулятор выбранного направления"></section>
+
         <!-- 3. SEGMENTED STATUS FILTERS & SEARCH -->
         <section class="controls-bar" aria-label="Фильтры и поиск уроков" data-i18n-attr="aria-label:a11y.controlsRegion">
           <div class="segmented-control reveal reveal--scale" data-reveal="scale" style="--i:5" id="status-filters" role="tablist" aria-label="Фильтр по статусу уроков" data-i18n-attr="aria-label:a11y.statusFilterGroup">
@@ -1731,6 +1739,70 @@
 
       document.querySelectorAll('.course-dropdown-item').forEach(btn => {
         btn.classList.toggle('is-active', btn.getAttribute('data-spec') === currentSpec);
+      });
+
+      renderTasksCourse3DShowcase(currentSpec, nextNum, locShort || course.short_title || course.title);
+    }
+
+    let disposeTasks3D = null;
+    let lastRenderedShowcaseKey = '';
+
+    function renderTasksCourse3DShowcase(spec, taskNum = 1, courseLabel = '') {
+      const host = document.getElementById('tasks-course-3d-showcase');
+      if (!host) return;
+      const key = `${spec}:${taskNum}`;
+      if (lastRenderedShowcaseKey === key && host.innerHTML.trim().length > 50) return;
+      lastRenderedShowcaseKey = key;
+
+      disposeTasks3D?.();
+      disposeTasks3D = null;
+
+      host.innerHTML = `
+        <div style="background:#0f172a;color:#f8fafc;border:1px solid rgba(56,189,248,0.28);border-radius:var(--radius-lg);padding:var(--sp-3);box-shadow:var(--shadow-elevated);">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;">
+            <div>
+              <span style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#38bdf8;">Интерактив выбранного направления · ${escapeHtml(courseLabel || spec.toUpperCase())}</span>
+              <h2 style="margin:3px 0 0;font-size:var(--fs-20);font-weight:800;color:#ffffff;">3D-модель и тренажёр по теме курса</h2>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;" role="group" aria-label="Переключатель 3D и тренажёра">
+              <button type="button" id="tasks-hub-btn-3d" class="btn-primary-cta" style="min-height:36px;padding:6px 14px;font-size:var(--fs-12);">🧊 3D-модели курса (5 стендов)</button>
+              <button type="button" id="tasks-hub-btn-lab" class="btn-secondary-outline" style="min-height:36px;padding:6px 14px;font-size:var(--fs-12);color:#e2e8f0;border-color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);">🔬 Интерактивный тренажёр профессии</button>
+            </div>
+          </div>
+          <div id="tasks-hub-3d-mount"></div>
+          <div id="tasks-hub-lab-mount" hidden></div>
+        </div>
+      `;
+
+      const m3d = host.querySelector('#tasks-hub-3d-mount');
+      const mLab = host.querySelector('#tasks-hub-lab-mount');
+      const b3d = host.querySelector('#tasks-hub-btn-3d');
+      const bLab = host.querySelector('#tasks-hub-btn-lab');
+
+      if (window.WorkshopModels && m3d) {
+        const def = window.WorkshopModels.forLesson({ course_slug: spec, order_num: taskNum }) || window.WorkshopModels.forCourse(spec, 0);
+        disposeTasks3D = window.WorkshopModels.show(m3d, def, { courseSlug: spec, allowModelSwitch: true });
+      }
+      if (window.LessonInteractives && mLab) {
+        window.LessonInteractives.renderTopicLab(
+          mLab,
+          { course_slug: spec, order_num: taskNum, title: courseLabel || spec },
+          {},
+          () => {}
+        );
+      }
+
+      b3d?.addEventListener('click', () => {
+        m3d.hidden = false;
+        mLab.hidden = true;
+        b3d.className = 'btn-primary-cta';
+        bLab.className = 'btn-secondary-outline';
+      });
+      bLab?.addEventListener('click', () => {
+        m3d.hidden = true;
+        mLab.hidden = false;
+        bLab.className = 'btn-primary-cta';
+        b3d.className = 'btn-secondary-outline';
       });
     }
 

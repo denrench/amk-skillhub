@@ -38,10 +38,10 @@
           <div class="landing-hero-copy">
             <div class="hero-pill">
               <span class="hero-pill-dot" aria-hidden="true"></span>
-              <span>EDU SPACE · АМК · 60 интерактивных уроков</span>
+              <span>EDU SPACE · АМК · 100 интерактивных уроков · 25 3D-стендов</span>
             </div>
             <h1>Знания, которые <span class="hero-highlight">можно применить</span></h1>
-            <p>Интерактивная мастерская нового поколения: 60 уникальных интерактивных игр по темам вместо скучных видеолекций, живые тренажёры и пошаговое ежедневное открытие модулей.</p>
+            <p>Интерактивная мастерская нового поколения: 100 глубоких уроков, 25 профильных 3D-моделей (.glb + WebGL), 100 уникальных мини-игр и живые тренажёры под каждую выбранную профессию.</p>
             <div class="landing-cta-row">
               <a class="button primary" href="learn.html">Открыть учебник</a>
               <a class="button" href="tasks.html">Перейти в практикум</a>
@@ -120,19 +120,19 @@
 
         <div class="kpi-strip" aria-label="Ключевые показатели платформы">
           <div class="kpi-cell">
-            <strong data-count="60" data-suffix=" уроков">100 уроков</strong>
+            <strong data-count="100" data-suffix=" уроков">100 уроков</strong>
             <span>20 последовательных модулей в каждом направлении</span>
           </div>
           <div class="kpi-cell">
             <strong data-count="5" data-suffix=" профессий">5 профессий</strong>
-            <span>IT, графический дизайн, автодело и HVAC</span>
+            <span>IT, графический дизайн, автоэлектрика, HVAC и автомеханика</span>
           </div>
           <div class="kpi-cell">
-            <strong data-count="60" data-suffix=" игр">60 игр</strong>
-            <span>Уникальная интерактивная мини-игра на каждую тему без повторов</span>
+            <strong data-count="25" data-suffix=" 3D-стендов">25 3D-стендов</strong>
+            <span>Интерактивные WebGL и .glb модели узлов по каждому курсу</span>
           </div>
           <div class="kpi-cell">
-            <strong>День 1 → 12</strong>
+            <strong>День 1 → 20</strong>
             <span>Первый урок сразу, следующие по суточному графику</span>
           </div>
         </div>
@@ -223,30 +223,35 @@
       <div class="holo-3d-card">
         <div class="holo-3d-viewport" id="holo-3d-viewport">
           <canvas id="studio-3d-canvas" aria-label="Интерактивная 3D-сцена для вращения мышью"></canvas>
-          <span class="holo-3d-hud" id="holo-3d-hud">3D ENGINE · DRAG 360°</span>
+          <span class="holo-3d-hud" id="holo-3d-hud">3D ENGINE · АВТОМЕХАНИКА: РОТОР ДВС & ТУРБИНА · DRAG 360°</span>
         </div>
         <div class="holo-3d-panel">
-          <p class="eyebrow">Объёмная графика и 3D-стенды</p>
-          <h2 id="holo-3d-title">Вращайте и разбирайте 3D-модели в реальном времени</h2>
-          <p>Зажмите сцену мышью или пальцем, чтобы рассмотреть узлы со всех сторон. Включите взрыв-схему, чтобы увидеть внутреннюю геометрию.</p>
-          <div class="sim-btn-row" role="group" aria-label="Выбор 3D-модели">
-            <button type="button" class="sim-chip" data-3d-model="engine" aria-pressed="true">3D Ротор ДВС</button>
-            <button type="button" class="sim-chip" data-3d-model="gyro" aria-pressed="false">3D Гиро-контур</button>
-            <button type="button" class="sim-chip" data-3d-model="crystal" aria-pressed="false">3D Кристалл</button>
-            <button type="button" class="sim-chip" data-3d-model="helix" aria-pressed="false">3D Спираль</button>
-            <button type="button" class="sim-chip" data-3d-model="atom" aria-pressed="false">3D Атом ⚡</button>
+          <p class="eyebrow">3D-стенды и визуал по 5 профессиям АМК</p>
+          <h2 id="holo-3d-title">Выберите специальность — исследуйте её 3D-модель в реальном времени</h2>
+          <p id="holo-course-desc">Зажмите сцену мышью или пальцем для обзора 360°. Включите взрыв-схему, чтобы разобрать внутренние узлы выбранной профессии, или скачайте 3D-файл (.glb).</p>
+          <div class="sim-btn-row" role="group" aria-label="Выбор 3D-модели по профессии">
+            <button type="button" class="sim-chip" data-3d-model="engine" data-3d-course="automechanic" aria-pressed="true">🔧 Автомеханика: 3D ДВС &amp; Турбина</button>
+            <button type="button" class="sim-chip" data-3d-model="gyro" data-3d-course="hvac" aria-pressed="false">❄️ Холодильное: 3D Контур Фреона</button>
+            <button type="button" class="sim-chip" data-3d-model="crystal" data-3d-course="graphic_design" aria-pressed="false">🎨 Графдизайн: 3D Студия &amp; CMYK</button>
+            <button type="button" class="sim-chip" data-3d-model="helix" data-3d-course="it" aria-pressed="false">💻 Веб-дизайн: 3D Стек &amp; WebGL</button>
+            <button type="button" class="sim-chip" data-3d-model="atom" data-3d-course="autoelectric" aria-pressed="false">⚡ Автоэлектрика: 3D CAN &amp; Генератор</button>
           </div>
           <div class="sim-btn-row">
             <button type="button" class="sim-chip" id="holo-explode-btn" aria-pressed="false">Взрыв-схема (Explode 3D)</button>
             <button type="button" class="sim-chip" id="holo-spin-btn" aria-pressed="true">Авто-вращение</button>
             <button type="button" class="sim-chip" id="holo-impulse-btn">⚡ Импульс 3D</button>
+            <a class="sim-chip" id="holo-glb-link" href="assets/models/mech-turbo.glb" download="mech-turbo.glb" style="text-decoration:none;">⬇ Скачать 3D (.glb)</a>
           </div>
           <div class="sim-controls">
             <div class="sim-label-row">
-              <label for="holo-speed">Скорость 3D-анимации:</label>
+              <label for="holo-speed">Скорость 3D-анимации и телеметрии:</label>
               <strong id="holo-speed-val">1.0x</strong>
             </div>
             <input class="sim-range" id="holo-speed" type="range" min="0" max="250" value="100">
+          </div>
+          <div class="sim-status" id="holo-course-telemetry" data-state="ok">🔧 Автомеханика: Ротор турбокомпрессора CHRA · Осевой люфт 0.00 мм · Давление наддува 1.35 бар</div>
+          <div class="actions" style="margin-top:0.5rem;">
+            <a class="button primary" id="holo-course-link" href="tasks.html?specialty=automechanic">Открыть 3D-практикум курса →</a>
           </div>
         </div>
       </div>
@@ -255,15 +260,24 @@
     <section class="container section" id="live-playground" aria-labelledby="playground-title">
       <div class="section-head">
         <div class="stack">
-          <p class="eyebrow">Живой интерактив прямо здесь</p>
-          <h2 id="playground-title">Покрутите настройки тренажёров</h2>
+          <p class="eyebrow">Живой интерактив по каждой выбранной профессии</p>
+          <h2 id="playground-title">Какой курс выберете — такой интерактив и откроется</h2>
         </div>
         <a class="button" href="simulator.html">Все 3D-тренажёры →</a>
       </div>
 
+      <div class="sim-btn-row" role="tablist" aria-label="Фильтр тренажёров по курсу" style="margin-bottom:1.1rem;">
+        <button type="button" class="sim-chip" data-pg-filter="all" aria-pressed="true">Все 5 профессий</button>
+        <button type="button" class="sim-chip" data-pg-filter="it" aria-pressed="false">💻 Веб-дизайн (IT)</button>
+        <button type="button" class="sim-chip" data-pg-filter="graphic_design" aria-pressed="false">🎨 Графический дизайн</button>
+        <button type="button" class="sim-chip" data-pg-filter="autoelectric" aria-pressed="false">⚡ Автоэлектрика</button>
+        <button type="button" class="sim-chip" data-pg-filter="hvac" aria-pressed="false">❄️ Холодильное (HVAC)</button>
+        <button type="button" class="sim-chip" data-pg-filter="automechanic" aria-pressed="false">🔧 Автомеханика</button>
+      </div>
+
       <div class="playground-grid">
         <!-- Live Sim 1: Auto Electric Voltage Drop Circuit -->
-        <article class="sim-widget">
+        <article class="sim-widget" data-sim-course="autoelectric">
           <div class="sim-head">
             <span class="sim-pill">Автоэлектрика</span>
             <span class="sim-pill" id="sim-v-badge" style="color:#d1fae5;border-color:rgba(52,211,153,0.4);background:rgba(6,78,59,0.5);">12.4 В · Норма</span>
@@ -299,7 +313,7 @@
         </article>
 
         <!-- Live Sim 2: HVAC Superheat Gauge -->
-        <article class="sim-widget">
+        <article class="sim-widget" data-sim-course="hvac">
           <div class="sim-head">
             <span class="sim-pill">HVAC · R600a</span>
             <span class="sim-pill" id="sim-sh-badge" style="color:#d1fae5;border-color:rgba(52,211,153,0.4);background:rgba(6,78,59,0.5);">ΔT = 6 K</span>
@@ -335,7 +349,7 @@
         </article>
 
         <!-- Live Sim 3: Web Design Interactive Flexbox Sandbox -->
-        <article class="sim-widget">
+        <article class="sim-widget" data-sim-course="it">
           <div class="sim-head">
             <span class="sim-pill">Веб-дизайн</span>
             <span class="sim-pill">Live CSS</span>
@@ -365,7 +379,7 @@
         </article>
 
         <!-- Live Sim 4: Auto Mechanic Cylinder Head Torque & Cross-Pattern Tightening -->
-        <article class="sim-widget" id="sim-torque-widget">
+        <article class="sim-widget" id="sim-torque-widget" data-sim-course="automechanic">
           <div class="sim-head">
             <span class="sim-pill">Автомеханика</span>
             <span class="sim-pill" id="sim-tq-badge" style="color:#d1fae5;border-color:rgba(52,211,153,0.4);background:rgba(6,78,59,0.5);">65 Н·м · Эталон</span>
@@ -392,6 +406,33 @@
             </div>
           </div>
           <div class="sim-status" id="sim-tq-status" data-state="ok">Нажимайте болты от центра крест-накрест (шаг 1 из 6)</div>
+        </article>
+
+        <!-- Live Sim 5: Graphic Design CMYK Prepress & WCAG Contrast Studio -->
+        <article class="sim-widget" id="sim-design-widget" data-sim-course="graphic_design">
+          <div class="sim-head">
+            <span class="sim-pill">Графический дизайн</span>
+            <span class="sim-pill" id="sim-gd-badge" style="color:#d1fae5;border-color:rgba(52,211,153,0.4);background:rgba(6,78,59,0.5);">CMYK 300 dpi · Bleed 3 мм</span>
+          </div>
+          <h3>Цветопроба CMYK, вылеты Bleed и контраст WCAG</h3>
+          <div class="sim-stage">
+            <div id="sim-gd-poster" style="padding:14px;border-radius:10px;background:#0f172a;border:2px dashed #34d399;text-align:center;transition:all 200ms ease;">
+              <div id="sim-gd-title" style="font-weight:800;font-size:0.95rem;color:#f8fafc;letter-spacing:0.04em;">АМК DESIGN FEST · 2026</div>
+              <div id="sim-gd-sub" style="font-size:0.75rem;color:#38bdf8;margin-top:4px;">FOGRA39 · Вылеты 3 мм · Контраст 11.4:1 (AAA)</div>
+            </div>
+          </div>
+          <div class="sim-controls">
+            <div class="sim-label-row">
+              <label for="sim-gd-bleed">Вылеты под обрез (Bleed):</label>
+              <strong id="sim-gd-bleed-val">3 мм (Норма)</strong>
+            </div>
+            <input class="sim-range" id="sim-gd-bleed" type="range" min="0" max="5" value="3">
+            <div class="sim-btn-row" role="group" aria-label="Цветовой профиль макета">
+              <button type="button" class="sim-chip" data-gd-mode="cmyk" aria-pressed="true">CMYK FOGRA39</button>
+              <button type="button" class="sim-chip" data-gd-mode="rgb" aria-pressed="false">RGB Screen</button>
+            </div>
+          </div>
+          <div class="sim-status" id="sim-gd-status" data-state="ok">✓ Макет готов к печати PDF/X-1a: вылеты 3 мм, профиль CMYK</div>
         </article>
       </div>
     </section>
@@ -646,6 +687,9 @@
         if (learnLink) learnLink.href = item.learnUrl;
         if (simLink) simLink.href = item.simUrl;
         mountStudioPreviewGame(courseKey);
+        if (typeof window.syncHolo3dCourse === 'function') {
+          window.syncHolo3dCourse(courseKey, true);
+        }
       }
 
       document.addEventListener('DOMContentLoaded', function () {
@@ -843,6 +887,74 @@
           });
         }
       }
+
+      // Live Sim 5: Graphic Design CMYK Prepress & Bleed 3mm
+      const gdBleed = document.getElementById('sim-gd-bleed');
+      const gdBleedVal = document.getElementById('sim-gd-bleed-val');
+      const gdBadge = document.getElementById('sim-gd-badge');
+      const gdPoster = document.getElementById('sim-gd-poster');
+      const gdSub = document.getElementById('sim-gd-sub');
+      const gdStatus = document.getElementById('sim-gd-status');
+      const gdModeBtns = Array.from(document.querySelectorAll('[data-gd-mode]'));
+      let gdMode = 'cmyk';
+
+      function updateDesignSim() {
+        if (!gdBleed) return;
+        const b = Number(gdBleed.value);
+        const isCmyk = gdMode === 'cmyk';
+        gdBleedVal.textContent = b + ' мм ' + (b >= 3 ? '(Норма)' : '(Риск брака!)');
+        gdBadge.textContent = (isCmyk ? 'CMYK 300 dpi' : 'RGB 72 ppi') + ' · Bleed ' + b + ' мм';
+        if (gdSub) {
+          gdSub.textContent = (isCmyk ? 'FOGRA39 · Вылеты ' : 'sRGB · Вылеты ') + b + ' мм · Контраст 11.4:1 (AAA)';
+          gdSub.style.color = isCmyk ? '#38bdf8' : '#f472b6';
+        }
+        if (b >= 3 && isCmyk) {
+          gdPoster.style.borderColor = '#34d399';
+          gdStatus.dataset.state = 'ok';
+          gdStatus.textContent = '✓ Макет готов к печати PDF/X-1a: вылеты ' + b + ' мм, профиль CMYK FOGRA39';
+        } else if (!isCmyk) {
+          gdPoster.style.borderColor = '#fbbf24';
+          gdStatus.dataset.state = 'warn';
+          gdStatus.textContent = 'Внимание: выбран экранный профиль RGB! Переключите в CMYK для типографии.';
+        } else {
+          gdPoster.style.borderColor = '#f87171';
+          gdStatus.dataset.state = 'crit';
+          gdStatus.textContent = 'Опасно: вылет ' + b + ' мм меньше 3 мм — при обрезке тиража появятся белые поля!';
+        }
+      }
+      if (gdBleed) gdBleed.addEventListener('input', updateDesignSim);
+      gdModeBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          gdMode = btn.getAttribute('data-gd-mode');
+          gdModeBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === btn ? 'true' : 'false'); });
+          updateDesignSim();
+        });
+      });
+
+      // Live Playground Course Filter
+      const pgFilterBtns = Array.from(document.querySelectorAll('[data-pg-filter]'));
+      const pgWidgets = Array.from(document.querySelectorAll('.playground-grid .sim-widget[data-sim-course]'));
+      function applyPlaygroundCourseFilter(filterCourse) {
+        pgFilterBtns.forEach(function (b) {
+          b.setAttribute('aria-pressed', b.getAttribute('data-pg-filter') === filterCourse ? 'true' : 'false');
+        });
+        pgWidgets.forEach(function (w) {
+          const c = w.getAttribute('data-sim-course');
+          if (filterCourse === 'all' || c === filterCourse) {
+            w.style.display = '';
+            w.style.outline = (filterCourse !== 'all' && c === filterCourse) ? '2px solid rgba(56,189,248,0.65)' : '';
+          } else {
+            w.style.display = 'none';
+            w.style.outline = '';
+          }
+        });
+      }
+      pgFilterBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          applyPlaygroundCourseFilter(btn.getAttribute('data-pg-filter'));
+          playFx('click');
+        });
+      });
 
       // Interactive 5-Profession Competency Roadmap (#skill-roadmap)
       const RM_DATA = {
@@ -1420,13 +1532,81 @@
             spawnBurst(e.clientX, e.clientY, 12);
           });
         }
+        const HOLO_COURSE_META = {
+          automechanic: {
+            model: 'engine',
+            glb: 'assets/models/mech-turbo.glb',
+            glbName: 'mech-turbo.glb',
+            telemetry: '🔧 Автомеханика: Ротор турбокомпрессора CHRA · Осевой люфт 0.00 мм · Давление наддува 1.35 бар',
+            href: 'tasks.html?specialty=automechanic'
+          },
+          hvac: {
+            model: 'gyro',
+            glb: 'assets/models/hvac-cycle.glb',
+            glbName: 'hvac-cycle.glb',
+            telemetry: '❄️ Холодильное (HVAC): Контур R600a/R410A · Перегрев Superheat ΔT = 6.2 K · Вакуум 280 микрон',
+            href: 'tasks.html?specialty=hvac'
+          },
+          graphic_design: {
+            model: 'crystal',
+            glb: 'assets/models/design-packaging.glb',
+            glbName: 'design-packaging.glb',
+            telemetry: '🎨 Графический дизайн: 3D-развёртка упаковки Dieline · Профиль FOGRA39 CMYK · Вылеты Bleed 3 мм',
+            href: 'tasks.html?specialty=graphic_design'
+          },
+          it: {
+            model: 'helix',
+            glb: 'assets/models/it-server.glb',
+            glbName: 'it-server.glb',
+            telemetry: '💻 Веб-дизайн (IT): 3D Стек REST API + WebGL · Сетка 8px · 60 FPS GPU-рендеринг',
+            href: 'tasks.html?specialty=it'
+          },
+          autoelectric: {
+            model: 'atom',
+            glb: 'assets/models/autoel-can.glb',
+            glbName: 'autoel-can.glb',
+            telemetry: '⚡ Автоэлектрика: Шина CAN High/Low (60 Ом) · Генератор 14.4 В · Осциллограмма ДПКВ 60-2',
+            href: 'tasks.html?specialty=autoelectric'
+          }
+        };
+
+        const holoTelEl = document.getElementById('holo-course-telemetry');
+        const holoGlbEl = document.getElementById('holo-glb-link');
+        const holoCourseLink = document.getElementById('holo-course-link');
+
+        function activateHoloCourse(courseSlug, fromHero) {
+          const meta = HOLO_COURSE_META[courseSlug] || HOLO_COURSE_META.automechanic;
+          activeModel = meta.model;
+          currentParts = getPartsForModel(activeModel);
+          modelBtns.forEach(function (x) {
+            const match = x.getAttribute('data-3d-course') === courseSlug || x.getAttribute('data-3d-model') === activeModel;
+            x.setAttribute('aria-pressed', match ? 'true' : 'false');
+            if (match && holoHud) {
+              holoHud.textContent = '3D ENGINE · ' + x.textContent.toUpperCase() + ' · DRAG 360°';
+            }
+          });
+          if (holoTelEl) holoTelEl.textContent = meta.telemetry;
+          if (holoGlbEl) {
+            holoGlbEl.href = meta.glb;
+            holoGlbEl.setAttribute('download', meta.glbName);
+          }
+          if (holoCourseLink) holoCourseLink.href = meta.href;
+          if (!fromHero && !holoRaf) renderHolo();
+        }
+        window.syncHolo3dCourse = activateHoloCourse;
+
         modelBtns.forEach(function (b) {
           b.addEventListener('click', function () {
-            activeModel = b.getAttribute('data-3d-model');
-            currentParts = getPartsForModel(activeModel);
-            modelBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+            const cSlug = b.getAttribute('data-3d-course');
+            if (cSlug) {
+              activateHoloCourse(cSlug, false);
+            } else {
+              activeModel = b.getAttribute('data-3d-model');
+              currentParts = getPartsForModel(activeModel);
+              modelBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+              if (holoHud) holoHud.textContent = '3D ENGINE · ' + b.textContent.toUpperCase() + ' · DRAG 360°';
+            }
             playFx('click');
-            if (holoHud) holoHud.textContent = '3D ENGINE · ' + b.textContent.toUpperCase() + ' · DRAG 360°';
           });
         });
         if (explodeBtn) {
