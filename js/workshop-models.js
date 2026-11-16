@@ -144,7 +144,7 @@ window.WorkshopModels = (() => {
       key: 'autoel-hv',
       course: 'autoelectric',
       glb: 'assets/models/autoel-hv.glb',
-      title: 'Высоковольтный инвертор и тяговый электропривод (400V HV)',
+      title: 'Высоковольтная тяговая батарея EV 400V и инвертор IGBT',
       author: 'АМК · Автоэлектрика',
       controlLabel: 'Частота ШИМ инвертора IGBT',
       controlUnit: ' кГц',
@@ -203,7 +203,7 @@ window.WorkshopModels = (() => {
       key: 'hvac-cycle',
       course: 'hvac',
       glb: 'assets/models/hvac-cycle.glb',
-      title: 'Промышленный холодильный шкаф-витрина',
+      title: 'Термодинамический стенд холодильного контура',
       author: 'АМК · Холодильное (HVAC)',
       controlLabel: 'Производительность компрессора',
       controlUnit: '%',
@@ -242,7 +242,7 @@ window.WorkshopModels = (() => {
       key: 'hvac-inverter',
       course: 'hvac',
       glb: 'assets/models/hvac-inverter.glb',
-      title: 'Инверторный BLDC-компрессор и плата IPM',
+      title: 'Наружный блок инверторной сплит-системы (BLDC + IPM)',
       author: 'АМК · Холодильное (HVAC)',
       controlLabel: 'Частота вращения инвертора',
       controlUnit: ' Гц',
@@ -378,7 +378,7 @@ window.WorkshopModels = (() => {
       key: 'design-brand',
       course: 'graphic_design',
       glb: 'assets/models/design-brand.glb',
-      title: 'Промышленный объект айдентики: металл, стекло и гравировка',
+      title: 'Брендбук, визитки и 3D-монограмма айдентики',
       author: 'АМК · Графический дизайн',
       controlLabel: 'Охранное поле знака (X)',
       controlUnit: '%',
@@ -601,21 +601,38 @@ window.WorkshopModels = (() => {
         { label: 'Wireframe', angle: -0.65, pitch: 2.35, zoom: 4.8, explode: 0, wire: true, clay: false },
       ];
 
+      const courseNamesMap = {
+        it: 'Веб-дизайн (IT)',
+        graphic_design: 'Графический дизайн',
+        autoelectric: 'Автоэлектрика и диагностика',
+        hvac: 'Холодильное оборудование (HVAC)',
+        automechanic: 'Автомеханика и ремонт ДВС',
+      };
+      const courseLabel = courseNamesMap[courseSlug] || (def.author ? def.author.replace('АМК · ', '') : 'Спецкурс АМК');
+
       canvas.innerHTML = `
         <section class="starter-panel workshop-model-panel" style="background:#0f172a;border:1px solid rgba(56,189,248,0.22);border-radius:18px;padding:18px;color:#f8fafc;">
           ${courseSwitcherHtml}
           <div class="starter-heading" style="margin-bottom:12px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-              <span style="font-size:11px;font-weight:800;color:#38bdf8;letter-spacing:0.06em;">${def.author || 'АМК · 3D-СТЕНД'} · GLB 2.0</span>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px;">
+              <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+                <span style="padding:4px 10px;border-radius:8px;background:rgba(56,189,248,0.16);border:1px solid rgba(56,189,248,0.45);font-size:11.5px;font-weight:800;color:#38bdf8;letter-spacing:0.04em;text-transform:uppercase;">КУРС: ${courseLabel}</span>
+                <span style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:0.04em;">3D-МОДЕЛЬ · GLB 2.0</span>
+              </div>
               <span id="wm-loading-badge" style="padding:3px 10px;border-radius:999px;background:rgba(56,189,248,0.14);border:1px solid rgba(56,189,248,0.35);color:#7dd3fc;font-size:11px;font-weight:700;">Загрузка 3D (.glb)…</span>
             </div>
-            <h2 style="margin:4px 0 4px;font-size:1.25rem;color:#ffffff;">${title}</h2>
+            <h2 style="margin:2px 0 4px;font-size:1.3rem;color:#ffffff;"><span style="color:#7dd3fc;font-weight:700;">3D-модель:</span> ${title}</h2>
             <p style="margin:0;font-size:12.5px;color:#94a3b8;">Вращайте 3D-модель мышью, переключайте ракурсы и режимы рендера или выберите узел справа.</p>
           </div>
 
           <div class="starter-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;align-items:start;">
             <div>
-              <div class="workshop-visual" aria-label="${title}" style="width:100%;height:340px;border-radius:14px;background:radial-gradient(circle at 50% 35%, #1e293b 0%, #090d16 80%);border:1px solid rgba(255,255,255,0.1);cursor:grab;touch-action:none;" hidden></div>
+              <div style="position:relative;">
+                <div style="position:absolute;top:10px;left:10px;z-index:2;pointer-events:none;padding:4px 9px;border-radius:7px;background:rgba(15,23,42,0.82);border:1px solid rgba(56,189,248,0.3);font-size:11px;font-weight:700;color:#e2e8f0;backdrop-filter:blur(4px);">
+                  <span style="color:#38bdf8;">${courseLabel}</span> · ${title.split(':')[0]}
+                </div>
+                <div class="workshop-visual" aria-label="${title}" style="width:100%;height:350px;border-radius:14px;background:radial-gradient(circle at 50% 35%, #1e293b 0%, #090d16 80%);border:1px solid rgba(255,255,255,0.1);cursor:grab;touch-action:none;" hidden></div>
+              </div>
 
               <div role="group" aria-label="Ракурсы и режимы 3D" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:8px;">
                 ${thumbs.map((th, idx) => `
