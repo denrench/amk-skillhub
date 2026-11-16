@@ -8,6 +8,8 @@
   <title>AMK SkillHub · Цифровая платформа АМК</title>
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg">
   <link rel="stylesheet" href="css/academy.css">
+  <script src="js/vendor/three.min.js" defer></script>
+  <script src="js/workshop-models.js" defer></script>
   <script src="js/topic-games-60.js" defer></script>
   <script src="js/topic-game-engine.js" defer></script>
 </head>
@@ -220,6 +222,7 @@
     </section>
 
     <section class="container section" id="holo-3d-lab" aria-labelledby="holo-3d-title">
+      <div id="index-3d-glb-studio" style="margin-bottom:1.5rem;"></div>
       <div class="holo-3d-card">
         <div class="holo-3d-viewport" id="holo-3d-viewport">
           <canvas id="studio-3d-canvas" aria-label="Интерактивная 3D-сцена для вращения мышью"></canvas>
@@ -1573,6 +1576,15 @@
         const holoTelEl = document.getElementById('holo-course-telemetry');
         const holoGlbEl = document.getElementById('holo-glb-link');
         const holoCourseLink = document.getElementById('holo-course-link');
+        const indexGlbStudioEl = document.getElementById('index-3d-glb-studio');
+        let disposeIndexGlbStudio = null;
+
+        function mountIndexGlbStudio(courseSlug) {
+          if (!indexGlbStudioEl || !window.WorkshopModels) return;
+          disposeIndexGlbStudio?.();
+          const def = window.WorkshopModels.forCourse(courseSlug || 'automechanic', 0);
+          disposeIndexGlbStudio = window.WorkshopModels.show(indexGlbStudioEl, def, { courseSlug: courseSlug || 'automechanic', allowModelSwitch: true });
+        }
 
         function activateHoloCourse(courseSlug, fromHero) {
           const meta = HOLO_COURSE_META[courseSlug] || HOLO_COURSE_META.automechanic;
@@ -1591,9 +1603,13 @@
             holoGlbEl.setAttribute('download', meta.glbName);
           }
           if (holoCourseLink) holoCourseLink.href = meta.href;
+          mountIndexGlbStudio(courseSlug);
           if (!fromHero && !holoRaf) renderHolo();
         }
         window.syncHolo3dCourse = activateHoloCourse;
+        document.addEventListener('DOMContentLoaded', function () {
+          mountIndexGlbStudio('automechanic');
+        });
 
         modelBtns.forEach(function (b) {
           b.addEventListener('click', function () {

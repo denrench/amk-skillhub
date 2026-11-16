@@ -24,7 +24,7 @@ window.EduSpace3D = (function () {
     delete activeScenes[containerId];
   }
 
-  function enhanceWorkbench(containerId, container, scene, camera, group, onTick) {
+  function enhanceWorkbench(containerId, container, scene, camera, group, onTick, glbUrl) {
     cleanupScene(containerId);
     while (container.firstChild) {
       container.removeChild(container.firstChild);
@@ -35,10 +35,50 @@ window.EduSpace3D = (function () {
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(w, h);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    if (renderer.outputEncoding !== undefined && THREE.sRGBEncoding !== undefined) {
+      renderer.outputEncoding = THREE.sRGBEncoding;
+    }
+    if (renderer.toneMapping !== undefined && THREE.ACESFilmicToneMapping !== undefined) {
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.25;
+    }
     container.style.position = container.style.position || 'relative';
     container.style.cursor = 'grab';
     container.style.touchAction = 'none';
     container.appendChild(renderer.domElement);
+
+    let mixer = null;
+    if (glbUrl && window.THREE && THREE.GLTFLoader) {
+      const loader = new THREE.GLTFLoader();
+      loader.load(
+        glbUrl,
+        (gltf) => {
+          const modelScene = gltf.scene || (gltf.scenes && gltf.scenes[0]);
+          if (!modelScene) return;
+          const box = new THREE.Box3().setFromObject(modelScene);
+          const size = new THREE.Vector3();
+          box.getSize(size);
+          const maxDim = Math.max(size.x, size.y, size.z, 0.001);
+          modelScene.scale.setScalar(3.2 / maxDim);
+          const sBox = new THREE.Box3().setFromObject(modelScene);
+          const sCenter = new THREE.Vector3();
+          sBox.getCenter(sCenter);
+          modelScene.position.set(-sCenter.x, -sCenter.y, -sCenter.z);
+          while (group.children.length > 0) {
+            group.remove(group.children[0]);
+          }
+          group.add(modelScene);
+          if (gltf.animations && gltf.animations.length > 0 && THREE.AnimationMixer) {
+            mixer = new THREE.AnimationMixer(modelScene);
+            gltf.animations.forEach((clip) => {
+              try { mixer.clipAction(clip).play(); } catch (e) {}
+            });
+          }
+        },
+        undefined,
+        () => {}
+      );
+    }
 
     // Subtle holographic floor grid
     const grid = new THREE.GridHelper(9, 18, 0x38bdf8, 0x1e293b);
@@ -120,6 +160,9 @@ window.EduSpace3D = (function () {
       camera.position.set(0, Math.sin(rotX) * zoom * 0.45 + 1.2, zoom);
       camera.lookAt(0, 0, 0);
 
+      if (mixer) {
+        try { mixer.update(0.016); } catch (e) {}
+      }
       if (onTick) onTick(t);
       renderer.render(scene, camera);
     }
@@ -256,7 +299,7 @@ window.EduSpace3D = (function () {
         const on = Math.sin(t * 5 + item.phase) > 0;
         item.mesh.material.color.setHex(on ? 0x10b981 : 0x38bdf8);
       });
-    });
+    }, 'assets/models/it-webgl.glb');
   }
 
   // 2. DESIGN: 3D Color Space Spectrum & Orbiting Rings
@@ -290,7 +333,7 @@ window.EduSpace3D = (function () {
       knot.rotation.x = t * 0.6;
       knot.rotation.z = t * 0.4;
       halo.rotation.y = -t * 0.9;
-    });
+    }, 'assets/models/design-color.glb');
   }
 
   // 3. AUTOELECTRIC: 3D CAN-Bus Harness with Live Signal Pulses
@@ -330,7 +373,7 @@ window.EduSpace3D = (function () {
     return enhanceWorkbench(containerId, container, scene, camera, group, (t) => {
       pulseH.position.set(Math.sin(t * 2.6) * 1.9, 0.22, 0);
       pulseL.position.set(-Math.sin(t * 2.6) * 1.9, -0.22, 0);
-    });
+    }, 'assets/models/autoel-charging.glb');
   }
 
   // 4. HVAC: 3D Thermodynamic Carnot Loop
@@ -370,7 +413,7 @@ window.EduSpace3D = (function () {
 
     return enhanceWorkbench(containerId, container, scene, camera, group, (t) => {
       group.rotation.z = t * 0.45;
-    });
+    }, 'assets/models/hvac-cycle.glb');
   }
 
   // 5. AUTOMECHANIC: 3D 4-Stroke Engine Cylinder & Piston
@@ -409,7 +452,7 @@ window.EduSpace3D = (function () {
       const y = Math.sin(t * 3.4) * 0.95;
       piston.position.y = y;
       sparkMat.color.setHex(y > 0.88 ? 0xfacc15 : 0x38bdf8);
-    });
+    }, 'assets/models/mech-turbo.glb');
   }
 
   return {

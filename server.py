@@ -3829,7 +3829,7 @@ def gradebook_page():
 ALLOWED_STATIC_EXTENSIONS = {
     '.html', '.css', '.js', '.svg', '.png', '.jpg', '.jpeg',
     '.webp', '.mp4', '.webm', '.vtt', '.ico', '.woff', '.woff2', '.ttf',
-    '.json', '.map'
+    '.json', '.map', '.glb', '.gltf', '.bin'
 }
 BLOCKED_STATIC_EXTENSIONS = {
     '.db', '.py', '.pyc', '.git', '.env', '.yml', '.yaml', '.sh',
