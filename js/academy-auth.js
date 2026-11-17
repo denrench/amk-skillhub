@@ -2,25 +2,7 @@
   const params = new URLSearchParams(location.search);
   const modes = ['login', 'register', 'reset'];
   const initial = modes.includes(params.get('mode')) ? params.get('mode') : 'login';
-  if (location.hostname.endsWith('.github.io')) {
-    const link = document.getElementById('account-server-link');
-    const status = document.getElementById('account-hosted-status');
-    const query = new URLSearchParams({ mode: initial });
-    if (params.get('role') === 'teacher') query.set('role', 'teacher');
-    link.href = 'https://amk-skillhub.onrender.com/auth.html?' + query;
-    document.getElementById('account-hosted').hidden = false;
-    fetch('https://amk-skillhub.onrender.com/api/auth/readiness', { signal: AbortSignal.timeout(10000) })
-      .then(response => response.ok ? response.json() : null)
-      .then(data => {
-        if (initial === 'login' ? data?.login : data?.registration) {
-          status.textContent = 'Откройте сервер AMK SkillHub, чтобы продолжить.';
-          link.hidden = false;
-        } else {
-          status.textContent = 'Сервер аккаунтов пока недоступен. Учебник можно открыть без аккаунта.';
-        }
-      }).catch(() => { status.textContent = 'Сервер аккаунтов пока недоступен. Учебник можно открыть без аккаунта.'; });
-    return;
-  }
+  const isStaticHost = location.hostname.endsWith('.github.io');
   const forms = document.getElementById('account-forms');
   const status = document.getElementById('account-status');
   const register = document.getElementById('account-register');
@@ -49,8 +31,47 @@
     register.elements.teacher_code.required = teacher;
     register.elements.teacher_code.disabled = !teacher;
   }
+  function localAuthFallback(path, payload) {
+    const STORE_KEY = 'amk.local_accounts.v1';
+    let db = {};
+    try { db = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { db = {}; }
+    const email = String(payload.email || '').trim().toLowerCase();
+    if (path === 'send_code') {
+      return { success: true, message: 'Локальный режим: используйте код 123456 для подтверждения.' };
+    }
+    if (path === 'register') {
+      const user = {
+        id: 'local-' + Date.now(),
+        email,
+        first_name: payload.first_name || 'Студент',
+        last_name: payload.last_name || '',
+        middle_name: payload.middle_name || '',
+        role: payload.role === 'teacher' ? 'teacher' : 'student',
+        specialty_slug: payload.specialty_slug || 'it',
+        group_name: payload.group_name || 'АМК-1',
+        password: payload.password || '',
+      };
+      db[email] = user;
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(db)); } catch {}
+      return { success: true, user };
+    }
+    if (path === 'login') {
+      const user = db[email];
+      if (!user || (payload.password && user.password && user.password !== payload.password)) {
+        return { success: false, message: 'Аккаунт не найден локально. Перейдите на вкладку «Регистрация».' };
+      }
+      return { success: true, user };
+    }
+    return { success: false, message: 'Сброс пароля недоступен без сервера.' };
+  }
   async function api(path, payload, control, done) {
     if (pending) return;
+    if (isStaticHost) {
+      const res = localAuthFallback(path, payload);
+      if (!res.success) { tell(res.message, true); return; }
+      done(res);
+      return;
+    }
     pending = true;
     control.disabled = true;
     tell('Отправляем запрос…');

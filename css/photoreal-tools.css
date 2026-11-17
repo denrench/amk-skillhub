@@ -205,14 +205,16 @@ body::after {
   font-size: 0.78rem;
 }
 
-.button.primary {
+.button.primary,
+.button.dark,
+#account-forms [data-mode][aria-pressed="true"] {
   background: var(--accent) !important;
   color: var(--accent-ink) !important;
   border: 1px solid var(--accent) !important;
   box-shadow: var(--glow) !important;
 }
 
-.button:not(.primary) {
+.button:not(.primary):not(.dark) {
   background: var(--surface-solid) !important;
   color: var(--ink) !important;
   border: 1px solid var(--line) !important;

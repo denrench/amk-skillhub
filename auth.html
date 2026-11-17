@@ -17,18 +17,18 @@
 <body>
   <header class="topbar"><div class="container">
     <a href="index.html" class="brand"><img class="brand-logo" src="assets/eduspace-logo.svg" alt="" width="30" height="30"> AMK SkillHub</a>
-    <nav aria-label="Основное меню"><a href="learn.html">Учебник</a><a href="tasks.html">Практикум</a><a href="features.html">Возможности</a><a href="auth.html" aria-current="page">Аккаунт</a></nav>
+    <nav aria-label="Основное меню"><a href="learn.html">Учебник</a><a href="tasks.html">Практикум</a><a href="features.html">Возможности</a><a href="auth.html" aria-current="page">Вход</a><a href="auth.html?mode=register">Регистрация</a></nav>
   </div></header>
   <main class="container auth-layout">
     <section class="auth-intro stack"><p class="eyebrow">Личный кабинет</p><h1>Ваше обучение в одном месте</h1>
-      <p>Войдите, чтобы продолжить работу, отправлять задания и видеть свой прогресс.</p>
+      <p>Войдите или зарегистрируйтесь, чтобы сохранять прогресс, отправлять задания и видеть оценки.</p>
       <p>Учебник можно читать без аккаунта.</p><div><a href="learn.html" class="button">Открыть учебник</a></div>
     </section>
-    <section class="card" id="account-forms" hidden>
+    <section class="card" id="account-forms">
       <nav class="actions" aria-label="Действия с аккаунтом">
-        <button class="button" type="button" data-mode="login">Войти</button>
-        <button class="button" type="button" data-mode="register">Создать аккаунт</button>
-        <button class="button" type="button" data-mode="reset">Сбросить пароль</button>
+        <button class="button" type="button" data-mode="login" aria-pressed="true">Войти</button>
+        <button class="button" type="button" data-mode="register" aria-pressed="false">Регистрация</button>
+        <button class="button" type="button" data-mode="reset" aria-pressed="false">Сбросить пароль</button>
       </nav>
       <p id="account-status" class="notice" role="status" aria-live="polite"></p>
       <form class="fields" id="account-login">
