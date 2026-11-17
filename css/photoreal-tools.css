@@ -141,14 +141,17 @@ body::after {
 
 .landing-hero {
   background: var(--bg) !important;
-  padding-top: 2.25rem !important;
-  padding-bottom: 1.5rem !important;
+  padding-top: 1.4rem !important;
+  padding-bottom: 0.5rem !important;
+  border-bottom: none !important;
 }
 .landing-hero-split {
   align-items: flex-start !important;
 }
 .landing-hero h1 {
-  line-height: 1.16 !important;
+  line-height: 1.12 !important;
+  max-width: none !important;
+  font-size: clamp(2.1rem, 4vw, 3.2rem) !important;
 }
 .landing-hero .hero-highlight {
   padding: 0.04em 0.24em !important;
