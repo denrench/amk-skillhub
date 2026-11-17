@@ -4,18 +4,33 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="AMK SkillHub — цифровая образовательная платформа нового поколения. 60 уникальных интерактивных игр по темам, живые тренажёры и ежедневный рост по 5 специальностям АМК.">
-  <meta name="theme-color" content="#f4f7fb">
+  <meta name="theme-color" content="#F2EFE9">
   <title>AMK SkillHub · Цифровая платформа АМК</title>
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg">
+  <script src="js/theme.js"></script>
   <link rel="stylesheet" href="css/academy.css">
   <link rel="stylesheet" href="css/starter-lesson.css">
+  <link rel="stylesheet" href="css/photoreal-tools.css">
   <script src="js/vendor/three.min.js" defer></script>
+  <script src="js/vendor/OrbitControls.js" defer></script>
+  <script src="js/vendor/RGBELoader.js" defer></script>
+  <script src="js/vendor/GLTFLoader.js" defer></script>
+  <script src="js/vendor/CopyShader.js" defer></script>
+  <script src="js/vendor/LuminosityHighPassShader.js" defer></script>
+  <script src="js/vendor/HorizontalBlurShader.js" defer></script>
+  <script src="js/vendor/VerticalBlurShader.js" defer></script>
+  <script src="js/vendor/EffectComposer.js" defer></script>
+  <script src="js/vendor/RenderPass.js" defer></script>
+  <script src="js/vendor/ShaderPass.js" defer></script>
+  <script src="js/vendor/UnrealBloomPass.js" defer></script>
+  <script src="js/photoreal-showcase.js" defer></script>
+  <script src="js/knowledge-base.js" defer></script>
+  <script src="js/student-tools.js" defer></script>
   <script src="js/workshop-models.js" defer></script>
   <script src="js/topic-games-60.js" defer></script>
   <script src="js/topic-game-engine.js" defer></script>
 </head>
 <body>
-  <canvas id="global-3d-canvas" class="global-3d-canvas" aria-hidden="true"></canvas>
   <a class="skip-link" href="#main-content">Перейти к содержанию</a>
 
   <header class="topbar">
@@ -39,23 +54,12 @@
       <div class="container landing-hero-inner">
         <div class="landing-hero-split">
           <div class="landing-hero-copy">
-            <div class="hero-pill">
-              <span class="hero-pill-dot" aria-hidden="true"></span>
-              <span>EDU SPACE · АМК · 100 интерактивных уроков · 25 3D-стендов</span>
-            </div>
             <h1>Знания, которые <span class="hero-highlight">можно применить</span></h1>
-            <p>Интерактивная мастерская нового поколения: 100 глубоких уроков, 25 профильных 3D-моделей (.glb + WebGL), 100 уникальных мини-игр и живые тренажёры под каждую выбранную профессию.</p>
+            <p>100 интерактивных уроков, фотореалистичные 3D-сканы реальных узлов и 25 учебных стендов по 5 специальностям АМК.</p>
             <div class="landing-cta-row">
               <a class="button primary" href="learn.html">Открыть учебник</a>
               <a class="button" href="tasks.html">Перейти в практикум</a>
               <a class="button" href="auth.html?mode=register">Создать аккаунт</a>
-            </div>
-            <div class="mood-bar" role="group" aria-label="Атмосфера оформления">
-              <span>Палитра:</span>
-              <button type="button" class="mood-btn" data-mood="prism" aria-pressed="true">Prism</button>
-              <button type="button" class="mood-btn" data-mood="cyber" aria-pressed="false">Cyber Blue</button>
-              <button type="button" class="mood-btn" data-mood="emerald" aria-pressed="false">Emerald Lab</button>
-              <button type="button" class="fx-btn" id="sfx-toggle-btn" aria-pressed="false">Звук UI</button>
             </div>
           </div>
 
@@ -100,27 +104,6 @@
           </div>
         </div>
 
-        <div class="marquee-wrap" aria-label="Ключевые инструменты обучения">
-          <div class="marquee-track">
-            <span class="marquee-pill" data-fact="⚡ Замеряй падение напряжения под нагрузкой, а не только холостой вольтаж!">⚡ Мультиметр 12.6 В</span>
-            <span class="marquee-pill" data-fact="❄️ Оптимальный перегрев испарителя (Superheat) — от 4 до 8 K.">❄️ Манометр Superheat ΔT</span>
-            <span class="marquee-pill" data-fact="🎨 Сетка кратная 8px делает макеты аккуратными на любых экранах.">🎨 Figma Auto Layout</span>
-            <span class="marquee-pill" data-fact="🖨️ Вылеты (Bleed) по 3–5 мм спасают тираж при обрезке в типографии.">🖨️ CMYK / PDF/X-1a Prepress</span>
-            <span class="marquee-pill" data-fact="🔧 3D-разбор узлов помогает понять посадку деталей до работы в боксе.">🔧 3D-стенды Three.js</span>
-            <span class="marquee-pill" data-fact="🚗 Замороженный кадр (Freeze Frame) хранит точные обороты и нагрузку в момент сбоя.">🚗 OBD-II Осциллограф</span>
-            <span class="marquee-pill" data-fact="⚙️ Ошибка всего на 1 зуб ГРМ уже сдвигает фазу газораспределения.">⚙️ Фазы ГРМ &amp; Микрометр</span>
-            <span class="marquee-pill" data-fact="💻 Flexbox + Grid позволяют верстать адаптивные интерфейсы без костылей.">💻 HTML5 + CSS Flexbox</span>
-            <span class="marquee-pill" data-fact="⚡ Замеряй падение напряжения под нагрузкой, а не только холостой вольтаж!">⚡ Мультиметр 12.6 В</span>
-            <span class="marquee-pill" data-fact="❄️ Оптимальный перегрев испарителя (Superheat) — от 4 до 8 K.">❄️ Манометр Superheat ΔT</span>
-            <span class="marquee-pill" data-fact="🎨 Сетка кратная 8px делает макеты аккуратными на любых экранах.">🎨 Figma Auto Layout</span>
-            <span class="marquee-pill" data-fact="🖨️ Вылеты (Bleed) по 3–5 мм спасают тираж при обрезке в типографии.">🖨️ CMYK / PDF/X-1a Prepress</span>
-            <span class="marquee-pill" data-fact="🔧 3D-разбор узлов помогает понять посадку деталей до работы в боксе.">🔧 3D-стенды Three.js</span>
-            <span class="marquee-pill" data-fact="🚗 Замороженный кадр (Freeze Frame) хранит точные обороты и нагрузку в момент сбоя.">🚗 OBD-II Осциллограф</span>
-            <span class="marquee-pill" data-fact="⚙️ Ошибка всего на 1 зуб ГРМ уже сдвигает фазу газораспределения.">⚙️ Фазы ГРМ &amp; Микрометр</span>
-            <span class="marquee-pill" data-fact="💻 Flexbox + Grid позволяют верстать адаптивные интерфейсы без костылей.">💻 HTML5 + CSS Flexbox</span>
-          </div>
-        </div>
-
         <div class="kpi-strip" aria-label="Ключевые показатели платформы">
           <div class="kpi-cell">
             <strong data-count="100" data-suffix=" уроков">100 уроков</strong>
@@ -142,6 +125,95 @@
       </div>
     </section>
 
+    <section class="container section" id="photoreal-3d-showcase" aria-labelledby="photoreal-title">
+      <div class="section-head">
+        <div class="stack">
+          <p class="eyebrow">Фотореалистичный 3D-шоукейс · PBR · HDRI · Contact Shadows</p>
+          <h2 id="photoreal-title" class="pr-section-title">Реальные 3D-сканы по направлениям АМК</h2>
+          <p class="muted" style="max-width:62ch;">Крутите объекты с физическими материалами, переключайте студийный свет и режимы <strong>Photo-Real / Clay / Wireframe</strong> прямо на холсте.</p>
+        </div>
+      </div>
+      <div id="photoreal-showcase-mount"></div>
+    </section>
+
+    <section class="container section" id="student-tools" aria-labelledby="tools-title">
+      <div class="section-head">
+        <div class="stack">
+          <p class="eyebrow">Рабочие инструменты студента</p>
+          <h2 id="tools-title" class="tools-heading">Поиск по базе знаний, калькулятор GPA и трекер задач</h2>
+          <p class="muted" style="max-width:62ch;">Мгновенная фильтрация шпаргалок, расчёт среднего балла за семестр и планировщик курсовых проектов с сохранением в браузере.</p>
+        </div>
+      </div>
+
+      <div class="tools-grid">
+        <article class="tool-card" data-tool="search">
+          <div class="tool-card-head">
+            <h3>1. Живой поиск по базе знаний</h3>
+            <span class="tool-count" data-kb-count>Найдено: 40 из 40</span>
+          </div>
+          <input class="tool-input" type="search" data-kb-input placeholder="Например: superheat, din 72552, bleed, flexbox, компрессия…" aria-label="Поиск по базе знаний">
+          <div class="tool-chips" data-kb-chips aria-label="Фильтр по курсу"></div>
+          <div class="tool-chips" data-kb-types aria-label="Фильтр по типу материала"></div>
+          <div class="kb-list" data-kb-list></div>
+        </article>
+
+        <div class="tools-row-2">
+          <article class="tool-card" data-tool="gpa">
+            <div class="tool-card-head">
+              <h3>2. Калькулятор GPA</h3>
+              <span class="tool-count">Шкала 5.0 и 4.0 · localStorage</span>
+            </div>
+            <div class="gpa-summary">
+              <div class="gpa-stat"><span>Средний балл (5.0)</span><strong data-gpa-5>0.00</strong></div>
+              <div class="gpa-stat"><span>GPA (4.0)</span><strong data-gpa-4>0.00</strong></div>
+              <div class="gpa-stat"><span>Кредитов</span><strong data-gpa-credits>0</strong></div>
+            </div>
+            <div class="gpa-meter-track"><div class="gpa-meter-fill" data-gpa-meter style="width:0%;"></div></div>
+            <p class="gpa-verdict" data-gpa-verdict></p>
+            <div class="gpa-rows" data-gpa-rows></div>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn tool-btn--primary" data-gpa-add>+ Добавить модуль</button>
+              <button type="button" class="tool-btn" data-gpa-reset>Очистить</button>
+            </div>
+          </article>
+
+          <article class="tool-card" data-tool="tasks">
+            <div class="tool-card-head">
+              <h3>3. Трекер задач · Task Hub</h3>
+              <span class="tool-count" data-task-pct>0% · 0 из 0</span>
+            </div>
+            <div class="task-proj-bar">
+              <select class="tool-input" data-task-project aria-label="Выбор проекта"></select>
+              <button type="button" class="tool-btn" data-task-newproj>+ Проект</button>
+            </div>
+            <div class="task-bar-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="task-bar-fill" data-task-bar style="width:0%;"></div>
+            </div>
+            <form class="task-form" data-task-form>
+              <input class="tool-input" type="text" data-task-title placeholder="Новая задача (например: Оформить чертёж)" aria-label="Название задачи">
+              <input class="tool-input" type="date" data-task-due aria-label="Срок">
+              <select class="tool-input" data-task-prio aria-label="Приоритет">
+                <option value="mid">Средний</option>
+                <option value="high">Высокий</option>
+                <option value="low">Низкий</option>
+              </select>
+              <button type="submit" class="tool-btn tool-btn--primary">Добавить</button>
+            </form>
+            <div class="tool-chips" data-task-filters>
+              <button type="button" class="tool-chip" data-task-filter="all" aria-pressed="true">Все</button>
+              <button type="button" class="tool-chip" data-task-filter="open" aria-pressed="false">Активные</button>
+              <button type="button" class="tool-chip" data-task-filter="done" aria-pressed="false">Готовые</button>
+            </div>
+            <ul class="task-list" data-task-list></ul>
+            <div class="tool-actions">
+              <button type="button" class="tool-btn" data-task-export>Экспорт JSON</button>
+              <label class="tool-btn" style="cursor:pointer;">Импорт JSON<input type="file" accept="application/json" data-task-import hidden></label>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="container section" aria-labelledby="pipeline-title">
       <div class="section-head">
         <div class="stack">
@@ -155,22 +227,22 @@
         <article class="pipeline-card">
           <span class="pipeline-step">01</span>
           <h3>Старт в первый день</h3>
-          <p class="muted">Сразу после регистрации открывается Урок №1 выбранной специальности, чтобы вы приступили к практике без ожидания.</p>
+          <p class="muted">Урок №1 выбранной специальности открывается сразу после регистрации.</p>
         </article>
         <article class="pipeline-card">
           <span class="pipeline-step">02</span>
           <h3>Суть темы в игре</h3>
-          <p class="muted">Уникальная 3-раундовая мини-игра для каждого урока: реальный кейс, поиск дефекта, замер прибором или сборка узла.</p>
+          <p class="muted">3-раундовый кейс: поиск дефекта, замер прибором или сборка узла.</p>
         </article>
         <article class="pipeline-card">
           <span class="pipeline-step">03</span>
           <h3>Живые тренажёры</h3>
-          <p class="muted">Мультиметр, манометр перегрева, песочница Flexbox, CMYK-препресс и порядок сборки прямо в браузере.</p>
+          <p class="muted">Мультиметр, манометр Superheat, Flexbox и порядок сборки в браузере.</p>
         </article>
         <article class="pipeline-card">
           <span class="pipeline-step">04</span>
           <h3>Новый модуль ежедневно</h3>
-          <p class="muted">Второй урок открывается на следующий день, третий — через 2 дня и так далее до финального сертификата.</p>
+          <p class="muted">Последовательное открытие модулей по графику до сертификата.</p>
         </article>
       </div>
     </section>
@@ -474,51 +546,56 @@
       </div>
     </section>
 
-    <section class="container section" id="arcade-game" aria-labelledby="arcade-title" data-reveal>
-      <div class="arcade-card">
-        <div class="stack" style="gap: 0.75rem;">
-          <p class="eyebrow" style="color:#7dd3fc;">Мини-игра · Рефлексы мастера</p>
-          <h2 id="arcade-title" style="color:#ffffff;">SkillHub Аркада: поймай правильный сигнал</h2>
-          <p style="color:#cbd5e1;">Ловите эталонные показания (12.6 В, ΔT 6K, Grid 8px, 🌟 Бонус x2) за 15 секунд, набивайте комбо-множитель и избегайте короткого замыкания!</p>
-          <div class="arcade-hud">
-            <div class="arcade-stat"><span>Очки XP</span><strong id="arc-score">0</strong></div>
-            <div class="arcade-stat"><span>Комбо</span><strong id="arc-combo" class="is-hot">x1</strong></div>
-            <div class="arcade-stat"><span>Время</span><strong id="arc-time">15s</strong></div>
-            <div class="arcade-stat"><span>Рекорд</span><strong id="arc-best">0</strong></div>
+    <section class="container section" aria-label="Дополнительные тренажёры">
+      <details class="compact-extra">
+        <summary>Размяться: мини-аркада рефлексов и экспресс-квест по диагностике</summary>
+        <div id="arcade-game" aria-labelledby="arcade-title" style="margin-bottom:16px;">
+          <div class="arcade-card">
+            <div class="stack" style="gap: 0.75rem;">
+              <p class="eyebrow" style="color:#7dd3fc;">Мини-игра · Рефлексы мастера</p>
+              <h2 id="arcade-title" style="color:#ffffff;">SkillHub Аркада: поймай правильный сигнал</h2>
+              <p style="color:#cbd5e1;">Ловите эталонные показания (12.6 В, ΔT 6K, Grid 8px, 🌟 Бонус x2) за 15 секунд, набивайте комбо и избегайте КЗ.</p>
+              <div class="arcade-hud">
+                <div class="arcade-stat"><span>Очки XP</span><strong id="arc-score">0</strong></div>
+                <div class="arcade-stat"><span>Комбо</span><strong id="arc-combo" class="is-hot">x1</strong></div>
+                <div class="arcade-stat"><span>Время</span><strong id="arc-time">15s</strong></div>
+                <div class="arcade-stat"><span>Рекорд</span><strong id="arc-best">0</strong></div>
+              </div>
+              <div class="sim-btn-row">
+                <button type="button" class="button primary" id="arc-start-btn">▶ Старт (15 сек)</button>
+                <button type="button" class="sim-chip" id="arc-turbo-btn" aria-pressed="false">🔥 Турбо-режим</button>
+              </div>
+              <div class="sim-status" id="arc-status">Нажмите «Старт» — проверьте скорость реакции!</div>
+            </div>
+            <div class="arcade-grid" id="arc-grid" role="group" aria-label="Игровое поле 3 на 3">
+              <button type="button" class="arcade-pad" data-pad="0">·</button>
+              <button type="button" class="arcade-pad" data-pad="1">·</button>
+              <button type="button" class="arcade-pad" data-pad="2">·</button>
+              <button type="button" class="arcade-pad" data-pad="3">·</button>
+              <button type="button" class="arcade-pad" data-pad="4">·</button>
+              <button type="button" class="arcade-pad" data-pad="5">·</button>
+              <button type="button" class="arcade-pad" data-pad="6">·</button>
+              <button type="button" class="arcade-pad" data-pad="7">·</button>
+              <button type="button" class="arcade-pad" data-pad="8">·</button>
+            </div>
           </div>
-          <div class="sim-btn-row">
-            <button type="button" class="button primary" id="arc-start-btn">▶ Старт (15 сек)</button>
-            <button type="button" class="sim-chip" id="arc-turbo-btn" aria-pressed="false">🔥 Турбо-режим</button>
-          </div>
-          <div class="sim-status" id="arc-status">Нажмите «Старт» — проверьте скорость реакции!</div>
         </div>
-        <div class="arcade-grid" id="arc-grid" role="group" aria-label="Игровое поле 3 на 3">
-          <button type="button" class="arcade-pad" data-pad="0">·</button>
-          <button type="button" class="arcade-pad" data-pad="1">·</button>
-          <button type="button" class="arcade-pad" data-pad="2">·</button>
-          <button type="button" class="arcade-pad" data-pad="3">·</button>
-          <button type="button" class="arcade-pad" data-pad="4">·</button>
-          <button type="button" class="arcade-pad" data-pad="5">·</button>
-          <button type="button" class="arcade-pad" data-pad="6">·</button>
-          <button type="button" class="arcade-pad" data-pad="7">·</button>
-          <button type="button" class="arcade-pad" data-pad="8">·</button>
-        </div>
-      </div>
-    </section>
 
-    <section class="container section" id="quick-quest" aria-labelledby="quest-title" data-reveal>
-      <div class="quest-card">
-        <div class="stack" style="gap: 0.45rem;">
-          <p class="eyebrow">Экспресс-кейс · Проверка интуиции за 10 секунд</p>
-          <h2 id="quest-title">Стартер щёлкает, на АКБ 12.6 В, а на клемме стартера при пуске 8.7 В. Что делать первым?</h2>
+        <div id="quick-quest" aria-labelledby="quest-title">
+          <div class="quest-card">
+            <div class="stack" style="gap: 0.45rem;">
+              <p class="eyebrow">Экспресс-кейс · Проверка интуиции за 10 секунд</p>
+              <h2 id="quest-title">Стартер щёлкает, на АКБ 12.6 В, а на клемме стартера при пуске 8.7 В. Что делать первым?</h2>
+            </div>
+            <div class="quest-options" role="group" aria-label="Варианты диагностики">
+              <button type="button" class="quest-opt" data-quest="wrong">1. Сразу покупать новый аккумулятор</button>
+              <button type="button" class="quest-opt" data-quest="correct">2. Замерить падение напряжения (Voltage Drop) по силовой цепи и массе</button>
+              <button type="button" class="quest-opt" data-quest="wrong">3. Заменить блок управления двигателем</button>
+            </div>
+            <div class="sim-status" id="quest-feedback" hidden></div>
+          </div>
         </div>
-        <div class="quest-options" role="group" aria-label="Варианты диагностики">
-          <button type="button" class="quest-opt" data-quest="wrong">1. Сразу покупать новый аккумулятор</button>
-          <button type="button" class="quest-opt" data-quest="correct">2. Замерить падение напряжения (Voltage Drop) по силовой цепи и массе</button>
-          <button type="button" class="quest-opt" data-quest="wrong">3. Заменить блок управления двигателем</button>
-        </div>
-        <div class="sim-status" id="quest-feedback" hidden></div>
-      </div>
+      </details>
     </section>
 
     <section class="container section">
@@ -1367,8 +1444,10 @@
       const course3dBtns = Array.from(document.querySelectorAll('[data-3d-course]'));
       let disposeIndexGlbStudio = null;
 
+      let studioMounted = false;
       function mountIndexGlbStudio(courseSlug) {
         if (!indexGlbStudioEl || !window.WorkshopModels) return;
+        studioMounted = true;
         disposeIndexGlbStudio?.();
         const slug = courseSlug || 'automechanic';
         const def = window.WorkshopModels.forCourse(slug, 0);
@@ -1388,7 +1467,24 @@
         });
       });
       document.addEventListener('DOMContentLoaded', function () {
-        mountIndexGlbStudio('automechanic');
+        if (!indexGlbStudioEl) return;
+        const mountOnce = function () {
+          if (studioMounted) return;
+          mountIndexGlbStudio('automechanic');
+        };
+        if ('IntersectionObserver' in window) {
+          const io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (ent) {
+              if (ent.isIntersecting) {
+                mountOnce();
+                io.disconnect();
+              }
+            });
+          }, { rootMargin: '180px' });
+          io.observe(indexGlbStudioEl);
+        } else {
+          mountOnce();
+        }
       });
 
       // Interactive Viewport-Culled CAD Holo-Engine Canvas (#studio-3d-canvas)
@@ -1971,6 +2067,117 @@
           });
         });
       }
+
+      // Mount Photorealistic 3D Showcase (Poly Haven CC0 PBR photogrammetry scans)
+      function bootPhotoreal() {
+        const prEl = document.getElementById('photoreal-showcase-mount');
+        if (!prEl || !window.PhotorealShowcase) return;
+        window.PhotorealShowcase.mount(prEl, [
+          {
+            course: 'Автомеханика',
+            short: 'Колесо и диск',
+            title: 'Колёсный диск и покрышка в сборе',
+            text: 'Реальный скан обода и шины с PBR-текстурами металла, коррозии и износа протектора. Базовый объект для изучения шиномонтажа, балансировки и углов УУК.',
+            facts: [
+              'Момент затяжки болтов: 100–120 Н·м крест-накрест',
+              'Проверка геометрии обода, биения и равномерности износа протектора',
+              'PBR-материалы: Diffuse, Normal, Roughness, Metalness, AO',
+            ],
+            source: 'Poly Haven: Rusted Wheel Rim & Old Tyre',
+            sourceUrl: 'https://polyhaven.com/a/rusted_wheel_rim_01',
+            cta: 'Открыть курс Автомеханики',
+            href: 'learn.html?course=automechanic',
+            size: 1.85,
+            envIntensity: 1.15,
+            parts: [
+              { url: 'assets/photoreal/old_tyre/old_tyre_1k.gltf', size: 1.85 },
+              { url: 'assets/photoreal/rusted_wheel_rim_01/rusted_wheel_rim_01_1k.gltf', size: 1.15, offset: [0, 0.35, 0] },
+            ],
+          },
+          {
+            course: 'Автоэлектрика',
+            short: 'Мультиметр',
+            title: 'Аналого-цифровой мультиметр диагноста',
+            text: 'Фотореалистичный измерительный прибор с реалистичными текстурами пластика, шкалы, переключателя диапазонов и гнезд щупов.',
+            facts: [
+              'Замер АКБ в покое (12.6–12.7 В) и под нагрузкой (Voltage Drop <= 0.5 В)',
+              'Сопротивление терминаторов CAN-Bus: 60 Ом (два по 120 Ом)',
+              'Режим прозвонки, DC V, сопротивление Ω и ток 10A в разрыв',
+            ],
+            source: 'Poly Haven: Retro Multimeter',
+            sourceUrl: 'https://polyhaven.com/a/retro_multimeter',
+            cta: 'Открыть курс Автоэлектрики',
+            href: 'learn.html?course=autoelectric',
+            size: 1.8,
+            envIntensity: 1.1,
+            parts: [
+              { url: 'assets/photoreal/retro_multimeter/retro_multimeter_1k.gltf', size: 1.8, rotation: [-0.2, 0.25, 0] },
+            ],
+          },
+          {
+            course: 'Холодильное (HVAC)',
+            short: 'Наружный блок',
+            title: 'Наружный блок сплит-системы (конденсатор)',
+            text: 'Детализированный скан наружного блока с защитной решёткой вентилятора, стальным корпусом, кронштейнами и ламелями теплообменника.',
+            facts: [
+              'Опрессовка азотом и вакуумирование до < 500 микрон перед запуском',
+              'Контроль перегрева (Superheat 4–8 K) и переохлаждения (Subcooling 3–6 K)',
+              'Проверка перепада температур ΔT на теплообменнике 8–12 °C',
+            ],
+            source: 'Poly Haven: Exterior Aircon Unit',
+            sourceUrl: 'https://polyhaven.com/a/exterior_aircon_unit',
+            cta: 'Открыть курс HVAC',
+            href: 'learn.html?course=hvac',
+            size: 2.0,
+            envIntensity: 1.1,
+            parts: [
+              { url: 'assets/photoreal/exterior_aircon_unit/exterior_aircon_unit_1k.gltf', size: 2.0 },
+            ],
+          },
+          {
+            course: 'Графический дизайн',
+            short: 'Краски и мокап',
+            title: 'Аэрозольные баллончики и матовая упаковка',
+            text: 'Наглядный образец материалов для предметной визуализации: матовая этикетка, металлизированное сопло и естественные блики цилиндрической упаковки.',
+            facts: [
+              'Контроль вылетов под обрез Bleed 3 мм и суммарной краски TIL <= 300%',
+              'Цветовые профили RGB (экран) и CMYK FOGRA39 (300 dpi печать)',
+              'Постановка 3-точечного студийного света: Key, Fill и Rim Light',
+            ],
+            source: 'Poly Haven: Spray Paint Bottles',
+            sourceUrl: 'https://polyhaven.com/a/spray_paint_bottles',
+            cta: 'Открыть курс Графдизайна',
+            href: 'learn.html?course=graphic_design',
+            size: 1.5,
+            envIntensity: 1.15,
+            parts: [
+              { url: 'assets/photoreal/spray_paint_bottles/spray_paint_bottles_1k.gltf', size: 1.5 },
+            ],
+          },
+          {
+            course: 'Веб-дизайн (IT)',
+            short: 'Ноутбук верстальщика',
+            title: 'Рабочая станция веб-разработчика',
+            text: 'Фотореалистичная модель ноутбука с текстурой клавиатуры, матового пластика корпуса и антибликового экрана.',
+            facts: [
+              'Адаптивные сетки CSS Grid, Flexbox и кратность отступов 8px',
+              'Контраст интерфейса по стандарту WCAG 2.1 (от 4.5:1 для текста)',
+              'Оптимизация WebGL, анимаций 60 FPS и сборки проектов в Git',
+            ],
+            source: 'Poly Haven: Classic Laptop',
+            sourceUrl: 'https://polyhaven.com/a/classic_laptop',
+            cta: 'Открыть курс IT / Веб-дизайна',
+            href: 'learn.html?course=it',
+            size: 1.95,
+            envIntensity: 1.05,
+            parts: [
+              { url: 'assets/photoreal/classic_laptop/classic_laptop_1k.gltf', size: 1.95 },
+            ],
+          },
+        ]);
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootPhotoreal);
+      else bootPhotoreal();
     })();
   </script>
   <script src="js/eduspace-animations.js" defer></script>
