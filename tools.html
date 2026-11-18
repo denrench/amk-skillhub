@@ -19,33 +19,6 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   
   <link rel="stylesheet" href="css/tailwind.min.css"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    if (window.tailwind) tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          },
-          colors: {
-            dark: {
-              800: '#1e2330',
-              850: '#161922',
-              900: '#0f1117',
-              950: '#090a0f',
-            }
-          },
-          boxShadow: {
-            'glow-indigo': '0 0 30px -5px rgba(99, 102, 241, 0.4)',
-            'glow-cyan': '0 0 30px -5px rgba(6, 182, 212, 0.4)',
-            'glow-amber': '0 0 30px -5px rgba(245, 158, 11, 0.4)',
-          }
-        }
-      }
-    }
-  </script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
   <link rel="stylesheet" href="css/starter-lesson.css"/>
@@ -55,6 +28,7 @@
   <script src="js/lesson-interactives.js"></script>
   <script src="js/prism-fx.js" defer></script>
   <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
   <link rel="stylesheet" href="css/photoreal-tools.css">
 </head>
 <body class="workshop bg-dark-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
@@ -121,6 +95,76 @@
         </div>
       </div>
     </div>
+
+    <!-- ========================================================================= -->
+    <!-- 4 ПЕРСОНАЛЬНЫХ ИНСТРУМЕНТА СТУДЕНТА (ПОИСК, GPA, ХАБ ЗАДАЧ, ТАЙМЕР/КОНСПЕКТ) -->
+    <!-- ========================================================================= -->
+    <section id="four-student-tools-hub" class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Персональные учебные инструменты">
+      <!-- 1. Глобальный поиск -->
+      <div class="p-5 rounded-3xl bg-dark-900 border border-white/10 space-y-3 flex flex-col justify-between">
+        <div class="space-y-2">
+          <div class="text-xs font-extrabold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px]">search</span>
+            <span>1. Поиск по курсам</span>
+          </div>
+          <input type="search" id="student-tool-search" oninput="runStudentCourseSearch(this.value)" placeholder="Поиск по темам и курсам (HVAC, ГРМ, Flexbox)..." class="w-full px-3 py-2 rounded-xl bg-dark-850 border border-white/15 text-xs text-white" />
+        </div>
+        <div id="student-tool-search-results" class="text-[11px] text-slate-300 space-y-1 max-h-28 overflow-y-auto">
+          <div>Найдено направлений: 5 (IT, Графдизайн, Автоэлектрика, HVAC, Автомеханика)</div>
+        </div>
+      </div>
+
+      <!-- 2. Калькулятор GPA -->
+      <div class="p-5 rounded-3xl bg-dark-900 border border-white/10 space-y-3 flex flex-col justify-between">
+        <div class="space-y-2">
+          <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px]">calculate</span>
+            <span>2. Калькулятор GPA</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <label for="student-tool-gpa-target" class="text-slate-400">Целевой GPA:</label>
+            <input type="number" id="student-tool-gpa-target" min="0" max="4.0" step="0.1" value="3.6" oninput="updateStudentGpaTool()" class="w-20 px-2.5 py-1.5 rounded-xl bg-dark-850 border border-white/15 text-xs font-mono text-white" />
+          </div>
+        </div>
+        <div class="flex items-center justify-between pt-2 border-t border-white/10 text-xs">
+          <span class="text-slate-400">Прогноз балла:</span>
+          <strong id="student-tool-gpa-out" class="font-mono text-emerald-400">3.60 / 4.00 (90%)</strong>
+        </div>
+      </div>
+
+      <!-- 3. Хаб учебных задач -->
+      <div class="p-5 rounded-3xl bg-dark-900 border border-white/10 space-y-3 flex flex-col justify-between">
+        <div class="space-y-2">
+          <div class="text-xs font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px]">checklist</span>
+            <span>3. Хаб задач</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <input type="text" id="student-tool-task-input" placeholder="Новая учебная задача..." class="flex-1 px-2.5 py-1.5 rounded-xl bg-dark-850 border border-white/15 text-xs text-white" />
+            <button type="button" onclick="addStudentToolTask()" class="px-2.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold">+</button>
+          </div>
+        </div>
+        <ul id="student-tool-task-list" class="text-[11px] text-slate-300 space-y-1 max-h-24 overflow-y-auto"></ul>
+      </div>
+
+      <!-- 4. Таймер фокуса и конспекты -->
+      <div class="p-5 rounded-3xl bg-dark-900 border border-white/10 space-y-3 flex flex-col justify-between">
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="text-xs font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[18px]">timer</span>
+              <span>4. Таймер и конспект</span>
+            </div>
+            <span id="student-tool-timer-display" class="font-mono font-bold text-xs text-amber-300">25:00</span>
+          </div>
+          <textarea id="student-tool-notes" rows="2" onchange="saveStudentToolsState()" placeholder="Быстрый конспект по уроку..." class="w-full px-2.5 py-1.5 rounded-xl bg-dark-850 border border-white/15 text-xs text-white"></textarea>
+        </div>
+        <div class="flex items-center justify-between gap-2">
+          <button type="button" onclick="toggleStudentTimer()" id="student-tool-timer-btn" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">Старт 25м</button>
+          <button type="button" onclick="saveStudentToolsState()" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white text-[11px] font-bold">Сохранить</button>
+        </div>
+      </div>
+    </section>
 
     <!-- Tab Selector -->
     <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar">
@@ -501,8 +545,10 @@
 
     // HVAC Saturation Formula Approximator
     function calculateHvac() {
-      const p = parseFloat(document.getElementById('hvac-pressure').value) || 0;
-      const pipeT = parseFloat(document.getElementById('hvac-pipe-temp').value) || 0;
+      const rawP = parseFloat(document.getElementById('hvac-pressure').value);
+      const rawT = parseFloat(document.getElementById('hvac-pipe-temp').value);
+      const p = Number.isFinite(rawP) ? Math.max(-0.5, Math.min(45, rawP)) : 2.0;
+      const pipeT = Number.isFinite(rawT) ? Math.max(-50, Math.min(120, rawT)) : 2.0;
       const ref = document.getElementById('hvac-refrigerant').value;
 
       let tsat = 0;
@@ -602,11 +648,153 @@
       `;
     }
 
+    // --- 4 STUDENT TOOLS LOGIC + BACKEND /api/tools/state PERSISTENCE ---
+    let studentToolsData = {
+      tasks: [{ id: 'st-1', title: 'Повторить регламент момента затяжки ГБЦ', done: false }],
+      gpa_target: 3.6,
+      notes: ''
+    };
+    let studentTimerSec = 1500;
+    let studentTimerId = null;
+
+    function runStudentCourseSearch(query) {
+      const box = document.getElementById('student-tool-search-results');
+      if (!box) return;
+      const q = String(query || '').trim().toLowerCase();
+      const catalog = [
+        { slug: 'it', title: 'Web-разработка (IT): HTML, CSS Flexbox, Grid, адаптив' },
+        { slug: 'graphic_design', title: 'Графический дизайн: композиция, колористика WCAG, Prepress' },
+        { slug: 'autoelectric', title: 'Автоэлектрика: мультиметр, закон Ома, CAN-шина, OBD-II' },
+        { slug: 'hvac', title: 'Холодильное оборудование (HVAC): фреоны R134a/R410A, перегрев' },
+        { slug: 'automechanic', title: 'Автомеханика: ДВС, ГБЦ, ГРМ, тормозная система, подвеска' }
+      ];
+      const matches = !q ? catalog : catalog.filter(c => c.title.toLowerCase().includes(q) || c.slug.includes(q));
+      box.innerHTML = '';
+      if (!matches.length) {
+        const empty = document.createElement('div');
+        empty.textContent = 'Совпадений не найдено';
+        box.appendChild(empty);
+        return;
+      }
+      matches.forEach(m => {
+        const row = document.createElement('div');
+        const link = document.createElement('a');
+        link.href = `tasks.html?specialty=${encodeURIComponent(m.slug)}`;
+        link.className = 'hover:text-cyan-300 underline block truncate';
+        link.textContent = m.title;
+        row.appendChild(link);
+        box.appendChild(row);
+      });
+    }
+
+    function updateStudentGpaTool() {
+      const inp = document.getElementById('student-tool-gpa-target');
+      const out = document.getElementById('student-tool-gpa-out');
+      if (!inp || !out) return;
+      const raw = parseFloat(inp.value);
+      const val = Number.isFinite(raw) ? Math.max(0.0, Math.min(4.0, raw)) : 0.0;
+      studentToolsData.gpa_target = val;
+      const pct = Math.round((val / 4.0) * 100);
+      out.textContent = `${val.toFixed(2)} / 4.00 (${pct}%)`;
+    }
+
+    function renderStudentTasksList() {
+      const listEl = document.getElementById('student-tool-task-list');
+      if (!listEl) return;
+      listEl.innerHTML = '';
+      (studentToolsData.tasks || []).forEach(t => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between gap-2 py-0.5';
+        const span = document.createElement('span');
+        span.textContent = (t && t.title) ? String(t.title) : '';
+        li.appendChild(span);
+        listEl.appendChild(li);
+      });
+    }
+
+    function addStudentToolTask() {
+      const inp = document.getElementById('student-tool-task-input');
+      if (!inp) return;
+      const title = (inp.value || '').trim();
+      if (!title) return;
+      studentToolsData.tasks = studentToolsData.tasks || [];
+      studentToolsData.tasks.push({ id: 't-' + Date.now(), title: title, done: false });
+      inp.value = '';
+      renderStudentTasksList();
+      saveStudentToolsState();
+    }
+
+    function toggleStudentTimer() {
+      const disp = document.getElementById('student-tool-timer-display');
+      const btn = document.getElementById('student-tool-timer-btn');
+      if (studentTimerId) {
+        clearInterval(studentTimerId);
+        studentTimerId = null;
+        if (btn) btn.textContent = 'Старт 25м';
+        return;
+      }
+      if (btn) btn.textContent = 'Пауза';
+      studentTimerId = setInterval(() => {
+        studentTimerSec = Math.max(0, studentTimerSec - 1);
+        const m = String(Math.floor(studentTimerSec / 60)).padStart(2, '0');
+        const s = String(studentTimerSec % 60).padStart(2, '0');
+        if (disp) disp.textContent = `${m}:${s}`;
+      }, 1000);
+    }
+
+    async function loadStudentToolsState() {
+      renderStudentTasksList();
+      updateStudentGpaTool();
+      try {
+        const sessRes = await fetch('/api/auth/session', { credentials: 'same-origin' });
+        if (!sessRes.ok) return;
+        const sess = await sessRes.json();
+        if (!sess || !sess.authenticated) return;
+        const res = await fetch('/api/tools/state', { credentials: 'same-origin' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && typeof data === 'object') {
+          if (Array.isArray(data.tasks)) studentToolsData.tasks = data.tasks;
+          if (data.gpa_target !== undefined) {
+            studentToolsData.gpa_target = Number(data.gpa_target) || 3.6;
+            const gIn = document.getElementById('student-tool-gpa-target');
+            if (gIn) gIn.value = String(studentToolsData.gpa_target);
+          }
+          if (typeof data.notes === 'string') {
+            studentToolsData.notes = data.notes;
+            const nIn = document.getElementById('student-tool-notes');
+            if (nIn) nIn.value = data.notes;
+          }
+          renderStudentTasksList();
+          updateStudentGpaTool();
+        }
+      } catch (e) {}
+    }
+
+    async function saveStudentToolsState() {
+      const nIn = document.getElementById('student-tool-notes');
+      if (nIn) studentToolsData.notes = nIn.value;
+      updateStudentGpaTool();
+      if (window.EduSpace && typeof window.EduSpace.api === 'function') {
+        try {
+          await window.EduSpace.api('/api/tools/state', {
+            method: 'POST',
+            body: {
+              tasks: studentToolsData.tasks,
+              gpa_target: studentToolsData.gpa_target,
+              notes: studentToolsData.notes
+            }
+          });
+        } catch (e) {}
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       filterObdCodes();
       selectEngine('toyota');
       calculateHvac();
       mountTools3DForTab('obd');
+      loadStudentToolsState();
     });
   </script>
   <script src="js/eduspace-animations.js" defer></script>

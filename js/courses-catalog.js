@@ -10031,3 +10031,51 @@ window.EDU_LESSONS = {
     }
   ]
 };
+
+// --- EduCatalog Lazy Loader ---
+(function () {
+  var _cache = {};
+  var _gameCache = {};
+  window.EduCatalog = {
+    loadIndex: async function () {
+      if (window.EDU_COURSES && window.EDU_LESSONS) {
+        return { courses: window.EDU_COURSES, lessons: window.EDU_LESSONS };
+      }
+      var res = await fetch('assets/data/catalog/index.json', { credentials: 'same-origin' });
+      var data = await res.json();
+      window.EDU_COURSES = data.courses || [];
+      window.EDU_LESSONS = data.lessons || {};
+      return data;
+    },
+    loadCourse: async function (slug) {
+      var s = slug || 'it';
+      if (_cache[s]) return _cache[s];
+      if (window.EDU_LESSONS && window.EDU_LESSONS[s] && window.EDU_LESSONS[s][0] && window.EDU_LESSONS[s][0].theory) {
+        _cache[s] = window.EDU_LESSONS[s];
+        return _cache[s];
+      }
+      var res = await fetch('assets/data/catalog/' + encodeURIComponent(s) + '.json', { credentials: 'same-origin' });
+      if (!res.ok) throw new Error('Failed to load catalog chunk for ' + s);
+      var data = await res.json();
+      window.EDU_LESSONS = window.EDU_LESSONS || {};
+      window.EDU_LESSONS[s] = data.lessons || [];
+      _cache[s] = window.EDU_LESSONS[s];
+      return _cache[s];
+    },
+    loadGames: async function (slug) {
+      var s = slug || 'it';
+      if (_gameCache[s]) return _gameCache[s];
+      if (window.EDU_TOPIC_GAMES && window.EDU_TOPIC_GAMES[s]) {
+        _gameCache[s] = window.EDU_TOPIC_GAMES[s];
+        return _gameCache[s];
+      }
+      var res = await fetch('assets/data/catalog/games-' + encodeURIComponent(s) + '.json', { credentials: 'same-origin' });
+      if (!res.ok) throw new Error('Failed to load topic games chunk for ' + s);
+      var data = await res.json();
+      window.EDU_TOPIC_GAMES = window.EDU_TOPIC_GAMES || {};
+      window.EDU_TOPIC_GAMES[s] = data.games || {};
+      _gameCache[s] = window.EDU_TOPIC_GAMES[s];
+      return _gameCache[s];
+    }
+  };
+})();

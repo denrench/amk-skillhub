@@ -14,49 +14,6 @@
 
   <!-- Tailwind CSS Local & CDN -->
   <link rel="stylesheet" href="css/tailwind.min.css"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    if (window.tailwind) tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
-          },
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
-              950: '#1e1b4b'
-            },
-            dark: {
-              950: '#07090e',
-              900: '#0b0f19',
-              850: '#101524',
-              800: '#161c2e',
-              700: '#1e263d',
-              600: '#2a3452'
-            }
-          },
-          boxShadow: {
-            'glow-indigo': '0 0 50px -10px rgba(99, 102, 241, 0.35)',
-            'glow-purple': '0 0 50px -10px rgba(168, 85, 247, 0.35)',
-            'glow-cyan': '0 0 50px -10px rgba(6, 182, 212, 0.35)',
-            'glow-amber': '0 0 50px -10px rgba(245, 158, 11, 0.35)'
-          }
-        }
-      }
-    };
-  </script>
 
   <style>
     .bg-grid-white {
@@ -84,6 +41,7 @@
   <link rel="stylesheet" href="css/components.css"/>
   <link rel="stylesheet" href="css/workshop.css">
   <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
   <link rel="stylesheet" href="css/photoreal-tools.css">
 </head>
 <body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
@@ -155,11 +113,6 @@
             <span>Чат со студентами</span>
           </div>
           <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-glow-cyan"></span>
-        </a>
-
-        <a href="javascript:void(0)" onclick="openZoomModal('Онлайн-консультация кафедры'); toggleMobileNav(false);" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">videocam</span>
-          <span>Вебинарная комната</span>
         </a>
 
         <a href="profile.html" onclick="toggleMobileNav(false);" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
@@ -244,11 +197,6 @@
           <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-glow-cyan"></span>
         </a>
 
-        <a href="javascript:void(0)" onclick="openZoomModal('Онлайн-консультация кафедры')" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
-          <span class="material-symbols-outlined text-[20px]">videocam</span>
-          <span>Вебинарная комната</span>
-        </a>
-
         <a href="profile.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white font-semibold text-sm transition-colors">
           <span class="material-symbols-outlined text-[20px]">account_circle</span>
           <span>Мой профиль</span>
@@ -310,6 +258,23 @@
     <!-- BODY -->
     <main id="academy-main" tabindex="-1" class="w-full pt-20 p-4 sm:p-8 space-y-7 flex-1">
 
+      <!-- Auth / Role Gate -->
+      <section id="teacher-auth-gate" class="hidden p-8 rounded-3xl bg-dark-900 border border-white/10 text-center space-y-4">
+        <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center mx-auto">
+          <span class="material-symbols-outlined text-[30px]">school</span>
+        </div>
+        <h2 class="text-xl font-extrabold text-white">Требуется вход преподавателя</h2>
+        <p id="teacher-auth-gate-msg" class="text-xs text-slate-300 max-w-md mx-auto">
+          Доступ к ведомости, очереди проверки работ и конструктору уроков открыт только для преподавателей и администраторов.
+        </p>
+        <div class="flex justify-center gap-3 pt-1">
+          <a href="auth.html?mode=login" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold">Войти в аккаунт</a>
+          <a href="learn.html" class="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 text-xs font-bold">Открыть учебник</a>
+        </div>
+      </section>
+
+      <div id="teacher-protected-content" class="hidden space-y-7">
+
       <!-- HERO: TEACHER'S ESSENTIAL MISSION BANNER -->
       <section class="academy-workbench rounded-2xl p-5 sm:p-7">
 
@@ -358,9 +323,9 @@
               <span class="material-symbols-outlined text-[18px]">forward_media</span>
               <span>Открыть следующий день (+1)</span>
             </button>
-            <button type="button" onclick="setPlatformStudyDay(10)" class="px-3.5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/15 font-bold text-xs transition-all flex items-center gap-1.5">
+            <button type="button" onclick="setPlatformStudyDay(20)" class="px-3.5 py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white border border-white/15 font-bold text-xs transition-all flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[16px] text-indigo-400">lock_open</span>
-              <span>Открыть все 10 дней</span>
+              <span>Открыть все 20 дней</span>
             </button>
             <button type="button" onclick="setPlatformStudyDay(1)" class="px-3.5 py-3 rounded-xl border border-white/10 text-slate-400 hover:text-white font-bold text-xs hover:bg-white/5 transition-colors">
               Вернуть День 1
@@ -369,7 +334,7 @@
         </div>
 
         <div class="pt-3 border-t border-white/10">
-          <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">Интерактивная шкала 10 учебных дней (нажмите для переключения):</div>
+          <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">Интерактивная шкала 20 учебных дней (нажмите для переключения):</div>
           <div class="grid grid-cols-5 sm:grid-cols-10 gap-2 text-center text-xs" id="timeline-days-grid"></div>
         </div>
       </section>
@@ -431,7 +396,7 @@
 
         <button type="button" id="t-tab-matrix" onclick="switchTeacherTab('matrix')" class="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-400 hover:text-white transition-all flex items-center gap-1.5">
           <span class="material-symbols-outlined text-[16px]">grid_on</span>
-          <span>3. Электронный журнал (1–10)</span>
+          <span>3. Электронный журнал (1–20)</span>
         </button>
 
         <button type="button" id="t-tab-builder" onclick="switchTeacherTab('builder')" class="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-400 hover:text-white transition-all flex items-center gap-1.5">
@@ -559,6 +524,14 @@
                 <th class="p-2.5 text-center">Ур.10</th>
                 <th class="p-2.5 text-center">Ур.11</th>
                 <th class="p-2.5 text-center">Ур.12</th>
+                <th class="p-2.5 text-center">Ур.13</th>
+                <th class="p-2.5 text-center">Ур.14</th>
+                <th class="p-2.5 text-center">Ур.15</th>
+                <th class="p-2.5 text-center">Ур.16</th>
+                <th class="p-2.5 text-center">Ур.17</th>
+                <th class="p-2.5 text-center">Ур.18</th>
+                <th class="p-2.5 text-center">Ур.19</th>
+                <th class="p-2.5 text-center">Ур.20</th>
                 <th class="p-3.5 text-right">Средний</th>
               </tr>
             </thead>
@@ -741,12 +714,13 @@
               </div>
               <div class="space-y-3 text-xs">
                 <select id="bc-group" class="w-full px-3 py-2 rounded-xl border border-white/15 bg-dark-900 text-white font-medium">
-                  <option value="">Все закрепленные группы</option>
+                  <option value="ИС-21">ИС-21 (Веб-разработка)</option>
                   <option value="ИС-22">ИС-22 (Веб-разработка)</option>
-                  <option value="ИС-21">ИС-21 (Дизайн)</option>
-                  <option value="АЭ-23">АЭ-23 (Автоэлектроника)</option>
-                  <option value="ХО-20">ХО-20 (Холодильные системы)</option>
-                  <option value="АВ-22">АВ-22 (Автомеханика)</option>
+                  <option value="ГД-21">ГД-21 (Графический дизайн)</option>
+                  <option value="ГД-22">ГД-22 (Графический дизайн)</option>
+                  <option value="АЭ-21">АЭ-21 (Автоэлектрика)</option>
+                  <option value="ХО-21">ХО-21 (Холодильные системы)</option>
+                  <option value="АМ-21">АМ-21 (Автомеханика)</option>
                 </select>
                 <input type="text" id="bc-title" placeholder="Тема объявления..." class="w-full px-3 py-2 rounded-xl border border-white/15 bg-dark-900 text-white font-bold" />
                 <textarea id="bc-body" rows="3" placeholder="Текст сообщения студентам..." class="w-full px-3 py-2 rounded-xl border border-white/15 bg-dark-900 text-white"></textarea>
@@ -763,6 +737,8 @@
 
       </section>
 
+      </div><!-- /#teacher-protected-content -->
+
     </main>
   </div>
 
@@ -771,6 +747,7 @@
     let currentStudyDay = 1;
     let studentsCache = [];
     let journalItemsCache = [];
+    let teacherAuthorized = false;
 
     function toggleMobileNav(open) {
       const backdrop = document.getElementById('mobile-nav-backdrop');
@@ -792,7 +769,7 @@
     }
 
     function escapeHtml(str) {
-      if (!str) return '';
+      if (str === null || str === undefined) return '';
       return String(str)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
@@ -811,6 +788,7 @@
     }
 
     function switchTeacherTab(tab) {
+      if (!teacherAuthorized) return;
       ['students', 'queue', 'matrix', 'builder'].forEach(k => {
         const btn = document.getElementById(`t-tab-${k}`);
         const panel = document.getElementById(`teacher-panel-${k}`);
@@ -877,9 +855,35 @@
     }
 
     async function loadTeacherDashboard() {
-      const user = window.EduSpace.getActiveUser();
-      if (!user || user.role !== 'teacher') {
-        // Fallback or guest
+      const gateEl = document.getElementById('teacher-auth-gate');
+      const gateMsg = document.getElementById('teacher-auth-gate-msg');
+      const protectedEl = document.getElementById('teacher-protected-content');
+
+      try {
+        const sessResp = await fetch('/api/auth/session', { credentials: 'same-origin' });
+        if (!sessResp.ok) throw new Error('session unavailable');
+        const sess = await sessResp.json();
+        if (sess && sess.csrf_token && window.EduSpace && window.EduSpace.setCsrfToken) {
+          window.EduSpace.setCsrfToken(sess.csrf_token);
+        }
+        const role = (sess && sess.authenticated && sess.user) ? sess.user.role : '';
+        if (role !== 'teacher' && role !== 'admin') {
+          teacherAuthorized = false;
+          if (protectedEl) protectedEl.classList.add('hidden');
+          if (gateEl) gateEl.classList.remove('hidden');
+          if (gateMsg && sess && sess.authenticated && sess.user) {
+            gateMsg.textContent = `Вы вошли как ${sess.user.role}. Кабинет преподавателя доступен только преподавателям и администраторам.`;
+          }
+          return;
+        }
+        teacherAuthorized = true;
+        if (gateEl) gateEl.classList.add('hidden');
+        if (protectedEl) protectedEl.classList.remove('hidden');
+      } catch (err) {
+        teacherAuthorized = false;
+        if (protectedEl) protectedEl.classList.add('hidden');
+        if (gateEl) gateEl.classList.remove('hidden');
+        return;
       }
 
       renderDayTimeline(currentStudyDay);
@@ -920,6 +924,12 @@
       renderDayTimeline(currentStudyDay);
       renderStudentsRoster();
       renderSubmissionsQueue();
+      const tabParam = new URLSearchParams(window.location.search).get('tab');
+      if (tabParam && ['students', 'queue', 'matrix', 'builder'].includes(tabParam)) {
+        switchTeacherTab(tabParam);
+      } else {
+        await loadGradebookMatrix();
+      }
     }
 
     function renderStudentsRoster(listToRender = null) {
@@ -1292,21 +1302,22 @@
     }
 
     async function loadGradebookMatrix() {
+      if (!teacherAuthorized) return;
       const spec = document.getElementById('matrix-course-select').value;
-      const res = await window.EduSpace.api(`/api/teacher/matrix?specialty=${spec}`);
+      const res = await window.EduSpace.api(`/api/teacher/matrix?specialty=${encodeURIComponent(spec)}`);
       const rows = (res.data && res.data.rows) || [];
       const tbody = document.getElementById('matrix-tbody');
       if (!tbody) return;
 
       if (rows.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="15" class="p-8 text-center text-slate-500">Нет зарегистрированных студентов по этому направлению.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="23" class="p-8 text-center text-slate-500">Нет зарегистрированных студентов по этому направлению.</td></tr>';
         return;
       }
 
       tbody.innerHTML = rows.map(r => {
         const st = r.student;
         let cellsHtml = '';
-        for (let n = 1; n <= 12; n++) {
+        for (let n = 1; n <= 20; n++) {
           const c = r.cells[String(n)];
           if (!c) {
             cellsHtml += `<td class="p-2.5 text-center text-slate-600">${n <= currentStudyDay ? '—' : '🔒'}</td>`;
@@ -1382,10 +1393,11 @@
     let currentBuilderBlocks = [];
 
     async function loadBuilderData() {
+      if (!teacherAuthorized) return;
       try {
-        const res = await fetch('/api/courses/manage');
-        const data = await res.json();
-        if (data.success) {
+        const res = await window.EduSpace.api('/api/courses/manage');
+        const data = (res && res.data) || {};
+        if (res.ok && data.success) {
           builderCourses = data.courses || [];
           populateBuilderCourseSelect();
         }
@@ -1398,7 +1410,7 @@
       const sel = document.getElementById('b-course-select');
       if (!sel) return;
       sel.innerHTML = builderCourses.map(c => `
-        <option value="${c.id}">${c.title} (${c.slug})</option>
+        <option value="${Number(c.id)}">${escapeHtml(c.title)} (${escapeHtml(c.slug)})</option>
       `).join('');
       if (builderCourses.length) onBuilderCourseChange();
     }
@@ -1407,8 +1419,8 @@
       const courseId = document.getElementById('b-course-select').value;
       if (!courseId) return;
       try {
-        const res = await fetch(`/api/courses/${courseId}/modules`);
-        const data = await res.json();
+        const res = await window.EduSpace.api(`/api/courses/${encodeURIComponent(courseId)}/modules`);
+        const data = (res && res.data) || {};
         builderModules = data.modules || [];
         populateBuilderModuleSelect();
       } catch (e) {
@@ -1420,7 +1432,7 @@
       const sel = document.getElementById('b-module-select');
       if (!sel) return;
       sel.innerHTML = builderModules.map(m => `
-        <option value="${m.id}">${m.title}</option>
+        <option value="${Number(m.id)}">${escapeHtml(m.title)}</option>
       `).join('');
       if (builderModules.length) onBuilderModuleChange();
     }
@@ -1429,8 +1441,8 @@
       const moduleId = document.getElementById('b-module-select').value;
       const courseId = document.getElementById('b-course-select').value;
       try {
-        const res = await fetch(`/api/lessons?course_id=${courseId}&module_id=${moduleId}`);
-        const data = await res.json();
+        const res = await window.EduSpace.api(`/api/lessons?course_id=${encodeURIComponent(courseId)}&module_id=${encodeURIComponent(moduleId)}`);
+        const data = (res && res.data) || {};
         builderLessons = data.lessons || [];
         populateBuilderLessonSelect();
       } catch (e) {
@@ -1442,7 +1454,7 @@
       const sel = document.getElementById('b-lesson-select');
       if (!sel) return;
       sel.innerHTML = builderLessons.map(l => `
-        <option value="${l.id}">${l.title}</option>
+        <option value="${Number(l.id)}">${escapeHtml(l.title)}</option>
       `).join('');
       if (builderLessons.length) {
         onBuilderLessonChange();
@@ -1455,9 +1467,9 @@
       const lessonId = document.getElementById('b-lesson-select').value;
       if (!lessonId) return;
       try {
-        const res = await fetch(`/api/lessons/${lessonId}`);
-        const data = await res.json();
-        if (data.success && data.lesson) {
+        const res = await window.EduSpace.api(`/api/lessons/${encodeURIComponent(lessonId)}`);
+        const data = (res && res.data) || {};
+        if (res.ok && data.success && data.lesson) {
           currentBuilderLesson = data.lesson;
           currentBuilderBlocks = currentBuilderLesson.blocks || [];
           document.getElementById('b-lesson-title').value = currentBuilderLesson.title || '';
@@ -1518,7 +1530,7 @@
               <span class="material-symbols-outlined text-slate-400 text-[18px]">
                 ${blockIconMap[b.type] || 'extension'}
               </span>
-              <span class="font-bold text-xs text-white uppercase tracking-wider">${b.type}</span>
+              <span class="font-bold text-xs text-white uppercase tracking-wider">${escapeHtml(b.type)}</span>
             </div>
 
             <div class="flex items-center gap-1">
@@ -1534,13 +1546,13 @@
             </div>
           </div>
 
-          <div class="space-y-2 text-xs">
-            <input type="text" value="${b.title || ''}" onchange="updateBlockField(${idx}, 'title', this.value)" placeholder="Заголовок блока..." class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-white font-bold" />
+          <div class="space-y-2 text-xs" data-block-card="${idx}">
+            <input type="text" data-block-field="title" onchange="updateBlockField(${idx}, 'title', this.value)" placeholder="Заголовок блока..." class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-white font-bold" />
             ${b.content !== undefined ? `
-              <textarea rows="2" onchange="updateBlockField(${idx}, 'content', this.value)" class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-slate-300 leading-relaxed">${b.content}</textarea>
+              <textarea rows="2" data-block-field="content" onchange="updateBlockField(${idx}, 'content', this.value)" class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-slate-300 leading-relaxed"></textarea>
             ` : ''}
             ${b.question !== undefined ? `
-              <input type="text" value="${b.question || ''}" onchange="updateBlockField(${idx}, 'question', this.value)" placeholder="Формулировка вопроса..." class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-amber-300 font-semibold" />
+              <input type="text" data-block-field="question" onchange="updateBlockField(${idx}, 'question', this.value)" placeholder="Формулировка вопроса..." class="w-full px-3 py-1.5 rounded-xl border border-white/10 bg-dark-900 text-amber-300 font-semibold" />
             ` : ''}
             ${b.type === 'theory' ? `
               <fieldset data-video-block="${idx}" class="space-y-2">
@@ -1559,6 +1571,14 @@
           </div>
         </div>
       `).join('');
+      container.querySelectorAll('[data-block-card]').forEach(card => {
+        const idx = Number(card.dataset.blockCard);
+        const blk = currentBuilderBlocks[idx] || {};
+        card.querySelectorAll('[data-block-field]').forEach(el => {
+          const field = el.dataset.blockField;
+          el.value = blk[field] !== undefined && blk[field] !== null ? String(blk[field]) : '';
+        });
+      });
       container.querySelectorAll('[data-video-block]').forEach(panel => {
         const idx = Number(panel.dataset.videoBlock);
         const video = panel.querySelector('video');
@@ -1661,24 +1681,22 @@
       try {
         let res;
         if (currentBuilderLesson && currentBuilderLesson.id) {
-          res = await fetch(`/api/lessons/${currentBuilderLesson.id}`, {
+          res = await window.EduSpace.api(`/api/lessons/${encodeURIComponent(currentBuilderLesson.id)}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: payload
           });
         } else {
-          res = await fetch('/api/lessons', {
+          res = await window.EduSpace.api('/api/lessons', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: payload
           });
         }
-        const data = await res.json();
-        if (data.success) {
+        const data = (res && res.data) || {};
+        if (res.ok && data.success) {
           alert('Урок успешно сохранен!');
           await onBuilderModuleChange();
         } else {
-          alert('Ошибка сохранения: ' + data.message);
+          alert('Ошибка сохранения: ' + (data.message || 'Сбой сервера'));
         }
       } catch (e) {
         console.error('Save lesson failed:', e);
@@ -1720,18 +1738,17 @@
       statusBox.textContent = 'AI формирует 8-блочную структуру урока... Пожалуйста, подождите.';
 
       try {
-        const res = await fetch('/api/ai/generate_lesson', {
+        const res = await window.EduSpace.api('/api/ai/generate_lesson', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          body: {
             topic: topic,
             discipline: disc,
             difficulty: diff,
             objectives: goal
-          })
+          }
         });
-        const data = await res.json();
-        if (data.success && data.blocks) {
+        const data = (res && res.data) || {};
+        if (res.ok && data.success && data.blocks) {
           currentBuilderBlocks = data.blocks;
           document.getElementById('b-lesson-title').value = `Урок. ${topic}`;
           renderBuilderBlocks();
@@ -1755,19 +1772,18 @@
         return;
       }
       try {
-        const res = await fetch('/api/courses', {
+        const res = await window.EduSpace.api('/api/courses', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, slug })
+          body: { title, slug }
         });
-        const data = await res.json();
-        if (data.success) {
+        const data = (res && res.data) || {};
+        if (res.ok && data.success) {
           alert('Курс успешно создан!');
           document.getElementById('quick-course-title').value = '';
           document.getElementById('quick-course-slug').value = '';
           await loadBuilderData();
         } else {
-          alert('Ошибка: ' + data.message);
+          alert('Ошибка: ' + (data.message || 'Сбой сервера'));
         }
       } catch (e) {
         console.error('Course create failed:', e);

@@ -492,6 +492,455 @@ window.EduSpace3D = (function () {
     renderDesign3d,
     renderAutoelectric3d,
     renderHvac3d,
-    renderAutomechanic3d
+    renderAutomechanic3d,
+    cleanupScene
   };
 })();
+
+/* ==========================================================================
+   M3: GRAPHICS PROFILES (LOW / BALANCED / ULTRA) & CENTRALIZED GPU DISPOSAL
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  var PROFILE_KEY = 'amk.graphics_profile';
+  var VALID_PROFILES = ['LOW', 'BALANCED', 'ULTRA'];
+  var activeRenderers = new Set();
+
+  function getProfileConfig(mode) {
+    var dpr = (typeof window !== 'undefined' && window.devicePixelRatio) ? window.devicePixelRatio : 1;
+    if (mode === 'LOW') {
+      return { id: 'LOW', dpr: 1.0, antialias: false, shadows: false, shadowMapSize: 512, bloom: false, hdri: false };
+    }
+    if (mode === 'ULTRA') {
+      return { id: 'ULTRA', dpr: Math.min(dpr, 2.0), antialias: true, shadows: true, shadowMapSize: 2048, bloom: true, hdri: true };
+    }
+    return { id: 'BALANCED', dpr: Math.min(dpr, 1.5), antialias: true, shadows: true, shadowMapSize: 1024, bloom: false, hdri: true };
+  }
+
+  function readProfile() {
+    try {
+      var saved = localStorage.getItem(PROFILE_KEY);
+      if (saved && VALID_PROFILES.indexOf(saved) !== -1) return saved;
+    } catch (e) {}
+    return 'BALANCED';
+  }
+
+  function applyProfileToRenderer(renderer, mode) {
+    if (!renderer) return;
+    var cfg = getProfileConfig(mode);
+    try {
+      if (typeof renderer.setPixelRatio === 'function') renderer.setPixelRatio(cfg.dpr);
+      if (renderer.shadowMap) {
+        renderer.shadowMap.enabled = Boolean(cfg.shadows);
+        if (window.THREE && THREE.PCFSoftShadowMap) {
+          renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        }
+      }
+    } catch (e) {}
+  }
+
+  function setProfile(nextMode) {
+    var normalized = String(nextMode || '').toUpperCase().trim();
+    if (VALID_PROFILES.indexOf(normalized) === -1) {
+      normalized = readProfile() || 'BALANCED';
+      if (VALID_PROFILES.indexOf(normalized) === -1) normalized = 'BALANCED';
+    }
+    try {
+      localStorage.setItem(PROFILE_KEY, normalized);
+    } catch (e) {}
+    activeRenderers.forEach(function (r) {
+      applyProfileToRenderer(r, normalized);
+    });
+    try {
+      window.dispatchEvent(new CustomEvent('amk:graphics-profile', {
+        detail: { profile: normalized, config: getProfileConfig(normalized) }
+      }));
+    } catch (e) {}
+    return normalized;
+  }
+
+  window.EduGraphicsProfile = {
+    get: readProfile,
+    set: setProfile,
+    getConfig: function (m) { return getProfileConfig(m || readProfile()); },
+    registerRenderer: function (r) {
+      if (r) {
+        activeRenderers.add(r);
+        applyProfileToRenderer(r, readProfile());
+      }
+    },
+    unregisterRenderer: function (r) {
+      if (r) activeRenderers.delete(r);
+    },
+    VALID_PROFILES: VALID_PROFILES
+  };
+
+  var TEX_SLOTS = ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'aoMap', 'emissiveMap', 'alphaMap', 'envMap', 'lightMap', 'bumpMap'];
+
+  function disposeMaterial(mat) {
+    if (!mat) return;
+    if (Array.isArray(mat)) {
+      mat.forEach(disposeMaterial);
+      return;
+    }
+    TEX_SLOTS.forEach(function (slot) {
+      if (mat[slot] && typeof mat[slot].dispose === 'function') {
+        try { mat[slot].dispose(); } catch (e) {}
+      }
+    });
+    if (typeof mat.dispose === 'function') {
+      try { mat.dispose(); } catch (e) {}
+    }
+  }
+
+  window.disposeThreeScene = function disposeThreeScene(ctx) {
+    if (!ctx) return;
+    try {
+      if (ctx.rafId) cancelAnimationFrame(ctx.rafId);
+      if (ctx.animId) cancelAnimationFrame(ctx.animId);
+    } catch (e) {}
+    try {
+      if (ctx.resizeObserver && typeof ctx.resizeObserver.disconnect === 'function') ctx.resizeObserver.disconnect();
+      if (ctx.resizeObs && typeof ctx.resizeObs.disconnect === 'function') ctx.resizeObs.disconnect();
+    } catch (e) {}
+    try {
+      if (Array.isArray(ctx.cleanupListeners)) {
+        ctx.cleanupListeners.forEach(function (fn) { try { fn(); } catch (e) {} });
+        ctx.cleanupListeners.length = 0;
+      }
+    } catch (e) {}
+    try {
+      if (ctx.controls && typeof ctx.controls.dispose === 'function') ctx.controls.dispose();
+    } catch (e) {}
+    try {
+      if (ctx.scene && typeof ctx.scene.traverse === 'function') {
+        ctx.scene.traverse(function (obj) {
+          if (obj.geometry && typeof obj.geometry.dispose === 'function') {
+            try { obj.geometry.dispose(); } catch (e) {}
+          }
+          if (obj.material) {
+            disposeMaterial(obj.material);
+          }
+        });
+        if (ctx.scene.environment && typeof ctx.scene.environment.dispose === 'function') {
+          try { ctx.scene.environment.dispose(); } catch (e) {}
+        }
+        if (ctx.scene.background && typeof ctx.scene.background.dispose === 'function') {
+          try { ctx.scene.background.dispose(); } catch (e) {}
+        }
+      }
+    } catch (e) {}
+    ['pmremTarget', 'pmremGenerator', 'composer', 'rtShadow', 'rtBlur', 'contactShadowTarget'].forEach(function (k) {
+      if (ctx[k] && typeof ctx[k].dispose === 'function') {
+        try { ctx[k].dispose(); } catch (e) {}
+      }
+    });
+    if (ctx.renderer) {
+      window.EduGraphicsProfile.unregisterRenderer(ctx.renderer);
+      try {
+        if (typeof ctx.renderer.dispose === 'function') ctx.renderer.dispose();
+      } catch (e) {}
+    }
+  };
+})();
+
+/* ==========================================================================
+   M3: REFERENCE 3D AUTOMECHANIC WORKSHOP (window.EduWorkshop3D)
+   ========================================================================== */
+window.EduWorkshop3D = (function () {
+  'use strict';
+
+  var WORKSHOP_SPECS = {
+    'mech-cylinder': {
+      modelId: 'mech-cylinder',
+      glb: 'assets/models/mech-cylinder.glb',
+      title: 'Эталонный 3D-стенд ДВС: ГБЦ, ГРМ и ЦПГ',
+      tools: ['socket_set', 'torque_wrench', 'feeler_gauge', 'inspect_lamp'],
+      parts: {
+        valve_cover: {
+          id: 'valve_cover',
+          nodeName: 'part_valve_cover',
+          label: 'Крышка клапанов',
+          allowedTools: ['socket_set', 'torque_wrench'],
+          prerequisites: [],
+          explodeOffset: [0, 0.55, 0]
+        },
+        camshaft_intake: {
+          id: 'camshaft_intake',
+          nodeName: 'part_camshaft_intake',
+          label: 'Впускной распредвал',
+          allowedTools: ['socket_set', 'feeler_gauge', 'torque_wrench'],
+          prerequisites: ['valve_cover'],
+          explodeOffset: [-0.35, 0.42, -0.25]
+        },
+        camshaft_exhaust: {
+          id: 'camshaft_exhaust',
+          nodeName: 'part_camshaft_exhaust',
+          label: 'Выпускной распредвал',
+          allowedTools: ['socket_set', 'feeler_gauge', 'torque_wrench'],
+          prerequisites: ['valve_cover'],
+          explodeOffset: [0.35, 0.42, 0.25]
+        },
+        cylinder_head: {
+          id: 'cylinder_head',
+          nodeName: 'part_cylinder_head',
+          label: 'Головка блока цилиндров (ГБЦ)',
+          allowedTools: ['socket_set', 'torque_wrench'],
+          prerequisites: ['valve_cover'],
+          explodeOffset: [0, 0.38, 0]
+        },
+        gasket_head: {
+          id: 'gasket_head',
+          nodeName: 'part_gasket_head',
+          label: 'Прокладка ГБЦ',
+          allowedTools: ['socket_set', 'inspect_lamp'],
+          prerequisites: ['valve_cover', 'cylinder_head'],
+          explodeOffset: [0, 0.25, 0.35]
+        },
+        piston_1: {
+          id: 'piston_1',
+          nodeName: 'part_piston_01',
+          label: 'Поршень №1 в сборе с шатуном',
+          allowedTools: ['socket_set', 'feeler_gauge'],
+          prerequisites: ['valve_cover', 'cylinder_head'],
+          explodeOffset: [-0.45, 0.30, 0]
+        },
+        piston_2: {
+          id: 'piston_2',
+          nodeName: 'part_piston_02',
+          label: 'Поршень №2 в сборе с шатуном',
+          allowedTools: ['socket_set', 'feeler_gauge'],
+          prerequisites: ['valve_cover', 'cylinder_head'],
+          explodeOffset: [0.45, 0.30, 0]
+        }
+      }
+    },
+    'mech-brakes': {
+      modelId: 'mech-brakes',
+      glb: 'assets/models/mech-brakes.glb',
+      title: 'Тормозной узел и суппорт',
+      tools: ['socket_set', 'torque_wrench', 'feeler_gauge', 'inspect_lamp'],
+      parts: {
+        caliper_bolts: { id: 'caliper_bolts', nodeName: 'part_caliper_bolts', label: 'Направляющие пальцы суппорта', allowedTools: ['socket_set', 'torque_wrench'], prerequisites: [], explodeOffset: [0.35, 0, 0] },
+        caliper_body: { id: 'caliper_body', nodeName: 'part_caliper_body', label: 'Корпус тормозного суппорта', allowedTools: ['socket_set'], prerequisites: ['caliper_bolts'], explodeOffset: [0.45, 0.25, 0] },
+        brake_pads: { id: 'brake_pads', nodeName: 'part_brake_pads', label: 'Тормозные колодки', allowedTools: ['socket_set', 'inspect_lamp'], prerequisites: ['caliper_bolts', 'caliper_body'], explodeOffset: [0.25, 0.15, 0.25] },
+        brake_rotor: { id: 'brake_rotor', nodeName: 'part_brake_rotor', label: 'Тормозной диск', allowedTools: ['socket_set', 'feeler_gauge'], prerequisites: ['caliper_bolts', 'caliper_body', 'brake_pads'], explodeOffset: [0, 0, 0.45] }
+      }
+    }
+  };
+
+  function evaluateAction(modelId, disassembledParts, action, partId, toolId) {
+    var spec = WORKSHOP_SPECS[modelId];
+    if (!spec) {
+      return { valid: false, status: 404, error_code: 'UNKNOWN_MODEL', message: 'Модель мастерской не найдена' };
+    }
+    var part = spec.parts[partId];
+    if (!part) {
+      return { valid: false, status: 404, error_code: 'UNKNOWN_PART', message: 'Узел не найден в спецификации модели' };
+    }
+    var current = Array.isArray(disassembledParts) ? disassembledParts.slice() : [];
+    var tool = String(toolId || 'socket_set');
+    if (part.allowedTools.indexOf(tool) === -1) {
+      return {
+        valid: false,
+        status: 200,
+        error_code: 'WRONG_TOOL',
+        message: 'Неверный инструмент (' + tool + ') для операции с узлом «' + part.label + '»',
+        disassembled_parts: current
+      };
+    }
+    if (action === 'detach') {
+      var missing = (part.prerequisites || []).filter(function (req) {
+        return current.indexOf(req) === -1;
+      });
+      if (missing.length > 0) {
+        return {
+          valid: false,
+          status: 200,
+          error_code: 'PREREQUISITE_LOCKED',
+          message: 'Нарушен технологический порядок разборки: сначала демонтируйте ' + missing.join(', '),
+          missing_prerequisites: missing,
+          disassembled_parts: current
+        };
+      }
+      if (current.indexOf(partId) === -1) current.push(partId);
+    } else if (action === 'attach' || action === 'torque') {
+      var idx = current.indexOf(partId);
+      if (idx !== -1) current.splice(idx, 1);
+    }
+    var totalParts = Object.keys(spec.parts).length || 1;
+    var pct = Math.min(100, Math.round((current.length / totalParts) * 100));
+    return {
+      valid: true,
+      status: 200,
+      disassembled_parts: current,
+      progress_pct: pct,
+      message: 'Операция выполнена успешно: ' + part.label
+    };
+  }
+
+  function mount(containerEl, config) {
+    var cfg = config || {};
+    var host = typeof containerEl === 'string' ? document.getElementById(containerEl) : containerEl;
+    if (!host) return null;
+
+    var modelId = cfg.modelId || 'mech-cylinder';
+    var spec = WORKSHOP_SPECS[modelId] || WORKSHOP_SPECS['mech-cylinder'];
+    var state = {
+      modelId: spec.modelId,
+      lessonId: cfg.lessonId || 1,
+      activeTool: cfg.activeTool || 'socket_set',
+      selectedPart: null,
+      disassembledParts: Array.isArray(cfg.savedState && cfg.savedState.disassembled_parts)
+        ? cfg.savedState.disassembled_parts.slice()
+        : [],
+      stepHistory: [],
+      profile: window.EduGraphicsProfile ? window.EduGraphicsProfile.get() : 'BALANCED'
+    };
+
+    window.__active3dDisassembledParts = state.disassembledParts;
+
+    var ctx = {
+      scene: null,
+      camera: null,
+      renderer: null,
+      controls: null,
+      resizeObserver: null,
+      rafId: null,
+      cleanupListeners: []
+    };
+
+    if (window.THREE) {
+      try {
+        var T = window.THREE;
+        var w = host.clientWidth || 640;
+        var h = host.clientHeight || 380;
+        var pCfg = window.EduGraphicsProfile ? window.EduGraphicsProfile.getConfig(state.profile) : { dpr: 1.5, antialias: true, shadows: true };
+        var renderer = new T.WebGLRenderer({ antialias: pCfg.antialias, alpha: true });
+        renderer.setSize(w, h);
+        window.EduGraphicsProfile?.registerRenderer(renderer);
+        host.innerHTML = '';
+        host.appendChild(renderer.domElement);
+
+        var scene = new T.Scene();
+        var camera = new T.PerspectiveCamera(42, w / Math.max(h, 1), 0.1, 100);
+        camera.position.set(2.4, 2.0, 3.2);
+        camera.lookAt(0, 0.9, 0);
+
+        scene.add(new T.AmbientLight(0xffffff, 0.85));
+        var keyLight = new T.DirectionalLight(0xffffff, 1.8);
+        keyLight.position.set(3, 5, 4);
+        keyLight.castShadow = Boolean(pCfg.shadows);
+        scene.add(keyLight);
+
+        var controls = null;
+        if (T.OrbitControls) {
+          controls = new T.OrbitControls(camera, renderer.domElement);
+          controls.enableDamping = true;
+          controls.dampingFactor = 0.08;
+          controls.target.set(0, 0.9, 0);
+        }
+
+        var partMeshes = {};
+        if (T.GLTFLoader) {
+          var loader = new T.GLTFLoader();
+          loader.load(spec.glb, function (gltf) {
+            var root = gltf.scene || (gltf.scenes && gltf.scenes[0]);
+            if (!root) return;
+            root.traverse(function (node) {
+              if (node.isMesh) {
+                node.castShadow = true;
+                node.receiveShadow = true;
+                partMeshes[node.name] = node;
+                node.userData.origPos = node.position.clone();
+              }
+            });
+            scene.add(root);
+          });
+        }
+
+        var raycaster = new T.Raycaster();
+        var pointer = new T.Vector2();
+        var onPointerDown = function (ev) {
+          var rect = renderer.domElement.getBoundingClientRect();
+          pointer.x = ((ev.clientX - rect.left) / Math.max(rect.width, 1)) * 2 - 1;
+          pointer.y = -((ev.clientY - rect.top) / Math.max(rect.height, 1)) * 2 + 1;
+          raycaster.setFromCamera(pointer, camera);
+          var hits = raycaster.intersectObjects(scene.children, true);
+          if (hits.length > 0) {
+            var hitObj = hits[0].object;
+            var hitName = hitObj.name || (hitObj.parent && hitObj.parent.name) || '';
+            Object.keys(spec.parts).forEach(function (pKey) {
+              if (spec.parts[pKey].nodeName === hitName) {
+                state.selectedPart = pKey;
+                window.__active3dSelectedPart = pKey;
+                if (typeof cfg.onPartSelect === 'function') cfg.onPartSelect(pKey, spec.parts[pKey]);
+              }
+            });
+          }
+        };
+        renderer.domElement.addEventListener('pointerdown', onPointerDown);
+        ctx.cleanupListeners.push(function () {
+          renderer.domElement.removeEventListener('pointerdown', onPointerDown);
+        });
+
+        ctx.scene = scene;
+        ctx.camera = camera;
+        ctx.renderer = renderer;
+        ctx.controls = controls;
+
+        var animate = function () {
+          ctx.rafId = requestAnimationFrame(animate);
+          if (controls) controls.update();
+          renderer.render(scene, camera);
+        };
+        animate();
+      } catch (e) {}
+    }
+
+    return {
+      dispose: function () { window.disposeThreeScene(ctx); },
+      setProfile: function (p) {
+        state.profile = window.EduGraphicsProfile ? window.EduGraphicsProfile.set(p) : p;
+        return state.profile;
+      },
+      selectTool: function (toolId) {
+        state.activeTool = toolId;
+        return state.activeTool;
+      },
+      performAction: function (action, partId) {
+        var res = evaluateAction(state.modelId, state.disassembledParts, action, partId, state.activeTool);
+        if (res.valid) {
+          state.disassembledParts = res.disassembled_parts;
+          window.__active3dDisassembledParts = state.disassembledParts;
+        }
+        state.stepHistory.push({ action: action, part_id: partId, tool_id: state.activeTool, valid: res.valid });
+        return res;
+      },
+      resetAssembly: function () {
+        state.disassembledParts = [];
+        state.stepHistory = [];
+        window.__active3dDisassembledParts = [];
+        return state;
+      },
+      getStateSnapshot: function () {
+        return {
+          model_id: state.modelId,
+          active_tool: state.activeTool,
+          selected_part: state.selectedPart,
+          disassembled_parts: state.disassembledParts.slice(),
+          step_history: state.stepHistory.slice(),
+          profile: state.profile
+        };
+      }
+    };
+  }
+
+  return {
+    mount: mount,
+    evaluateAction: evaluateAction,
+    getSpecs: function () { return WORKSHOP_SPECS; }
+  };
+})();
+

@@ -12,37 +12,11 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   
   <link rel="stylesheet" href="css/tailwind.min.css"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    if (window.tailwind) tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          },
-          colors: {
-            dark: {
-              800: '#1e2330',
-              850: '#161922',
-              900: '#0f1117',
-              950: '#090a0f',
-            }
-          },
-          boxShadow: {
-            'glow-indigo': '0 0 35px -5px rgba(99, 102, 241, 0.45)',
-            'glow-cyan': '0 0 35px -5px rgba(6, 182, 212, 0.45)',
-            'glow-red': '0 0 35px -5px rgba(239, 68, 68, 0.45)',
-          }
-        }
-      }
-    }
-  </script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
   <link rel="stylesheet" href="css/workshop.css">
   <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
   <link rel="stylesheet" href="css/photoreal-tools.css">
 </head>
 <body class="workshop bg-dark-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
@@ -121,26 +95,42 @@
       <p class="text-slate-300">Найдите аккаунт, чтобы проверить его роль и назначение учебных групп.</p>
     </section>
     
+    <!-- Auth / Role Gate -->
+    <section id="admin-auth-gate" class="hidden p-8 rounded-3xl bg-dark-900 border border-white/10 text-center space-y-4">
+      <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-[30px]">admin_panel_settings</span>
+      </div>
+      <h2 class="text-xl font-extrabold text-white">Требуется вход администратора</h2>
+      <p id="admin-auth-gate-msg" class="text-xs text-slate-300 max-w-md mx-auto">
+        Доступ к управлению учётными записями, ролями и системным настройкам открыт только для роли администратора.
+      </p>
+      <div class="flex justify-center gap-3 pt-1">
+        <a href="auth.html?mode=login" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold">Войти в аккаунт</a>
+        <a href="learn.html" class="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 text-xs font-bold">Открыть учебник</a>
+      </div>
+    </section>
+
+    <div id="admin-protected-content" class="hidden space-y-6">
     <!-- Top KPI Grid -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div class="p-5 rounded-2xl bg-dark-900 border border-white/10">
         <div class="text-xs text-slate-400">Всего пользователей</div>
-        <div class="text-2xl font-black text-white mt-1" id="stat-total-users">12</div>
+        <div class="text-2xl font-black text-white mt-1" id="stat-total-users">—</div>
         <div class="text-[10px] text-emerald-400 mt-1">Активная база ТиПО</div>
       </div>
       <div class="p-5 rounded-2xl bg-dark-900 border border-white/10">
         <div class="text-xs text-slate-400">Студентов</div>
-        <div class="text-2xl font-black text-indigo-400 mt-1" id="stat-students">10</div>
+        <div class="text-2xl font-black text-indigo-400 mt-1" id="stat-students">—</div>
         <div class="text-[10px] text-indigo-300 mt-1">В 5 специальностях</div>
       </div>
       <div class="p-5 rounded-2xl bg-dark-900 border border-white/10">
         <div class="text-xs text-slate-400">Преподавателей</div>
-        <div class="text-2xl font-black text-amber-400 mt-1" id="stat-teachers">2</div>
+        <div class="text-2xl font-black text-amber-400 mt-1" id="stat-teachers">—</div>
         <div class="text-[10px] text-amber-300 mt-1">Аттестованные кураторы</div>
       </div>
       <div class="p-5 rounded-2xl bg-dark-900 border border-white/10">
         <div class="text-xs text-slate-400">Сдано практик</div>
-        <div class="text-2xl font-black text-emerald-400 mt-1" id="stat-submissions">48</div>
+        <div class="text-2xl font-black text-emerald-400 mt-1" id="stat-submissions">—</div>
         <div class="text-[10px] text-emerald-300 mt-1">С автопроверкой</div>
       </div>
     </div>
@@ -202,10 +192,11 @@
         Сброс демо очищает только тестовые попытки в песочнице, сохраняя реальных зарегистрированных студентов и их оценки.
       </div>
     </div>
+    </div>
 
   </main>
 
-  <script src="js/courses-catalog.js"></script>
+  <script src="js/courses-catalog-lite.js"></script>
   <script src="js/app-logistics.js"></script>
   <script>
     let adminUsersList = [];
@@ -220,19 +211,42 @@
         .replace(/'/g, '&#39;');
     }
 
-    function loadAdminDashboard() {
-      fetch('/api/admin/users')
-        .then(r => r.json())
-        .then(data => {
-          if (data.success && data.users) {
-            adminUsersList = data.users;
-            document.getElementById('stat-total-users').textContent = adminUsersList.length;
-            document.getElementById('stat-students').textContent = adminUsersList.filter(u => u.role === 'student').length;
-            document.getElementById('stat-teachers').textContent = adminUsersList.filter(u => u.role === 'teacher').length;
-            renderAdminUsersTable(adminUsersList);
+    async function loadAdminDashboard() {
+      const gateEl = document.getElementById('admin-auth-gate');
+      const gateMsg = document.getElementById('admin-auth-gate-msg');
+      const protectedEl = document.getElementById('admin-protected-content');
+      try {
+        const sessResp = await fetch('/api/auth/session', { credentials: 'same-origin' });
+        if (!sessResp.ok) throw new Error('session unavailable');
+        const sess = await sessResp.json();
+        if (sess && sess.csrf_token && window.EduSpace && window.EduSpace.setCsrfToken) {
+          window.EduSpace.setCsrfToken(sess.csrf_token);
+        }
+        if (!sess.authenticated || !sess.user || sess.user.role !== 'admin') {
+          if (protectedEl) protectedEl.classList.add('hidden');
+          if (gateEl) gateEl.classList.remove('hidden');
+          if (gateMsg && sess.authenticated && sess.user) {
+            gateMsg.textContent = `Вы вошли как ${sess.user.role}. Панель доступна только администраторам.`;
           }
-        })
-        .catch(err => console.error('Admin users load err:', err));
+          return;
+        }
+        if (gateEl) gateEl.classList.add('hidden');
+        if (protectedEl) protectedEl.classList.remove('hidden');
+
+        const res = await window.EduSpace.api('/api/admin/users');
+        const data = (res && res.data) || {};
+        if (res.ok && data.success && data.users) {
+          adminUsersList = data.users;
+          document.getElementById('stat-total-users').textContent = String(adminUsersList.length);
+          document.getElementById('stat-students').textContent = String(adminUsersList.filter(u => u.role === 'student').length);
+          document.getElementById('stat-teachers').textContent = String(adminUsersList.filter(u => u.role === 'teacher').length);
+          document.getElementById('stat-submissions').textContent = data.total_submissions !== undefined ? String(data.total_submissions) : '—';
+          renderAdminUsersTable(adminUsersList);
+        }
+      } catch (err) {
+        if (protectedEl) protectedEl.classList.add('hidden');
+        if (gateEl) gateEl.classList.remove('hidden');
+      }
     }
 
     function renderAdminUsersTable(users) {
@@ -255,7 +269,7 @@
             </span>
           </td>
           <td class="p-3 text-right">
-            <select onchange="changeUserRole(${u.id}, this.value)" class="px-2.5 py-1 rounded-lg bg-dark-850 border border-white/10 text-white text-[11px]">
+            <select onchange="changeUserRole(${Number(u.id)}, this.value)" class="px-2.5 py-1 rounded-lg bg-dark-850 border border-white/10 text-white text-[11px]">
               <option value="student" ${u.role === 'student' ? 'selected' : ''}>Студент</option>
               <option value="teacher" ${u.role === 'teacher' ? 'selected' : ''}>Преподаватель</option>
               <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Администратор</option>
@@ -278,34 +292,34 @@
       renderAdminUsersTable(filtered);
     }
 
-    function changeUserRole(userId, newRole) {
-      fetch('/api/admin/change_role', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, role: newRole })
-      })
-      .then(r => r.json())
-      .then(res => {
-        if (res.success) {
-          if (window.EduSpace && window.EduSpace.playUiTone) window.EduSpace.playUiTone('success');
-          loadAdminDashboard();
+    async function changeUserRole(userId, newRole) {
+      try {
+        const res = await window.EduSpace.api('/api/admin/change_role', {
+          method: 'POST',
+          body: { user_id: userId, role: newRole }
+        });
+        const data = (res && res.data) || {};
+        if (res.ok && data.success) {
+          if (window.EduSpace && window.EduSpace.showToast) window.EduSpace.showToast('Роль обновлена', 'success');
+          await loadAdminDashboard();
         } else {
-          alert('Ошибка смены роли: ' + (res.message || 'Сбой сервера'));
+          alert('Ошибка смены роли: ' + (data.message || 'Сбой сервера'));
         }
-      })
-      .catch(err => alert('Ошибка сети при смене роли'));
+      } catch (err) {
+        alert('Ошибка сети при смене роли');
+      }
     }
 
-    function triggerAdminDemoReset() {
+    async function triggerAdminDemoReset() {
       if (!confirm('Вы уверены, что хотите сбросить демо-режим в начальное состояние (День 1, Модуль 1, 0%)?')) return;
-      fetch('/api/demo/reset', { method: 'POST' })
-        .then(r => r.json())
-        .then(res => {
-          if (res.success) {
-            alert('✓ Демо-режим успешно сброшен в начальное состояние (0%)!');
-            loadAdminDashboard();
-          }
-        });
+      const res = await window.EduSpace.api('/api/demo/reset', { method: 'POST', body: {} });
+      const data = (res && res.data) || {};
+      if (res.ok && data.success) {
+        alert('✓ Демо-режим успешно сброшен в начальное состояние (0%)!');
+        await loadAdminDashboard();
+      } else {
+        alert('Ошибка сброса: ' + (data.message || 'Сбой сервера'));
+      }
     }
 
     function toggleMobileNav(open) {

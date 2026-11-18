@@ -23,49 +23,6 @@
 
   <!-- Tailwind CSS Local & CDN -->
   <link rel="stylesheet" href="css/tailwind.min.css"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    if (window.tailwind) tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
-          },
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
-              950: '#1e1b4b'
-            },
-            dark: {
-              950: '#07090e',
-              900: '#0b0f19',
-              850: '#101524',
-              800: '#161c2e',
-              700: '#1e263d',
-              600: '#2a3452'
-            }
-          },
-          boxShadow: {
-            'glow-indigo': '0 0 50px -10px rgba(99, 102, 241, 0.35)',
-            'glow-purple': '0 0 50px -10px rgba(168, 85, 247, 0.35)',
-            'glow-cyan': '0 0 50px -10px rgba(6, 182, 212, 0.35)',
-            'glow-amber': '0 0 50px -10px rgba(245, 158, 11, 0.35)'
-          }
-        }
-      }
-    };
-  </script>
 
   <style>
     .bg-grid-white {
@@ -92,12 +49,13 @@
     }
   </style>
 
-  <script src="js/courses-catalog.js"></script>
+  <script src="js/courses-catalog-lite.js"></script>
   <script src="js/app-logistics.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
   <link rel="stylesheet" href="css/workshop.css">
   <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
   <link rel="stylesheet" href="css/photoreal-tools.css">
 </head>
 <body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative overflow-x-hidden">
@@ -329,7 +287,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div class="p-4 rounded-2xl bg-dark-950/60 border border-white/10">
             <div class="text-[11px] font-bold text-slate-400 uppercase">Зачтено модулей</div>
-            <div class="font-extrabold text-xl text-white mt-1" id="prof-completed-cnt">0 из 10</div>
+            <div class="font-extrabold text-xl text-white mt-1" id="prof-completed-cnt">0 из 20 работ</div>
           </div>
           <div class="p-4 rounded-2xl bg-dark-950/60 border border-white/10">
             <div class="text-[11px] font-bold text-slate-400 uppercase">Средний балл / GPA</div>
@@ -357,6 +315,19 @@
           </div>
           <div id="skills-progress-container" class="space-y-4 pt-1">
             <!-- Rendered dynamically -->
+          </div>
+          <div class="pt-4 border-t border-white/10 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-400">Граф навыков и пререквизитов (20 узлов DAG)</span>
+              <span id="skills-dag-summary" class="text-[11px] font-mono text-slate-400">20 узлов</span>
+            </div>
+            <div id="skills-dag-container" class="grid grid-cols-4 sm:grid-cols-5 gap-2 pt-1">
+              <div class="skill-node p-2 rounded-xl border border-indigo-500/40 bg-indigo-500/10 text-center text-[11px] font-bold text-white" data-skill-node="1">Узел #1</div>
+              <div class="skill-node p-2 rounded-xl border border-white/10 bg-dark-950/60 text-center text-[11px] font-bold text-slate-400" data-skill-node="2">Узел #2</div>
+              <div class="skill-node p-2 rounded-xl border border-white/10 bg-dark-950/60 text-center text-[11px] font-bold text-slate-400" data-skill-node="3">Узел #3</div>
+              <div class="skill-node p-2 rounded-xl border border-white/10 bg-dark-950/60 text-center text-[11px] font-bold text-slate-400" data-skill-node="4">Узел #4</div>
+              <div class="skill-node p-2 rounded-xl border border-white/10 bg-dark-950/60 text-center text-[11px] font-bold text-slate-400" data-skill-node="5">Узел #5</div>
+            </div>
           </div>
         </div>
 
@@ -428,8 +399,14 @@
     }
 
     async function initProfilePage() {
-      const user = window.EduSpace.getActiveUser();
+      let user = window.EduSpace.getActiveUser();
+      if (!user && window.EduSpace.syncSession) {
+        user = await window.EduSpace.syncSession();
+      }
       if (!user) return;
+
+      document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = user.full_name; });
+      document.querySelectorAll('[data-user-initials]').forEach(el => { el.textContent = user.initials || 'СТ'; });
 
       if (user.role === 'teacher') {
         document.getElementById('header-back-link').href = 'teacher.html';
@@ -455,12 +432,14 @@
       document.getElementById('prof-meta-line').textContent =
         `Email: ${p.email} • ${p.student_id ? `Студенческий ID: ${p.student_id}` : 'Аккаунт сотрудника кафедры'}`;
 
-      document.getElementById('prof-completed-cnt').textContent = `${stats.passed_count} из 10 работ`;
+      const totalModules = Number(stats.total_modules) || 20;
+      const passedCount = Number(stats.passed_count) || 0;
+      document.getElementById('prof-completed-cnt').textContent = `${passedCount} из ${totalModules} работ`;
       document.getElementById('prof-gpa-val').textContent =
         stats.avg_score > 0 ? `${stats.avg_score}/100 (GPA ${stats.gpa})` : '— (Старт с 0%)';
       document.getElementById('prof-xp-val').textContent = `${stats.xp} XP (Уровень ${stats.level})`;
       document.getElementById('prof-cert-status').textContent =
-        stats.passed_count >= 8 ? 'Готов к выдаче с отличием ✓' : `Пройдено ${stats.progress_percent}% (нужно 80%)`;
+        passedCount >= totalModules ? 'Сертификат сформирован ✓' : `В процессе (${passedCount} из ${totalModules})`;
 
       // Dynamic Skills
       const skillsBox = document.getElementById('skills-progress-container');
@@ -477,6 +456,33 @@
           </div>
         </div>
       `).join('');
+
+      // Render 20-node Interactive Skill Map DAG
+      try {
+        const dagRes = await window.EduSpace.api(`/api/skills/map?specialty=${encodeURIComponent(p.specialty_slug || 'it')}`);
+        const dagBox = document.getElementById('skills-dag-container');
+        if (dagRes.ok && dagRes.data && Array.isArray(dagRes.data.nodes) && dagBox) {
+          const nodes = dagRes.data.nodes;
+          const doneCnt = nodes.filter(n => n.completed).length;
+          const sumEl = document.getElementById('skills-dag-summary');
+          if (sumEl) sumEl.textContent = `${doneCnt} / ${nodes.length} освоено`;
+          dagBox.innerHTML = nodes.map(n => {
+            const cls = n.completed
+              ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
+              : (n.unlocked ? 'border-indigo-500/50 bg-indigo-500/15 text-white' : 'border-white/10 bg-dark-950/60 text-slate-500');
+            const icon = n.completed ? '✓' : (n.unlocked ? '●' : '🔒');
+            return `
+              <a href="lesson_player.html?course=${encodeURIComponent(n.specialty || p.specialty_slug || 'it')}&lesson=${Number(n.lesson_order)}"
+                 class="skill-node p-2 rounded-xl border ${cls} flex flex-col items-center justify-center text-center transition-all hover:scale-[1.03]"
+                 data-skill-node="${escapeHtml(n.id)}"
+                 title="${escapeHtml(n.title)}">
+                <span class="text-[10px] font-mono font-bold">${icon} #${Number(n.lesson_order)}</span>
+                <span class="text-[10px] font-semibold truncate w-full mt-0.5">${escapeHtml(n.title)}</span>
+              </a>
+            `;
+          }).join('');
+        }
+      } catch (e) {}
 
       // Transcript Table
       const tbody = document.getElementById('profile-transcript-tbody');
@@ -506,12 +512,21 @@
       }
     }
 
-    function openCertificateModal() {
+    async function openCertificateModal() {
       const user = window.EduSpace.getActiveUser();
       if (!user) return;
-      const stats = (profilePayload && profilePayload.statistics) || { passed_count: 0, progress_percent: 0, avg_score: 0, gpa: 0 };
+      if (!profilePayload) {
+        await initProfilePage();
+      }
+      const profileUser = (profilePayload && profilePayload.profile) || user;
+      const stats = (profilePayload && profilePayload.statistics) || { passed_count: 0, total_modules: 20, progress_percent: 0, avg_score: 0, gpa: 0 };
+      const totalModules = Number(stats.total_modules) || 20;
+      const passedCount = Number(stats.passed_count) || 0;
+      const isStudent = (profileUser.role || user.role) === 'student';
+      const signedCertCode = (profileUser && profileUser.certificate_code) || user.certificate_code || '';
+      const certNum = signedCertCode || profileUser.student_id || user.student_id || `KZ-AMK-2026-${10000 + Number(user.id || 1)}`;
+      const isCertValid = isStudent && passedCount >= totalModules;
       const course = (profilePayload && profilePayload.active_course) || window.EduSpace.getCourseBySlug(user.specialty_slug);
-      const certNum = user.student_id || `KZ-AMK-2026-${10000 + Number(user.id || 1)}`;
 
       openModal('🎓 Официальный сертификат и реестр квалификации', `
         <div class="p-6 sm:p-8 rounded-2xl border-2 border-indigo-500/40 bg-dark-950 text-center space-y-4 shadow-2xl relative overflow-hidden">
@@ -519,40 +534,47 @@
 
           <div class="text-[11px] font-extrabold uppercase tracking-[0.2em] text-indigo-400">Министерство просвещения РК • АМК</div>
           <h3 class="font-extrabold text-2xl text-white">
-            ${stats.passed_count >= 8 ? 'СЕРТИФИКАТ КВАЛИФИКАЦИИ' : 'АКАДЕМИЧЕСКАЯ СПРАВКА СЛУШАТЕЛЯ'}
+            ${isCertValid ? 'СЕРТИФИКАТ КВАЛИФИКАЦИИ' : 'АКАДЕМИЧЕСКАЯ СПРАВКА СЛУШАТЕЛЯ'}
           </h3>
           <p class="text-xs text-slate-400">Настоящим удостоверяется, что слушатель</p>
           <div class="font-extrabold text-xl sm:text-2xl text-indigo-300 py-1 border-b border-white/10 max-w-md mx-auto">
             ${escapeHtml(user.full_name)}
           </div>
           <p class="text-xs text-slate-300 max-w-lg mx-auto leading-relaxed">
-            осваивает образовательную программу <strong class="text-white">«${escapeHtml(course.code)} — ${escapeHtml(course.title)}»</strong>.<br/>
-            Зачтено модулей: <strong class="text-emerald-400">${Number(stats.passed_count)} из 10 (${Number(stats.progress_percent)}%)</strong> • Средний балл: <strong class="text-indigo-400">${stats.avg_score > 0 ? `${escapeHtml(stats.avg_score)}/100 (GPA ${escapeHtml(stats.gpa)})` : 'В процессе'}</strong>.
+            осваивает образовательную программу <strong class="text-white">«${escapeHtml(course && course.code)} — ${escapeHtml(course && course.title)}»</strong>.<br/>
+            Зачтено модулей: <strong class="text-emerald-400">${passedCount} из ${totalModules} (${Number(stats.progress_percent) || 0}%)</strong> • Средний балл: <strong class="text-indigo-400">${stats.avg_score > 0 ? `${escapeHtml(stats.avg_score)}/100 (GPA ${escapeHtml(stats.gpa)})` : 'В процессе'}</strong>.
           </p>
 
           <div class="p-4 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-left text-xs">
             <div>
               <div class="text-[10px] uppercase font-bold text-slate-400">Номер в государственном реестре</div>
-              <div class="font-mono font-extrabold text-white text-sm mt-0.5">${certNum}</div>
+              <div class="font-mono font-extrabold text-white text-sm mt-0.5">${escapeHtml(certNum)}</div>
             </div>
             <div class="text-right">
-              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                ВЕРИФИЦИРОВАНО
-              </span>
+              ${isCertValid
+                ? `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[11px] font-bold">
+                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                     VALID • ДЕЙСТВИТЕЛЕН
+                   </span>`
+                : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">
+                     <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                     IN_PROGRESS • НЕ ВЫДАН
+                   </span>`}
             </div>
           </div>
 
           <div class="pt-3 flex items-center justify-between text-[11px] text-slate-400 border-t border-white/10">
             <span>Стандарт: <strong class="text-white">ГОСО РК ТиПО</strong></span>
-            <span>Куратор: <strong class="text-white">${course.curator}</strong></span>
+            <span>Куратор: <strong class="text-white">${escapeHtml(course && course.curator)}</strong></span>
           </div>
         </div>
         <div class="pt-3 flex flex-wrap items-center justify-between gap-2">
-          <a href="verify.html?cert=${encodeURIComponent(certNum)}" target="_blank" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-glow-emerald flex items-center gap-1.5 transition-all">
-            <span class="material-symbols-outlined text-[16px]">verified</span>
-            <span>Открыть страницу верификации с QR →</span>
-          </a>
+          ${signedCertCode
+            ? `<a href="verify.html?cert=${encodeURIComponent(signedCertCode)}" target="_blank" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-glow-emerald flex items-center gap-1.5 transition-all">
+                 <span class="material-symbols-outlined text-[16px]">verified</span>
+                 <span>Открыть страницу верификации с QR →</span>
+               </a>`
+            : `<span class="text-xs text-slate-400">Цифровой реестр сертификатов доступен только для аккаунтов студентов</span>`}
           <div class="flex items-center gap-2">
             <button type="button" onclick="closeModal()" class="px-4 py-2.5 rounded-xl border border-white/15 bg-white/5 text-slate-300 hover:text-white text-xs font-bold">Закрыть</button>
             <button type="button" onclick="exportPdfStatement()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-glow-indigo flex items-center gap-1.5">
@@ -581,14 +603,14 @@
       cont.innerHTML = badges.map(b => `
         <div class="p-4 rounded-2xl border transition-all flex items-start gap-3.5 ${b.unlocked ? 'bg-dark-900/90 border-indigo-500/30 hover:border-indigo-400/60 shadow-md' : 'bg-dark-950/40 border-white/5 opacity-50'}">
           <div class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${b.unlocked ? 'bg-white/5 border border-white/10 shadow-inner' : 'bg-white/5'}">
-            <span class="material-symbols-outlined text-[24px] ${b.unlocked ? b.color : 'text-slate-600'}">${b.icon}</span>
+            <span class="material-symbols-outlined text-[24px] ${b.unlocked ? b.color : 'text-slate-600'}">${escapeHtml(b.icon)}</span>
           </div>
           <div class="space-y-1">
             <div class="flex items-center gap-2">
-              <span class="font-bold text-xs sm:text-sm text-white">${b.title}</span>
+              <span class="font-bold text-xs sm:text-sm text-white">${escapeHtml(b.title)}</span>
               ${b.unlocked ? '<span class="text-[10px] text-emerald-400 font-bold">✓</span>' : '<span class="text-[10px] text-slate-500">🔒</span>'}
             </div>
-            <p class="text-[11px] text-slate-400 leading-relaxed">${b.desc}</p>
+            <p class="text-[11px] text-slate-400 leading-relaxed">${escapeHtml(b.desc)}</p>
           </div>
         </div>
       `).join('');

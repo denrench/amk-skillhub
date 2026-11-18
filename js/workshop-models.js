@@ -1071,18 +1071,24 @@ window.WorkshopModels = (() => {
         };
         rafId = requestAnimationFrame(tick);
 
+        if (window.EduGraphicsProfile) {
+          window.EduGraphicsProfile.registerRenderer(renderer);
+        }
         innerCleanup = () => {
-          if (rafId) cancelAnimationFrame(rafId);
-          window.removeEventListener('pointerup', onPointerUp);
-          resize.disconnect();
-          scene.traverse((item) => {
-            item.geometry?.dispose?.();
-            if (item.material) {
-              item.material.map?.dispose?.();
-              item.material.dispose?.();
-            }
-          });
-          renderer.dispose();
+          if (typeof window.disposeThreeScene === 'function') {
+            window.disposeThreeScene({
+              rafId,
+              resizeObserver: resize,
+              scene,
+              renderer,
+              cleanupListeners: [() => window.removeEventListener('pointerup', onPointerUp)]
+            });
+          } else {
+            if (rafId) cancelAnimationFrame(rafId);
+            window.removeEventListener('pointerup', onPointerUp);
+            resize.disconnect();
+            renderer.dispose();
+          }
         };
       }
 

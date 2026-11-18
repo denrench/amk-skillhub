@@ -1,16 +1,16 @@
 # EDU SPACE LMS — KNOWN ISSUES & ENVIRONMENT CONSTRAINTS
 
-**Platform:** Алматинский многопрофильный колледж (АМК) — EduSpace / SkillHub  
-**Updated:** 2026-11-06  
+**Platform:** Алматинский многопрофильный колледж (АМК) — EduSpace / SkillHub
+**Updated:** 2026-11-17
 
 ---
 
 ## 1. External Service Constraints
-- **Live SMTP Server:** If `SMTP_PASSWORD` / `SMTP_USER` environment variables are not supplied, the server operates in Dev Preview mode, printing the 6-digit OTP code to the server console log for verification. This ensures 100% testability in local and offline environments without breaking the user registration or password reset flows.
-- **Production PostgreSQL Database:** When `DATABASE_URL` is configured (e.g. on Render.com or local Postgres), the backend automatically engages the PostgreSQL adapter with SSL; in local offline development, it falls back to the local SQLite database (`database.db`) with zero schema discrepancies.
+- **Optional Local Email OTP (`SMTP` / `Resend`):** When `HOSTED=False` and neither `MAIL_API_KEY` nor `SMTP_PASSWORD` is configured, `email_verification_required` defaults to `false` (`/api/auth/readiness`), allowing local registration and login without SMTP/Resend credentials. Password recovery by email returns `503 MAIL_NOT_CONFIGURED` until mail credentials are provisioned (authenticated password change remains available in Profile Settings).
+- **Production PostgreSQL Database:** When `DATABASE_URL` is configured, the backend engages the PostgreSQL adapter with `sslmode=require` support and skips local SQLite fallback in `HOSTED` mode. Live PostgreSQL runtime execution is blocked locally unless PostgreSQL/Docker is provisioned.
+- **LLM AI Mentor:** `/api/ai/chat` returns `503 BLOCKED` (`AI_PROVIDER_UNCONFIGURED`) unless `GEMINI_API_KEY`, `OPENAI_API_KEY`, or a user-supplied session key is provided.
 
-## 2. Active Remediations In Progress
-- Resolving P0 access control flaws where anonymous requests bypass teacher and admin checks.
-- Adding idempotent `xp_transactions` ledger to eliminate gamification farming.
-- Integrating submission return for revision workflow.
-- Designing responsive and unified futuristic cybernetic design system across all 17 platform views.
+## 2. M1 Foundation Remediations Completed
+- Enforced server-side `@login_required()` / `@require_roles(...)` with `users.session_version` DB re-validation and teacher group isolation.
+- Enforced double-submit CSRF (`X-CSRF-Token`), strict `Origin` checks, allowlisted CORS preflight, and IP+account rate limiting on `/api/auth/*` and `/api/ai/*`.
+- Aligned 12->20 curriculum progression (`100` lessons / `100` tasks), HMAC-SHA256 certificate verification, XP ledger idempotency, XSS sanitization, and `EDUSPACE_DB_PATH` / `UPLOAD_DIR` configurability.

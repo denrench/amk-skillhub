@@ -628,7 +628,12 @@
 
   function detectDefaultLocale() {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const params = new URLSearchParams(window.location.search || '');
+      const qLang = params.get('lang');
+      if (qLang && LOCALES_CONFIG[qLang]) return qLang;
+    } catch (e) {}
+    try {
+      const saved = localStorage.getItem('amk.lang') || localStorage.getItem(STORAGE_KEY);
       if (saved && LOCALES_CONFIG[saved]) return saved;
     } catch (e) {}
 
@@ -835,18 +840,120 @@
     };
   }
 
+  const SHARED_UI_PHRASES_RU_KK = {
+    'Учебник': 'Оқулық',
+    'Практикум': 'Практикум',
+    'Возможности': 'Мүмкіндіктер',
+    'О колледже': 'Колледж туралы',
+    'Войти': 'Кіру',
+    'Вход': 'Кіру',
+    'Регистрация': 'Тіркелу',
+    'Моё обучение': 'Менің оқуым',
+    'Выйти': 'Шығу',
+    'Инструменты': 'Құралдар',
+    'Карьера': 'Мансап',
+    'Тарифы': 'Тарифтер',
+    'Отзывы': 'Пікірлер',
+    'Тренажёр': 'Жаттықтырғыш',
+    'Светлая': 'Ашық',
+    'Графит': 'Графит',
+    'Неон': 'Неон',
+    'Кабинет': 'Кабинет',
+    'К списку миссий': 'Миссиялар тізіміне',
+    'AI Тьютор': 'AI Тьютор',
+    'Синхронизировано с PostgreSQL': 'PostgreSQL-мен синхрондалған',
+    'Каталог курсов': 'Курстар каталогы',
+    'Проверка сертификата': 'Сертификатты тексеру',
+    'Личный кабинет': 'Жеке кабинет'
+  };
+
+  function translateSharedHeaderNodes() {
+    const header = document.querySelector('header');
+    if (!header) return;
+    const candidates = header.querySelectorAll('a, button, span, h1, p');
+    candidates.forEach(el => {
+      if (el.hasAttribute('data-i18n') || el.hasAttribute('data-lang') || el.children.length > 0) return;
+      const raw = (el.getAttribute('data-orig-ru') || el.textContent || '').trim();
+      if (!raw) return;
+      if (SHARED_UI_PHRASES_RU_KK[raw]) {
+        if (!el.hasAttribute('data-orig-ru')) {
+          el.setAttribute('data-orig-ru', raw);
+        }
+        el.textContent = currentLocale === 'kk' ? SHARED_UI_PHRASES_RU_KK[raw] : raw;
+      } else if (el.hasAttribute('data-orig-ru')) {
+        const orig = el.getAttribute('data-orig-ru');
+        el.textContent = currentLocale === 'kk' ? (SHARED_UI_PHRASES_RU_KK[orig] || orig) : orig;
+      }
+    });
+  }
+
+  function buildHeaderLangSwitcher() {
+    const header = document.querySelector('header');
+    if (!header) return;
+    const existingBtns = document.querySelectorAll('[data-lang-switch], [data-lang], [data-i18n-lang]');
+    if (existingBtns.length > 0) {
+      existingBtns.forEach(btn => {
+        const loc = btn.getAttribute('data-lang-switch') || btn.getAttribute('data-lang') || btn.getAttribute('data-i18n-lang');
+        if (!loc) return;
+        btn.setAttribute('data-lang', loc);
+        btn.setAttribute('data-i18n-lang', loc);
+        btn.setAttribute('data-lang-switch', loc);
+        if (!btn.hasAttribute('data-i18n-bound')) {
+          btn.setAttribute('data-i18n-bound', '1');
+          btn.addEventListener('click', () => setLocale(loc));
+        }
+      });
+      return;
+    }
+
+    const host =
+      document.getElementById('lang-switch-slot') ||
+      document.querySelector('.topbar .container') ||
+      header.querySelector('.max-w-7xl, .header-actions') ||
+      header;
+    if (!host) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'lang-switch';
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Язык интерфейса');
+
+    ['ru', 'kk'].forEach(code => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'lang-dot' + (code === currentLocale ? ' is-active' : '');
+      b.setAttribute('data-lang', code);
+      b.setAttribute('data-i18n-lang', code);
+      b.setAttribute('data-lang-switch', code);
+      b.setAttribute('data-i18n-bound', '1');
+      b.setAttribute('aria-pressed', String(code === currentLocale));
+      b.textContent = code === 'kk' ? 'ҚАЗ' : 'РУС';
+      b.addEventListener('click', () => setLocale(code));
+      wrap.appendChild(b);
+    });
+
+    const themeSwitch = host.querySelector('.theme-switch');
+    if (themeSwitch && themeSwitch.parentNode === host) {
+      host.insertBefore(wrap, themeSwitch);
+    } else {
+      host.appendChild(wrap);
+    }
+  }
+
   /**
    * Applies translations to DOM elements with [data-i18n] and [data-i18n-attr].
    */
   function applyTranslations(root = document) {
     if (!root) return;
 
-    // Update <html lang="...">, document.title and meta description
+    // Update <html lang="...">
     if (root === document && document.documentElement) {
       document.documentElement.setAttribute('lang', currentLocale);
-      document.title = t('meta.pageTitle');
-      const metaDesc = document.querySelector('meta[name="description"]');
-      if (metaDesc) metaDesc.setAttribute('content', t('meta.pageDescription'));
+      if (document.querySelector('[data-i18n]')) {
+        document.title = t('meta.pageTitle');
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', t('meta.pageDescription'));
+      }
     }
 
     // 1. Text content: [data-i18n="key"]
@@ -875,9 +982,11 @@
       });
     });
 
+    translateSharedHeaderNodes();
+
     // 3. Sync Language Switcher active states (aria-pressed, is-active)
-    document.querySelectorAll('[data-lang-switch]').forEach(btn => {
-      const btnLoc = btn.getAttribute('data-lang-switch');
+    document.querySelectorAll('[data-lang-switch], [data-lang], [data-i18n-lang]').forEach(btn => {
+      const btnLoc = btn.getAttribute('data-lang-switch') || btn.getAttribute('data-lang') || btn.getAttribute('data-i18n-lang');
       const isActive = btnLoc === currentLocale;
       btn.classList.toggle('is-active', isActive);
       btn.setAttribute('aria-pressed', String(isActive));
@@ -885,7 +994,7 @@
   }
 
   /**
-   * Switches active locale without page reload, with a 150ms fade transition.
+   * Switches active locale without page reload.
    */
   function setLocale(nextLocale, options = { silent: false, animate: true }) {
     if (!LOCALES_CONFIG[nextLocale]) {
@@ -898,7 +1007,7 @@
 
     try {
       localStorage.setItem(STORAGE_KEY, currentLocale);
-      // Persist in active user profile if logged in
+      localStorage.setItem('amk.lang', currentLocale);
       if (window.EduSpace && typeof window.EduSpace.getActiveUser === 'function') {
         const u = window.EduSpace.getActiveUser();
         if (u) {
@@ -908,25 +1017,14 @@
       }
     } catch (e) {}
 
-    const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const workspace = document.querySelector('.workspace-container') || document.querySelector('main');
+    if (document.documentElement) {
+      document.documentElement.setAttribute('lang', currentLocale);
+    }
 
-    const performDomUpdate = () => {
-      applyTranslations(document);
-      window.dispatchEvent(new CustomEvent('eduspace:localeChanged', { detail: { locale: currentLocale } }));
-      if (changed && !options.silent && typeof window.showToast === 'function') {
-        window.showToast(t('toast.langSwitched'), 'info');
-      }
-    };
-
-    if (changed && options.animate !== false && !reducedMotion && workspace) {
-      workspace.classList.add('i18n-fade-transition');
-      setTimeout(() => {
-        performDomUpdate();
-        workspace.classList.remove('i18n-fade-transition');
-      }, 150);
-    } else {
-      performDomUpdate();
+    applyTranslations(document);
+    window.dispatchEvent(new CustomEvent('eduspace:localeChanged', { detail: { locale: currentLocale } }));
+    if (changed && !options.silent && typeof window.showToast === 'function') {
+      window.showToast(t('toast.langSwitched'), 'info');
     }
 
     return currentLocale;
@@ -955,14 +1053,25 @@
 
   // Initialize locale immediately
   currentLocale = detectDefaultLocale();
+  try {
+    localStorage.setItem(STORAGE_KEY, currentLocale);
+    localStorage.setItem('amk.lang', currentLocale);
+  } catch (e) {}
   if (typeof document !== 'undefined' && document.documentElement) {
     document.documentElement.setAttribute('lang', currentLocale);
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function onReady() {
+    buildHeaderLangSwitcher();
     applyTranslations(document);
     loadExternalDictionaries();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', onReady);
+  } else {
+    onReady();
+  }
 
   window.I18n = {
     t,
@@ -981,3 +1090,4 @@
   };
   window.t = t;
 })();
+

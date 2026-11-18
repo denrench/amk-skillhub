@@ -23,49 +23,6 @@
 
   <!-- Tailwind CSS Local & CDN -->
   <link rel="stylesheet" href="css/tailwind.min.css"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    if (window.tailwind) tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
-          },
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
-              950: '#1e1b4b'
-            },
-            dark: {
-              950: '#07090e',
-              900: '#0b0f19',
-              850: '#101524',
-              800: '#161c2e',
-              700: '#1e263d',
-              600: '#2a3452'
-            }
-          },
-          boxShadow: {
-            'glow-indigo': '0 0 50px -10px rgba(99, 102, 241, 0.35)',
-            'glow-purple': '0 0 50px -10px rgba(168, 85, 247, 0.35)',
-            'glow-cyan': '0 0 50px -10px rgba(6, 182, 212, 0.35)',
-            'glow-amber': '0 0 50px -10px rgba(245, 158, 11, 0.35)'
-          }
-        }
-      }
-    };
-  </script>
 
   <style>
     .bg-grid-white {
@@ -87,13 +44,14 @@
     }
   </style>
 
-  <script src="js/courses-catalog.js"></script>
+  <script src="js/courses-catalog-lite.js"></script>
   <script src="js/app-logistics.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
   <link rel="stylesheet" href="css/workshop.css">
   <script src="js/prism-fx.js" defer></script>
   <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
   <link rel="stylesheet" href="css/photoreal-tools.css">
 </head>
 <body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white bg-grid-white relative">
@@ -286,7 +244,7 @@
           <div class="text-xs font-bold text-white uppercase tracking-wider mb-4">Навигация</div>
           <ul class="space-y-2 text-slate-400">
             <li><a href="features.html" class="hover:text-indigo-400 transition-colors">Возможности LMS</a></li>
-            <li><a href="tasks.html" class="hover:text-indigo-400 transition-colors">Каталог 50 модулей</a></li>
+            <li><a href="tasks.html" class="hover:text-indigo-400 transition-colors">Каталог 100 модулей</a></li>
             <li><a href="pricing.html" class="hover:text-indigo-400 transition-colors">Тарифы и подписка</a></li>
             <li><a href="gradebook.html" class="hover:text-indigo-400 transition-colors">Ведомость оценок</a></li>
             <li><a href="verify.html" class="hover:text-indigo-400 transition-colors">Реестр сертификатов</a></li>

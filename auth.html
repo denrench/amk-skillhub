@@ -7,11 +7,12 @@
   <title>Аккаунт · AMK SkillHub</title>
   <link rel="icon" href="assets/eduspace-logo.svg">
   <link rel="stylesheet" href="css/academy.css">
-  <script src="js/courses-catalog.js" defer></script>
+  <script src="js/courses-catalog-lite.js" defer></script>
   <script src="js/app-logistics.js" defer></script>
   <script src="js/academy-auth.js" defer></script>
   <script src="js/prism-fx.js" defer></script>
   <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
   <link rel="stylesheet" href="css/photoreal-tools.css">
 </head>
 <body>
@@ -50,9 +51,11 @@
         <label>Почта<input name="email" type="email" maxlength="120" autocomplete="username" required></label>
         <label>Пароль<input name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="128" aria-describedby="register-password-hint"></label>
         <p id="register-password-hint" class="muted">Не менее 8 символов, включая букву и цифру.</p>
-        <div><button type="button" class="button" data-send="register">Отправить код на почту</button></div>
-        <label>Код из письма<input name="verification_code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></label>
-        <button type="submit" class="button dark">Подтвердить и зарегистрироваться</button>
+        <div id="register-otp-group" hidden>
+          <div><button type="button" class="button" data-send="register">Отправить код на почту</button></div>
+          <label>Код из письма<input name="verification_code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6"></label>
+        </div>
+        <button type="submit" class="button dark">Зарегистрироваться</button>
       </form>
       <form class="fields" id="account-reset" hidden>
         <h2>Восстановление доступа</h2>
@@ -62,10 +65,6 @@
         <label>Новый пароль<input name="new_password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required></label>
         <button type="submit" class="button dark">Сохранить новый пароль</button>
       </form>
-    </section>
-    <section id="account-hosted" class="card" hidden><h2>Откройте сервер аккаунтов</h2>
-      <p id="account-hosted-status" role="status">Проверяем доступность сервера аккаунтов…</p>
-      <div><a id="account-server-link" class="button dark" href="https://amk-skillhub.onrender.com/auth.html" hidden>Перейти к аккаунтам</a></div>
     </section>
     <noscript><p>Для входа и регистрации включите JavaScript.</p></noscript>
   </main>

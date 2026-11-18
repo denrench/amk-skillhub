@@ -33,10 +33,21 @@
     return `learn.html?course=${target}${number ? `&lesson=${number}` : ''}`;
   }
 
+  let csrfToken = '';
+
   async function readAccountProgress() {
     if (!serverProgress) return;
     try {
-      const response = await fetch('/api/academy/progress', {signal: AbortSignal.timeout(4500)});
+      const sessResp = await fetch('/api/auth/session', { credentials: 'same-origin', signal: AbortSignal.timeout(4500) });
+      if (!sessResp.ok) return;
+      const sessData = await sessResp.json();
+      if (sessData && sessData.csrf_token) {
+        csrfToken = sessData.csrf_token;
+        window.EduSpace?.setCsrfToken?.(csrfToken);
+      }
+      if (!sessData || !sessData.authenticated) return;
+
+      const response = await fetch('/api/academy/progress', { credentials: 'same-origin', signal: AbortSignal.timeout(4500) });
       if (!response.ok) return;
       const progData = await response.json();
       accountProgress = new Set(progData.completed || []);
@@ -86,9 +97,15 @@
   async function saveAccountProgress() {
     if (!serverProgress || accountProgress.has(`${slug}:${requested}`)) return;
     try {
+      const tok = csrfToken || window.EduSpace?.getCsrfToken?.() || '';
+      const headers = { 'Content-Type': 'application/json' };
+      if (tok) headers['X-CSRF-Token'] = tok;
       const response = await fetch('/api/academy/progress', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({specialty: slug, lesson: requested}), signal: AbortSignal.timeout(4500),
+        method: 'POST',
+        credentials: 'same-origin',
+        headers,
+        body: JSON.stringify({ specialty: slug, lesson: requested }),
+        signal: AbortSignal.timeout(4500),
       });
       if (response.ok) {
         accountProgress.add(`${slug}:${requested}`);

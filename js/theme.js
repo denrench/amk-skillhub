@@ -1,4 +1,4 @@
-/* AMK SkillHub · Theme switcher: light (#F2EFE9) / graphite (#25262B) / neon.
+/* AMK SkillHub · Theme switcher: light (#F2EFE9) / graphite (#25262B) / neon (#0B0C10).
  * Подключается в <head> без defer — тема применяется до отрисовки (без вспышки). */
 (function () {
   'use strict';
@@ -27,18 +27,46 @@
     if (persist) {
       try { localStorage.setItem(KEY, id); } catch (e) { /* private mode */ }
     }
-    var btns = document.querySelectorAll('[data-theme-set]');
+    var btns = document.querySelectorAll('[data-theme-set], [data-theme-value], .theme-switch button[data-theme]');
     for (var i = 0; i < btns.length; i++) {
-      btns[i].setAttribute('aria-pressed', String(btns[i].getAttribute('data-theme-set') === id));
+      var bTheme = btns[i].getAttribute('data-theme-set') || btns[i].getAttribute('data-theme-value') || btns[i].getAttribute('data-theme');
+      var active = bTheme === id;
+      btns[i].setAttribute('aria-pressed', String(active));
+      btns[i].classList.toggle('is-active', active);
     }
     try { document.dispatchEvent(new CustomEvent('amk:theme', { detail: { theme: id } })); } catch (e) { /* old browsers */ }
   }
 
   apply(read(), false);
 
+  function findHeaderHost() {
+    var slot = document.getElementById('theme-switch-slot');
+    if (slot) return slot;
+    var topbarContainer = document.querySelector('.topbar .container');
+    if (topbarContainer) return topbarContainer;
+    var header = document.querySelector('header');
+    if (!header) return null;
+    var innerRow = header.querySelector('.max-w-7xl, .header-actions');
+    if (innerRow) return innerRow;
+    return header;
+  }
+
   function buildSwitcher() {
-    if (document.querySelector('.theme-switch')) return;
-    var host = document.querySelector('.topbar .container') || document.querySelector('header');
+    var existing = document.querySelector('.theme-switch');
+    if (existing) {
+      var exBtns = existing.querySelectorAll('button');
+      for (var j = 0; j < exBtns.length; j++) {
+        var tid = exBtns[j].getAttribute('data-theme-set') || exBtns[j].getAttribute('data-theme-value') || exBtns[j].getAttribute('data-theme');
+        if (tid) {
+          exBtns[j].setAttribute('data-theme-set', tid);
+          exBtns[j].setAttribute('data-theme-value', tid);
+          exBtns[j].setAttribute('data-theme', tid);
+        }
+      }
+      apply(read(), false);
+      return;
+    }
+    var host = findHeaderHost();
     if (!host) return;
     var wrap = document.createElement('div');
     wrap.className = 'theme-switch';
@@ -50,6 +78,8 @@
       b.type = 'button';
       b.className = 'theme-dot theme-dot--' + t.id;
       b.setAttribute('data-theme-set', t.id);
+      b.setAttribute('data-theme-value', t.id);
+      b.setAttribute('data-theme', t.id);
       b.setAttribute('aria-pressed', String(t.id === cur));
       b.setAttribute('title', t.hint);
       b.setAttribute('aria-label', t.label);
@@ -65,3 +95,4 @@
 
   window.AMKTheme = { set: function (id) { apply(id, true); }, get: read, list: THEMES };
 })();
+

@@ -11,9 +11,29 @@ import re
 import urllib.request
 import urllib.error
 
+class AIProviderUnconfiguredError(RuntimeError):
+    pass
+
+
+class AIProviderCallError(RuntimeError):
+    pass
+
+
+def resolve_llm_keys(user_api_key="", provider=""):
+    user_api_key = (user_api_key or "").strip()
+    provider = (provider or "").strip().lower()
+    gemini_key = os.environ.get("GEMINI_API_KEY") or (user_api_key if provider == "gemini" else "")
+    openai_key = (
+        os.environ.get("OPENAI_API_KEY")
+        or os.environ.get("OPENROUTER_API_KEY")
+        or (user_api_key if provider in ("openai", "openrouter", "") and user_api_key and not gemini_key else "")
+    )
+    return gemini_key, openai_key
+
+
 def _call_gemini_api(api_key, system_prompt, user_prompt):
     """Calls Google Gemini API safely via standard urllib."""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
     payload = {
         "contents": [
             {
@@ -31,7 +51,10 @@ def _call_gemini_api(api_key, system_prompt, user_prompt):
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Content-Type": "application/json"}
+        headers={
+            "Content-Type": "application/json",
+            "x-goog-api-key": api_key,
+        }
     )
     with urllib.request.urlopen(req, timeout=12) as response:
         res_data = json.loads(response.read().decode("utf-8"))
@@ -259,86 +282,87 @@ def generate_lesson_content(topic, discipline="IT", difficulty="beginner", durat
     ]
     return {"provider": "heuristic_offline", "blocks": blocks}
 
-def student_socratic_tutor(lesson_data, current_block, student_question, history=None):
+def student_socratic_tutor(lesson_data, current_block, student_question, history=None, context=None, user_api_key="", provider=""):
     """
     Socratic AI Tutor for students.
-    Assists in understanding concepts and hints, while STRICTLY guarding against giving direct test answers.
+    Strictly requires a configured LLM provider key; never falls back to canned offline replies.
     """
+    gemini_key, openai_key = resolve_llm_keys(user_api_key=user_api_key, provider=provider)
+    if not gemini_key and not openai_key:
+        raise AIProviderUnconfiguredError(
+            "AI-наставник недоступен: не задан API-ключ LLM (укажите в настройках или переменных окружения)."
+        )
+
     history = history or []
-    question_lower = student_question.lower()
-    
-    # 1. Anti-cheat Guardrail
+    context = context if isinstance(context, dict) else {}
+    lesson_title = lesson_data.get("title", "Текущий урок")
+    course_slug = lesson_data.get("course_slug") or context.get("course_slug") or "it"
+    block_type = current_block.get("type", "general")
+    block_title = current_block.get("title", "")
+
     cheat_triggers = [
         "дай ответ", "скажи ответ", "какой ответ", "правильный ответ",
         "ответ на тест", "ответ на вопрос", "вариант а или б", "а, б, в или г",
         "номер правильного ответа", "какой вариант выбрать", "реши за меня",
         "подскажи правильную букву", "скажи букву"
     ]
+    question_lower = student_question.lower()
     is_cheat_attempt = any(t in question_lower for t in cheat_triggers)
-    
-    if is_cheat_attempt:
-        return {
-            "role": "assistant",
-            "anti_cheat_triggered": True,
-            "message": (
-                "🎯 Как ваш образовательный наставник EduSpace, я не могу просто назвать правильную букву или готовый ответ на тест — "
-                "ведь главная цель обучения состоит в том, чтобы вы сами освоили этот навык!\n\n"
-                "💡 **Подсказка и направление для размышления:**\n"
-                "Обратите внимание на ключевой принцип в теоретическом блоке текущего урока. "
-                "Подумайте: какое из предложенных утверждений логически согласуется с этим правилом, а какие содержат заведомо абсурдные действия? "
-                "Перечитайте формулировку вопроса и попробуйте исключить явно неверные варианты. Какой у вас первый вариант?"
-            )
-        }
 
-    gemini_key = os.environ.get("GEMINI_API_KEY")
-    openai_key = os.environ.get("OPENAI_API_KEY")
-    
-    lesson_title = lesson_data.get("title", "Текущий урок")
-    block_type = current_block.get("type", "general")
-    block_title = current_block.get("title", "")
-    
     system_prompt = (
         "Ты — доброжелательный, чуткий и профессиональный Сократовский ИИ-тьютор образовательной платформы EduSpace. "
         "Твоя задача — помогать студенту глубоко понимать учебный материал, объяснять сложные термины простыми аналогиями, "
         "задавать наводящие вопросы и вдохновлять на самостоятельное решение. "
         "ПРАВИЛО БЕЗОПАСНОСТИ: Если студент пытается узнать прямой ответ на проверочный вопрос, вежливо откажи и дай подсказку по принципу работы."
     )
+
+    context_lines = []
+    if context.get("selected_part"):
+        context_lines.append(f"Выбранная 3D-деталь: {context.get('selected_part')}")
+    if context.get("disassembled_parts"):
+        context_lines.append(f"Разобранные детали: {', '.join(map(str, context.get('disassembled_parts') or []))}")
+    if context.get("simulator_state"):
+        context_lines.append(f"Состояние симулятора: {json.dumps(context.get('simulator_state'), ensure_ascii=False)[:600]}")
+    if context.get("recent_errors"):
+        context_lines.append(f"Недавние ошибки: {json.dumps(context.get('recent_errors'), ensure_ascii=False)[:600]}")
+    history_lines = []
+    for item in history[-6:]:
+        if isinstance(item, dict) and item.get("content"):
+            history_lines.append(f"{item.get('role', 'user')}: {str(item.get('content'))[:300]}")
+
     user_prompt = (
+        f"Курс: {course_slug}\n"
         f"Урок: {lesson_title}\n"
         f"Текущий блок: {block_title} ({block_type})\n"
-        f"Вопрос студента: {student_question}\n"
+        + ("Контекст 3D/симулятора:\n" + "\n".join(context_lines) + "\n" if context_lines else "")
+        + ("История диалога:\n" + "\n".join(history_lines) + "\n" if history_lines else "")
+        + ("ВНИМАНИЕ: студент запросил готовый ответ на тест — не раскрывай ответ, дай только Сократовскую подсказку.\n" if is_cheat_attempt else "")
+        + f"Вопрос студента: {student_question}\n"
         "Ответь структурированно, понятно и поддерживающе в стиле персонального наставника."
     )
-    
+
+    last_error = None
     if gemini_key:
         try:
             ans = _call_gemini_api(gemini_key, system_prompt, user_prompt)
             if ans:
-                return {"role": "assistant", "anti_cheat_triggered": False, "message": ans.strip()}
+                return {"role": "assistant", "anti_cheat_triggered": is_cheat_attempt, "message": ans.strip(), "provider": "gemini"}
         except Exception as e:
+            last_error = e
             print(f"[WARN] Gemini tutor failed: {e}")
-            
+
     if openai_key:
         try:
             ans = _call_openai_api(openai_key, system_prompt, user_prompt)
             if ans:
-                return {"role": "assistant", "anti_cheat_triggered": False, "message": ans.strip()}
+                return {"role": "assistant", "anti_cheat_triggered": is_cheat_attempt, "message": ans.strip(), "provider": "openai"}
         except Exception as e:
+            last_error = e
             print(f"[WARN] OpenAI tutor failed: {e}")
 
-    # Deterministic Contextual Tutor (Offline Engine)
-    return {
-        "role": "assistant",
-        "anti_cheat_triggered": False,
-        "message": (
-            f"👋 Отличный вопрос по теме «{lesson_title}»!\n\n"
-            f"Давайте разберем его по шагам:\n"
-            f"1. В блоке «{block_title}» ключевым является понимание взаимосвязи компонентов и их назначения.\n"
-            f"2. При возникновении затруднений полезно провести аналогию с реальной практикой: представьте, как система ведет себя в штатном режиме.\n"
-            f"3. Обратите внимание на правила и термины, выделенные в карточках с подсказками.\n\n"
-            f"Если хотите, мы можем разобрать конкретный пример. Что именно в данном правиле показалось вам наиболее сложным?"
-        )
-    }
+    raise AIProviderCallError(
+        f"Провайдер LLM не вернул ответ ({type(last_error).__name__ if last_error else 'EmptyResponse'})."
+    )
 
 def review_submission_ai(submission_data, task_data):
     """

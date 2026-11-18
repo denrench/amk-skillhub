@@ -352,109 +352,106 @@ body.workshop main .tilt-3d:hover {
 #edu-modal-dialog,
 #edu-auth-guard > div,
 #edu-command-palette-modal > div {
-  background-color: #ffffff !important;
-  border: 1px solid rgba(15, 23, 42, 0.14) !important;
+  background-color: var(--surface-solid, #ffffff) !important;
+  border: 1px solid var(--line, rgba(15, 23, 42, 0.14)) !important;
   border-radius: 16px !important;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18) !important;
-  color: #0f172a !important;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25) !important;
+  color: var(--ink, #0f172a) !important;
 }
 
 #edu-modal-dialog > .edu-modal-header,
 #edu-modal-dialog > div:first-child {
-  background-color: #f8fafc !important;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.1) !important;
+  background-color: var(--bg-elev, #f8fafc) !important;
+  border-bottom: 1px solid var(--line, rgba(15, 23, 42, 0.1)) !important;
 }
 
 #edu-modal-dialog > .edu-modal-body {
-  background-color: #ffffff !important;
-  color: #334155 !important;
+  background-color: var(--surface-solid, #ffffff) !important;
+  color: var(--ink-soft, #334155) !important;
 }
 
 #ai-tutor-drawer {
-  background-color: #ffffff !important;
-  border-left: 1px solid rgba(15, 23, 42, 0.12) !important;
+  background-color: var(--surface-solid, #ffffff) !important;
+  border-left: 1px solid var(--line, rgba(15, 23, 42, 0.12)) !important;
 }
 
 /* ==========================================================================
-   UNIVERSAL LIGHT DAYLIGHT OVERRIDE ACROSS PORTAL & MARKETING PAGES
+   UNIFIED THEME-AWARE SURFACES ACROSS PORTAL & MARKETING PAGES
    ========================================================================== */
 html, body {
-  background-color: #eef2ff !important;
-  background-image:
-    radial-gradient(ellipse 65% 45% at 10% -5%, rgba(251, 146, 60, 0.16), transparent 60%),
-    radial-gradient(ellipse 70% 50% at 92% 0%, rgba(79, 70, 229, 0.2), transparent 58%),
-    radial-gradient(ellipse 60% 45% at 80% 90%, rgba(14, 165, 233, 0.15), transparent 60%) !important;
-  background-attachment: scroll !important;
-  color: #0f172a !important;
+  background-color: var(--bg, #F2EFE9);
+  color: var(--ink, #1F2126);
+  overflow-x: clip;
+  max-width: 100vw;
 }
 
 .bg-grid-white {
-  background-image: radial-gradient(rgba(79, 70, 229, 0.11) 1px, transparent 1px) !important;
+  background-image: radial-gradient(var(--line, rgba(79, 70, 229, 0.11)) 1px, transparent 1px) !important;
 }
 
-:is([class*="bg-dark-950"], [class*="bg-slate-950"], [class*="bg-gray-950"]) {
-  background-color: rgba(238, 242, 255, 0.72) !important;
+:is([class*="bg-dark-950"], [class*="bg-slate-950"], [class*="bg-gray-950"], .bg-neo-bg) {
+  background-color: var(--bg-elev, #E6E1D8) !important;
 }
-:is([class*="bg-dark-900"], [class*="bg-slate-900"], [class*="bg-slate-800"], [class*="bg-gray-900"]) {
-  background-color: rgba(255, 255, 255, 0.92) !important;
-  box-shadow: 0 12px 30px -14px rgba(30, 27, 75, 0.14) !important;
+:is([class*="bg-dark-900"], [class*="bg-slate-900"], [class*="bg-slate-800"], [class*="bg-gray-900"], .bg-neo-surface) {
+  background-color: var(--surface, #FAF8F5) !important;
+  box-shadow: 0 12px 30px -14px rgba(0, 0, 0, 0.14) !important;
 }
 :is([class*="bg-dark-850"], [class*="bg-dark-800"], [class*="bg-dark-700"]) {
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.96) 0%, rgba(238, 242, 255, 0.9) 100%) !important;
-  box-shadow: 0 14px 32px -16px rgba(79, 70, 229, 0.16) !important;
+  background: var(--surface-solid, #FFFFFF) !important;
+  box-shadow: 0 14px 32px -16px rgba(0, 0, 0, 0.16) !important;
 }
 :is(.bg-indigo-950\/60, .bg-indigo-950\/40, .bg-indigo-950\/30, .bg-indigo-950\/20) {
-  background-color: #eef2ff !important;
+  background-color: var(--bg-elev, #eef2ff) !important;
 }
 :is(.bg-emerald-950\/40, .bg-emerald-950\/30, .bg-emerald-950\/20) {
-  background-color: #ecfdf5 !important;
+  background-color: rgba(16, 185, 129, 0.1) !important;
 }
 :is(.bg-amber-950\/30, .bg-amber-950\/20) {
-  background-color: #fffbeb !important;
+  background-color: rgba(245, 158, 11, 0.1) !important;
 }
 :is(.bg-purple-950\/40) {
-  background-color: #f5f3ff !important;
+  background-color: rgba(139, 92, 246, 0.1) !important;
 }
 :is(.bg-white\/5, .bg-white\/\[0\.04\]) {
-  background-color: rgba(15, 23, 42, 0.04) !important;
+  background-color: var(--bg-elev) !important;
 }
 :is(.bg-white\/10, .hover\:bg-white\/10:hover) {
-  background-color: rgba(15, 23, 42, 0.07) !important;
+  background-color: var(--surface-hover) !important;
 }
 :is(.bg-white\/15, .bg-white\/20, .hover\:bg-white\/15:hover, .hover\:bg-white\/20:hover) {
-  background-color: rgba(15, 23, 42, 0.11) !important;
+  background-color: var(--surface-hover) !important;
 }
-:is(.bg-indigo-500\/20, .bg-indigo-500\/10) { background-color: rgba(79, 70, 229, 0.09) !important; }
-:is(.bg-emerald-500\/20, .bg-emerald-500\/10) { background-color: rgba(5, 150, 105, 0.09) !important; }
-:is(.bg-amber-500\/20, .bg-amber-500\/10) { background-color: rgba(217, 119, 6, 0.09) !important; }
-:is(.bg-cyan-500\/20, .bg-cyan-500\/10) { background-color: rgba(2, 132, 199, 0.09) !important; }
-:is(.bg-red-500\/10, .bg-red-500\/20) { background-color: rgba(220, 38, 38, 0.09) !important; }
-:is(.blur-3xl, .blur-2xl).pointer-events-none { opacity: 0.35 !important; z-index: 0 !important; }
+:is(.bg-indigo-500\/20, .bg-indigo-500\/10) { background-color: rgba(79, 70, 229, 0.12) !important; }
+:is(.bg-emerald-500\/20, .bg-emerald-500\/10) { background-color: rgba(5, 150, 105, 0.12) !important; }
+:is(.bg-amber-500\/20, .bg-amber-500\/10) { background-color: rgba(217, 119, 6, 0.12) !important; }
+:is(.bg-cyan-500\/20, .bg-cyan-500\/10) { background-color: rgba(2, 132, 199, 0.12) !important; }
+:is(.bg-red-500\/10, .bg-red-500\/20) { background-color: rgba(220, 38, 38, 0.12) !important; }
+:is(.blur-3xl, .blur-2xl).pointer-events-none { opacity: 0.25 !important; z-index: 0 !important; }
 #lp-block-canvas .relative > :not(.pointer-events-none) { position: relative; z-index: 1; }
 
-/* Crisp Light Borders */
+/* Theme-Aware Crisp Borders */
 :is(.border-white\/5, .border-white\/10, .border-slate-800, .border-dark-700, .border-dark-600) {
-  border-color: rgba(15, 23, 42, 0.12) !important;
+  border-color: var(--line, rgba(15, 23, 42, 0.14)) !important;
 }
 :is(.border-white\/15, .border-white\/20) {
-  border-color: rgba(15, 23, 42, 0.18) !important;
+  border-color: var(--line-strong, rgba(15, 23, 42, 0.22)) !important;
 }
-:is(.border-indigo-500\/30, .border-indigo-500\/40, .border-indigo-500\/80) { border-color: rgba(79, 70, 229, 0.35) !important; }
-:is(.border-emerald-500\/30, .border-emerald-500\/50) { border-color: rgba(5, 150, 105, 0.35) !important; }
-:is(.border-amber-500\/30, .border-amber-500\/40) { border-color: rgba(217, 119, 6, 0.35) !important; }
-:is(.border-purple-500\/30) { border-color: rgba(124, 58, 237, 0.35) !important; }
+:is(.border-indigo-500\/30, .border-indigo-500\/40, .border-indigo-500\/80) { border-color: rgba(79, 70, 229, 0.4) !important; }
+:is(.border-emerald-500\/30, .border-emerald-500\/50) { border-color: rgba(5, 150, 105, 0.4) !important; }
+:is(.border-amber-500\/30, .border-amber-500\/40) { border-color: rgba(217, 119, 6, 0.4) !important; }
+:is(.border-purple-500\/30) { border-color: rgba(124, 58, 237, 0.4) !important; }
 
-/* Dark High-Contrast Typography inside Light Containers */
-:is(.text-white, .text-slate-100, .text-slate-200, .text-gray-100, .text-gray-200) {
-  color: #0f172a !important;
+/* Theme-Aware High-Contrast Typography */
+:is(.text-white, .text-slate-100, .text-slate-200, .text-gray-100, .text-gray-200, .text-neo-white) {
+  color: var(--ink, #1F2126) !important;
 }
-:is(.text-slate-300, .text-gray-300) { color: #334155 !important; }
-:is(.text-slate-400, .text-slate-500, .text-gray-400) { color: #475569 !important; }
-:is(.text-indigo-300, .text-indigo-200) { color: #3730a3 !important; }
-:is(.text-cyan-300, .text-cyan-400, .text-sky-300) { color: #0369a1 !important; }
-:is(.text-emerald-300, .text-emerald-400) { color: #047857 !important; }
-:is(.text-amber-300, .text-amber-400) { color: #b45309 !important; }
-:is(.text-purple-300, .text-purple-400) { color: #6d28d9 !important; }
+:is(.text-slate-300, .text-gray-300) { color: var(--ink-soft, #32343A) !important; }
+:is(.text-slate-400, .text-slate-500, .text-gray-400, .text-neo-gray) { color: var(--muted, #525660) !important; }
+:root[data-theme="light"] :is(.text-indigo-300, .text-indigo-200, .text-indigo-400) { color: #3730a3 !important; }
+:root[data-theme="light"] :is(.text-cyan-300, .text-cyan-400, .text-sky-300, .text-neo-cyan) { color: #0369a1 !important; }
+:root[data-theme="light"] :is(.text-emerald-300, .text-emerald-400, .text-neo-success) { color: #047857 !important; }
+:root[data-theme="light"] :is(.text-amber-300, .text-amber-400) { color: #b45309 !important; }
+:root[data-theme="light"] :is(.text-purple-300, .text-purple-400, .text-neo-purple) { color: #6d28d9 !important; }
 
 /* Rich dark-indigo gradient restoration for hero banners & featured cards with dark stops */
 body.workshop main [class*="bg-gradient-to-"]:is([class*="900"], [class*="950"], [class*="800"]):not(.bg-clip-text):not(.text-transparent) {
@@ -477,18 +474,19 @@ body.workshop main [class*="bg-gradient-to-"]:is([class*="900"], [class*="950"],
 
 body.workshop main #cv-avatar-initials,
 body.workshop main [class*="bg-gradient-to-"]:not(.bg-clip-text) .bg-dark-850#cv-avatar-initials {
-  background: linear-gradient(135deg, #eef2ff, #e0e7ff) !important;
-  color: #312e81 !important;
+  background: var(--bg-elev) !important;
+  color: var(--ink) !important;
 }
 
-/* High-contrast daylight gradient text */
+/* High-contrast theme-aware gradient text */
 .bg-clip-text {
-  background-image: linear-gradient(135deg, #1d4ed8, #4f46e5) !important;
+  background-image: linear-gradient(135deg, var(--accent, #2563eb), var(--primary-deep, #4f46e5)) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
-  color: #1d4ed8 !important;
+  color: var(--accent, #2563eb) !important;
 }
+
 
 /* Preserve dark stage inside 3D / Video / Interactive Lab consoles */
 .studio-stage, .workshop-visual, #lp-block-canvas video {

@@ -13,7 +13,8 @@
   'use strict';
 
   const SESSION_KEY = 'eduspace_active_session_v3';
-  const LOCAL_DB_KEY = 'eduspace_lms_db_v4';
+  const CSRF_STORAGE_KEY = 'eduspace_csrf_token_v1';
+  let _inMemoryCsrfToken = '';
 
   function normalizeTeacherCode(str) {
     if (!str) return '';
@@ -27,8 +28,24 @@
     return clean.split('').map(ch => map[ch] || ch).join('');
   }
 
-  const _RAW_TEACHER_CODES = ['AMK2026', 'TEACHER2026', 'EDU2026', 'AMK', 'TEACHER', 'EDU', '2026', 'AMKCOLLEGE', 'AMKEDUSPACE', 'ПРЕПОДАВАТЕЛЬ', 'ПРЕПОД'];
-  const TEACHER_CODES = _RAW_TEACHER_CODES.map(normalizeTeacherCode);
+  function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function safeUrl(url, fallback = '#') {
+    if (!url) return fallback;
+    const raw = String(url).trim();
+    if (/^(https?:\/\/|\/|[A-Za-z0-9_.\-]+\.html([?#].*)?$)/i.test(raw)) {
+      return escapeHtml(raw);
+    }
+    return fallback;
+  }
 
   const NAME_WORD_RE = /^[А-Яа-яЁёӘәІіҢңҒғҮүҰұҚқӨөҺһA-Za-z\-]{2,40}$/;
   const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,12}$/;
@@ -132,7 +149,7 @@
 
   function validatePasswordStrength(password) {
     const pwd = password || '';
-    const hasMinLen = pwd.length >= 6;
+    const hasMinLen = pwd.length >= 8;
     const hasLetter = /[A-Za-zА-Яа-яЁё]/.test(pwd);
     const hasDigit = /\d/.test(pwd);
     const hasSpecialOrUpper = /[A-ZА-ЯЁ!@#$%^&*()_+\-=]/.test(pwd);
@@ -140,15 +157,17 @@
 
     if (hasMinLen) score++;
     if (hasLetter && hasDigit) score++;
-    if (pwd.length >= 8) score++;
+    if (pwd.length >= 10) score++;
     if (hasSpecialOrUpper) score++;
 
     const valid = hasMinLen && hasLetter && hasDigit;
 
     return {
       valid,
+      ok: valid,
       score, // 0..4
-      error: valid ? null : 'Пароль должен содержать минимум 6 символов, включая буквы и цифры.'
+      message: valid ? null : 'Пароль должен содержать минимум 8 символов, включая буквы и цифры.',
+      error: valid ? null : 'Пароль должен содержать минимум 8 символов, включая буквы и цифры.'
     };
   }
 
@@ -279,484 +298,121 @@
   }
 
   // ==========================================
-  // 2. LOCAL RELATIONAL DB FALLBACK (GITHUB PAGES)
-
+  // 2. CSRF & API BASE HELPERS (FAIL-CLOSED, NO LOCAL FAKE AUTH)
   // ==========================================
 
-  async function loadLocalDB() {
-    let db = null;
+  function apiBase() {
+    if (typeof window !== 'undefined' && window.EDUSPACE_API_BASE) {
+      return String(window.EDUSPACE_API_BASE).replace(/\/+$/, '');
+    }
+    return '';
+  }
+
+  function getCsrfToken() {
+    if (_inMemoryCsrfToken) return _inMemoryCsrfToken;
     try {
-      const raw = localStorage.getItem(LOCAL_DB_KEY);
-
-      if (raw) db = JSON.parse(raw);
+      const m = document.cookie.match(/(?:^|;\s*)eduspace_csrf=([^;]+)/);
+      if (m && m[1]) {
+        _inMemoryCsrfToken = decodeURIComponent(m[1]);
+        return _inMemoryCsrfToken;
+      }
     } catch (e) {}
+    try {
+      const stored = sessionStorage.getItem(CSRF_STORAGE_KEY);
+      if (stored) {
+        _inMemoryCsrfToken = stored;
+        return stored;
+      }
+    } catch (e) {}
+    return '';
+  }
 
-    if (!db || !Array.isArray(db.users)) {
-      const studentHash = await sha256Hex('student123');
-      const teacherHash = await sha256Hex('teacher123');
-      db = {
-        current_study_day: 1,
-        next_user_id: 4,
-        next_sub_id: 1,
-        next_notif_id: 2,
-        next_msg_id: 2,
-        users: [
-          {
-            id: 1,
-            email: 'student@amk.kz',
-            password_hash: studentHash,
-            full_name: 'Оспанов Адилет Серикович',
-            last_name: 'Оспанов',
-            first_name: 'Адилет',
-            middle_name: 'Серикович',
-            role: 'student',
-            group_name: 'ИС-21',
-            specialty_slug: 'it',
-            department: '',
-            student_id: 'KZ-AMK-2026-10001',
-            email_verified: true,
-            is_demo: true,
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 2,
-            email: 'voronov@student.amk.kz',
-            password_hash: studentHash,
-            full_name: 'Воронов Константин Сергеевич',
-            last_name: 'Воронов',
-            first_name: 'Константин',
-            middle_name: 'Сергеевич',
-            role: 'student',
-            group_name: 'ИС-21',
-            specialty_slug: 'it',
-            department: '',
-            student_id: 'KZ-AMK-2026-98421',
-            email_verified: true,
-            is_demo: true,
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 3,
-            email: 'teacher@amk.kz',
-            password_hash: teacherHash,
-            full_name: 'Иванов Сергей Павлович',
-            last_name: 'Иванов',
-            first_name: 'Сергей',
-            middle_name: 'Павлович',
-            role: 'teacher',
-            group_name: 'Кафедра ИТ',
-            specialty_slug: 'it',
-            department: 'Кафедра информационных технологий',
-            student_id: null,
-            email_verified: true,
-            is_demo: true,
-            created_at: new Date().toISOString()
-          },
-          {
-            id: 95,
-            email: 'real_student_alpha@amk.kz',
-            password_hash: studentHash,
-            full_name: 'Касымов Алихан Батырович',
-            last_name: 'Касымов',
-            first_name: 'Алихан',
-            middle_name: 'Батырович',
-            role: 'student',
-            group_name: 'ИС-21',
-            specialty_slug: 'it',
-            department: '',
-            student_id: 'KZ-AMK-2026-10095',
-            email_verified: true,
-            is_demo: false,
-            created_at: new Date(Date.now() - 3600000).toISOString()
-          },
-          {
-            id: 96,
-            email: 'real_student_beta@amk.kz',
-            password_hash: studentHash,
-            full_name: 'Садыкова Дильназ Ерлановна',
-            last_name: 'Садыкова',
-            first_name: 'Дильназ',
-            middle_name: 'Ерлановна',
-            role: 'student',
-            group_name: 'ГД-22',
-            specialty_slug: 'graphic_design',
-            department: '',
-            student_id: 'KZ-AMK-2026-10096',
-            email_verified: true,
-            is_demo: false,
-            created_at: new Date(Date.now() - 1800000).toISOString()
-          }
-        ],
-        verifications: {},
-        enrollments: [
-          { user_id: 1, specialty_slug: 'it' },
-          { user_id: 2, specialty_slug: 'it' },
-          { user_id: 95, specialty_slug: 'it' },
-          { user_id: 96, specialty_slug: 'graphic_design' }
-        ],
-        progress: {},
-        custom_tasks: {},
-        submissions: [],
-        notifications: [
-          {
-            id: 1,
-            user_id: null,
-            target_group: '',
-            title: 'Добро пожаловать на образовательную платформу EDU SPACE!',
-            body: 'Обучение начинается с Урока №1. Изучите теоретический конспект, ответьте на 3 проверочных вопроса и выполните практику в тренажёре.',
-            type: 'info',
-            is_read: false,
-            created_at: new Date().toLocaleString('ru-RU')
-          }
-        ],
-        messages: [
-          {
-            id: 1,
-            sender_id: 3,
-            sender_name: 'Куратор курса',
-            sender_role: 'teacher',
-            recipient_key: 'general',
-            body: 'Здравствуйте! Если возникнут вопросы по теории или автотестам урока — пишите в этот чат, я на связи.',
-            created_at: 'Сегодня, 09:05'
-          }
-        ]
-      };
-      saveLocalDB(db);
+  function setCsrfToken(token) {
+    if (!token || typeof token !== 'string') return;
+    _inMemoryCsrfToken = token;
+    try { sessionStorage.setItem(CSRF_STORAGE_KEY, token); } catch (e) {}
+  }
+
+  async function ensureCsrfToken() {
+    const existing = getCsrfToken();
+    if (existing) return existing;
+    try {
+      const res = await fetch(apiBase() + '/api/auth/session', {
+        credentials: 'same-origin',
+        signal: AbortSignal.timeout(5000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.csrf_token) setCsrfToken(data.csrf_token);
+      }
+    } catch (e) {}
+    return getCsrfToken();
+  }
+
+  async function fetchWithCsrf(url, options = {}) {
+    const opts = Object.assign({}, options);
+    const method = (opts.method || 'GET').toUpperCase();
+    const headers = Object.assign({}, opts.headers || {});
+    const isFormData = (typeof FormData !== 'undefined') && (opts.body instanceof FormData);
+
+    if (!isFormData && opts.body !== undefined && typeof opts.body !== 'string') {
+      opts.body = JSON.stringify(opts.body);
+    }
+    if (!isFormData && opts.body !== undefined && !headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+      const tok = await ensureCsrfToken();
+      if (tok && !headers['X-CSRF-Token']) {
+        headers['X-CSRF-Token'] = tok;
+      }
+    }
+    opts.headers = headers;
+    if (!opts.credentials) opts.credentials = 'same-origin';
+    const targetUrl = /^https?:\/\//i.test(url) ? url : (apiBase() + url);
+    return fetch(targetUrl, opts);
+  }
+
+  function readOnlyStaticCatalogResponse(urlStr, options = {}) {
+    const isStaticHost = typeof location !== 'undefined' && location.hostname.endsWith('.github.io');
+    const method = (options.method || 'GET').toUpperCase();
+    const unavailable = {
+      ok: false,
+      status: 503,
+      data: {
+        success: false,
+        code: 'BACKEND_UNAVAILABLE',
+        message: 'Сервер платформы недоступен. Повторите попытку позже.'
+      }
+    };
+    if (!isStaticHost || method !== 'GET') {
+      return unavailable;
     }
 
-    return db;
-  }
-
-  function saveLocalDB(db) {
-    try {
-      localStorage.setItem(LOCAL_DB_KEY, JSON.stringify(db));
-    } catch (e) {}
-  }
-
-  async function handleLocalApi(urlStr, options = {}) {
-    const db = await loadLocalDB();
     const base = (window.location && window.location.origin && window.location.origin !== 'null') ? window.location.origin : 'http://localhost';
     const uObj = new URL(urlStr, base);
     const path = uObj.pathname;
     const params = uObj.searchParams;
-    const method = (options.method || 'GET').toUpperCase();
-    let body = {};
 
-    if (options.body) {
-      try { body = typeof options.body === 'string' ? JSON.parse(options.body) : options.body; } catch (e) {}
+    if (path === '/api/courses') {
+      const coursesOut = getCoursesList().map(c => Object.assign({}, c, {
+        enrolled: false,
+        completed_lessons: 0,
+        total_lessons: 20,
+        progress_percent: 0
+      }));
+      return { ok: true, status: 200, data: { success: true, courses: coursesOut, current_study_day: 1 } };
     }
 
-    const reply = (status, data) => ({ ok: status >= 200 && status < 300, status, data });
-    // 1. Send email verification code
-
-    if (path === '/api/auth/send_code' && method === 'POST') {
-      const emCheck = validateEmailFormat(body.email);
-
-      if (!emCheck.valid) return reply(400, { success: false, message: emCheck.error });
-
-      const email = emCheck.email;
-
-      if (db.users.some(u => u.email === email)) {
-        return reply(409, { success: false, message: 'Пользователь с таким email уже зарегистрирован. Перейдите на вкладку «Вход».' });
-      }
-
-      const code = String(Math.floor(100000 + Math.random() * 900000));
-      db.verifications[email] = {
-        code,
-        expires_at: Date.now() + 600000,
-        verified: false
-      };
-      saveLocalDB(db);
-
-      return reply(200, {
-        success: true,
-        message: `6-значный код подтверждения отправлен на ${email}`,
-        expires_in_seconds: 600,
-        mail_preview: {
-          to: email,
-          from: 'noreply@eduspace.amk.kz',
-          subject: 'Подтверждение электронной почты EDU SPACE',
-          code
-        }
-      });
-    }
-    // 2. Verify email code
-
-    if (path === '/api/auth/verify_code' && method === 'POST') {
-      const email = (body.email || '').trim().toLowerCase();
-      const code = String(body.code || '').trim();
-      const rec = db.verifications[email];
-
-      if (!rec) return reply(400, { success: false, message: 'Сначала запросите код подтверждения на почту.' });
-      if (Date.now() > rec.expires_at) return reply(400, { success: false, message: 'Срок действия кода истёк. Запросите новый код.' });
-      if (rec.code !== code) return reply(400, { success: false, message: 'Неверный 6-значный код подтверждения. Проверьте письмо.' });
-      rec.verified = true;
-      saveLocalDB(db);
-
-      return reply(200, { success: true, verified: true, message: 'Электронная почта успешно подтверждена!' });
-    }
-    // 3. Register
-
-    if (path === '/api/auth/register' && method === 'POST') {
-      const role = (body.role || 'student').trim().toLowerCase();
-
-      if (!['student', 'teacher'].includes(role)) {
-        return reply(400, { success: false, message: 'Недопустимая роль пользователя.' });
-      }
-
-      const fio = validateFioFields(body);
-
-      if (!fio.valid) return reply(400, { success: false, message: fio.error });
-
-      const emCheck = validateEmailFormat(body.email);
-
-      if (!emCheck.valid) return reply(400, { success: false, message: emCheck.error });
-
-      const email = emCheck.email;
-      const pwdCheck = validatePasswordStrength(body.password);
-
-      if (!pwdCheck.valid) return reply(400, { success: false, message: pwdCheck.error });
-      if (role === 'teacher') {
-        const rawCode = (body.teacher_code || '').trim();
-        const normCode = normalizeTeacherCode(rawCode);
-        const isValid = Boolean(rawCode && TEACHER_CODES.includes(normCode));
-
-        if (!isValid) {
-          return reply(403, { success: false, message: 'Неверный служебный код преподавателя. Код кафедры: AMK2026 (можно вводить русскими или латинскими буквами).' });
-        }
-      }
-
-      if (db.users.some(u => u.email === email)) {
-        return reply(409, { success: false, message: 'Пользователь с таким email уже зарегистрирован.' });
-      }
-
-      const verRec = db.verifications[email];
-      const vCode = String(body.verification_code || '').trim();
-
-      if (!verRec) {
-        return reply(400, { success: false, require_verification: true, message: 'Сначала подтвердите электронную почту 6-значным кодом.' });
-      }
-
-      if (!verRec.verified) {
-        if (vCode && verRec.code === vCode && Date.now() <= verRec.expires_at) {
-          verRec.verified = true;
-        } else {
-          return reply(400, { success: false, require_verification: true, message: 'Электронная почта не подтверждена или введён неверный код.' });
-        }
-      }
-
-      const uid = db.next_user_id++;
-      const specSlug = getCourseBySlug(body.specialty_slug || 'it').slug;
-      const dept = (body.department || 'Кафедра профильных дисциплин АМК').trim();
-      const groupName = role === 'teacher' ? dept : ((body.group_name || 'ИС-21').trim());
-      const pwdHash = await sha256Hex(body.password);
-      const newUser = {
-        id: uid,
-        email,
-        password_hash: pwdHash,
-        full_name: fio.full_name,
-        last_name: fio.last_name,
-        first_name: fio.first_name,
-        middle_name: fio.middle_name,
-        role,
-        group_name: groupName,
-        specialty_slug: specSlug,
-        department: role === 'teacher' ? dept : '',
-        student_id: role === 'student' ? `KZ-AMK-2026-${10000 + uid}` : null,
-        email_verified: true,
-        is_demo: false,
-        created_at: new Date().toISOString()
-      };
-      db.users.push(newUser);
-
-      if (role === 'student') {
-        db.enrollments.push({ user_id: uid, specialty_slug: specSlug });
-
-        const courseObj = getCourseBySlug(specSlug);
-        db.notifications.unshift({
-          id: db.next_notif_id++,
-          user_id: uid,
-          target_group: '',
-          title: `Вы зачислены на курс «${courseObj.short_title}»!`,
-          body: `${fio.first_name}, ваш аккаунт и почта ${email} подтверждены. Прогресс 0% — приступайте к Уроку №1.`,
-          type: 'success',
-          is_read: false,
-          created_at: new Date().toLocaleString('ru-RU')
-        });
-      }
-      saveLocalDB(db);
-
-      return reply(201, {
-        success: true,
-        message: `Регистрация успешно завершена! Добро пожаловать, ${fio.first_name}!`,
-        user: enrichUserObject(newUser)
-      });
-    }
-    // 4. Login
-
-    if (path === '/api/auth/login' && method === 'POST') {
-      const email = (body.email || '').trim().toLowerCase();
-      const password = (body.password || '').trim();
-
-      if (!email || !password) return reply(400, { success: false, message: 'Введите email и пароль.' });
-
-      const pwdHash = await sha256Hex(password);
-      const found = db.users.find(u => u.email === email && u.password_hash === pwdHash);
-
-      if (!found) {
-        return reply(401, { success: false, message: 'Неверный email или пароль. Проверьте введённые данные.' });
-      }
-
-      const uOut = enrichUserObject(found);
-
-      return reply(200, { success: true, message: `Добро пожаловать, ${uOut.full_name}!`, user: uOut });
-    }
-    // 5. Courses list & Enroll
-
-    if (path === '/api/courses' && method === 'GET') {
-      const uid = Number(params.get('user_id') || 0);
-      const enrolledSet = new Set(db.enrollments.filter(e => e.user_id === uid).map(e => e.specialty_slug));
-      const coursesOut = getCoursesList().map(c => {
-        const passed = new Set(
-          db.submissions
-            .filter(s => s.user_id === uid && s.specialty_slug === c.slug && s.score >= 60)
-            .map(s => s.task_number)
-        ).size;
-
-        return Object.assign({}, c, {
-          enrolled: enrolledSet.has(c.slug),
-          completed_lessons: passed,
-          total_lessons: 12,
-          progress_percent: Math.min(100, Math.round((passed / 20) * 100))
-        });
-      });
-
-      return reply(200, { success: true, courses: coursesOut, current_study_day: db.current_study_day });
-    }
-
-    if (path === '/api/courses/enroll' && method === 'POST') {
-      const uid = Number(body.user_id);
-      const slug = getCourseBySlug(body.specialty_slug || 'it').slug;
-      const u = db.users.find(x => x.id === uid);
-
-      if (!u) return reply(404, { success: false, message: 'Пользователь не найден.' });
-      if (!db.enrollments.some(e => e.user_id === uid && e.specialty_slug === slug)) {
-        db.enrollments.push({ user_id: uid, specialty_slug: slug });
-      }
-      u.specialty_slug = slug;
-      saveLocalDB(db);
-
-      return reply(200, {
-        success: true,
-        message: `Вы переключились на курс «${getCourseBySlug(slug).title}»!`,
-        user: enrichUserObject(u)
-      });
-    }
-    // 6. User Profile GET & PUT
-
-    if (path.startsWith('/api/user/profile/') && method === 'GET') {
-      const uid = Number(path.split('/').pop());
-      const u = db.users.find(x => x.id === uid);
-
-      if (!u) return reply(404, { success: false, message: 'Пользователь не найден.' });
-
-      const uOut = enrichUserObject(u);
-      const specSlug = params.get('specialty') || uOut.specialty_slug || 'it';
-      const courseMeta = getCourseBySlug(specSlug);
-      const userSubs = db.submissions.filter(s => s.user_id === uid);
-      const specSubs = userSubs.filter(s => s.specialty_slug === specSlug);
-      const passedNums = new Set(specSubs.filter(s => s.score >= 60).map(s => s.task_number));
-      const validScores = specSubs.filter(s => s.score > 0).map(s => s.score);
-      const avgScore = validScores.length ? Number((validScores.reduce((a, b) => a + b, 0) / validScores.length).toFixed(1)) : 0;
-      const gpa = validScores.length ? Number(((avgScore / 100) * 4).toFixed(2)) : 0;
-      const xp = userSubs.filter(s => s.score >= 60).reduce((acc, s) => acc + s.score * 3, 0);
-      const level = 1 + Math.floor(xp / 500);
-      const skillsOut = (courseMeta.skills || []).map(sk => {
-        const tList = sk.tasks || [];
-        const doneCnt = tList.filter(tn => passedNums.has(tn)).length;
-        const minUnlock = tList.length ? Math.min(...tList) : 1;
-
-        return {
-          key: sk.key,
-          name: sk.name,
-          tasks: tList,
-          completed: doneCnt,
-          total: tList.length,
-          percent: tList.length ? Math.round((doneCnt / tList.length) * 100) : 0,
-          unlocked: db.current_study_day >= minUnlock,
-          unlock_day: minUnlock
-        };
-      });
-
-      const enrolledSlugs = db.enrollments.filter(e => e.user_id === uid).map(e => e.specialty_slug);
-
-      return reply(200, {
-        success: true,
-        profile: uOut,
-        active_course: courseMeta,
-        enrolled_courses: enrolledSlugs,
-        current_study_day: db.current_study_day,
-        statistics: {
-          total_submitted: specSubs.length,
-          passed_count: passedNums.size,
-          progress_percent: Math.min(100, Math.round((passedNums.size / 20) * 100)),
-          avg_score: avgScore,
-          gpa,
-          xp,
-          level
-        },
-        skills: skillsOut,
-        submissions: userSubs.slice().reverse()
-      });
-    }
-
-    if (path === '/api/user/profile' && method === 'PUT') {
-      const uid = Number(body.user_id);
-      const u = db.users.find(x => x.id === uid);
-
-      if (!u) return reply(404, { success: false, message: 'Пользователь не найден.' });
-
-      const fio = validateFioFields(body);
-
-      if (!fio.valid) return reply(400, { success: false, message: fio.error });
-      if (body.new_password) {
-        const pc = validatePasswordStrength(body.new_password);
-
-        if (!pc.valid) return reply(400, { success: false, message: pc.error });
-        u.password_hash = await sha256Hex(body.new_password);
-      }
-      u.full_name = fio.full_name;
-      u.last_name = fio.last_name;
-      u.first_name = fio.first_name;
-      u.middle_name = fio.middle_name;
-
-      if (body.group_name) u.group_name = body.group_name.trim();
-      if (body.specialty_slug) {
-        u.specialty_slug = getCourseBySlug(body.specialty_slug).slug;
-
-        if (!db.enrollments.some(e => e.user_id === uid && e.specialty_slug === u.specialty_slug)) {
-          db.enrollments.push({ user_id: uid, specialty_slug: u.specialty_slug });
-        }
-      }
-      saveLocalDB(db);
-
-      return reply(200, { success: true, message: 'Профиль успешно сохранён!', user: enrichUserObject(u) });
-    }
-    // 7. Tasks list, Progress & Submit (with strict Drip-Feed Lock)
-
-    if (path === '/api/tasks' && method === 'GET') {
+    if (path === '/api/tasks') {
       const spec = params.get('specialty') || 'it';
-      const uid = Number(params.get('user_id') || 0);
-      const curDay = getUserStudyDay(uid, db);
       const slugs = params.get('specialty') ? [spec] : getCoursesList().map(c => c.slug);
       const tasksOut = [];
       let globalId = 1;
       for (const sSlug of slugs) {
         const catLessons = (window.EDU_LESSONS && window.EDU_LESSONS[sSlug]) || [];
         for (let i = 1; i <= 20; i++) {
-          const customKey = `${sSlug}:${i}`;
-          const custom = db.custom_tasks[customKey];
-          const base = catLessons.find(x => Number(x.num) === i) || {
+          const baseItem = catLessons.find(x => Number(x.num) === i) || {
             num: i,
             title: `Урок ${i}`,
             difficulty: 'Средний',
@@ -765,662 +421,62 @@
             task_prompt: 'Выполните практическое задание модуля.',
             starter_code: ''
           };
-
-          const unlockDay = custom ? Number(custom.unlock_day || i) : i;
-          const isLocked = unlockDay > curDay;
-          const sub = uid ? db.submissions.find(s => s.user_id === uid && s.specialty_slug === sSlug && s.task_number === i) : null;
-          const prog = uid ? db.progress[`${uid}:${sSlug}:${i}`] : null;
-          const dates = computeExactDates(unlockDay, curDay);
-          let statusCode = 'available';
-          let statusLabel = 'Доступно';
-          let score = 0;
-          let gradeLetter = '—';
-
-          if (isLocked) {
-            statusCode = 'locked';
-            statusLabel = 'Заблокировано';
-          } else if (sub) {
-            score = sub.score;
-            gradeLetter = sub.grade_letter;
-
-            const stLow = (sub.status || '').toLowerCase();
-
-            if (stLow.includes('на проверке') || stLow === 'submitted') {
-              statusCode = 'submitted';
-              statusLabel = 'Отправлено на проверку';
-            } else if (stLow.includes('доработ') || score < 60) {
-              statusCode = 'revision';
-              statusLabel = 'На доработке';
-            } else {
-              statusCode = 'graded';
-              statusLabel = sub.status;
-            }
-          } else if (prog) {
-            statusCode = 'in_progress';
-            statusLabel = 'В процессе';
-          }
+          const dates = computeExactDates(i, 1);
+          const isLocked = i > 1;
           tasksOut.push({
             id: globalId++,
             specialty_slug: sSlug,
             task_number: i,
-            title: custom ? custom.title : base.title,
-            difficulty: custom ? custom.difficulty : base.difficulty,
-            time_limit: base.time_limit || '60 мин',
-            unlock_day: unlockDay,
-            unlock_date_text: unlockDay === 1 ? 'Доступно в День 1' : `Откроется в День ${unlockDay}`,
-            deadline_text: `День ${unlockDay + 2}, 23:59`,
+            title: baseItem.title,
+            difficulty: baseItem.difficulty,
+            time_limit: baseItem.time_limit || '60 мин',
+            unlock_day: i,
+            unlock_date_text: i === 1 ? 'Доступно в День 1' : `Откроется в День ${i}`,
+            deadline_text: `День ${i + 2}, 23:59`,
             unlock_date_exact: dates.openText,
             deadline_exact: dates.deadlineText,
-            description: custom ? custom.description : base.task_prompt,
-            tools_required: custom ? custom.tools_required : base.tools,
-            starter_code: custom ? custom.starter_code : base.starter_code,
-            current_study_day: curDay,
+            description: baseItem.task_prompt,
+            tools_required: baseItem.tools,
+            starter_code: baseItem.starter_code,
+            current_study_day: 1,
             is_locked: isLocked,
-            status_code: statusCode,
-            status: statusCode === 'available' || statusCode === 'locked' ? statusCode : statusLabel,
-            status_label: statusLabel,
-            student_score: score,
-            grade_letter: gradeLetter,
-            teacher_comment: sub ? sub.teacher_comment : null,
-            quiz_score: (sub && sub.quiz_score) || (prog && prog.quiz_score) || 0,
-            draft_code: prog ? prog.draft_code : null
+            status_code: isLocked ? 'locked' : 'available',
+            status: isLocked ? 'locked' : 'available',
+            status_label: isLocked ? 'Заблокировано' : 'Доступно',
+            student_score: 0,
+            grade_letter: '—',
+            teacher_comment: null,
+            quiz_score: 0,
+            draft_code: null
           });
         }
       }
-
-      return reply(200, {
-        success: true,
-        current_study_day: curDay,
-        count: tasksOut.length,
-        tasks: tasksOut
-      });
+      return { ok: true, status: 200, data: { success: true, current_study_day: 1, count: tasksOut.length, tasks: tasksOut } };
     }
 
-    if (path === '/api/tasks/progress' && method === 'POST') {
-      const activeUser = getActiveUser();
-      const sessionUid = activeUser ? activeUser.id : 0;
-      const sessionRole = activeUser ? activeUser.role : 'student';
-
-      if (!sessionUid) return reply(401, { success: false, message: 'Требуется авторизация.' });
-
-      if (sessionRole === 'student' && body.user_id && Number(body.user_id) !== sessionUid) {
-        return reply(403, {
-          success: false,
-          code: 'TAMPERING_DETECTED',
-          message: 'Сохранение прогресса для чужого аккаунта запрещено.'
-        });
-      }
-
-      const uid = sessionRole === 'student' ? sessionUid : Number(body.user_id || sessionUid);
-      const spec = (body.specialty_slug || 'it').trim().toLowerCase();
-      const num = Number(body.task_number || 1);
-      const userCurDay = getUserStudyDay(uid, db);
-      if (num > userCurDay) {
-        return reply(403, { success: false, is_locked: true, error: `Урок №${num} заблокирован до Дня ${num}.` });
-      }
-
-      const key = `${uid}:${spec}:${num}`;
-      const prev = db.progress[key] || { quiz_score: 0, draft_code: '' };
-      db.progress[key] = {
-        quiz_score: body.quiz_score !== undefined ? Number(body.quiz_score) : prev.quiz_score,
-        draft_code: body.draft_code !== undefined ? body.draft_code : prev.draft_code,
-        updated_at: new Date().toISOString()
-      };
-      saveLocalDB(db);
-
-      return reply(200, { success: true, message: 'Прогресс сохранён.', quiz_score: db.progress[key].quiz_score });
-    }
-
-    if (path === '/api/tasks/submit' && method === 'POST') {
-      const activeUser = getActiveUser();
-      const sessionUid = activeUser ? activeUser.id : 0;
-      const sessionRole = activeUser ? activeUser.role : 'student';
-
-      if (sessionRole === 'student' && body.user_id && Number(body.user_id) !== sessionUid) {
-        return reply(403, {
-          success: false,
-          code: 'TAMPERING_DETECTED',
-          message: 'Попытка подмены идентификатора пользователя заблокирована.'
-        });
-      }
-
-      const uid = sessionRole === 'student' ? sessionUid : Number(body.user_id || sessionUid || 1);
-      const repoUrl = (body.repo_url || '').trim();
-      if (repoUrl) {
-        try {
-          const parsed = new URL(repoUrl);
-          if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-            return reply(400, {
-              success: false,
-              code: 'INVALID_REPO_URL',
-              message: 'Недопустимый URL репозитория. Разрешены только протоколы http:// и https://'
-            });
-          }
-        } catch (e) {
-          return reply(400, {
-            success: false,
-            code: 'INVALID_REPO_URL',
-            message: 'Недопустимый URL репозитория. Разрешены только протоколы http:// и https://'
-          });
-        }
-      }
-      const spec = (body.specialty_slug || 'it').trim().toLowerCase();
-      const num = Number(body.task_number || 1);
-      const custom = db.custom_tasks[`${spec}:${num}`];
-      const unlockDay = custom ? Number(custom.unlock_day || num) : num;
-      const userCurDay = getUserStudyDay(uid, db);
-
-      if (unlockDay > userCurDay) {
-        return reply(403, {
-          success: false,
-          is_locked: true,
-          error: `Нельзя отправить заблокированное задание! Оно откроется в День ${unlockDay}.`
-        });
-      }
-
-      const u = db.users.find(x => x.id === uid);
-      const studentName = u ? u.full_name : (body.student_name || 'Студент');
-      const groupName = (u && u.group_name) || body.group_name || 'ИС-21';
-      const studentId = (u && u.student_id) || body.student_id || `KZ-AMK-2026-${10000 + uid}`;
-      const score = Math.max(0, Math.min(100, Number(body.score ?? 100)));
-      const awaitTeacher = Boolean(body.await_teacher);
-      const lessonObj = getLessonFromCatalog(spec, num);
-      const taskTitle = (custom && custom.title) || (lessonObj && lessonObj.title) || body.task_title || `Урок №${num}`;
-      let gradeLetter = '—';
-      let status = 'Отправлено на проверку';
-
-      if (!awaitTeacher) {
-        if (score >= 90) { gradeLetter = 'A'; status = 'Проверено (Отлично)'; }
-        else if (score >= 75) { gradeLetter = 'B'; status = 'Проверено (Хорошо)'; }
-        else if (score >= 60) { gradeLetter = 'C'; status = 'Проверено (Зачтено)'; }
-        else { gradeLetter = 'F'; status = 'На доработке'; }
-      }
-      let sub = db.submissions.find(s => s.user_id === uid && s.specialty_slug === spec && s.task_number === num);
-
-      if (sub) {
-        Object.assign(sub, {
-          student_name: studentName,
-          group_name: groupName,
-          task_title: taskTitle,
-          score,
-          grade_letter: gradeLetter,
-          status,
-          submitted_code: body.submitted_code || '',
-          repo_url: body.repo_url || '',
-          student_comment: body.student_comment || '',
-          autotest_passed: Number(body.autotest_passed || 0),
-          autotest_total: Number(body.autotest_total || 0),
-          quiz_score: Number(body.quiz_score || 0),
-          updated_at: new Date().toLocaleString('ru-RU')
-        });
-      } else {
-        sub = {
-          id: db.next_sub_id++,
-          user_id: uid,
-          student_id: studentId,
-          student_name: studentName,
-          group_name: groupName,
-          specialty_slug: spec,
-          task_number: num,
-          task_title: taskTitle,
-          score,
-          grade_letter: gradeLetter,
-          status,
-          submitted_code: body.submitted_code || '',
-          repo_url: body.repo_url || '',
-          student_comment: body.student_comment || '',
-          autotest_passed: Number(body.autotest_passed || 0),
-          autotest_total: Number(body.autotest_total || 0),
-          quiz_score: Number(body.quiz_score || 0),
-          teacher_comment: null,
-          created_at: new Date().toLocaleString('ru-RU'),
-          updated_at: new Date().toLocaleString('ru-RU')
-        };
-        db.submissions.push(sub);
-      }
-      saveLocalDB(db);
-
-      return reply(200, {
-        success: true,
-        message: awaitTeacher
-          ? `Работа отправлена преподавателю на проверку (результат автотестов: ${score}/100)!`
-          : `Работа успешно проверена! Ваш балл: ${score}/100 (${gradeLetter}).`,
-        result: { score, grade_letter: gradeLetter, status, task_title: taskTitle, submission_id: sub.id }
-      });
-    }
-    // 8. Demo Status & Isolated Reset
-
-    if (path === '/api/demo/status' && method === 'GET') {
-      const uid = Number(params.get('user_id') || 1);
-      const spec = params.get('specialty') || 'it';
-      const subs = db.submissions.filter(s => s.user_id === uid && s.specialty_slug === spec && s.score >= 60);
-      const done = new Set(subs.map(s => s.task_number)).size;
-      const avg = subs.length ? Number((subs.reduce((a, b) => a + b.score, 0) / subs.length).toFixed(1)) : 0;
-
-      return reply(200, {
-        success: true,
-        current_study_day: db.current_study_day,
-        progress_percent: Math.min(100, Math.round((done / 20) * 100)),
-        completed_count: done,
-        avg_score: avg,
-        tasks_available: Math.min(20, db.current_study_day),
-        tasks_locked: Math.max(0, 20 - db.current_study_day),
-        is_fresh_start: done === 0 && db.current_study_day === 1
-      });
-    }
-
-    if (path === '/api/demo/reset' && method === 'POST') {
-      const demoIds = new Set(db.users.filter(u => u.is_demo).map(u => u.id));
-      db.submissions = db.submissions.filter(s => !demoIds.has(s.user_id));
-      Object.keys(db.progress).forEach(k => {
-        const uid = Number(k.split(':')[0]);
-
-        if (demoIds.has(uid)) delete db.progress[k];
-      });
-      db.current_study_day = 1;
-      saveLocalDB(db);
-
-      return reply(200, {
-        success: true,
-        message: 'Демоверсия сброшена к началу: День 1, 0% прогресса, открыт только Урок №1. Реальные аккаунты сохранены.',
-        status: { progress_percent: 0, completed_count: 0, current_study_day: 1 }
-      });
-    }
-    // 9. Teacher Studio Endpoints
-
-    if (path === '/api/teacher/advance_day' && method === 'POST') {
-      const target = body.day !== undefined ? Number(body.day) : db.current_study_day + 1;
-      db.current_study_day = Math.max(1, Math.min(20, target));
-      saveLocalDB(db);
-
-      return reply(200, {
-        success: true,
-        message: `График обучения переключён на День ${db.current_study_day}. Разблокированы уроки с 1 по ${db.current_study_day}.`,
-        current_study_day: db.current_study_day
-      });
-    }
-
-    if (path === '/api/teacher/stats' && method === 'GET') {
-      const students = db.users.filter(u => u.role === 'student').length;
-      const totalSubs = db.submissions.length;
-      const pending = db.submissions.filter(s => s.status === 'Отправлено на проверку').length;
-      const scored = db.submissions.filter(s => s.score > 0);
-      const avg = scored.length ? Number((scored.reduce((a, b) => a + b.score, 0) / scored.length).toFixed(1)) : 0;
-
-      return reply(200, {
-        success: true,
-        stats: {
-          total_students: students,
-          total_submissions: totalSubs,
-          pending_submissions: pending,
-          average_score: avg,
-          current_study_day: db.current_study_day
-        }
-      });
-    }
-    // 9.1 Teacher Students List
-
-    if (path === '/api/teacher/students' && method === 'GET') {
-      const spec = params.get('specialty');
-      const groupFilter = params.get('group');
-      let students = db.users.filter(u => u.role === 'student');
-
-      if (spec) students = students.filter(u => u.specialty_slug === spec);
-      if (groupFilter) students = students.filter(u => u.group_name === groupFilter);
-      students.sort((a, b) => Number(a.is_demo) - Number(b.is_demo) || (new Date(b.created_at || 0) - new Date(a.created_at || 0)));
-
-      const out = students.map(st => {
-        const enriched = enrichUserObject(st);
-        const userSubs = db.submissions.filter(s => s.user_id === st.id);
-        const passedSubs = userSubs.filter(s => s.score >= 60);
-        const scoredSubs = userSubs.filter(s => s.score > 0);
-        const avg = scoredSubs.length ? Number((scoredSubs.reduce((a, b) => a + b.score, 0) / scoredSubs.length).toFixed(1)) : 0;
-        const lastAct = userSubs.length ? (userSubs[userSubs.length - 1].updated_at || userSubs[userSubs.length - 1].created_at) : (st.created_at || 'Недавно');
-        enriched.submitted_count = userSubs.length;
-        enriched.passed_count = new Set(passedSubs.map(s => s.task_number)).size;
-        enriched.avg_score = avg;
-        enriched.last_activity = lastAct;
-
-        return enriched;
-      });
-
-      return reply(200, { success: true, count: out.length, students: out, current_study_day: db.current_study_day });
-    }
-    // 9.2 Teacher Sync User from Flask or static
-
-    if (path === '/api/teacher/sync_user' && method === 'POST') {
-      const email = (body.email || '').trim().toLowerCase();
-
-      if (!email) return reply(400, { success: false, message: 'Email обязателен' });
-      let existing = db.users.find(u => u.email === email);
-
-      if (!existing) {
-        const uid = db.next_user_id++;
-        const newUser = {
-          id: uid,
-          email,
-          password_hash: body.password_hash || 'placeholder',
-          full_name: body.full_name || 'Студент',
-          last_name: body.last_name || '',
-          first_name: body.first_name || '',
-          middle_name: body.middle_name || '',
-          role: body.role || 'student',
-          group_name: body.group_name || 'ИС-21',
-          specialty_slug: body.specialty_slug || 'it',
-          department: body.department || '',
-          student_id: body.student_id || `KZ-AMK-2026-${10000 + uid}`,
-          email_verified: true,
-          is_demo: Boolean(body.is_demo),
-          created_at: body.created_at || new Date().toISOString()
-        };
-        db.users.push(newUser);
-        saveLocalDB(db);
-
-        return reply(200, { success: true, message: 'Пользователь сохранён в localStorage', user: enrichUserObject(newUser) });
-      }
-
-      return reply(200, { success: true, message: 'Пользователь уже есть в localStorage', user: enrichUserObject(existing) });
-    }
-    // 9.3 Simulate Student Submission for Instant Review
-
-    if (path === '/api/teacher/simulate_submission' && method === 'POST') {
-      const uid = body.user_id ? Number(body.user_id) : null;
-      let targetStudent = null;
-
-      if (uid) {
-        targetStudent = db.users.find(u => u.id === uid && u.role === 'student');
-      } else {
-        targetStudent = db.users.find(u => u.role === 'student' && !u.is_demo) || db.users.find(u => u.role === 'student');
-      }
-
-      if (!targetStudent) return reply(404, { success: false, message: 'Студенты не найдены' });
-
-      const spec = body.specialty_slug || targetStudent.specialty_slug || 'it';
-      const taskNum = Number(body.task_number || 1);
-      const lesson = getLessonFromCatalog(spec, taskNum);
-      const taskTitle = lesson ? lesson.title : `Практический урок №${taskNum}`;
-      const existingIndex = db.submissions.findIndex(s => s.user_id === targetStudent.id && s.specialty_slug === spec && s.task_number === taskNum);
-      const subObj = {
-        id: existingIndex >= 0 ? db.submissions[existingIndex].id : db.next_sub_id++,
-        user_id: targetStudent.id,
-        student_id: targetStudent.student_id || `KZ-AMK-2026-${10000 + targetStudent.id}`,
-        student_name: targetStudent.full_name,
-        group_name: targetStudent.group_name || 'ИС-21',
-        task_id: taskNum,
-        specialty_slug: spec,
-        task_number: taskNum,
-        task_title: taskTitle,
-        score: 90,
-        grade_letter: '—',
-        status: 'Отправлено на проверку',
-        time_spent_seconds: 1200,
-        submitted_code: '<!DOCTYPE html>\n<html lang="ru">\n<head>\n  <title>Макет карточки студента</title>\n  <style>\n    .card { padding: 20px; border-radius: 12px; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }\n  </style>\n</head>\n<body>\n  <div class="card">\n    <h2>Выполненное практическое задание</h2>\n    <p>Решение сдано на проверку куратору. Все критерии выполнены.</p>\n  </div>\n</body>\n</html>',
-        repo_url: 'https://github.com/amk-student/project-demo',
-        student_comment: `Здравствуйте, Сергей Павлович! Выполнил практическое задание №${taskNum}. Проверьте, пожалуйста, соответствие критериям и чистоту кода.`,
-        autotest_passed: 3,
-        autotest_total: 3,
-        quiz_score: 3,
-        teacher_comment: '',
-        created_at: new Date().toLocaleString('ru-RU'),
-        updated_at: new Date().toLocaleString('ru-RU')
-      };
-
-      if (existingIndex >= 0) {
-        db.submissions[existingIndex] = subObj;
-      } else {
-        db.submissions.unshift(subObj);
-      }
-      saveLocalDB(db);
-
-      return reply(200, {
-        success: true,
-        message: `Тестовая работа от студента ${targetStudent.full_name} (Урок №${taskNum}) успешно отправлена в очередь на проверку!`,
-        submission_id: subObj.id
-      });
-    }
-
-    if ((path === '/api/teacher/journal' || path === '/api/teacher/submissions') && method === 'GET') {
-      const spec = params.get('specialty');
-      let list = db.submissions.slice().reverse();
-
-      if (spec) list = list.filter(s => s.specialty_slug === spec);
-
-      return reply(200, { success: true, count: list.length, current_study_day: db.current_study_day, journal: list });
-    }
-
-    if (path === '/api/teacher/matrix' && method === 'GET') {
-      const spec = params.get('specialty') || 'it';
-      const students = db.users
-        .filter(u => u.role === 'student')
-        .sort((a, b) => Number(a.is_demo) - Number(b.is_demo) || a.full_name.localeCompare(b.full_name))
-        .map(enrichUserObject);
-
-      const rows = students.map(st => {
-        const cells = {};
-        const scores = [];
-        for (let n = 1; n <= 20; n++) {
-          const s = db.submissions.find(x => x.user_id === st.id && x.specialty_slug === spec && x.task_number === n);
-
-          if (s) {
-            cells[String(n)] = s;
-
-            if (s.score > 0) scores.push(s.score);
-          }
-        }
-
-        return {
-          student: st,
-          cells,
-          completed_count: Object.values(cells).filter(v => v.score >= 60).length,
-          avg_score: scores.length ? Number((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)) : 0
-        };
-      });
-
-      return reply(200, { success: true, specialty: spec, current_study_day: db.current_study_day, rows });
-    }
-
-    if (path === '/api/teacher/grade_submission' && method === 'POST') {
-      const subId = Number(body.submission_id);
-      const grade = Math.max(0, Math.min(100, Number(body.grade ?? 95)));
-      const feedback = (body.feedback || 'Работа проверена преподавателем.').trim();
-      const action = (body.action || 'approve').trim().toLowerCase();
-      const sub = db.submissions.find(s => s.id === subId);
-
-      if (!sub) return reply(404, { success: false, message: 'Работа не найдена.' });
-      if (action === 'revision' || grade < 60) {
-        sub.grade_letter = grade < 60 ? 'F' : 'C';
-        sub.status = 'На доработке';
-      } else {
-        sub.grade_letter = grade >= 90 ? 'A' : (grade >= 75 ? 'B' : 'C');
-        sub.status = `Проверено (${grade}/100)`;
-      }
-      sub.score = grade;
-      sub.teacher_comment = feedback;
-      sub.updated_at = new Date().toLocaleString('ru-RU');
-      db.notifications.unshift({
-        id: db.next_notif_id++,
-        user_id: sub.user_id,
-        target_group: '',
-        title: sub.status === 'На доработке'
-          ? `Урок №${sub.task_number} отправлен на доработку`
-          : `Выставлена оценка ${grade}/100 за Урок №${sub.task_number}`,
-        body: `Рецензия преподавателя: ${feedback}`,
-        type: sub.status === 'На доработке' ? 'warning' : 'success',
-        is_read: false,
-        created_at: new Date().toLocaleString('ru-RU')
-      });
-      saveLocalDB(db);
-
-      return reply(200, {
-        success: true,
-        message: sub.status === 'На доработке'
-          ? 'Работа возвращена студенту на доработку!'
-          : `Оценка ${grade}/100 сохранена в электронном журнале!`
-      });
-    }
-
-    if (path === '/api/teacher/create_task' && method === 'POST') {
-      const spec = (body.specialty_slug || 'it').trim().toLowerCase();
-      const num = Math.max(1, Math.min(20, Number(body.task_number || 1)));
-
-      if (!body.title || !body.description) {
-        return reply(400, { success: false, message: 'Заполните название и описание задания.' });
-      }
-      db.custom_tasks[`${spec}:${num}`] = {
-        title: body.title.trim(),
-        description: body.description.trim(),
-        difficulty: body.difficulty || 'Средний',
-        unlock_day: Math.max(1, Math.min(20, Number(body.unlock_day || num))),
-        tools_required: body.tools_required || 'Практикум EDU SPACE',
-        starter_code: body.starter_code || '// Введите решение\n'
-      };
-      saveLocalDB(db);
-
-      return reply(200, { success: true, message: `Задание №${num} успешно обновлено в программе курса!` });
-    }
-
-    if (path === '/api/teacher/broadcast' && method === 'POST') {
-      if (!body.title || !body.body) {
-        return reply(400, { success: false, message: 'Введите тему и текст объявления.' });
-      }
-      db.notifications.unshift({
-        id: db.next_notif_id++,
-        user_id: null,
-        target_group: (body.target_group || '').trim(),
-        title: body.title.trim(),
-        body: body.body.trim(),
-        type: 'info',
-        is_read: false,
-        created_at: new Date().toLocaleString('ru-RU')
-      });
-      saveLocalDB(db);
-
-      return reply(200, { success: true, message: 'Объявление доставлено студентам!' });
-    }
-    // 10. Notifications & Messages
-
-    if (path === '/api/notifications' && method === 'GET') {
-      const uid = Number(params.get('user_id') || -1);
-      const grp = params.get('group_name') || '';
-      const list = db.notifications.filter(n =>
-        n.user_id === uid || (n.user_id === null && (!n.target_group || n.target_group === grp))
-      );
-
-      return reply(200, {
-        success: true,
-        unread_count: list.filter(x => !x.is_read).length,
-        notifications: list
-      });
-    }
-
-    if (path === '/api/notifications/read' && method === 'POST') {
-      const uid = Number(body.user_id || -1);
-      db.notifications.forEach(n => {
-        if (n.user_id === uid || n.user_id === null) n.is_read = true;
-      });
-      saveLocalDB(db);
-
-      return reply(200, { success: true });
-    }
-
-    if (path === '/api/messages' && method === 'GET') {
-      const ch = params.get('channel') || 'general';
-
-      return reply(200, { success: true, messages: db.messages.filter(m => m.recipient_key === ch) });
-    }
-
-    if (path === '/api/messages/send' && method === 'POST') {
-      const text = (body.body || '').trim();
-
-      if (!text) return reply(400, { success: false, message: 'Введите текст сообщения.' });
-      db.messages.push({
-        id: db.next_msg_id++,
-        sender_id: body.sender_id || null,
-        sender_name: body.sender_name || 'Пользователь',
-        sender_role: body.sender_role || 'student',
-        recipient_key: body.channel || 'general',
-        body: text,
-        created_at: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-      });
-      saveLocalDB(db);
-
-      return reply(200, { success: true });
-    }
-
-    return reply(200, { success: true });
+    return unavailable;
   }
 
   // ==========================================
-  // 3. UNIFIED API CLIENT (FLASK FIRST -> LOCAL FALLBACK)
-
+  // 3. UNIFIED API CLIENT (FLASK BACKEND + CSRF)
   // ==========================================
-  let backendMode = null; // 'flask' | 'local'
 
   async function apiRequest(url, options = {}) {
-    const fetchOpts = Object.assign({}, options);
-    fetchOpts.headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+    try {
+      const res = await fetchWithCsrf(url, options);
+      const contentType = res.headers.get('content-type') || '';
 
-    if (fetchOpts.body && typeof fetchOpts.body !== 'string') {
-      fetchOpts.body = JSON.stringify(fetchOpts.body);
-    }
-
-    if (backendMode !== 'local') {
-      try {
-        const res = await fetch(url, fetchOpts);
-        const contentType = res.headers.get('content-type') || '';
-
-        if (contentType.includes('application/json')) {
-          backendMode = 'flask';
-
-          const data = await res.json();
-          // Bi-directional sync between Flask and localStorage
-
-          if (url.includes('/api/auth/register') && data.success && data.user) {
-            try {
-              const db = await loadLocalDB();
-
-              if (!db.users.some(u => u.email === data.user.email)) {
-                db.users.push(data.user);
-                saveLocalDB(db);
-              }
-            } catch (e) {}
-          }
-
-          if (url.includes('/api/teacher/students') && data.success && Array.isArray(data.students)) {
-            try {
-              const db = await loadLocalDB();
-              let updated = false;
-              data.students.forEach(st => {
-                if (!db.users.some(u => u.email === st.email)) {
-                  db.users.push(st);
-                  updated = true;
-                }
-              });
-              // Push any local real students to Flask if Flask is missing them
-              db.users.filter(u => u.role === 'student' && !u.is_demo).forEach(lu => {
-                if (!data.students.some(s => s.email === lu.email)) {
-                  fetch('/api/teacher/sync_user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(lu)
-                  }).catch(() => {});
-                }
-              });
-
-              if (updated) saveLocalDB(db);
-            } catch (e) {}
-          }
-
-          return { ok: res.ok, status: res.status, data };
+      if (contentType.includes('application/json')) {
+        const data = await res.json();
+        if (data && data.csrf_token) {
+          setCsrfToken(data.csrf_token);
         }
-        // Static server (like GitHub Pages) returned 404/405 HTML
-        backendMode = 'local';
-      } catch (e) {
-        backendMode = 'local';
+        return { ok: res.ok, status: res.status, data };
       }
+      return readOnlyStaticCatalogResponse(url, options);
+    } catch (e) {
+      return readOnlyStaticCatalogResponse(url, options);
     }
-
-    return handleLocalApi(url, options);
   }
 
   // ==========================================
@@ -1617,16 +673,14 @@
 
   async function logoutUser() {
     if (!location.hostname.endsWith('.github.io')) {
-      try {
-        const response = await fetch('/api/auth/logout', {
-          method: 'POST', credentials: 'same-origin', signal: AbortSignal.timeout(5000),
-        });
-        if (!response.ok) throw new Error('logout failed');
-      } catch {
+      const res = await apiRequest('/api/auth/logout', { method: 'POST' });
+      if (!res.ok) {
         showToast('Не удалось закрыть серверную сессию. Повторите выход.', 'error');
         return;
       }
     }
+    _inMemoryCsrfToken = '';
+    try { sessionStorage.removeItem(CSRF_STORAGE_KEY); } catch (e) {}
     localStorage.removeItem(SESSION_KEY);
     localStorage.removeItem('currentUser');
     document.cookie = 'user_id=; path=/; max-age=0';
@@ -1664,15 +718,18 @@
 
     const res = await apiRequest('/api/demo/reset', {
       method: 'POST',
-      body: { user_id: active ? active.id : null }
+      body: {}
     });
-    showToast((res.data && res.data.message) || 'Демоверсия сброшена к началу!', 'success');
+    if (!res.ok || !res.data || !res.data.success) {
+      showToast((res.data && res.data.message) || 'Не удалось сбросить демоверсию.', 'error');
+      return;
+    }
+    showToast(res.data.message || 'Демоверсия сброшена к началу!', 'success');
     setTimeout(() => window.location.reload(), 450);
   }
 
   // ==========================================
   // 6. UI TOASTS, INCOMING EMAIL PREVIEW & MODALS
-
   // ==========================================
 
   function showToast(message, type = 'success') {
@@ -1697,7 +754,7 @@
     toast.className = `${bg} pointer-events-auto px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 text-xs sm:text-sm font-semibold transition-all duration-300 transform translate-y-4 opacity-0`;
     toast.innerHTML = `
       <span class="material-symbols-outlined text-[20px] shrink-0">${icon}</span>
-      <span class="leading-snug">${message}</span>
+      <span class="leading-snug">${escapeHtml(message)}</span>
       <button type="button" class="ml-auto pl-2 hover:opacity-75 focus:outline-none" onclick="this.parentElement.remove()">
         <span class="material-symbols-outlined text-[16px]">close</span>
       </button>
@@ -1722,18 +779,18 @@
       <div class="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex items-center justify-between text-xs font-bold border-b border-white/10">
         <span class="flex items-center gap-1.5">
           <span class="material-symbols-outlined text-[18px]">mark_email_unread</span>
-          <span>Входящее письмо (${mailPreview.to})</span>
+          <span>Входящее письмо (${escapeHtml(mailPreview.to)})</span>
         </span>
         <button type="button" onclick="this.closest('#edu-incoming-mail-card').remove()" class="w-6 h-6 rounded flex items-center justify-center hover:bg-white/20 transition-colors">
           <span class="material-symbols-outlined text-[16px]">close</span>
         </button>
       </div>
       <div class="p-4 space-y-2.5 text-xs text-slate-200">
-        <div class="text-[11px] text-slate-400">От: <strong class="text-indigo-300">${mailPreview.from}</strong></div>
-        <div class="font-bold text-white">${mailPreview.subject}</div>
+        <div class="text-[11px] text-slate-400">От: <strong class="text-indigo-300">${escapeHtml(mailPreview.from)}</strong></div>
+        <div class="font-bold text-white">${escapeHtml(mailPreview.subject)}</div>
         <p class="text-slate-300 leading-relaxed">Ваш одноразовый код подтверждения электронной почты для регистрации в EDU SPACE:</p>
         <div class="py-2.5 px-4 rounded-xl bg-dark-950/80 border border-indigo-500/30 text-center font-mono font-extrabold text-2xl tracking-[0.35em] text-indigo-400 select-all shadow-inner">
-          ${mailPreview.code}
+          ${escapeHtml(mailPreview.code)}
         </div>
         <div class="flex items-center justify-between pt-1">
           <span class="text-[10px] text-slate-400 font-mono">Действителен 10 минут</span>
@@ -1775,7 +832,7 @@
     modal.style.cssText = `background-color:#131c18;border:1px solid rgba(255,255,255,0.14);border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,0.78);color:#f4f7f5;width:100%;max-width:${maxW};max-height:88vh;display:flex;flex-direction:column;overflow:hidden;margin:auto;opacity:0;transform:scale(0.95) translateY(8px);transition:opacity 220ms cubic-bezier(0.22, 1, 0.36, 1), transform 220ms cubic-bezier(0.22, 1, 0.36, 1);`;
     modal.innerHTML = `
       <div class="edu-modal-header px-6 py-4 border-b border-white/10 flex items-center justify-between bg-dark-900/80 shrink-0" style="background-color:#192621;border-bottom:1px solid rgba(255,255,255,0.12);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
-        <h3 class="font-bold text-base text-white flex items-center gap-2" style="margin:0;font-weight:700;font-size:16px;color:#f4f7f5;display:flex;align-items:center;gap:8px;">${title}</h3>
+        <h3 class="font-bold text-base text-white flex items-center gap-2" style="margin:0;font-weight:700;font-size:16px;color:#f4f7f5;display:flex;align-items:center;gap:8px;">${escapeHtml(title)}</h3>
         <button type="button" onclick="closeModal()" aria-label="Закрыть окно" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors" style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#c2d1c8;cursor:pointer;">
           <span class="material-symbols-outlined text-[20px]" style="font-size:20px;">close</span>
         </button>
@@ -1824,7 +881,6 @@
 
   // ==========================================
   // 7. GLOBAL SHARED LMS MODALS (COURSES, GRADES, CALENDAR, CHAT, SETTINGS)
-
   // ==========================================
 
   async function openSubjectsModal() {
@@ -1835,26 +891,28 @@
     const activeSlug = (user && user.specialty_slug) || 'it';
     const cardsHtml = courses.map(c => {
       const isCurrent = c.slug === activeSlug;
-      const pct = c.progress_percent || 0;
-      const done = c.completed_lessons || 0;
+      const pct = Number(c.progress_percent || 0);
+      const done = Number(c.completed_lessons || 0);
+      const total = Number(c.total_lessons || 20);
+      const slugSafe = escapeHtml(c.slug);
 
       return `
         <div class="p-4 rounded-2xl border ${isCurrent ? 'border-indigo-500/80 bg-indigo-950/40 shadow-glow-indigo' : 'border-white/10 bg-dark-900/60'} flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="space-y-1 flex-1">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="px-2 py-0.5 rounded-md bg-white/10 text-indigo-300 text-[10px] font-mono font-bold border border-white/5">${c.code}</span>
-              <span class="font-bold text-sm text-white">${c.title}</span>
+              <span class="px-2 py-0.5 rounded-md bg-white/10 text-indigo-300 text-[10px] font-mono font-bold border border-white/5">${escapeHtml(c.code)}</span>
+              <span class="font-bold text-sm text-white">${escapeHtml(c.title)}</span>
               ${isCurrent ? '<span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[10px] font-bold shadow-glow-indigo">Активный курс</span>' : ''}
             </div>
-            <p class="text-xs text-slate-400">Куратор: ${c.curator} • 12 практических уроков</p>
+            <p class="text-xs text-slate-400">Куратор: ${escapeHtml(c.curator)} • ${total} практических уроков</p>
             <div class="pt-1 flex items-center gap-3">
               <div class="flex-1 bg-dark-950/80 h-2 rounded-full overflow-hidden max-w-xs border border-white/5">
-                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-full rounded-full" style="width:${pct}%"></div>
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 h-full rounded-full" style="width:${Math.max(0, Math.min(100, pct))}%"></div>
               </div>
-              <span class="text-[11px] font-bold text-slate-300">${done}/20 уроков (${pct}%)</span>
+              <span class="text-[11px] font-bold text-slate-300">${done}/${total} уроков (${pct}%)</span>
             </div>
           </div>
-          <button type="button" onclick="window.EduSpace.switchActiveCourse('${c.slug}')" class="px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 transition-all ${isCurrent ? 'bg-white/10 hover:bg-white/20 text-white border border-white/15' : 'bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-glow-indigo'}">
+          <button type="button" onclick="window.EduSpace.switchActiveCourse('${slugSafe}')" class="px-4 py-2.5 rounded-xl text-xs font-bold shrink-0 transition-all ${isCurrent ? 'bg-white/10 hover:bg-white/20 text-white border border-white/15' : 'bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-glow-indigo'}">
             ${isCurrent ? 'Открыть уроки' : (c.enrolled ? 'Переключить курс' : 'Записаться на курс')}
           </button>
         </div>
@@ -1877,10 +935,10 @@
 
     const res = await apiRequest('/api/courses/enroll', {
       method: 'POST',
-      body: { user_id: user.id, specialty_slug: slug }
+      body: { specialty_slug: slug }
     });
 
-    if (res.ok && res.data.user) {
+    if (res.ok && res.data && res.data.user) {
       setActiveUser(res.data.user);
       showToast(res.data.message || 'Курс успешно выбран!', 'success');
       closeModal();
@@ -1889,26 +947,24 @@
         window.location.reload();
       }
     } else {
-      showToast('Не удалось переключить курс', 'error');
+      showToast((res.data && res.data.message) || 'Не удалось переключить курс', 'error');
     }
   }
 
   async function openGradesModal() {
     const rawUser = getActiveUser();
-    const user = rawUser || {
-      id: 1,
-      full_name: 'Студент АМК (Ознакомительный режим)',
-      specialty_slug: window.currentSpec || 'it',
-      group_name: 'ИС-21',
-      is_guest_fallback: true
-    };
+    if (!rawUser) {
+      window.location.href = 'auth.html?mode=login';
+      return;
+    }
+    const user = rawUser;
 
     const res = await apiRequest(`/api/user/profile/${user.id}`);
     const data = res.data || {};
     const stats = data.statistics || { passed_count: 0, avg_score: 0, gpa: 0, xp: 0 };
     const subs = data.submissions || [];
     const rowsHtml = subs.length === 0
-      ? `<tr><td colspan="5" class="p-8 text-center text-xs text-slate-500">${tr('modal.grades.emptyRow', 'У вас пока нет сданных работ. Откройте Урок №1, пройдите автопроверку и отправьте первое решение!')}</td></tr>`
+      ? `<tr><td colspan="5" class="p-8 text-center text-xs text-slate-500">${escapeHtml(tr('modal.grades.emptyRow', 'У вас пока нет сданных работ. Откройте Урок №1, пройдите автопроверку и отправьте первое решение!'))}</td></tr>`
       : subs.map(s => {
           const isPending = String(s.status).includes('на проверке') || String(s.status).includes('Отправлено');
           const isRev = String(s.status).includes('доработ');
@@ -1918,38 +974,38 @@
 
           return `
             <tr class="hover:bg-white/[0.04] border-b border-white/5 transition-colors">
-              <td class="p-3 font-bold text-white">${tr('lesson.prefix', 'Урок ' + s.task_number + '. ', { num: s.task_number })}${s.task_title}</td>
-              <td class="p-3 text-indigo-400 uppercase text-[10px] font-bold font-mono">${s.specialty_slug}</td>
-              <td class="p-3 font-extrabold text-white">${s.score}/100 (${s.grade_letter})</td>
-              <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeCls}">${s.status}</span></td>
-              <td class="p-3 text-slate-300 text-[11px]">${s.teacher_comment || 'Автопроверка пройдена'}</td>
+              <td class="p-3 font-bold text-white">${escapeHtml(tr('lesson.prefix', 'Урок ' + Number(s.task_number) + '. ', { num: s.task_number }))}${escapeHtml(s.task_title)}</td>
+              <td class="p-3 text-indigo-400 uppercase text-[10px] font-bold font-mono">${escapeHtml(s.specialty_slug)}</td>
+              <td class="p-3 font-extrabold text-white">${Number(s.score || 0)}/100 (${escapeHtml(s.grade_letter)})</td>
+              <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeCls}">${escapeHtml(s.status)}</span></td>
+              <td class="p-3 text-slate-300 text-[11px]">${escapeHtml(s.teacher_comment || 'Автопроверка пройдена')}</td>
             </tr>
           `;
         }).join('');
     openModal(tr('modal.grades.title', `📊 Зачётная книжка — ${user.full_name}`, { name: user.full_name }), `
       <div class="grid grid-cols-3 gap-3 text-center">
         <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30">
-          <div class="text-[11px] text-indigo-300 font-bold">${tr('modal.grades.passedLabel', 'Зачтено по курсу')}</div>
-          <div class="text-xl font-extrabold text-indigo-200 mt-0.5">${stats.passed_count} / 20</div>
+          <div class="text-[11px] text-indigo-300 font-bold">${escapeHtml(tr('modal.grades.passedLabel', 'Зачтено по курсу'))}</div>
+          <div class="text-xl font-extrabold text-indigo-200 mt-0.5">${Number(stats.passed_count || 0)} / 20</div>
         </div>
         <div class="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
-          <div class="text-[11px] text-emerald-300 font-bold">${tr('modal.grades.gpaLabel', 'Средний балл / GPA')}</div>
-          <div class="text-xl font-extrabold text-emerald-200 mt-0.5">${stats.avg_score > 0 ? `${stats.avg_score} (${stats.gpa})` : '—'}</div>
+          <div class="text-[11px] text-emerald-300 font-bold">${escapeHtml(tr('modal.grades.gpaLabel', 'Средний балл / GPA'))}</div>
+          <div class="text-xl font-extrabold text-emerald-200 mt-0.5">${stats.avg_score > 0 ? `${escapeHtml(stats.avg_score)} (${escapeHtml(stats.gpa)})` : '—'}</div>
         </div>
         <div class="p-3 rounded-xl bg-purple-950/40 border border-purple-500/30">
-          <div class="text-[11px] text-purple-300 font-bold">${tr('modal.grades.xpLabel', 'Опыт обучения')}</div>
-          <div class="text-xl font-extrabold text-purple-200 mt-0.5">${stats.xp} XP</div>
+          <div class="text-[11px] text-purple-300 font-bold">${escapeHtml(tr('modal.grades.xpLabel', 'Опыт обучения'))}</div>
+          <div class="text-xl font-extrabold text-purple-200 mt-0.5">${Number(stats.xp || 0)} XP</div>
         </div>
       </div>
       <div class="border border-white/10 rounded-xl overflow-x-auto bg-dark-950/40">
         <table class="w-full text-xs text-left">
           <thead class="bg-white/[0.04] text-slate-400 border-b border-white/10 font-bold">
             <tr>
-              <th class="p-3">${tr('modal.grades.colLesson', 'Урок / Модуль')}</th>
-              <th class="p-3">${tr('modal.grades.colCourse', 'Курс')}</th>
-              <th class="p-3">${tr('modal.grades.colScore', 'Балл')}</th>
-              <th class="p-3">${tr('modal.grades.colStatus', 'Статус')}</th>
-              <th class="p-3">${tr('modal.grades.colComment', 'Комментарий куратора')}</th>
+              <th class="p-3">${escapeHtml(tr('modal.grades.colLesson', 'Урок / Модуль'))}</th>
+              <th class="p-3">${escapeHtml(tr('modal.grades.colCourse', 'Курс'))}</th>
+              <th class="p-3">${escapeHtml(tr('modal.grades.colScore', 'Балл'))}</th>
+              <th class="p-3">${escapeHtml(tr('modal.grades.colStatus', 'Статус'))}</th>
+              <th class="p-3">${escapeHtml(tr('modal.grades.colComment', 'Комментарий куратора'))}</th>
             </tr>
           </thead>
           <tbody>${rowsHtml}</tbody>
@@ -1958,9 +1014,9 @@
       <div class="flex justify-between items-center pt-2">
         <button type="button" onclick="exportCsvJournal()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/15 text-xs font-bold flex items-center gap-1.5 transition-colors">
           <span class="material-symbols-outlined text-[16px]">download</span>
-          <span>${tr('modal.grades.downloadCsv', 'Скачать выписку CSV')}</span>
+          <span>${escapeHtml(tr('modal.grades.downloadCsv', 'Скачать выписку CSV'))}</span>
         </button>
-        <button type="button" onclick="closeModal()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-glow-indigo transition-all">${tr('modal.close', 'Закрыть')}</button>
+        <button type="button" onclick="closeModal()" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-glow-indigo transition-all">${escapeHtml(tr('modal.close', 'Закрыть'))}</button>
       </div>
     `, 'max-w-3xl');
   }
@@ -1969,7 +1025,7 @@
     const user = getActiveUser();
     const spec = window.currentSpec || (user && user.specialty_slug) || 'it';
     const uid = user ? user.id : 0;
-    const res = await apiRequest(`/api/tasks?specialty=${spec}&user_id=${uid}`);
+    const res = await apiRequest(`/api/tasks?specialty=${encodeURIComponent(spec)}&user_id=${uid}`);
     let tasks = (res.data && res.data.tasks) || [];
     const curDay = (res.data && res.data.current_study_day) || getUserStudyDay(user);
     if (!tasks.length && window.EDU_LESSONS && window.EDU_LESSONS[spec]) {
@@ -1996,35 +1052,35 @@
         ? 'border-emerald-500/30 bg-emerald-950/30'
         : (isToday ? 'border-indigo-500/80 bg-indigo-950/40 shadow-glow-indigo' : (isLocked ? 'border-white/5 bg-dark-950/40 opacity-70' : 'border-white/10 bg-dark-900/60'));
 
-      const locOpen = window.I18n ? window.I18n.localizeDateString(t.unlock_date_exact) : t.unlock_date_exact;
-      const locDl = window.I18n ? window.I18n.localizeDateString(t.deadline_exact) : t.deadline_exact;
+      const locOpen = escapeHtml(window.I18n ? window.I18n.localizeDateString(t.unlock_date_exact) : t.unlock_date_exact);
+      const locDl = escapeHtml(window.I18n ? window.I18n.localizeDateString(t.deadline_exact) : t.deadline_exact);
       const locLesson = window.I18n ? window.I18n.localizeLessonContent(spec, t.task_number, t) : { title: t.title };
       const badge = isDone
-        ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">${tr('modal.deadlines.doneBadge', `Выполнено (${t.student_score}/100)`, { score: t.student_score })}</span>`
+        ? `<span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">${escapeHtml(tr('modal.deadlines.doneBadge', `Выполнено (${t.student_score}/100)`, { score: t.student_score }))}</span>`
         : (isLocked
-            ? `<span class="px-2.5 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/10 text-[10px] font-bold">${tr('modal.deadlines.lockedBadge', `Откроется: ${locOpen}`, { date: locOpen })}</span>`
-            : `<span class="px-2.5 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold shadow-glow-indigo">${isToday ? tr('modal.deadlines.todayBadge', 'Задание на сегодня') : tr('modal.deadlines.availableBadge', 'Доступно')}</span>`);
+            ? `<span class="px-2.5 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/10 text-[10px] font-bold">${escapeHtml(tr('modal.deadlines.lockedBadge', `Откроется: ${locOpen}`, { date: locOpen }))}</span>`
+            : `<span class="px-2.5 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold shadow-glow-indigo">${escapeHtml(isToday ? tr('modal.deadlines.todayBadge', 'Задание на сегодня') : tr('modal.deadlines.availableBadge', 'Доступно'))}</span>`);
 
       return `
         <div class="p-3.5 rounded-xl border ${cardCls} flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-[11px] font-extrabold text-indigo-400">${tr('modal.deadlines.dayLabel', `День ${t.unlock_day}`, { day: t.unlock_day })}</span>
+              <span class="text-[11px] font-extrabold text-indigo-400">${escapeHtml(tr('modal.deadlines.dayLabel', `День ${t.unlock_day}`, { day: t.unlock_day }))}</span>
               ${badge}
             </div>
-            <div class="font-bold text-xs text-white mt-1">${locLesson.title}</div>
-            <div class="text-[11px] text-slate-400 mt-0.5">${tr('modal.deadlines.scheduleLine', `Открытие: ${locOpen} • Дедлайн: ${locDl}`, { openDate: locOpen, deadlineDate: locDl })}</div>
+            <div class="font-bold text-xs text-white mt-1">${escapeHtml(locLesson.title)}</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">${escapeHtml(tr('modal.deadlines.scheduleLine', `Открытие: ${locOpen} • Дедлайн: ${locDl}`, { openDate: locOpen, deadlineDate: locDl }))}</div>
           </div>
           ${isLocked
             ? '<span class="material-symbols-outlined text-slate-500 text-[20px]">lock</span>'
-            : `<a href="simulator.html?specialty=${spec}&task=${t.task_number}" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs font-bold shrink-0 text-center shadow-glow-indigo transition-all">${tr('modal.deadlines.openLessonBtn', 'Открыть урок')}</a>`
+            : `<a href="simulator.html?specialty=${encodeURIComponent(spec)}&task=${Number(t.task_number)}" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white text-xs font-bold shrink-0 text-center shadow-glow-indigo transition-all">${escapeHtml(tr('modal.deadlines.openLessonBtn', 'Открыть урок'))}</a>`
           }
         </div>
       `;
     }).join('');
     openModal(tr('modal.deadlines.title', `🗓️ График открытия модулей и дедлайны (Текущий день: День ${curDay})`, { day: curDay }), `
       <div class="p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30 text-xs text-indigo-300">
-        ${tr('modal.deadlines.banner', 'Задания открываются поэтапно согласно расписанию курса. Будущие уроки заблокированы на сервере до наступления соответствующего учебного дня.')}
+        ${escapeHtml(tr('modal.deadlines.banner', 'Задания открываются поэтапно согласно расписанию курса. Будущие уроки заблокированы на сервере до наступления соответствующего учебного дня.'))}
       </div>
       <div class="space-y-2.5">${itemsHtml}</div>
     `, 'max-w-3xl');
@@ -2036,8 +1092,8 @@
     const course = getCourseBySlug((user && user.specialty_slug) || 'it');
     openModal(`📅 Расписание учебных занятий — ${grp}`, `
       <div class="flex items-center justify-between pb-3 border-b border-white/10 text-xs">
-        <span class="font-bold text-indigo-300 bg-indigo-950/60 border border-indigo-500/30 px-3 py-1 rounded-full">${course.short_title} (${grp})</span>
-        <span class="text-slate-400 font-medium">Куратор: ${course.curator}</span>
+        <span class="font-bold text-indigo-300 bg-indigo-950/60 border border-indigo-500/30 px-3 py-1 rounded-full">${escapeHtml(course.short_title)} (${escapeHtml(grp)})</span>
+        <span class="text-slate-400 font-medium">Куратор: ${escapeHtml(course.curator)}</span>
       </div>
       <div class="space-y-2.5 text-xs">
         <div class="p-3.5 rounded-xl bg-dark-900/60 border border-white/10">
@@ -2087,7 +1143,7 @@
     }
 
     if (user) {
-      await apiRequest('/api/notifications/read', { method: 'POST', body: { user_id: user.id } });
+      await apiRequest('/api/notifications/read', { method: 'POST', body: {} });
       document.querySelectorAll('[data-notif-badge]').forEach(el => el.classList.add('hidden'));
     }
 
@@ -2101,9 +1157,9 @@
             <div class="p-3.5 rounded-xl border ${col} flex items-start gap-3">
               <span class="material-symbols-outlined text-[20px] mt-0.5">${icon}</span>
               <div class="flex-1">
-                <div class="font-bold text-xs text-white">${n.title}</div>
-                <p class="text-xs text-slate-300 mt-0.5 leading-relaxed">${n.body}</p>
-                <span class="text-[10px] text-slate-500 block mt-1 font-mono">${n.created_at || ''}</span>
+                <div class="font-bold text-xs text-white">${escapeHtml(n.title)}</div>
+                <p class="text-xs text-slate-300 mt-0.5 leading-relaxed">${escapeHtml(n.body)}</p>
+                <span class="text-[10px] text-slate-500 block mt-1 font-mono">${escapeHtml(n.created_at || '')}</span>
               </div>
             </div>
           `;
@@ -2115,11 +1171,11 @@
     const peerId = Number.isInteger(recipient) && recipient > 0 ? recipient : null;
     openModal(peerId ? 'Личный диалог' : tr('modal.chat.title', 'Обсуждение курса'), `
       <div class="flex flex-col h-80 border border-white/10 rounded-2xl bg-dark-950/60">
-        <p id="edu-chat-status" class="px-4 pt-3 text-sm text-slate-300" role="status">${tr('modal.chat.loading', 'Загружаем сообщения…')}</p>
+        <p id="edu-chat-status" class="px-4 pt-3 text-sm text-slate-300" role="status">${escapeHtml(tr('modal.chat.loading', 'Загружаем сообщения…'))}</p>
         <div id="edu-chat-box" class="flex-1 p-4 overflow-y-auto space-y-3" role="log" aria-label="Сообщения чата"></div>
         <form id="edu-chat-form" class="p-2.5 bg-dark-900/90 border-t border-white/10 flex flex-wrap gap-2" hidden>
-          <input type="text" id="edu-chat-input" aria-label="Сообщение" placeholder="${tr('modal.chat.inputPlaceholder', 'Напишите сообщение')}" maxlength="1000" class="min-w-0 flex-1 px-3 py-2 border border-white/15 bg-dark-800 text-white rounded-xl text-sm" required>
-          <button type="submit" class="academy-action">${tr('modal.chat.sendBtn', 'Отправить')}</button>
+          <input type="text" id="edu-chat-input" aria-label="Сообщение" placeholder="${escapeHtml(tr('modal.chat.inputPlaceholder', 'Напишите сообщение'))}" maxlength="1000" class="min-w-0 flex-1 px-3 py-2 border border-white/15 bg-dark-800 text-white rounded-xl text-sm" required>
+          <button type="submit" class="academy-action">${escapeHtml(tr('modal.chat.sendBtn', 'Отправить'))}</button>
         </form>
       </div>
     `);
@@ -2145,7 +1201,7 @@
     }
 
     async function chatRequest(path, options = {}) {
-      const response = await fetch(path, { ...options, credentials: 'same-origin', signal: AbortSignal.timeout(6000) });
+      const response = await fetchWithCsrf(path, { ...options, signal: AbortSignal.timeout(6000) });
       if (response.status === 401) throw new Error('Войдите в аккаунт, чтобы открыть чат.');
       if (response.status === 403) throw new Error('Этот диалог недоступен вашему аккаунту.');
       if (!response.ok) throw new Error('Сервер чата временно недоступен.');
@@ -2191,8 +1247,9 @@
       submit.disabled = true;
       try {
         const data = await chatRequest('/api/messages/send', {
-          method: 'POST', headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({body, peer_id: peerId}),
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ body, peer_id: peerId }),
         });
         if (!box.isConnected) return;
         appendMessage(data.message);
@@ -2229,56 +1286,62 @@
     const curLoc = (window.I18n && window.I18n.getLocale) ? window.I18n.getLocale() : 'ru';
     const courseOpts = getCoursesList().map(c => {
       const cTitle = tr(`course.catalog.${c.slug}.title`, c.title);
-      return `<option value="${c.slug}" ${c.slug === user.specialty_slug ? 'selected' : ''}>${c.code} — ${cTitle}</option>`;
+      return `<option value="${escapeHtml(c.slug)}" ${c.slug === user.specialty_slug ? 'selected' : ''}>${escapeHtml(c.code)} — ${escapeHtml(cTitle)}</option>`;
     }).join('');
     openModal(tr('modal.settings.title', '⚙️ Настройки личного профиля и безопасности'), `
       <form id="edu-profile-settings-form" class="space-y-3.5 text-xs text-slate-200">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.lastName', 'Фамилия *')}</label>
-            <input type="text" id="set-last-name" value="${ln}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" required />
+            <label class="block font-bold text-slate-300 mb-1">${escapeHtml(tr('modal.settings.lastName', 'Фамилия *'))}</label>
+            <input type="text" id="set-last-name" value="${escapeHtml(ln)}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" required />
           </div>
           <div>
-            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.firstName', 'Имя *')}</label>
-            <input type="text" id="set-first-name" value="${fn}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" required />
+            <label class="block font-bold text-slate-300 mb-1">${escapeHtml(tr('modal.settings.firstName', 'Имя *'))}</label>
+            <input type="text" id="set-first-name" value="${escapeHtml(fn)}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" required />
           </div>
           <div>
-            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.middleName', 'Отчество')}</label>
-            <input type="text" id="set-middle-name" value="${mn}" placeholder="${tr('modal.settings.middleNamePlaceholder', 'При наличии')}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" />
+            <label class="block font-bold text-slate-300 mb-1">${escapeHtml(tr('modal.settings.middleName', 'Отчество'))}</label>
+            <input type="text" id="set-middle-name" value="${escapeHtml(mn)}" placeholder="${escapeHtml(tr('modal.settings.middleNamePlaceholder', 'При наличии'))}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" />
           </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.email', 'Подтверждённый Email')}</label>
-            <input type="email" value="${user.email}" disabled class="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-dark-950 text-slate-500 cursor-not-allowed font-mono" />
+            <label class="block font-bold text-slate-300 mb-1">${escapeHtml(tr('modal.settings.email', 'Подтверждённый Email'))}</label>
+            <input type="email" value="${escapeHtml(user.email)}" disabled class="w-full px-3.5 py-2.5 rounded-xl border border-white/10 bg-dark-950 text-slate-500 cursor-not-allowed font-mono" />
           </div>
           <div>
-            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.group', 'Учебная группа')}</label>
-            <input type="text" id="set-group" value="${user.group_name || 'ИС-21'}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" required />
+            <label class="block font-bold text-slate-300 mb-1">${escapeHtml(tr('modal.settings.group', 'Учебная группа'))}</label>
+            <input type="text" id="set-group" value="${escapeHtml(user.group_name || 'ИС-21')}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500" required />
           </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           ${user.role === 'student' ? `
           <div>
-            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.activeCourse', 'Активный курс обучения')}</label>
+            <label class="block font-bold text-slate-300 mb-1">${escapeHtml(tr('modal.settings.activeCourse', 'Активный курс обучения'))}</label>
             <select id="set-course" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500">${courseOpts}</select>
           </div>` : ''}
           <div>
-            <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.interfaceLanguage', 'Язык интерфейса')}</label>
+            <label class="block font-bold text-slate-300 mb-1">${escapeHtml(tr('modal.settings.interfaceLanguage', 'Язык интерфейса'))}</label>
             <select id="set-locale" onchange="if(window.I18n){window.I18n.setLocale(this.value);openSettingsModal();}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500">
               <option value="ru" ${curLoc === 'ru' ? 'selected' : ''}>Русский (РУС)</option>
               <option value="kk" ${curLoc === 'kk' ? 'selected' : ''}>Қазақша (ҚАЗ)</option>
             </select>
           </div>
         </div>
-        <div class="pt-2 border-t border-white/10">
-          <label class="block font-bold text-slate-300 mb-1">${tr('modal.settings.newPassword', 'Новый пароль (оставьте пустым, если не меняете)')}</label>
-          <input type="password" id="set-new-pwd" placeholder="${tr('modal.settings.newPasswordPlaceholder', 'Минимум 6 символов, буквы и цифры')}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500 placeholder-slate-500" />
+        <div class="pt-2 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Текущий пароль (если меняете пароль)</label>
+            <input type="password" id="set-cur-pwd" autocomplete="current-password" placeholder="Текущий пароль" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500 placeholder-slate-500" />
+          </div>
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">${escapeHtml(tr('modal.settings.newPassword', 'Новый пароль (необязательно)'))}</label>
+            <input type="password" id="set-new-pwd" autocomplete="new-password" placeholder="${escapeHtml(tr('modal.settings.newPasswordPlaceholder', 'Минимум 8 символов, буквы и цифры'))}" class="w-full px-3.5 py-2.5 rounded-xl border border-white/15 bg-dark-900 text-white focus:outline-none focus:border-indigo-500 placeholder-slate-500" />
+          </div>
         </div>
         <div id="set-error-box" class="hidden p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 font-semibold"></div>
         <div class="pt-2 flex justify-end gap-2">
-          <button type="button" onclick="closeModal()" class="px-4 py-2.5 rounded-xl border border-white/15 text-slate-300 font-bold hover:bg-white/10 transition-colors">${tr('modal.cancel', 'Отмена')}</button>
-          <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold shadow-glow-indigo transition-all">${tr('modal.save', 'Сохранить изменения')}</button>
+          <button type="button" onclick="closeModal()" class="px-4 py-2.5 rounded-xl border border-white/15 text-slate-300 font-bold hover:bg-white/10 transition-colors">${escapeHtml(tr('modal.cancel', 'Отмена'))}</button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold shadow-glow-indigo transition-all">${escapeHtml(tr('modal.save', 'Сохранить изменения'))}</button>
         </div>
       </form>
     `);
@@ -2290,14 +1353,33 @@
         e.preventDefault();
 
         const errBox = document.getElementById('set-error-box');
+        const newPwd = document.getElementById('set-new-pwd').value;
+        const curPwd = document.getElementById('set-cur-pwd') ? document.getElementById('set-cur-pwd').value : '';
+        if (newPwd) {
+          const pwCheck = validatePasswordStrength(newPwd);
+          if (!pwCheck.valid) {
+            if (errBox) {
+              errBox.textContent = pwCheck.error;
+              errBox.classList.remove('hidden');
+            }
+            return;
+          }
+          if (!curPwd) {
+            if (errBox) {
+              errBox.textContent = 'Укажите текущий пароль для смены пароля.';
+              errBox.classList.remove('hidden');
+            }
+            return;
+          }
+        }
         const payload = {
-          user_id: user.id,
           last_name: document.getElementById('set-last-name').value,
           first_name: document.getElementById('set-first-name').value,
           middle_name: document.getElementById('set-middle-name').value,
           group_name: document.getElementById('set-group').value,
           specialty_slug: document.getElementById('set-course') ? document.getElementById('set-course').value : user.specialty_slug,
-          new_password: document.getElementById('set-new-pwd').value
+          new_password: newPwd,
+          current_password: curPwd
         };
 
         if (user.is_guest_fallback) {
@@ -2310,7 +1392,7 @@
         }
         const res = await apiRequest('/api/user/profile', { method: 'PUT', body: payload });
 
-        if (!res.ok || !res.data.success) {
+        if (!res.ok || !res.data || !res.data.success) {
           if (errBox) {
             errBox.textContent = (res.data && res.data.message) || 'Ошибка сохранения профиля';
             errBox.classList.remove('hidden');
@@ -2382,26 +1464,10 @@
     }
   }
   // Legacy modal helpers kept interactive and accurate
-
-  function openZoomModal(title = 'Онлайн-консультация курса') {
-    openModal(`🎥 ${title}`, `
-      <div class="rounded-2xl overflow-hidden bg-slate-950 aspect-video flex flex-col items-center justify-center text-white p-6 text-center">
-        <div class="w-16 h-16 rounded-full bg-indigo-600/30 flex items-center justify-center mb-3">
-          <span class="material-symbols-outlined text-[36px] text-indigo-400">videocam</span>
-        </div>
-        <div class="font-bold text-sm mb-1">Вебинарная комната кафедры АМК</div>
-        <p class="text-xs text-slate-400 max-w-sm mb-4">Подключение к живому разбору практических заданий и ответам на вопросы студентов.</p>
-        <div class="flex items-center gap-3">
-          <button type="button" onclick="showToast('Микрофон переключён', 'info')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold">Микрофон</button>
-          <button type="button" onclick="showToast('Демонстрация экрана активна', 'success')" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-xs font-bold">Показать экран</button>
-        </div>
-      </div>
-    `);
-  }
+  // (openZoomModal stub removed per T-M2-04)
 
   // ==========================================
   // 9. PAGE SHELL HYDRATION & AUTH/ROLE GUARDS
-
   // ==========================================
 
   function showAuthRequiredOverlay(targetRole = 'student') {
@@ -2452,21 +1518,46 @@
     });
   }
 
-  function hydratePageIdentity() {
+  async function syncSession() {
+    const localUser = getActiveUser();
+    if (localUser) return localUser;
+    try {
+      const res = await fetch(apiBase() + '/api/auth/session', {
+        credentials: 'same-origin',
+        cache: 'no-store',
+        signal: AbortSignal.timeout(5000)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.csrf_token) setCsrfToken(data.csrf_token);
+        if (data && data.authenticated && data.user) {
+          const synced = setActiveUser(data.user);
+          const guard = document.getElementById('edu-auth-guard');
+          if (guard) guard.remove();
+          return synced;
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  async function hydratePageIdentity() {
     const path = window.location.pathname.toLowerCase();
-    const user = getActiveUser();
+    let user = getActiveUser();
+    if (!user) {
+      user = await syncSession();
+    }
     const isProtectedStudent = path.endsWith('student.html') || path.endsWith('/student') || path.endsWith('student-workspace.html') ||
       path.endsWith('tasks.html') || path.endsWith('/tasks') ||
       path.endsWith('simulator.html') || path.endsWith('/simulator') ||
       path.endsWith('profile.html') || path.endsWith('/profile');
     const isProtectedTeacher = path.endsWith('teacher.html') || path.endsWith('/teacher') || path.endsWith('gradebook.html') || path.endsWith('/gradebook');
 
-    const isPublicCatalog = path.endsWith('tasks.html') || path.endsWith('/tasks');
+    const isPublicCatalog = path.endsWith('tasks.html') || path.endsWith('/tasks') || path.endsWith('simulator.html') || path.endsWith('/simulator');
     if (isProtectedStudent && !isPublicCatalog && !user) {
       showAuthRequiredOverlay('student');
       return;
     }
-    // Hydrate user badges across workspace pages
 
     if (user) {
       document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = user.full_name; });
@@ -2480,13 +1571,11 @@
       document.querySelectorAll('[data-user-course]').forEach(el => {
         el.textContent = `Курс: ${user.specialty_name}`;
       });
-      // Update demo reset button visibility/label for real accounts
       document.querySelectorAll('[onclick*="resetDemoMode"]').forEach(btn => {
         if (!user.is_demo && user.role === 'student') {
           btn.classList.add('hidden');
         }
       });
-      // Hydrate Public Header (index, features, about, pricing, reviews) when logged in
 
       const isPublicPage = !isProtectedStudent && !isProtectedTeacher && !path.endsWith('auth.html');
 
@@ -2511,10 +1600,16 @@
 
   // ==========================================
   // 10. EXPORT GLOBAL API
-
   // ==========================================
   window.EduSpace = {
     normalizeTeacherCode,
+    escapeHtml,
+    safeUrl,
+    apiBase,
+    getCsrfToken,
+    setCsrfToken,
+    ensureCsrfToken,
+    fetchWithCsrf,
     api: apiRequest,
     validateFioFields,
     validateEmailFormat,
@@ -2528,6 +1623,7 @@
     getInitials,
     getActiveUser,
     setActiveUser,
+    syncSession,
     logoutUser,
     startIsolatedDemo,
     switchActiveCourse,
@@ -2537,7 +1633,6 @@
 
   // ==========================================
   // 7b. ADVANCED GAMIFICATION MODALS: LEADERBOARD, DAILY QUESTS, ACHIEVEMENTS
-
   // ==========================================
 
   async function openLeaderboardModal(groupFilter = 'all') {
@@ -2565,41 +1660,43 @@
     try {
       const url = groupFilter && groupFilter !== 'all' ? `/api/leaderboard?group=${encodeURIComponent(groupFilter)}` : '/api/leaderboard';
       const res = await apiRequest(url);
+      const data = (res && res.data) || {};
       const container = document.getElementById('lb-modal-body');
 
       if (!container) return;
-      if (!res.success || !res.leaderboard || res.leaderboard.length === 0) {
+      if (!res.ok || !data.success || !data.leaderboard || data.leaderboard.length === 0) {
         container.innerHTML = '<div class="text-center py-8 text-slate-400 text-xs">В данной группе пока нет активных участников.</div>';
         return;
       }
-      container.innerHTML = res.leaderboard.map(st => {
-        const medal = st.rank === 1 ? '🥇' : (st.rank === 2 ? '🥈' : (st.rank === 3 ? '🥉' : `#${st.rank}`));
+      container.innerHTML = data.leaderboard.map(st => {
+        const medal = st.rank === 1 ? '🥇' : (st.rank === 2 ? '🥈' : (st.rank === 3 ? '🥉' : `#${Number(st.rank)}`));
         const medalBg = st.rank === 1 ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-glow-amber' : (st.rank === 2 ? 'bg-slate-300/20 text-slate-200 border-slate-300/40' : (st.rank === 3 ? 'bg-orange-500/20 text-orange-300 border-orange-500/40' : 'bg-white/5 text-slate-400 border-white/10'));
+        const safeColor = /^#[0-9a-fA-F]{3,8}$/.test(String(st.rank_color || '')) ? st.rank_color : '#38bdf8';
 
         return `
           <div class="p-3.5 rounded-2xl bg-dark-900/90 border border-white/10 flex items-center justify-between gap-3 hover:border-cyan-500/30 transition-all">
             <div class="flex items-center gap-3">
               <span class="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs border ${medalBg}">${medal}</span>
               <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500/30 to-indigo-500/30 border border-cyan-500/30 flex items-center justify-center font-bold text-cyan-300 text-xs">
-                ${st.initials}
+                ${escapeHtml(st.initials)}
               </div>
               <div>
                 <div class="font-bold text-white text-xs sm:text-sm flex items-center gap-2">
-                  <span>${st.full_name}</span>
-                  <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-white/5 text-slate-400 border border-white/10">${st.group_name}</span>
+                  <span>${escapeHtml(st.full_name)}</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-white/5 text-slate-400 border border-white/10">${escapeHtml(st.group_name)}</span>
                 </div>
                 <div class="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5 flex-wrap">
-                  <span style="color: ${st.rank_color}">${st.rank_name} (Ур. ${st.level})</span>
+                  <span style="color: ${safeColor}">${escapeHtml(st.rank_name)} (Ур. ${Number(st.level || 1)})</span>
                   <span>•</span>
-                  <span>Заданий: ${st.passed_tasks}/20</span>
+                  <span>Заданий: ${Number(st.passed_tasks || 0)}/20</span>
                   <span>•</span>
-                  <span>🏆 Достижений: ${st.achievements_count}</span>
+                  <span>🏆 Достижений: ${Number(st.achievements_count || 0)}</span>
                 </div>
               </div>
             </div>
             <div class="text-right shrink-0">
-              <div class="font-black text-sm sm:text-base text-cyan-300">${st.total_xp} XP</div>
-              <div class="text-[10px] text-slate-400">Балл: ${st.avg_score}/100</div>
+              <div class="font-black text-sm sm:text-base text-cyan-300">${Number(st.total_xp || 0)} XP</div>
+              <div class="text-[10px] text-slate-400">Балл: ${Number(st.avg_score || 0)}/100</div>
             </div>
           </div>
         `;
@@ -2640,28 +1737,29 @@
     `, 'max-w-2xl');
     try {
       const res = await apiRequest(`/api/daily_quests?user_id=${user.id}`);
+      const data = (res && res.data) || {};
 
-      if (!res.success) return;
+      if (!res.ok || !data.success) return;
 
       const streakEl = document.getElementById('modal-streak-val');
 
-      if (streakEl) streakEl.textContent = `${res.streak_days} ${res.streak_days === 1 ? 'день' : 'дня'} подряд`;
+      if (streakEl) streakEl.textContent = `${Number(data.streak_days || 1)} ${data.streak_days === 1 ? 'день' : 'дня'} подряд`;
 
       const container = document.getElementById('daily-quests-list');
 
       if (!container) return;
-      container.innerHTML = res.quests.map(q => `
+      container.innerHTML = (data.quests || []).map(q => `
         <div class="p-4 rounded-2xl bg-dark-900/90 border ${q.completed ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-white/10'} flex items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl ${q.completed ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-white/5 text-slate-400 border border-white/10'} flex items-center justify-center shrink-0">
-              <span class="material-symbols-outlined text-[20px]">${q.completed ? 'check_circle' : q.icon}</span>
+              <span class="material-symbols-outlined text-[20px]">${q.completed ? 'check_circle' : escapeHtml(q.icon)}</span>
             </div>
             <div>
               <div class="font-bold text-sm text-white flex items-center gap-2">
-                <span>${q.title}</span>
-                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${q.completed ? 'bg-emerald-500/20 text-emerald-300' : 'bg-cyan-500/20 text-cyan-300'}">+${q.xp} XP</span>
+                <span>${escapeHtml(q.title)}</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${q.completed ? 'bg-emerald-500/20 text-emerald-300' : 'bg-cyan-500/20 text-cyan-300'}">+${Number(q.xp || 0)} XP</span>
               </div>
-              <div class="text-xs text-slate-400 mt-0.5">${q.desc}</div>
+              <div class="text-xs text-slate-400 mt-0.5">${escapeHtml(q.desc)}</div>
             </div>
           </div>
           <div class="shrink-0">
@@ -2671,7 +1769,7 @@
                 Выполнено
               </span>
             ` : `
-              <button type="button" onclick="completeQuestInModal('${q.key}')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:shadow-cyan-500/40 text-white font-bold text-xs transition-all flex items-center gap-1 shadow-glow-cyan">
+              <button type="button" onclick="completeQuestInModal('${escapeHtml(q.key)}')" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:shadow-cyan-500/40 text-white font-bold text-xs transition-all flex items-center gap-1 shadow-glow-cyan">
                 <span>Зачесть</span>
                 <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
               </button>
@@ -2689,11 +1787,15 @@
 
     if (!user) return;
 
-    const res = await apiRequest('/api/daily_quests', 'POST', { user_id: user.id, quest_key: questKey });
+    const res = await apiRequest('/api/daily_quests', {
+      method: 'POST',
+      body: { quest_key: questKey }
+    });
+    const data = (res && res.data) || {};
 
-    if (res.success) {
-      if (res.awarded) {
-        showToast(`🎉 Квест выполнен! Получено +${res.xp_earned} XP`, 'success');
+    if (res.ok && data.success) {
+      if (data.awarded) {
+        showToast(`🎉 Квест выполнен! Получено +${Number(data.xp_earned || 0)} XP`, 'success');
       } else {
         showToast('Квест уже был выполнен ранее сегодня', 'info');
       }
@@ -2717,10 +1819,11 @@
     `, 'max-w-3xl');
     try {
       const res = await apiRequest(`/api/user/profile/${user.id}`);
+      const data = (res && res.data) || {};
 
-      if (!res.success) return;
+      if (!res.ok || !data.success) return;
 
-      const userAchs = (res.achievements || []).map(a => a.id || a);
+      const userAchs = (data.achievements || []).map(a => a.id || a);
       const catalog = [
         { id: 'first_step', title: 'Первый шаг в EduSpace', desc: 'Сдано первое практическое задание курса', xp: 50, icon: 'school', color: '#06b6d4' },
         { id: 'quiz_master', title: 'Эрудит EduSpace', desc: 'Сдан проверочный тест на 3/3 баллов', xp: 50, icon: 'psychology', color: '#818cf8' },
@@ -2740,14 +1843,14 @@
         return `
           <div class="p-4 rounded-2xl ${isUnlocked ? 'bg-dark-900 border-cyan-500/40 shadow-glow-cyan' : 'bg-dark-950/60 border-white/5 opacity-60'} border flex items-center gap-3.5 transition-all">
             <div class="w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl shrink-0" style="background: ${isUnlocked ? ach.color + '25' : 'rgba(255,255,255,0.05)'}; color: ${isUnlocked ? ach.color : '#64748b'}; border: 1px solid ${isUnlocked ? ach.color + '60' : 'rgba(255,255,255,0.1)'}">
-              <span class="material-symbols-outlined text-[24px]">${ach.icon}</span>
+              <span class="material-symbols-outlined text-[24px]">${escapeHtml(ach.icon)}</span>
             </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between gap-1">
-                <div class="font-bold text-xs sm:text-sm text-white truncate">${ach.title}</div>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isUnlocked ? 'bg-cyan-500/20 text-cyan-300' : 'bg-white/5 text-slate-500'}">+${ach.xp} XP</span>
+                <div class="font-bold text-xs sm:text-sm text-white truncate">${escapeHtml(ach.title)}</div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isUnlocked ? 'bg-cyan-500/20 text-cyan-300' : 'bg-white/5 text-slate-500'}">+${Number(ach.xp)} XP</span>
               </div>
-              <div class="text-[11px] text-slate-400 mt-0.5 leading-snug">${ach.desc}</div>
+              <div class="text-[11px] text-slate-400 mt-0.5 leading-snug">${escapeHtml(ach.desc)}</div>
               <div class="mt-1 text-[10px] font-bold ${isUnlocked ? 'text-emerald-400' : 'text-slate-500'}">
                 ${isUnlocked ? '✓ Получено в профиль' : '🔒 Заблокировано'}
               </div>
@@ -2774,7 +1877,6 @@
   window.openNotificationsModal = openNotificationsModal;
   window.openMessengerModal = openMessengerModal;
   window.openSettingsModal = openSettingsModal;
-  window.openZoomModal = openZoomModal;
   window.openLeaderboardModal = openLeaderboardModal;
   window.openDailyQuestsModal = openDailyQuestsModal;
   window.openAchievementsModal = openAchievementsModal;
@@ -2788,7 +1890,6 @@
 
   // ==========================================
   // GLOBAL COMMAND PALETTE (Ctrl + K)
-
   // ==========================================
 
   function initCommandPalette() {
@@ -2845,14 +1946,14 @@
   }
 
   const PALETTE_ITEMS = [
-    { title: 'Веб-дизайн и разработка ПО (12 модулей)', desc: 'HTML, CSS, JS, A11y, Дипломный проект', url: 'tasks.html?specialty=it', icon: 'code', category: 'Специальность' },
-    { title: 'Графический дизайн (12 модулей)', desc: 'Figma, брендинг, типографика, брендбук', url: 'tasks.html?specialty=graphic_design', icon: 'palette', category: 'Специальность' },
-    { title: 'Автоэлектрика и диагностика (12 модулей)', desc: 'Мультиметр, осциллограф, CAN-шина, OBD-II, BCM', url: 'tasks.html?specialty=autoelectric', icon: 'electric_meter', category: 'Специальность' },
-    { title: 'Холодильное оборудование и HVAC (12 модулей)', desc: 'Фреоны, вакуумирование, перегрев, инверторы, ПНР', url: 'tasks.html?specialty=hvac', icon: 'ac_unit', category: 'Специальность' },
-    { title: 'Автомеханика и ТО (12 модулей)', desc: 'ДВС, ГРМ, подвеска, ШРУС, регламентное ТО', url: 'tasks.html?specialty=automechanic', icon: 'build', category: 'Специальность' },
-    { title: 'Электронная ведомость оценок', desc: 'Сводный академический журнал всех студентов', url: 'gradebook.html', icon: 'grid_on', category: 'Учебная часть' },
+    { title: 'Веб-дизайн и разработка ПО (20 модулей)', desc: 'HTML, CSS, JS, A11y, Дипломный проект', url: 'tasks.html?specialty=it', icon: 'code', category: 'Специальность' },
+    { title: 'Графический дизайн (20 модулей)', desc: 'Figma, брендинг, типографика, брендбук', url: 'tasks.html?specialty=graphic_design', icon: 'palette', category: 'Специальность' },
+    { title: 'Автоэлектрика и диагностика (20 модулей)', desc: 'Мультиметр, осциллограф, CAN-шина, OBD-II, BCM', url: 'tasks.html?specialty=autoelectric', icon: 'electric_meter', category: 'Специальность' },
+    { title: 'Холодильное оборудование и HVAC (20 модулей)', desc: 'Фреоны, вакуумирование, перегрев, инверторы, ПНР', url: 'tasks.html?specialty=hvac', icon: 'ac_unit', category: 'Специальность' },
+    { title: 'Автомеханика и ТО (20 модулей)', desc: 'ДВС, ГРМ, подвеска, ШРУС, регламентное ТО', url: 'tasks.html?specialty=automechanic', icon: 'build', category: 'Специальность' },
+    { title: 'Электронная ведомость оценок', desc: 'Сводный академический журнал всех студентов', url: 'teacher.html?tab=matrix', icon: 'grid_on', category: 'Учебная часть' },
     { title: 'Реестр проверки сертификатов', desc: 'Государственная проверка подлинности с QR-кодом', url: 'verify.html', icon: 'verified_user', category: 'Сертификация' },
-    { title: 'Тарифные планы и подписка Pro', desc: 'Kaspi QR, оплата картой, доступ к модулям 4–10', url: 'pricing.html', icon: 'diamond', category: 'Финансы' },
+    { title: 'Тарифные планы и подписка Pro', desc: 'Kaspi QR, оплата картой, доступ к модулям 4–20', url: 'pricing.html', icon: 'diamond', category: 'Финансы' },
     { title: 'Личный кабинет слушателя', desc: 'Профиль, статистика, зачётная книжка', url: 'profile.html', icon: 'person', category: 'Профиль' }
   ];
 
@@ -2863,23 +1964,25 @@
 
     const q = (query || '').toLowerCase().trim();
     const filtered = PALETTE_ITEMS.filter(it => !q || it.title.toLowerCase().includes(q) || it.desc.toLowerCase().includes(q) || it.category.toLowerCase().includes(q));
+    const esc = (window.EduSpace && window.EduSpace.escapeHtml) ? window.EduSpace.escapeHtml : (s => String(s || ''));
+    const safeU = (window.EduSpace && window.EduSpace.safeUrl) ? window.EduSpace.safeUrl : (u => esc(u));
 
     if (filtered.length === 0) {
       cont.innerHTML = '<div class="p-6 text-center text-slate-500">По запросу ничего не найдено. Попробуйте другой термин.</div>';
       return;
     }
     cont.innerHTML = filtered.map(it => `
-      <a href="${it.url}" onclick="closeCommandPaletteModal()" class="flex items-center justify-between p-3 rounded-2xl hover:bg-white/5 transition-colors group">
+      <a href="${safeU(it.url)}" onclick="closeCommandPaletteModal()" class="flex items-center justify-between p-3 rounded-2xl hover:bg-white/5 transition-colors group">
         <div class="flex items-center gap-3">
           <div class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-indigo-400 group-hover:scale-105 transition-transform">
-            <span class="material-symbols-outlined text-[20px]">${it.icon}</span>
+            <span class="material-symbols-outlined text-[20px]">${esc(it.icon)}</span>
           </div>
           <div>
-            <div class="font-bold text-white group-hover:text-indigo-300 transition-colors">${it.title}</div>
-            <div class="text-[11px] text-slate-400">${it.desc}</div>
+            <div class="font-bold text-white group-hover:text-indigo-300 transition-colors">${esc(it.title)}</div>
+            <div class="text-[11px] text-slate-400">${esc(it.desc)}</div>
           </div>
         </div>
-        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-400">${it.category}</span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-slate-400">${esc(it.category)}</span>
       </a>
     `).join('');
   }
@@ -2891,7 +1994,6 @@
 
   // ==========================================
   // SLEEK AUDIO SYNTHESIZER (WEB AUDIO API)
-
   // ==========================================
   let audioCtx = null;
   let audioEnabled = false;
@@ -2915,7 +2017,6 @@
       gain.connect(audioCtx.destination);
 
       if (type === 'success' || type === 'grade') {
-        // High soft chime: E5 (659Hz) -> B5 (987Hz)
         osc.type = 'sine';
         osc.frequency.setValueAtTime(659.25, now);
         osc.frequency.exponentialRampToValueAtTime(987.77, now + 0.12);
@@ -2924,7 +2025,6 @@
         osc.start(now);
         osc.stop(now + 0.35);
       } else if (type === 'click') {
-        // Subtle haptic pop
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(440, now);
         gain.gain.setValueAtTime(0.03, now);
@@ -2933,13 +2033,11 @@
         osc.stop(now + 0.08);
       }
     } catch (e) {
-      // Audio not permitted or unsupported, fail silently
     }
   }
 
   // ==========================================
   // TAB KEY INDENTATION IN CODE EDITORS
-
   // ==========================================
 
   function setupCodeEditorTabs(textareaId) {
@@ -2962,7 +2060,6 @@
 
   // ==========================================
   // STUDENT ACHIEVEMENTS SYSTEM
-
   // ==========================================
 
   function computeStudentBadges(user, passedCount, avgScore, isPro) {
@@ -2994,7 +2091,7 @@
       {
         id: 'pro_tier',
         title: 'Тариф Pro 💎',
-        desc: 'Открыт полный доступ ко всем 12 модулям специальности',
+        desc: 'Открыт полный доступ ко всем 20 модулям специальности',
         icon: 'diamond',
         color: 'text-amber-400',
         unlocked: Boolean(isPro)
@@ -3010,16 +2107,17 @@
       {
         id: 'graduate',
         title: 'Аккредитованный специалист',
-        desc: 'Освоены все 12 модулей, выдан гос. сертификат',
+        desc: 'Освоены все 20 модулей, выдан гос. сертификат',
         icon: 'school',
         color: 'text-cyan-400',
-        unlocked: passedCount >= 12
+        unlocked: passedCount >= 20
       }
     ];
   }
 
   function openInteractiveRoadmapModal() {
     const trRm = (k, fb, p) => (window.I18n && window.I18n.t) ? window.I18n.t(k, p) : fb;
+    const escRm = (window.EduSpace && window.EduSpace.escapeHtml) ? window.EduSpace.escapeHtml : (s => String(s || ''));
     const user = getActiveUser();
     const spec = window.currentSpec || (user && user.specialty_slug) || 'it';
     const course = (window.EduSpace && window.EduSpace.getCourseBySlug)
@@ -3029,7 +2127,7 @@
     const tasks = (window._cachedTasks && window._cachedTasks[course.slug]) || [];
     const catalogLessons = (window.EDU_LESSONS && window.EDU_LESSONS[course.slug]) || [];
     const curDay = getUserStudyDay(user);
-    const nodesHtml = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => {
+    const nodesHtml = Array.from({ length: 20 }, (_, i) => i + 1).map(num => {
       const isPro = num > 3;
       const t = tasks.find(x => x.task_number === num);
       const isLocked = t ? Boolean(t.is_locked) : (num > curDay);
@@ -3045,7 +2143,7 @@
         : (isLocked ? `День ${num}` : (isPro ? trRm('modal.roadmap.modulePro', 'Профильный модуль · Сертификат') : trRm('modal.roadmap.moduleBase', 'Базовый модуль')));
       const actionHtml = isLocked
         ? `<span class="px-3 py-1.5 rounded-xl bg-white/5 text-slate-400 text-xs font-bold shrink-0 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">lock</span><span>День ${num}</span></span>`
-        : `<a href="simulator.html?specialty=${course.slug}&task=${num}" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all shrink-0">${trRm('lesson.action.open', 'Открыть')}</a>`;
+        : `<a href="simulator.html?specialty=${encodeURIComponent(course.slug)}&task=${num}" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all shrink-0">${escRm(trRm('lesson.action.open', 'Открыть'))}</a>`;
 
       return `
         <div class="p-3.5 rounded-2xl border ${border} flex items-center justify-between gap-3 hover:scale-[1.01] transition-transform">
@@ -3054,8 +2152,8 @@
               ${num}
             </div>
             <div>
-              <div class="text-xs font-bold text-white">${title}</div>
-              <div class="text-[10px] text-slate-400">${subLabel}</div>
+              <div class="text-xs font-bold text-white">${escRm(title)}</div>
+              <div class="text-[10px] text-slate-400">${escRm(subLabel)}</div>
             </div>
           </div>
           ${actionHtml}
@@ -3064,7 +2162,7 @@
     }).join('');
     openModal(trRm('modal.roadmap.title', '🚀 Интерактивный роадмап курса: ' + locCourseShort, { course: locCourseShort }), `
       <div class="space-y-4 text-xs">
-        <p class="text-slate-300">${trRm('modal.roadmap.subtitle', 'Персональная траектория освоения профессии от базовой теории до дипломного проекта с поддержкой 3D-моделей и лабораторных симуляторов.')}</p>
+        <p class="text-slate-300">${escRm(trRm('modal.roadmap.subtitle', 'Персональная траектория освоения профессии от базовой теории до дипломного проекта с поддержкой 3D-моделей и лабораторных симуляторов.'))}</p>
         <div class="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1">
           ${nodesHtml}
         </div>

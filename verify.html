@@ -23,36 +23,11 @@
 
   <!-- Tailwind CSS Local & CDN -->
   <link rel="stylesheet" href="css/tailwind.min.css"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    if (window.tailwind) tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          },
-          colors: {
-            dark: {
-              950: '#07090e',
-              900: '#0c1017',
-              850: '#111722',
-              800: '#172033',
-            }
-          },
-          boxShadow: {
-            'glow-indigo': '0 0 35px -5px rgba(99, 102, 241, 0.35)',
-            'glow-emerald': '0 0 35px -5px rgba(16, 185, 129, 0.35)',
-          }
-        }
-      }
-    };
-  </script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
   <link rel="stylesheet" href="css/workshop.css">
   <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
   <link rel="stylesheet" href="css/photoreal-tools.css">
 </head>
 <body class="workshop bg-dark-950 text-slate-100 font-sans min-h-screen antialiased flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
@@ -145,17 +120,17 @@
             </div>
             <div>
               <div class="text-[11px] uppercase font-bold tracking-widest text-indigo-400">Министерство просвещения РК • ТиПО</div>
-              <h1 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">Электронный сертификат квалификации</h1>
+              <h2 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">Электронный сертификат квалификации</h2>
               <div class="text-xs text-slate-400">ГККП «Алматинский многопрофильный колледж»</div>
             </div>
           </div>
 
           <div class="shrink-0 flex sm:flex-col sm:items-end justify-between items-center">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-extrabold shadow-glow-emerald">
-              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>ВЕРИФИЦИРОВАНО</span>
+            <span id="cert-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-extrabold shadow-glow-emerald">
+              <span id="cert-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span id="cert-status-text">ВЕРИФИЦИРОВАНО</span>
             </span>
-            <span class="text-[11px] font-mono text-slate-400 mt-1" id="cert-num-badge">KZ-AMK-2026-XXXXX</span>
+            <span class="text-[11px] font-mono text-slate-400 mt-1" id="cert-num-badge">—</span>
           </div>
         </div>
 
@@ -165,7 +140,7 @@
           <div class="text-center sm:text-left space-y-1">
             <div class="text-xs uppercase font-bold text-slate-400 tracking-wider">Настоящим подтверждается, что</div>
             <div class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight" id="cert-student-name"></div>
-            <div class="text-xs text-indigo-300 font-semibold" id="cert-group-label">Учебная группа: ИС-21</div>
+            <div class="text-xs text-indigo-300 font-semibold" id="cert-group-label">—</div>
           </div>
 
           <div class="p-5 rounded-2xl bg-dark-950/70 border border-white/10 space-y-3">
@@ -182,22 +157,22 @@
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
             <div class="p-4 rounded-xl bg-white/5 border border-white/10">
               <div class="text-[11px] font-bold text-slate-400">Модули</div>
-              <div class="text-xl font-extrabold text-white mt-1" id="cert-modules-cnt">10 / 10</div>
-              <div class="text-[10px] text-emerald-400 font-semibold">100% выполнено</div>
+              <div class="text-xl font-extrabold text-white mt-1" id="cert-modules-cnt">—</div>
+              <div class="text-[10px] text-emerald-400 font-semibold" id="cert-modules-sub">—</div>
             </div>
             <div class="p-4 rounded-xl bg-white/5 border border-white/10">
               <div class="text-[11px] font-bold text-slate-400">Средний балл</div>
-              <div class="text-xl font-extrabold text-emerald-400 mt-1" id="cert-avg-score">92.4</div>
+              <div class="text-xl font-extrabold text-emerald-400 mt-1" id="cert-avg-score">—</div>
               <div class="text-[10px] text-slate-400">из 100 баллов</div>
             </div>
             <div class="p-4 rounded-xl bg-white/5 border border-white/10">
               <div class="text-[11px] font-bold text-slate-400">Итоговый GPA</div>
-              <div class="text-xl font-extrabold text-indigo-400 mt-1" id="cert-gpa-label">4.0 (A)</div>
-              <div class="text-[10px] text-slate-400">Отлично</div>
+              <div class="text-xl font-extrabold text-indigo-400 mt-1" id="cert-gpa-label">—</div>
+              <div class="text-[10px] text-slate-400" id="cert-gpa-sub">—</div>
             </div>
             <div class="p-4 rounded-xl bg-white/5 border border-white/10">
               <div class="text-[11px] font-bold text-slate-400">Дата выдачи</div>
-              <div class="text-sm font-extrabold text-slate-200 mt-2 font-mono" id="cert-date-label"></div>
+              <div class="text-sm font-extrabold text-slate-200 mt-2 font-mono" id="cert-date-label">—</div>
               <div class="text-[10px] text-slate-400">Бессрочно</div>
             </div>
           </div>
@@ -223,7 +198,7 @@
 
           <!-- Digital Hash and Standard Info -->
           <div class="text-left md:text-right space-y-1">
-            <div class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Цифровая подпись сертификата (SHA-256)</div>
+            <div class="text-[10px] uppercase font-bold tracking-wider text-slate-400">Цифровая подпись сертификата (HMAC-SHA256)</div>
             <div class="font-mono text-xs text-indigo-300 font-bold tracking-wider select-all" id="cert-hash-val"></div>
             <div class="text-[10px] text-slate-400 pt-0.5">
               Директор: <strong class="text-white" id="cert-director-label">Бейсетбаев Асылхан Косылханович</strong>
@@ -231,6 +206,7 @@
             <div class="text-[10px] text-slate-500">
               КГКП «АМК» • БИН: 990440001809 • г. Алматы, ул. Жандосова, 63
             </div>
+            <div class="text-[10px] text-slate-400 font-semibold" id="cert-standard-label"></div>
           </div>
 
         </div>
@@ -268,50 +244,343 @@
         Единый реестр аккредитации образовательных сертификатов ТиПО РК
       </div>
       <div class="text-slate-300">
-        Поддержка: <a href="https://wa.me/77079079764" class="text-emerald-400 font-bold hover:underline">+7 707 907 97 64 (WhatsApp)</a> • <a href="mailto:danidanilov333@gmail.com" class="text-indigo-400 hover:underline">danidanilov333@gmail.com</a>
+        Поддержка: <a href="https://wa.me/77079079764" class="text-emerald-400 font-bold hover:underline">+7 707 907 97 64 (WhatsApp)</a> • <a href="mailto:support@amk.kz" class="text-indigo-400 hover:underline">support@amk.kz</a>
       </div>
     </div>
   </footer>
 
   <script src="js/app-logistics.js"></script>
   <script>
+    // Pure-JS ISO/IEC 18004 QR Code (ECC Level M, Byte mode, Versions 1..10) SVG encoder
+    const QrEncoder = (() => {
+      const EXP = new Uint8Array(512);
+      const LOG = new Uint8Array(256);
+      let x = 1;
+      for (let i = 0; i < 255; i++) {
+        EXP[i] = x;
+        LOG[x] = i;
+        x <<= 1;
+        if (x & 0x100) x ^= 0x11d;
+      }
+      for (let i = 255; i < 512; i++) EXP[i] = EXP[i - 255];
+
+      function gfMul(a, b) {
+        return (a === 0 || b === 0) ? 0 : EXP[LOG[a] + LOG[b]];
+      }
+
+      function rsGenPoly(ecLen) {
+        let poly = [1];
+        for (let i = 0; i < ecLen; i++) {
+          const next = new Array(poly.length + 1).fill(0);
+          for (let j = 0; j < poly.length; j++) {
+            next[j] ^= poly[j];
+            next[j + 1] ^= gfMul(poly[j], EXP[i]);
+          }
+          poly = next;
+        }
+        return poly;
+      }
+
+      function rsCompute(data, ecLen) {
+        const gen = rsGenPoly(ecLen);
+        const rem = data.slice().concat(new Array(ecLen).fill(0));
+        for (let i = 0; i < data.length; i++) {
+          const coef = rem[i];
+          if (coef !== 0) {
+            for (let j = 0; j < gen.length; j++) {
+              rem[i + j] ^= gfMul(gen[j], coef);
+            }
+          }
+        }
+        return rem.slice(data.length);
+      }
+
+      // ECC Level M table for Versions 1..10: [dataCodewords, ecPerBlock, g1Blocks, g1Data, g2Blocks, g2Data, alignCenters]
+      const SPECS_M = [
+        null,
+        [16, 10, 1, 16, 0, 0, []],
+        [28, 16, 1, 28, 0, 0, [6, 18]],
+        [44, 26, 1, 44, 0, 0, [6, 22]],
+        [64, 18, 2, 32, 0, 0, [6, 26]],
+        [86, 24, 2, 43, 0, 0, [6, 30]],
+        [108, 16, 4, 27, 0, 0, [6, 34]],
+        [124, 18, 4, 31, 0, 0, [6, 22, 38]],
+        [154, 22, 2, 38, 2, 39, [6, 24, 42]],
+        [182, 22, 3, 36, 2, 37, [6, 26, 46]],
+        [216, 26, 4, 43, 1, 44, [6, 28, 50]],
+      ];
+
+      function pickVersion(byteLen) {
+        for (let v = 1; v < SPECS_M.length; v++) {
+          const capBits = SPECS_M[v][0] * 8;
+          const headerBits = 4 + (v >= 10 ? 16 : 8);
+          if (headerBits + byteLen * 8 <= capBits) return v;
+        }
+        return 10;
+      }
+
+      function encodeCodewords(bytes, version) {
+        const [totalData, ecLen, g1B, g1D, g2B, g2D] = SPECS_M[version];
+        const bits = [];
+        const pushBits = (val, len) => {
+          for (let i = len - 1; i >= 0; i--) bits.push((val >> i) & 1);
+        };
+        const lenBits = version >= 10 ? 16 : 8;
+        const maxBytes = Math.floor((totalData * 8 - 4 - lenBits) / 8);
+        const clipped = bytes.slice(0, maxBytes);
+
+        pushBits(0b0100, 4); // Byte mode
+        pushBits(clipped.length, lenBits);
+        for (const b of clipped) pushBits(b, 8);
+        const capBits = totalData * 8;
+        pushBits(0, Math.min(4, capBits - bits.length));
+        while (bits.length % 8 !== 0) bits.push(0);
+        const padBytes = [0xec, 0x11];
+        let p = 0;
+        while (bits.length < capBits) {
+          pushBits(padBytes[p % 2], 8);
+          p++;
+        }
+
+        const dataBytes = [];
+        for (let i = 0; i < bits.length; i += 8) {
+          let val = 0;
+          for (let j = 0; j < 8; j++) val = (val << 1) | bits[i + j];
+          dataBytes.push(val);
+        }
+
+        const blocks = [];
+        const ecBlocks = [];
+        let offset = 0;
+        for (let b = 0; b < g1B; b++) {
+          const slice = dataBytes.slice(offset, offset + g1D);
+          blocks.push(slice);
+          ecBlocks.push(rsCompute(slice, ecLen));
+          offset += g1D;
+        }
+        for (let b = 0; b < g2B; b++) {
+          const slice = dataBytes.slice(offset, offset + g2D);
+          blocks.push(slice);
+          ecBlocks.push(rsCompute(slice, ecLen));
+          offset += g2D;
+        }
+
+        const out = [];
+        const maxD = Math.max(g1D, g2D);
+        for (let i = 0; i < maxD; i++) {
+          for (const bl of blocks) if (i < bl.length) out.push(bl[i]);
+        }
+        for (let i = 0; i < ecLen; i++) {
+          for (const ebl of ecBlocks) if (i < ebl.length) out.push(ebl[i]);
+        }
+        return out;
+      }
+
+      function buildMatrix(version) {
+        const size = version * 4 + 17;
+        const grid = Array.from({ length: size }, () => new Int8Array(size).fill(-1));
+        const func = Array.from({ length: size }, () => new Uint8Array(size));
+
+        const setFunc = (r, c, v) => {
+          if (r < 0 || r >= size || c < 0 || c >= size) return;
+          grid[r][c] = v ? 1 : 0;
+          func[r][c] = 1;
+        };
+
+        const placeFinder = (r0, c0) => {
+          for (let dr = -1; dr <= 7; dr++) {
+            for (let dc = -1; dc <= 7; dc++) {
+              const r = r0 + dr;
+              const c = c0 + dc;
+              if (r < 0 || r >= size || c < 0 || c >= size) continue;
+              const inOuter = dr >= 0 && dr <= 6 && dc >= 0 && dc <= 6;
+              const dark = inOuter && (dr === 0 || dr === 6 || dc === 0 || dc === 6 || (dr >= 2 && dr <= 4 && dc >= 2 && dc <= 4));
+              setFunc(r, c, dark ? 1 : 0);
+            }
+          }
+        };
+
+        placeFinder(0, 0);
+        placeFinder(0, size - 7);
+        placeFinder(size - 7, 0);
+
+        const centers = SPECS_M[version][6];
+        for (const cr of centers) {
+          for (const cc of centers) {
+            if ((cr === 6 && cc === 6) || (cr === 6 && cc === size - 7) || (cr === size - 7 && cc === 6)) continue;
+            for (let dr = -2; dr <= 2; dr++) {
+              for (let dc = -2; dc <= 2; dc++) {
+                const dark = Math.abs(dr) === 2 || Math.abs(dc) === 2 || (dr === 0 && dc === 0);
+                setFunc(cr + dr, cc + dc, dark ? 1 : 0);
+              }
+            }
+          }
+        }
+
+        for (let i = 8; i < size - 8; i++) {
+          if (!func[6][i]) setFunc(6, i, i % 2 === 0 ? 1 : 0);
+          if (!func[i][6]) setFunc(i, 6, i % 2 === 0 ? 1 : 0);
+        }
+        setFunc(size - 8, 8, 1);
+
+        // Reserve format info cells
+        for (let i = 0; i < 9; i++) {
+          if (!func[8][i]) setFunc(8, i, 0);
+          if (!func[i][8]) setFunc(i, 8, 0);
+        }
+        for (let i = 0; i < 8; i++) {
+          if (!func[8][size - 1 - i]) setFunc(8, size - 1 - i, 0);
+          if (!func[size - 1 - i][8]) setFunc(size - 1 - i, 8, 0);
+        }
+
+        // Reserve version info for v >= 7
+        if (version >= 7) {
+          const verBits = [0,0,0,0,0,0,0,0x07c94,0x085bc,0x09a99,0x0a4d3][version];
+          for (let i = 0; i < 18; i++) {
+            const bit = (verBits >> i) & 1;
+            const r = Math.floor(i / 3);
+            const c = size - 11 + (i % 3);
+            setFunc(r, c, bit);
+            setFunc(c, r, bit);
+          }
+        }
+
+        return { size, grid, func };
+      }
+
+      function formatBits(mask) {
+        // ECC M indicator = 00
+        const data = (0b00 << 3) | mask;
+        let rem = data << 10;
+        const gen = 0b10100110111;
+        for (let i = 14; i >= 10; i--) {
+          if ((rem >> i) & 1) rem ^= (gen << (i - 10));
+        }
+        return ((data << 10) | rem) ^ 0b101010000010010;
+      }
+
+      function applyFormat(grid, size, mask) {
+        const fb = formatBits(mask);
+        for (let i = 0; i < 15; i++) {
+          const bit = (fb >> i) & 1;
+          if (i < 6) grid[8][i] = bit;
+          else if (i < 8) grid[8][i + 1] = bit;
+          else grid[8][size - 15 + i] = bit;
+
+          if (i < 8) grid[size - 1 - i][8] = bit;
+          else if (i < 9) grid[7][8] = bit;
+          else grid[14 - i][8] = bit;
+        }
+      }
+
+      function penaltyScore(grid, size) {
+        let score = 0;
+        for (let r = 0; r < size; r++) {
+          let run = 1;
+          for (let c = 1; c < size; c++) {
+            if (grid[r][c] === grid[r][c - 1]) run++;
+            else { if (run >= 5) score += 3 + (run - 5); run = 1; }
+          }
+          if (run >= 5) score += 3 + (run - 5);
+        }
+        for (let c = 0; c < size; c++) {
+          let run = 1;
+          for (let r = 1; r < size; r++) {
+            if (grid[r][c] === grid[r - 1][c]) run++;
+            else { if (run >= 5) score += 3 + (run - 5); run = 1; }
+          }
+          if (run >= 5) score += 3 + (run - 5);
+        }
+        for (let r = 0; r < size - 1; r++) {
+          for (let c = 0; c < size - 1; c++) {
+            const v = grid[r][c];
+            if (v === grid[r][c + 1] && v === grid[r + 1][c] && v === grid[r + 1][c + 1]) score += 3;
+          }
+        }
+        return score;
+      }
+
+      function encodeSvg(text) {
+        const utf8 = Array.from(new TextEncoder().encode(String(text || '')));
+        const version = pickVersion(utf8.length);
+        const codewords = encodeCodewords(utf8, version);
+        const { size, grid, func } = buildMatrix(version);
+
+        // Zigzag data placement
+        let bitIdx = 0;
+        const totalBits = codewords.length * 8;
+        let upward = true;
+        for (let right = size - 1; right >= 1; right -= 2) {
+          if (right === 6) right = 5;
+          for (let step = 0; step < size; step++) {
+            const r = upward ? (size - 1 - step) : step;
+            for (let j = 0; j < 2; j++) {
+              const c = right - j;
+              if (!func[r][c]) {
+                let bit = 0;
+                if (bitIdx < totalBits) {
+                  bit = (codewords[bitIdx >> 3] >> (7 - (bitIdx & 7))) & 1;
+                }
+                grid[r][c] = bit;
+                bitIdx++;
+              }
+            }
+          }
+          upward = !upward;
+        }
+
+        const masks = [
+          (r, c) => (r + c) % 2 === 0,
+          (r) => r % 2 === 0,
+          (_, c) => c % 3 === 0,
+          (r, c) => (r + c) % 3 === 0,
+          (r, c) => (Math.floor(r / 2) + Math.floor(c / 3)) % 2 === 0,
+          (r, c) => ((r * c) % 2 + (r * c) % 3) === 0,
+          (r, c) => (((r * c) % 2 + (r * c) % 3) % 2) === 0,
+          (r, c) => (((r + c) % 2 + (r * c) % 3) % 2) === 0,
+        ];
+
+        let bestMask = 0;
+        let bestPenalty = Infinity;
+        let bestGrid = null;
+        for (let m = 0; m < masks.length; m++) {
+          const cand = grid.map(row => row.slice());
+          const fn = masks[m];
+          for (let r = 0; r < size; r++) {
+            for (let c = 0; c < size; c++) {
+              if (!func[r][c] && fn(r, c)) cand[r][c] ^= 1;
+            }
+          }
+          applyFormat(cand, size, m);
+          const p = penaltyScore(cand, size);
+          if (p < bestPenalty) {
+            bestPenalty = p;
+            bestMask = m;
+            bestGrid = cand;
+          }
+        }
+
+        const margin = 4;
+        const dim = size + margin * 2;
+        const rects = [];
+        for (let r = 0; r < size; r++) {
+          for (let c = 0; c < size; c++) {
+            if (bestGrid[r][c] === 1) {
+              rects.push(`<rect x="${c + margin}" y="${r + margin}" width="1" height="1" fill="#000000"/>`);
+            }
+          }
+        }
+        return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${dim} ${dim}" class="w-full h-full" shape-rendering="crispEdges" role="img" aria-label="QR-код верификации сертификата (ISO/IEC 18004, v${version}, M)">`
+          + `<rect width="${dim}" height="${dim}" fill="#ffffff"/>`
+          + rects.join('')
+          + `</svg>`;
+      }
+
+      return { encodeSvg };
+    })();
+
     function generateQrSvg(text) {
-      // Clean styled SVG QR representation with dynamic matrix pattern
-      return `
-        <svg viewBox="0 0 100 100" class="w-full h-full" shape-rendering="crispEdges">
-          <rect width="100" height="100" fill="#ffffff"/>
-          <!-- Position Markers -->
-          <rect x="6" y="6" width="28" height="28" fill="#000000"/>
-          <rect x="10" y="10" width="20" height="20" fill="#ffffff"/>
-          <rect x="14" y="14" width="12" height="12" fill="#000000"/>
-
-          <rect x="66" y="6" width="28" height="28" fill="#000000"/>
-          <rect x="70" y="10" width="20" height="20" fill="#ffffff"/>
-          <rect x="74" y="14" width="12" height="12" fill="#000000"/>
-
-          <rect x="6" y="66" width="28" height="28" fill="#000000"/>
-          <rect x="10" y="70" width="20" height="20" fill="#ffffff"/>
-          <rect x="14" y="74" width="12" height="12" fill="#000000"/>
-
-          <!-- Decorative Hash Matrix Dots -->
-          <rect x="38" y="10" width="6" height="6" fill="#000000"/>
-          <rect x="48" y="14" width="6" height="6" fill="#000000"/>
-          <rect x="38" y="24" width="6" height="6" fill="#000000"/>
-          <rect x="52" y="24" width="6" height="6" fill="#000000"/>
-          <rect x="10" y="44" width="6" height="6" fill="#000000"/>
-          <rect x="22" y="48" width="6" height="6" fill="#000000"/>
-          <rect x="38" y="42" width="8" height="8" fill="#4f46e5"/>
-          <rect x="50" y="42" width="8" height="8" fill="#000000"/>
-          <rect x="44" y="54" width="8" height="8" fill="#4f46e5"/>
-          <rect x="62" y="48" width="6" height="6" fill="#000000"/>
-          <rect x="74" y="42" width="6" height="6" fill="#000000"/>
-          <rect x="84" y="52" width="6" height="6" fill="#000000"/>
-          <rect x="42" y="70" width="6" height="6" fill="#000000"/>
-          <rect x="54" y="78" width="6" height="6" fill="#000000"/>
-          <rect x="68" y="72" width="6" height="6" fill="#000000"/>
-          <rect x="80" y="80" width="8" height="8" fill="#000000"/>
-        </svg>
-      `;
+      return QrEncoder.encodeSvg(text);
     }
 
     async function loadCertificate(certCode) {
@@ -323,26 +592,60 @@
       errorEl.classList.add('hidden');
       cardEl.classList.add('hidden');
 
+      if (!/^KZ-AMK-\d{4}-\d+-[0-9A-F]{10}$/i.test(String(certCode || '').trim())) {
+        loadingEl.classList.add('hidden');
+        document.getElementById('verify-error-msg').textContent =
+          `Сертификат с кодом «${certCode}» не найден в государственном реестре выпускников (требуется подписанный код формата KZ-AMK-YYYY-ID-HMAC).`;
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
       try {
         const res = await window.EduSpace.api(`/api/certificate/verify?cert=${encodeURIComponent(certCode)}`);
         loadingEl.classList.add('hidden');
 
         if (res.ok && res.data && res.data.found) {
           const cert = res.data.certificate;
-          document.getElementById('cert-student-name').textContent = cert.student_name;
-          document.getElementById('cert-group-label').textContent = `Учебная группа: ${cert.group_name} • ИИН / Студбилет: ${cert.certificate_number}`;
-          document.getElementById('cert-course-title').textContent = cert.specialty_title;
-          document.getElementById('cert-spec-code').textContent = cert.specialty_code;
-          document.getElementById('cert-qual-label').textContent = cert.qualification;
-          document.getElementById('cert-curator-label').textContent = cert.curator;
-          document.getElementById('cert-num-badge').textContent = cert.certificate_number;
-          document.getElementById('cert-modules-cnt').textContent = `${cert.passed_modules} / ${cert.total_modules}`;
-          document.getElementById('cert-avg-score').textContent = cert.average_score;
-          document.getElementById('cert-gpa-label').textContent = cert.gpa;
-          document.getElementById('cert-date-label').textContent = cert.issue_date;
-          document.getElementById('cert-hash-val').textContent = cert.digital_signature_hash;
+          const passed = Number(cert.passed_modules || 0);
+          const total = Number(cert.total_modules || 20);
+          const avgScore = Number(cert.average_score || 0);
+          const isComplete = cert.status === 'ISSUED' || cert.status === 'VERIFIED' || String(cert.status || '').startsWith('VALID') || (total > 0 && passed >= total);
+
+          const statusBadge = document.getElementById('cert-status-badge');
+          const statusDot = document.getElementById('cert-status-dot');
+          const statusText = document.getElementById('cert-status-text');
+          if (statusBadge && statusDot && statusText) {
+            if (isComplete) {
+              statusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-extrabold shadow-glow-emerald';
+              statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+              statusText.textContent = 'ВЕРИФИЦИРОВАНО';
+            } else {
+              statusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-extrabold';
+              statusDot.className = 'w-2 h-2 rounded-full bg-amber-400';
+              statusText.textContent = 'В ПРОЦЕССЕ ОБУЧЕНИЯ';
+            }
+          }
+
+          document.getElementById('cert-student-name').textContent = cert.student_name || '—';
+          document.getElementById('cert-group-label').textContent = `Учебная группа: ${cert.group_name || '—'} • Студбилет: ${cert.certificate_number || '—'}`;
+          document.getElementById('cert-course-title').textContent = cert.specialty_title || '—';
+          document.getElementById('cert-spec-code').textContent = cert.specialty_code || '—';
+          document.getElementById('cert-qual-label').textContent = cert.qualification || '—';
+          document.getElementById('cert-curator-label').textContent = cert.curator || '—';
+          document.getElementById('cert-num-badge').textContent = cert.certificate_number || '—';
+          document.getElementById('cert-modules-cnt').textContent = `${passed} / ${total}`;
+          const pct = total > 0 ? Math.round((passed / total) * 100) : 0;
+          const modSubEl = document.getElementById('cert-modules-sub');
+          if (modSubEl) modSubEl.textContent = `${pct}% выполнено`;
+          document.getElementById('cert-avg-score').textContent = avgScore > 0 ? String(avgScore) : '—';
+          document.getElementById('cert-gpa-label').textContent = cert.gpa || '—';
+          const gpaSubEl = document.getElementById('cert-gpa-sub');
+          if (gpaSubEl) gpaSubEl.textContent = avgScore >= 85 ? 'Отлично' : (avgScore >= 70 ? 'Хорошо' : (avgScore > 0 ? 'В процессе' : '—'));
+          document.getElementById('cert-date-label').textContent = cert.issue_date || '—';
+          document.getElementById('cert-hash-val').textContent = cert.digital_signature_hash || '—';
           if (cert.director) document.getElementById('cert-director-label').textContent = cert.director;
-          document.getElementById('cert-standard-label').textContent = cert.accreditation_standard;
+          const stdEl = document.getElementById('cert-standard-label');
+          if (stdEl) stdEl.textContent = cert.accreditation_standard || '';
 
           document.getElementById('cert-qr-svg').innerHTML = generateQrSvg(window.location.href);
 
@@ -374,9 +677,13 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       const params = new URLSearchParams(window.location.search);
-      const certParam = params.get('cert') || params.get('id') || 'KZ-AMK-2026-98421';
-      document.getElementById('cert-search-input').value = certParam;
-      loadCertificate(certParam);
+      const certParam = (params.get('cert') || params.get('id') || '').trim();
+      if (certParam) {
+        document.getElementById('cert-search-input').value = certParam;
+        loadCertificate(certParam);
+      } else {
+        document.getElementById('verify-loading').classList.add('hidden');
+      }
     });
   </script>
   <script src="js/eduspace-animations.js" defer></script>

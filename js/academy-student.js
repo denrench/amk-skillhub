@@ -6,12 +6,30 @@
   const logout = element('[data-logout]');
   const staticHost = location.hostname.endsWith('.github.io');
 
+  let csrfToken = '';
+
+  function readCookieCsrf() {
+    const m = document.cookie.match(/(?:^|;\s*)eduspace_csrf=([^;]+)/);
+    return m ? decodeURIComponent(m[1]) : '';
+  }
+
   async function request(path, options = {}) {
+    const method = (options.method || 'GET').toUpperCase();
+    const headers = Object.assign({}, options.headers || {});
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+      const tok = csrfToken || readCookieCsrf() || window.EduSpace?.getCsrfToken?.() || '';
+      if (tok) headers['X-CSRF-Token'] = tok;
+    }
     const response = await fetch(path, {
-      ...options, cache: 'no-store', credentials: 'same-origin', signal: AbortSignal.timeout(8000),
+      ...options, headers, cache: 'no-store', credentials: 'same-origin', signal: AbortSignal.timeout(8000),
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return response.json();
+    const payload = await response.json();
+    if (payload && payload.csrf_token) {
+      csrfToken = payload.csrf_token;
+      window.EduSpace?.setCsrfToken?.(csrfToken);
+    }
+    return payload;
   }
 
   function addListItem(list, title, subtitle, href, index = 0) {

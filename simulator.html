@@ -23,49 +23,6 @@
 
   <!-- Tailwind CSS Local & CDN -->
   <link rel="stylesheet" href="css/tailwind.min.css"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    if (window.tailwind) tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
-          },
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
-              950: '#1e1b4b'
-            },
-            dark: {
-              950: '#07090e',
-              900: '#0b0f19',
-              850: '#101524',
-              800: '#161c2e',
-              700: '#1e263d',
-              600: '#2a3452'
-            }
-          },
-          boxShadow: {
-            'glow-indigo': '0 0 50px -10px rgba(99, 102, 241, 0.35)',
-            'glow-purple': '0 0 50px -10px rgba(168, 85, 247, 0.35)',
-            'glow-cyan': '0 0 50px -10px rgba(6, 182, 212, 0.35)',
-            'glow-amber': '0 0 50px -10px rgba(245, 158, 11, 0.35)'
-          }
-        }
-      }
-    };
-  </script>
 
   <style>
     .bg-grid-white {
@@ -109,19 +66,21 @@
   <link rel="stylesheet" href="css/workshop.css">
   <script src="js/prism-fx.js" defer></script>
   <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
   <link rel="stylesheet" href="css/photoreal-tools.css">
 </head>
-
-  <!-- Futuristic Glowing Orbs -->
-  <div class="fixed top-10 left-1/3 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[180px] pointer-events-none"></div>
-  <div class="fixed bottom-10 right-10 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[180px] pointer-events-none"></div>
 
 <body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex selection:bg-indigo-500 selection:text-white bg-grid-white relative">
   <a class="academy-skip" href="#academy-main">К содержимому</a>
 
-  <!-- Ambient background glow orbs -->
-  <div class="fixed top-20 left-1/3 w-96 h-96 bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none"></div>
-  <div class="fixed bottom-20 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+  <!-- Futuristic Glowing Orbs (clipped to viewport) -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute top-10 left-1/3 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[180px]"></div>
+    <div class="absolute bottom-10 right-10 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[180px]"></div>
+    <div class="absolute top-20 left-1/3 w-96 h-96 bg-indigo-600/10 rounded-full blur-[140px]"></div>
+    <div class="absolute bottom-20 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-[140px]"></div>
+  </div>
+
 
   <!-- COURSE OUTLINE SIDEBAR -->
   <aside class="fixed left-0 top-0 h-full w-72 bg-dark-950/95 backdrop-blur-xl border-r border-white/10 z-50 hidden lg:flex flex-col justify-between shadow-2xl">
@@ -579,6 +538,16 @@
     let draftTimer = null;
     const sessionStartTs = Date.now();
 
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function switchLessonStage(stage) {
       ['theory', 'quiz', 'practice'].forEach(st => {
         const btn = document.getElementById(`step-tab-${st}`);
@@ -610,7 +579,7 @@
       document.getElementById('editor-file-label').textContent =
         activeSpecialty === 'it' ? (activeTaskNumber === 2 ? 'card.html' : ([4, 6].includes(activeTaskNumber) ? 'query.sql' : (activeTaskNumber === 9 ? 'docker-compose.yml' : 'solution.js'))) : `case_module_${activeTaskNumber}.txt`;
 
-      const res = await window.EduSpace.api(`/api/tasks?specialty=${activeSpecialty}&user_id=${user.id}`);
+      const res = await window.EduSpace.api(`/api/tasks?specialty=${encodeURIComponent(activeSpecialty)}&user_id=${user.id}`);
       const tasks = (res.data && res.data.tasks) || [];
       const curDay = (res.data && res.data.current_study_day) || 1;
 
@@ -625,13 +594,15 @@
         const isDone = t.status_code === 'graded';
         const icon = isLocked ? 'lock' : (isDone ? 'check_circle' : (isCurrent ? 'play_circle' : 'radio_button_unchecked'));
         const iconCol = isLocked ? 'text-slate-600' : (isDone ? 'text-emerald-400' : (isCurrent ? 'text-indigo-400' : 'text-slate-500'));
+        const taskNum = Number(t.task_number);
+        const cleanTitle = escapeHtml((t.title || '').replace(/^Урок\s*\d+\.\s*/i, ''));
 
         return `
-          <a href="${isLocked ? 'javascript:void(0)' : `simulator.html?specialty=${activeSpecialty}&task=${t.task_number}`}"
-             ${isLocked ? `onclick="showToast('Модуль №${t.task_number} откроется ${t.unlock_date_exact} (День ${t.unlock_day})', 'info')"` : ''}
+          <a href="${isLocked ? '#' : `simulator.html?specialty=${encodeURIComponent(activeSpecialty)}&task=${taskNum}`}"
+             ${isLocked ? `onclick="event.preventDefault(); showToast('Модуль №${taskNum} откроется ${escapeHtml(t.unlock_date_exact)} (День ${Number(t.unlock_day)})', 'info')"` : ''}
              class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs transition-colors ${isCurrent ? 'bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30 shadow-glow-indigo' : (isLocked ? 'text-slate-600 cursor-not-allowed' : 'text-slate-400 hover:bg-white/5 hover:text-white font-medium')}">
             <span class="material-symbols-outlined text-[18px] ${iconCol} shrink-0">${icon}</span>
-            <span class="truncate flex-1">${t.task_number}. ${t.title.replace(/^Урок\s*\d+\.\s*/i, '')}</span>
+            <span class="truncate flex-1">${taskNum}. ${cleanTitle}</span>
           </a>
         `;
       }).join('');
@@ -648,7 +619,7 @@
         document.getElementById('sim-locked-title').textContent = activeTaskServer ? activeTaskServer.title : `Модуль №${activeTaskNumber} пока закрыт`;
         document.getElementById('sim-locked-desc').textContent =
           `Сейчас на курсе идёт День ${curDay}. Этот урок откроется ${exactOpen}. Выполните доступные модули, чтобы подготовиться к следующей теме.`;
-        document.getElementById('sim-jump-available-btn').href = `simulator.html?specialty=${activeSpecialty}&task=${Math.min(curDay, 10)}`;
+        document.getElementById('sim-jump-available-btn').href = `simulator.html?specialty=${encodeURIComponent(activeSpecialty)}&task=${Math.min(curDay, 20)}`;
         return;
       }
 
@@ -672,10 +643,10 @@
         );
         banner.innerHTML = `
           <div>
-            <div class="font-extrabold text-white">${activeTaskServer.status_label} ${activeTaskServer.student_score ? `— ${activeTaskServer.student_score}/100 (${activeTaskServer.grade_letter})` : ''}</div>
-            <p class="mt-0.5 text-slate-300">${activeTaskServer.teacher_comment ? `Комментарий преподавателя: ${activeTaskServer.teacher_comment}` : (isPending ? 'Ваше решение находится в очереди проверки преподавателя.' : 'Автотесты успешно пройдены и зачтены.')}</p>
+            <div class="font-extrabold text-white">${escapeHtml(activeTaskServer.status_label)} ${activeTaskServer.student_score ? `— ${Number(activeTaskServer.student_score)}/100 (${escapeHtml(activeTaskServer.grade_letter)})` : ''}</div>
+            <p class="mt-0.5 text-slate-300">${activeTaskServer.teacher_comment ? `Комментарий преподавателя: ${escapeHtml(activeTaskServer.teacher_comment)}` : (isPending ? 'Ваше решение находится в очереди проверки преподавателя.' : 'Автотесты успешно пройдены и зачтены.')}</p>
           </div>
-          ${activeTaskNumber < curDay ? `<a href="simulator.html?specialty=${activeSpecialty}&task=${activeTaskNumber + 1}" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold shrink-0 shadow-glow-indigo">Следующий урок →</a>` : ''}
+          ${activeTaskNumber < curDay ? `<a href="simulator.html?specialty=${encodeURIComponent(activeSpecialty)}&task=${activeTaskNumber + 1}" class="px-4 py-2 rounded-xl bg-indigo-600 text-white font-bold shrink-0 shadow-glow-indigo">Следующий урок →</a>` : ''}
         `;
         banner.classList.remove('hidden');
       } else {
@@ -685,7 +656,7 @@
       // Stage 1: Interactive Topic Game & Theory Notes
       document.getElementById('theory-tools-badge').textContent = (activeTaskServer && activeTaskServer.tools_required) || (activeLessonCatalog && activeLessonCatalog.tools) || 'Профильный инструмент АМК';
       document.getElementById('theory-content-body').innerHTML =
-        (activeLessonCatalog && activeLessonCatalog.theory) || `<p>${(activeTaskServer && activeTaskServer.description) || (activeLessonCatalog && activeLessonCatalog.summary) || ''}</p>`;
+        (activeLessonCatalog && activeLessonCatalog.theory) || `<p>${escapeHtml((activeTaskServer && activeTaskServer.description) || (activeLessonCatalog && activeLessonCatalog.summary) || '')}</p>`;
 
       mountSimulatorTopicGame();
 
@@ -877,7 +848,7 @@
 
       const linesHtml = report.logs.map((l, idx) => `
         <div class="${l.passed ? 'text-emerald-400' : 'text-red-400'}">
-          [${l.passed ? 'PASS' : 'FAIL'}] Тест #${idx + 1} (${l.name}): <span class="text-slate-300">${String(l.detail).replace(/</g, '&lt;')}</span>
+          [${l.passed ? 'PASS' : 'FAIL'}] Тест #${idx + 1} (${escapeHtml(l.name)}): <span class="text-slate-300">${escapeHtml(String(l.detail))}</span>
         </div>
       `).join('');
 
@@ -915,7 +886,6 @@
       }
 
       const report = executeAutoTests();
-      // Combine auto-test score (85% weight) + quiz bonus (up to 15% if passed, or full 100 if auto-tests = 100)
       let finalScore = report.score;
       if (currentQuizScore > 0 && finalScore >= 60) {
         finalScore = Math.min(100, Math.round(report.score * 0.85 + (currentQuizScore / 3) * 15));
@@ -1004,12 +974,11 @@
       showToast(`Загрузка файла ${file.name}...`, 'info');
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('user_id', user.id);
       formData.append('specialty_slug', activeSpecialty);
       formData.append('task_number', activeTaskNumber);
 
       try {
-        const response = await fetch('/api/tasks/upload', {
+        const response = await window.EduSpace.fetchWithCsrf('/api/tasks/upload', {
           method: 'POST',
           body: formData
         });
@@ -1046,7 +1015,6 @@
     // ==========================================
 
     function renderSpecialtyWorkbench(spec, taskNum) {
-      // Mount corresponding 3D Model
       if (window.EduSpace3D) {
         setTimeout(() => {
           if (spec === 'it') {
@@ -1086,7 +1054,7 @@
               </button>
             </div>
             <div class="rounded-2xl border border-white/15 bg-white p-3 shadow-inner h-60 overflow-hidden relative">
-              <iframe id="live-web-iframe" class="w-full h-full border-0 rounded-xl bg-white" sandbox="allow-scripts"></iframe>
+              <iframe id="live-web-iframe" class="w-full h-full border-0 rounded-xl bg-white" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe>
             </div>
           </div>
         `;
@@ -1213,10 +1181,12 @@
       const iframe = document.getElementById('live-web-iframe');
       if (!iframe) return;
 
+      const cspMeta = '<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; script-src \'unsafe-inline\';">';
       let htmlDoc = code;
       if (!code.includes('<html') && !code.includes('<body') && !code.includes('<!DOCTYPE')) {
-        const sEnd = '<' + '/script>';
-        htmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;padding:16px;color:#1e293b;}</style><script src="js/vendor/three.min.js">${sEnd}<script src="js/eduspace-3d-engine.js">${sEnd}</head><body>${code}</body></html>`;
+        htmlDoc = `<!DOCTYPE html><html><head><meta charset="utf-8">${cspMeta}<style>body{font-family:sans-serif;padding:16px;color:#1e293b;}</style></head><body>${code}</body></html>`;
+      } else if (!code.includes('Content-Security-Policy')) {
+        htmlDoc = code.replace(/<head([^>]*)>/i, `<head$1>${cspMeta}`);
       }
       iframe.srcdoc = htmlDoc;
     }
@@ -1324,7 +1294,6 @@
       const el = document.getElementById('solution-code');
       if (!el) return;
       let val = el.value;
-      // Basic clean indent formatting
       const lines = val.split('\n');
       let indentLevel = 0;
       const formatted = lines.map(line => {
@@ -1345,7 +1314,6 @@
       showToast('Код аккуратно выровнен по стандарту (2 пробела)', 'info');
     }
 
-    // Initialize Tab key on document load
     document.addEventListener('DOMContentLoaded', () => {
       if (typeof setupCodeEditorTabs === 'function') {
         setupCodeEditorTabs('solution-code');
@@ -1384,32 +1352,44 @@
         quotaLabel.textContent = isPro ? 'Тариф Pro: безлимитные подсказки 24/7 💎' : `Бесплатный план: использовано ${aiPromptCount}/3`;
       }
 
-      appendAiMessage('assistant', `Здравствуйте, ${user ? user.first_name || user.full_name : 'Студент'}! Я ваш интеллектуальный AI-Куратор по направлению <strong>«${course.short_title}»</strong>.<br/><br/>Я знаю все требования Модуля №${activeTaskNumber}, критерии автотестов и стандарты колледжа АМК. Чем могу помочь прямо сейчас?`);
+      const nameSafe = escapeHtml(user ? (user.first_name || user.full_name) : 'Студент');
+      const courseSafe = escapeHtml(course.short_title);
+      appendAiMessage('assistant', `Здравствуйте, ${nameSafe}! Я ваш интеллектуальный AI-Куратор по направлению <strong>«${courseSafe}»</strong>.<br/><br/>Я знаю все требования Модуля №${Number(activeTaskNumber)}, критерии автотестов и стандарты колледжа АМК. Чем могу помочь прямо сейчас?`, true);
     }
 
-    function appendAiMessage(role, text) {
+    function appendAiMessage(role, text, isTrustedHtml = false) {
       const cont = document.getElementById('ai-chat-messages');
       if (!cont) return;
 
       const isUser = (role === 'user');
       const bubble = document.createElement('div');
       bubble.className = isUser ? 'flex justify-end' : 'flex justify-start';
-      bubble.innerHTML = `
-        <div class="max-w-[85%] p-3.5 rounded-2xl ${isUser ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-dark-850 border border-white/10 text-slate-200 rounded-tl-none shadow-md'} space-y-1.5 leading-relaxed">
-          ${!isUser ? '<div class="text-[10px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1"><span class="material-symbols-outlined text-[13px]">smart_toy</span>AI-Куратор</div>' : ''}
-          <div>${text}</div>
-        </div>
-      `;
+      const inner = document.createElement('div');
+      inner.className = `max-w-[85%] p-3.5 rounded-2xl ${isUser ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-dark-850 border border-white/10 text-slate-200 rounded-tl-none shadow-md'} space-y-1.5 leading-relaxed`;
+      if (!isUser) {
+        const header = document.createElement('div');
+        header.className = 'text-[10px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1';
+        header.innerHTML = '<span class="material-symbols-outlined text-[13px]">smart_toy</span>AI-Куратор';
+        inner.appendChild(header);
+      }
+      const body = document.createElement('div');
+      if (isTrustedHtml) {
+        body.innerHTML = text;
+      } else {
+        body.textContent = String(text || '');
+      }
+      inner.appendChild(body);
+      bubble.appendChild(inner);
       cont.appendChild(bubble);
       cont.scrollTop = cont.scrollHeight;
     }
 
-    function sendAiQuickPrompt(type) {
+    async function sendAiQuickPrompt(type) {
       const user = window.EduSpace.getActiveUser();
       const isPro = (user && user.subscription_tier === 'pro');
 
       if (!isPro && aiPromptCount >= 3) {
-        appendAiMessage('assistant', `⚠️ Вы использовали лимит (3 из 3) бесплатных подсказок AI-Куратора на сегодня.<br/><br/>Чтобы получать неограниченную помощь при решении практических задач — <a href="pricing.html?plan=pro" class="text-amber-400 underline font-bold">активируйте тариф Pro (4 990 ₸)</a>.`);
+        appendAiMessage('assistant', `⚠️ Вы использовали лимит (3 из 3) бесплатных подсказок AI-Куратора на сегодня.<br/><br/>Чтобы получать неограниченную помощь при решении практических задач — <a href="pricing.html?plan=pro" class="text-amber-400 underline font-bold">активируйте тариф Pro (4 990 ₸)</a>.`, true);
         return;
       }
 
@@ -1428,62 +1408,27 @@
 
       appendAiMessage('user', promptLabels[type] || 'Подскажи решение');
 
-      // Call Real Server-Side AI API with Full Context
-      fetch('/api/ai/chat', {
+      const res = await window.EduSpace.api('/api/ai/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           prompt: promptLabels[type] || 'Подскажи решение',
           specialty: activeSpecialty,
           task_number: activeTaskNumber,
           user_code: code,
           prompt_type: type
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        appendAiMessage('assistant', data.reply || 'Рекомендуется свериться с критериями модуля и запустить автотесты.');
-      })
-      .catch(() => {
-        // Fallback local response
-        setTimeout(() => {
-        let answer = '';
-        if (type === 'hint') {
-          if (activeSpecialty === 'it') {
-            answer = `💡 <strong>Подсказка по Web-разработке (Модуль №${activeTaskNumber}):</strong><br/>Обратите внимание на семантику тегов и правильные имена классов. Если задание требует центрирования или сетки — используйте <code>display: flex</code> или <code>grid</code> с соответствующими правилами.`;
-          } else if (activeSpecialty === 'autoelectric') {
-            answer = `💡 <strong>Совет диагноста:</strong><br/>Всегда начинайте проверку с питания датчика и целостности массы. Опорное напряжение большинства датчиков составляет 5.0 В. Сопротивление CAN-шины между линиями High и Low должно составлять строго 60 Ом (два резистора по 120 Ом параллельно).`;
-          } else if (activeSpecialty === 'hvac') {
-            answer = `💡 <strong>Рекомендация мастера холода:</strong><br/>Для R134a нормальное давление всасывания составляет 1.8–2.2 bar при температуре кипения около -5...-8 °C. Перегрев должен оставаться в коридоре 5–8 °C. Если перегрев выше 10 °C — система недозаправлена!`;
-          } else if (activeSpecialty === 'automechanic') {
-            answer = `💡 <strong>Норматив моториста:</strong><br/>Затяжку болтов ГБЦ проводите строго в 3 этапа по спирали от центра к краям: 40 Н·м ➔ 75 Н·м ➔ доворот на 90°. Проверку зазоров клапанов делайте только на остывшем двигателе (20 °C).`;
-          } else {
-            answer = `💡 <strong>Совет дизайнера:</strong><br/>Следите за коэффициентом контрастности текста к фону (WCAG AA: минимум 4.5:1). Применяйте модульную сетку 8px и не используйте более 2 шрифтовых гарнитур на одном макете.`;
-          }
-        } else if (type === 'bug') {
-          if (!code || code.length < 20) {
-            answer = `🔍 В редакторе пока пусто или слишком мало кода. Напишите решение или вставьте исходный шаблон, и я найду в нём синтаксические и логические ошибки.`;
-          } else if (code.includes('var ')) {
-            answer = `🔍 <strong>Замечание по чистоте кода:</strong><br/>Замечено использование устаревшего ключевого слова <code>var</code>. Замените его на современные <code>const</code> и <code>let</code> по стандарту ES6+.`;
-          } else {
-            answer = `🔍 Анализ кода решения завершён. Базовый синтаксис корректен. Рекомендую запустить кнопку <strong>«Запустить автотесты»</strong> под редактором — тест-раннер проверит граничные случаи и покажет точную строку несоответствия.`;
-          }
-        } else if (type === 'explain') {
-          answer = `📖 <strong>Теоретическая основа модуля №${activeTaskNumber}:</strong><br/>В этом задании оценивается понимание базовых физических и программных принципов. Главная цель — не просто воспроизвести шаблон, а понять причинно-следственную связь: как параметры влияют на итоговую стабильность системы.`;
-        } else if (type === 'checklist') {
-          answer = `📋 <strong>Чек-лист перед сдачей работы:</strong><br/>
-            1. Все функции и параметры названы корректно ✓<br/>
-            2. Запущены автотесты и получен балл не ниже 60/100 ✓<br/>
-            3. Квиз проверен и зафиксирован (до +15 баллов бонуса) ✓<br/>
-            4. Прикреплён отчёт или макет в поле загрузки файлов ✓`;
         }
-
-        appendAiMessage('assistant', answer);
-        }, 300);
       });
+      if (res && res.ok && res.data && res.data.reply) {
+        appendAiMessage('assistant', res.data.reply);
+      } else {
+        const msg = (res && res.data && res.data.message)
+          ? res.data.message
+          : 'AI-наставник временно недоступен (API-ключ LLM не настроен или требуется авторизация).';
+        appendAiMessage('assistant', msg);
+      }
     }
 
-    function handleAiUserSubmit(e) {
+    async function handleAiUserSubmit(e) {
       e.preventDefault();
       const input = document.getElementById('ai-chat-input');
       const val = (input.value || '').trim();
@@ -1493,7 +1438,7 @@
       const user = window.EduSpace.getActiveUser();
       const isPro = (user && user.subscription_tier === 'pro');
       if (!isPro && aiPromptCount >= 3) {
-        appendAiMessage('assistant', `⚠️ Лимит бесплатных запросов исчерпан. Перейдите на <a href="pricing.html?plan=pro" class="text-amber-400 underline font-bold">Тариф Pro</a> для безлимитного AI-наставника 24/7.`);
+        appendAiMessage('assistant', '⚠️ Лимит бесплатных запросов исчерпан. Перейдите на Тариф Pro для безлимитного AI-наставника.');
         return;
       }
 
@@ -1501,9 +1446,24 @@
       localStorage.setItem('eduspace_ai_count', aiPromptCount);
       appendAiMessage('user', val);
 
-      setTimeout(() => {
-        appendAiMessage('assistant', `Отличный вопрос по модулю №${activeTaskNumber}! Для успешного решения обратите внимание на технические требования в верхней панели brief и критерии автотестов. Рекомендую проверить решение по шагам и нажать «Запустить автотесты».`);
-      }, 500);
+      const code = document.getElementById('code-editor') ? document.getElementById('code-editor').value : '';
+      const res = await window.EduSpace.api('/api/ai/chat', {
+        method: 'POST',
+        body: {
+          message: val,
+          specialty: activeSpecialty,
+          task_number: activeTaskNumber,
+          user_code: code
+        }
+      });
+      if (res && res.ok && res.data && res.data.reply) {
+        appendAiMessage('assistant', res.data.reply);
+      } else {
+        const msg = (res && res.data && res.data.message)
+          ? res.data.message
+          : 'AI-наставник недоступен: не задан API-ключ LLM (укажите в настройках или переменных окружения).';
+        appendAiMessage('assistant', msg);
+      }
     }
 
   </script>

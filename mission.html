@@ -6,36 +6,10 @@
   <title>Миссия 01: Архитектор цвета — EDU SPACE Neo</title>
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg" />
   <link rel="stylesheet" href="css/tailwind.min.css" />
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,500,0,0" rel="stylesheet" />
-
-  <script>
-    if (window.tailwind) tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            neo: {
-              bg: '#080B16',
-              surface: '#11182A',
-              cyan: '#00D9FF',
-              purple: '#8957FF',
-              white: '#F4F7FF',
-              gray: '#8B96AD',
-              success: '#36E6A0'
-            }
-          },
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
-          }
-        }
-      }
-    };
-  </script>
 
   <style>
     :root {
@@ -166,6 +140,7 @@
   <link rel="stylesheet" href="css/components.css"/>
   <link rel="stylesheet" href="css/workshop.css">
   <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
   <link rel="stylesheet" href="css/photoreal-tools.css">
 </head>
 
@@ -235,19 +210,37 @@
         </button>
       </div>
     </div>
+  </header>
+
+  <!-- Main Mission Viewport -->
+  <main id="academy-main" tabindex="-1" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
     <!-- 7-Stage Interactive Progress Stepper -->
-    <div class="bg-neo-bg/80 border-t border-white/5">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 overflow-x-auto">
+    <div class="rounded-2xl bg-neo-bg/80 border border-white/10 overflow-hidden">
+      <div class="px-4 sm:px-6 py-2.5 overflow-x-auto">
         <div class="flex items-center justify-between min-w-[680px] gap-2" id="stage-stepper">
           <!-- Populated dynamically by JS -->
         </div>
       </div>
     </div>
-  </header>
 
-  <!-- Main Mission Viewport -->
-  <main id="academy-main" tabindex="-1" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- Auth Gate -->
+    <section id="mission-auth-gate" class="hidden p-8 rounded-3xl neo-glass border border-neo-cyan/30 text-center space-y-4">
+      <div class="w-14 h-14 rounded-2xl bg-neo-cyan/20 text-neo-cyan border border-neo-cyan/30 flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-[30px]">lock</span>
+      </div>
+      <h2 class="text-xl font-extrabold text-neo-white">Требуется авторизация для прохождения миссии</h2>
+      <p id="mission-auth-gate-msg" class="text-xs text-neo-gray max-w-md mx-auto">
+        Прогресс этапов, начисление XP и отправка дизайн-палитры преподавателю привязаны к вашему аккаунту. Войдите, чтобы продолжить миссию.
+      </p>
+      <div class="flex justify-center gap-3 pt-1">
+        <a href="auth.html?mode=login" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-neo-cyan to-neo-purple text-neo-bg text-xs font-extrabold">Войти в аккаунт</a>
+        <a href="learn.html" class="px-5 py-2.5 rounded-xl bg-neo-surface hover:bg-white/10 border border-white/15 text-neo-white text-xs font-bold">Открыть учебник</a>
+      </div>
+    </section>
+
+    <div id="mission-protected-content">
 
     <!-- Notification / Feedback Banner -->
     <div id="mission-toast" class="hidden fixed bottom-6 right-6 z-50 max-w-md neo-glass border-l-4 border-neo-cyan px-5 py-4 rounded-2xl shadow-2xl flex items-start gap-3">
@@ -1055,6 +1048,8 @@
       </div>
     </section>
 
+    </div><!-- /#mission-protected-content -->
+
   </main>
 
   <script>
@@ -1124,26 +1119,7 @@
     let selectedChipForTap = null;
     let activeLabSlotIndex = 2;
     let draftSaveTimer = null;
-
-    function getCurrentUserId() {
-      try {
-        if (window.EduSpace && typeof window.EduSpace.getActiveUser === 'function') {
-          const u = window.EduSpace.getActiveUser();
-          if (u && u.id) return Number(u.id);
-        }
-      } catch (e) {}
-      try {
-        for (const k of ['eduspace_active_user', 'eduspace_user', 'active_user']) {
-          const raw = localStorage.getItem(k);
-          if (raw) {
-            const parsed = JSON.parse(raw);
-            if (parsed && parsed.id) return Number(parsed.id);
-          }
-        }
-      } catch (e) {}
-      const params = new URLSearchParams(window.location.search);
-      return Number(params.get('user_id') || 2);
-    }
+    let missionAuthorized = false;
 
     function showMissionToast(title, body, type = 'info') {
       const toast = document.getElementById('mission-toast');
@@ -1233,17 +1209,16 @@
     }
 
     async function saveStageToServer(targetStage, eventKey = '') {
+      if (!missionAuthorized) return false;
       const dot = document.getElementById('autosave-dot');
       const txt = document.getElementById('autosave-text');
       dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
-      txt.textContent = 'Сохранение в PostgreSQL...';
+      txt.textContent = 'Сохранение...';
 
       try {
-        const resp = await fetch('/api/mission/save_stage', {
+        const res = await window.EduSpace.api('/api/mission/save_stage', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: getCurrentUserId(),
+          body: {
             specialty_slug: 'graphic_design',
             task_number: 1,
             current_stage: targetStage,
@@ -1255,10 +1230,10 @@
               final_palette: missionState.labPalette,
               final_explanation: missionState.finalExplanation
             }
-          })
+          }
         });
-        const data = await resp.json();
-        if (resp.ok && data.success) {
+        const data = (res && res.data) || {};
+        if (res.ok && data.success) {
           missionState.currentStage = data.current_stage;
           missionState.maxAllowedStage = data.max_allowed_stage;
           missionState.missionXp = data.mission_xp;
@@ -1277,7 +1252,7 @@
             });
           }
           dot.className = 'w-2 h-2 rounded-full bg-neo-success';
-          txt.textContent = 'Сохранено в PostgreSQL';
+          txt.textContent = 'Сохранено на сервере';
           renderHUD();
           return true;
         } else {
@@ -1680,18 +1655,40 @@
       }
     }
 
+    function escapeMissionHtml(str) {
+      if (window.EduSpace && typeof window.EduSpace.escapeHtml === 'function') {
+        return window.EduSpace.escapeHtml(str);
+      }
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function sanitizeHexColor(hex, fallback = '#080B16') {
+      const clean = String(hex || '').trim();
+      return /^#[0-9A-Fa-f]{3,8}$/.test(clean) && [4, 5, 7, 9].includes(clean.length)
+        ? clean.toUpperCase()
+        : fallback;
+    }
+
     function renderLabUI() {
       const grid = document.getElementById('lab-palette-grid');
       document.getElementById('lab-slot-count').textContent = `${missionState.labPalette.length} цветов`;
 
       grid.innerHTML = missionState.labPalette.map((slot, idx) => {
         const isActive = (idx === activeLabSlotIndex);
+        const safeHex = sanitizeHexColor(slot.hex);
+        const safeRole = escapeMissionHtml(slot.role);
         return `
           <div onclick="selectLabSlot(${idx})" class="p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center gap-3 ${isActive ? 'border-neo-cyan bg-neo-cyan/10 glow-cyan' : 'border-white/10 bg-neo-bg/80 hover:border-white/30'}">
-            <div class="w-12 h-12 rounded-xl border border-white/20 shrink-0 shadow-inner" style="background:${slot.hex}"></div>
+            <div class="w-12 h-12 rounded-xl border border-white/20 shrink-0 shadow-inner" style="background:${safeHex}"></div>
             <div class="flex-1 min-w-0">
-              <div class="text-[11px] text-neo-gray truncate">${slot.role}</div>
-              <input type="text" value="${slot.hex}" onchange="updateSlotHexInput(${idx}, this.value)" onclick="event.stopPropagation()" class="mt-0.5 w-28 px-2 py-0.5 rounded bg-neo-surface border border-white/15 font-mono font-bold text-xs text-neo-white uppercase" />
+              <div class="text-[11px] text-neo-gray truncate">${safeRole}</div>
+              <input type="text" value="${escapeMissionHtml(safeHex)}" onchange="updateSlotHexInput(${idx}, this.value)" onclick="event.stopPropagation()" class="mt-0.5 w-28 px-2 py-0.5 rounded bg-neo-surface border border-white/15 font-mono font-bold text-xs text-neo-white uppercase" />
             </div>
             ${missionState.labPalette.length > 3 ? `
               <button type="button" onclick="event.stopPropagation(); removeLabSlot(${idx})" class="text-neo-gray hover:text-red-400 p-1" title="Удалить цвет">
@@ -1704,16 +1701,17 @@
 
       const activeSlot = missionState.labPalette[activeLabSlotIndex] || missionState.labPalette[0];
       if (activeSlot) {
-        document.getElementById('lab-active-slot-label').textContent = `#${activeLabSlotIndex + 1} (${activeSlot.role}) — ${activeSlot.hex}`;
-        document.getElementById('lab-native-picker').value = activeSlot.hex;
+        const activeHex = sanitizeHexColor(activeSlot.hex);
+        document.getElementById('lab-active-slot-label').textContent = `#${activeLabSlotIndex + 1} (${activeSlot.role}) — ${activeHex}`;
+        document.getElementById('lab-native-picker').value = activeHex.length === 7 ? activeHex : '#080B16';
       }
 
       // Update Live UI Preview
-      const bgHex = missionState.labPalette[0]?.hex || '#080B16';
-      const surfHex = missionState.labPalette[1]?.hex || '#11182A';
-      const primHex = missionState.labPalette[2]?.hex || '#00D9FF';
-      const secHex = missionState.labPalette[3]?.hex || primHex;
-      const succHex = missionState.labPalette[4]?.hex || '#36E6A0';
+      const bgHex = sanitizeHexColor(missionState.labPalette[0]?.hex, '#080B16');
+      const surfHex = sanitizeHexColor(missionState.labPalette[1]?.hex, '#11182A');
+      const primHex = sanitizeHexColor(missionState.labPalette[2]?.hex, '#00D9FF');
+      const secHex = sanitizeHexColor(missionState.labPalette[3]?.hex, primHex);
+      const succHex = sanitizeHexColor(missionState.labPalette[4]?.hex, '#36E6A0');
 
       const mockup = document.getElementById('lab-live-mockup');
       const surf = document.getElementById('lab-live-surface');
@@ -1848,15 +1846,19 @@
     // =========================================================================
     function renderStage5ProjectUI() {
       const container = document.getElementById('final-palette-preview');
-      container.innerHTML = missionState.labPalette.map(slot => `
-        <div class="p-3 rounded-xl bg-neo-bg border border-white/10 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg border border-white/20" style="background:${slot.hex}"></div>
-            <span class="text-xs font-semibold text-neo-white">${slot.role}</span>
+      container.innerHTML = missionState.labPalette.map(slot => {
+        const safeHex = sanitizeHexColor(slot.hex);
+        const safeRole = escapeMissionHtml(slot.role);
+        return `
+          <div class="p-3 rounded-xl bg-neo-bg border border-white/10 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg border border-white/20" style="background:${safeHex}"></div>
+              <span class="text-xs font-semibold text-neo-white">${safeRole}</span>
+            </div>
+            <span class="font-mono text-xs font-bold text-neo-cyan">${escapeMissionHtml(safeHex)}</span>
           </div>
-          <span class="font-mono text-xs font-bold text-neo-cyan">${slot.hex}</span>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
       const expEl = document.getElementById('final-explanation');
       if (missionState.finalExplanation && !expEl.value) {
@@ -1882,6 +1884,7 @@
     }
 
     async function submitFinalMissionToTeacher() {
+      if (!missionAuthorized) return;
       const expEl = document.getElementById('final-explanation');
       const explanation = (expEl.value || '').trim();
       const harmonyType = document.getElementById('final-harmony-type').value;
@@ -1897,23 +1900,21 @@
       btn.opacity = '0.6';
 
       try {
-        const resp = await fetch('/api/mission/submit', {
+        const res = await window.EduSpace.api('/api/mission/submit', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: getCurrentUserId(),
+          body: {
             specialty_slug: 'graphic_design',
             task_number: 1,
             palette: missionState.labPalette,
             harmony_type: harmonyType,
             explanation: explanation,
             project_name: 'Образовательное приложение EduSpace Neo'
-          })
+          }
         });
-        const data = await resp.json();
+        const data = (res && res.data) || {};
         btn.disabled = false;
 
-        if (resp.ok && data.success) {
+        if (res.ok && data.success) {
           missionState.submission = data.submission;
           missionState.missionXp = data.mission_xp;
           missionState.totalXp = data.total_xp;
@@ -1939,13 +1940,17 @@
     // =========================================================================
     function renderStage6VerificationUI() {
       const swatches = document.getElementById('stage6-palette-swatches');
-      swatches.innerHTML = missionState.labPalette.map(s => `
-        <div class="p-3 rounded-xl bg-neo-surface border border-white/10 text-center space-y-1.5">
-          <div class="w-full h-10 rounded-lg border border-white/20" style="background:${s.hex}"></div>
-          <div class="font-mono text-xs font-bold text-neo-white">${s.hex}</div>
-          <div class="text-[10px] text-neo-gray truncate">${s.role}</div>
-        </div>
-      `).join('');
+      swatches.innerHTML = missionState.labPalette.map(s => {
+        const safeHex = sanitizeHexColor(s.hex);
+        const safeRole = escapeMissionHtml(s.role);
+        return `
+          <div class="p-3 rounded-xl bg-neo-surface border border-white/10 text-center space-y-1.5">
+            <div class="w-full h-10 rounded-lg border border-white/20" style="background:${safeHex}"></div>
+            <div class="font-mono text-xs font-bold text-neo-white">${escapeMissionHtml(safeHex)}</div>
+            <div class="text-[10px] text-neo-gray truncate">${safeRole}</div>
+          </div>
+        `;
+      }).join('');
 
       const sub = missionState.submission;
       document.getElementById('stage6-student-explanation').textContent = (sub && sub.student_comment) || missionState.finalExplanation || 'Объяснение сохранено.';
@@ -2020,10 +2025,11 @@
     }
 
     async function refreshMissionFromServer(notify = false) {
+      if (!missionAuthorized) return;
       try {
-        const resp = await fetch(`/api/mission/state?specialty=graphic_design&task=1&user_id=${getCurrentUserId()}`);
-        const data = await resp.json();
-        if (resp.ok && data.success) {
+        const res = await window.EduSpace.api('/api/mission/state?specialty=graphic_design&task=1');
+        const data = (res && res.data) || {};
+        if (res.ok && data.success) {
           const m = data.mission;
           const u = data.user;
           missionState.currentStage = m.current_stage || 1;
@@ -2039,7 +2045,10 @@
             missionState.trainingCompleted = m.state.training_completed || [];
             missionState.awardedEvents = m.state.awarded_events || [];
             if (Array.isArray(m.state.lab_palette) && m.state.lab_palette.length >= 3) {
-              missionState.labPalette = m.state.lab_palette;
+              missionState.labPalette = m.state.lab_palette.map(item => ({
+                hex: sanitizeHexColor(item && item.hex),
+                role: String((item && item.role) || 'Цвет палитры')
+              }));
             }
             if (m.state.final_explanation) {
               missionState.finalExplanation = m.state.final_explanation;
@@ -2066,7 +2075,7 @@
           if (activePanel) activePanel.classList.remove('hidden');
 
           if (notify) {
-            showMissionToast('Данные синхронизированы', 'Актуальный статус проверки загружен из PostgreSQL.', 'success');
+            showMissionToast('Данные синхронизированы', 'Актуальный статус проверки загружен с сервера.', 'success');
           }
         }
       } catch (e) {
@@ -2075,6 +2084,30 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+      const gateEl = document.getElementById('mission-auth-gate');
+      const protectedEl = document.getElementById('mission-protected-content');
+      try {
+        const sessResp = await fetch('/api/auth/session', { credentials: 'same-origin' });
+        if (!sessResp.ok) throw new Error('session unavailable');
+        const sess = await sessResp.json();
+        if (sess && sess.csrf_token && window.EduSpace && window.EduSpace.setCsrfToken) {
+          window.EduSpace.setCsrfToken(sess.csrf_token);
+        }
+        if (!sess || !sess.authenticated || !sess.user) {
+          missionAuthorized = false;
+          if (protectedEl) protectedEl.classList.add('hidden');
+          if (gateEl) gateEl.classList.remove('hidden');
+          return;
+        }
+        missionAuthorized = true;
+        if (gateEl) gateEl.classList.add('hidden');
+        if (protectedEl) protectedEl.classList.remove('hidden');
+      } catch (e) {
+        missionAuthorized = false;
+        if (protectedEl) protectedEl.classList.add('hidden');
+        if (gateEl) gateEl.classList.remove('hidden');
+        return;
+      }
       buildInteractiveColorWheel();
       initChallenge4Chips();
       await refreshMissionFromServer(false);

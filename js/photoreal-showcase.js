@@ -29,6 +29,25 @@ window.PhotorealShowcase = (function () {
     }
   }
 
+  function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function safeHref(url) {
+    if (!url) return '#';
+    const raw = String(url).trim();
+    if (/^(https?:\/\/|\/|[A-Za-z0-9_.\-]+\.html([?#].*)?$)/i.test(raw)) {
+      return escapeHtml(raw);
+    }
+    return '#';
+  }
+
   function el(tag, attrs, html) {
     const n = document.createElement(tag);
     Object.entries(attrs || {}).forEach(([k, v]) => n.setAttribute(k, v));
@@ -49,7 +68,7 @@ window.PhotorealShowcase = (function () {
       const b = el('button', {
         type: 'button', role: 'tab', class: 'pr-tab', 'data-pr-tab': String(i),
         'aria-selected': i === 0 ? 'true' : 'false',
-      }, `<span class="pr-tab-course">${it.course}</span><span class="pr-tab-title">${it.short}</span>`);
+      }, `<span class="pr-tab-course">${escapeHtml(it.course)}</span><span class="pr-tab-title">${escapeHtml(it.short)}</span>`);
       tabs.appendChild(b);
     });
 
@@ -74,13 +93,13 @@ window.PhotorealShowcase = (function () {
 
     function renderInfo(i) {
       const it = items[i];
-      label.innerHTML = `<b>${it.course}</b><span>${it.title}</span>`;
+      label.innerHTML = `<b>${escapeHtml(it.course)}</b><span>${escapeHtml(it.title)}</span>`;
       info.innerHTML = `
-        <h3 class="pr-info-title">${it.title}</h3>
-        <p class="pr-info-text">${it.text}</p>
-        <ul class="pr-info-facts">${it.facts.map((f) => `<li>${f}</li>`).join('')}</ul>
-        <div class="pr-info-meta">3D-скан: <a href="${it.sourceUrl}" target="_blank" rel="noopener">${it.source}</a> · CC0</div>
-        <a class="pr-info-cta" href="${it.href}">${it.cta} →</a>`;
+        <h3 class="pr-info-title">${escapeHtml(it.title)}</h3>
+        <p class="pr-info-text">${escapeHtml(it.text)}</p>
+        <ul class="pr-info-facts">${(it.facts || []).map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
+        <div class="pr-info-meta">3D-скан: <a href="${safeHref(it.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(it.source)}</a> · CC0</div>
+        <a class="pr-info-cta" href="${safeHref(it.href)}">${escapeHtml(it.cta)} →</a>`;
     }
     renderInfo(0);
 

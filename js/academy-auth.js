@@ -2,13 +2,16 @@
   const params = new URLSearchParams(location.search);
   const modes = ['login', 'register', 'reset'];
   const initial = modes.includes(params.get('mode')) ? params.get('mode') : 'login';
-  const isStaticHost = location.hostname.endsWith('.github.io');
   const forms = document.getElementById('account-forms');
   const status = document.getElementById('account-status');
   const register = document.getElementById('account-register');
   const registerRole = register.elements.role;
+  const otpGroup = document.getElementById('register-otp-group');
+  const otpInput = register.elements.verification_code;
+  const resetForm = document.getElementById('account-reset');
   let pending = false;
   let active;
+  let readiness = { email_verification_required: false, mail_configured: false, server_available: true };
 
   function tell(message, error = false) {
     status.textContent = message;
@@ -21,6 +24,9 @@
       button.setAttribute('aria-pressed', String(button.dataset.mode === mode));
     });
     tell('');
+    if (mode === 'reset' && readiness.server_available && !readiness.mail_configured) {
+      tell('Почтовый сервис на этом сервере не настроен — отправка кода восстановления недоступна.', true);
+    }
   }
   function setRole() {
     const teacher = registerRole.value === 'teacher';
@@ -31,59 +37,80 @@
     register.elements.teacher_code.required = teacher;
     register.elements.teacher_code.disabled = !teacher;
   }
-  function localAuthFallback(path, payload) {
-    const STORE_KEY = 'amk.local_accounts.v1';
-    let db = {};
-    try { db = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch { db = {}; }
-    const email = String(payload.email || '').trim().toLowerCase();
-    if (path === 'send_code') {
-      return { success: true, message: 'Локальный режим: используйте код 123456 для подтверждения.' };
+  function validatePassword(pw) {
+    if (window.EduSpace && typeof window.EduSpace.validatePasswordStrength === 'function') {
+      return window.EduSpace.validatePasswordStrength(pw);
     }
-    if (path === 'register') {
-      const user = {
-        id: 'local-' + Date.now(),
-        email,
-        first_name: payload.first_name || 'Студент',
-        last_name: payload.last_name || '',
-        middle_name: payload.middle_name || '',
-        role: payload.role === 'teacher' ? 'teacher' : 'student',
-        specialty_slug: payload.specialty_slug || 'it',
-        group_name: payload.group_name || 'АМК-1',
-        password: payload.password || '',
+    const text = String(pw || '');
+    if (text.length < 8) return { ok: false, message: 'Пароль должен содержать минимум 8 символов.' };
+    if (!/[A-Za-zА-Яа-яЁё]/.test(text) || !/[0-9]/.test(text)) {
+      return { ok: false, message: 'Пароль должен содержать хотя бы одну букву и одну цифру.' };
+    }
+    return { ok: true };
+  }
+  async function initReadiness() {
+    try {
+      const apiBase = (window.EduSpace && window.EduSpace.apiBase) ? window.EduSpace.apiBase() : '';
+      const response = await fetch(apiBase + '/api/auth/readiness', {
+        credentials: 'same-origin',
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      const data = await response.json();
+      readiness = {
+        email_verification_required: Boolean(data.email_verification_required),
+        mail_configured: Boolean(data.mail_configured),
+        server_available: true,
       };
-      db[email] = user;
-      try { localStorage.setItem(STORE_KEY, JSON.stringify(db)); } catch {}
-      return { success: true, user };
-    }
-    if (path === 'login') {
-      const user = db[email];
-      if (!user || (payload.password && user.password && user.password !== payload.password)) {
-        return { success: false, message: 'Аккаунт не найден локально. Перейдите на вкладку «Регистрация».' };
+      if (otpGroup) otpGroup.hidden = !readiness.email_verification_required;
+      if (otpInput) {
+        otpInput.required = readiness.email_verification_required;
+        otpInput.disabled = !readiness.email_verification_required;
       }
-      return { success: true, user };
+      const sendResetBtn = resetForm ? resetForm.querySelector('[data-send="reset"]') : null;
+      if (sendResetBtn) sendResetBtn.disabled = !readiness.mail_configured;
+      if (active === 'reset' && !readiness.mail_configured) {
+        tell('Почтовый сервис на этом сервере не настроен — отправка кода восстановления недоступна.', true);
+      }
+    } catch {
+      readiness.server_available = false;
+      if (otpGroup) otpGroup.hidden = true;
+      if (otpInput) {
+        otpInput.required = false;
+        otpInput.disabled = true;
+      }
+      forms.querySelectorAll('button[type="submit"], button[data-send]').forEach(btn => { btn.disabled = true; });
+      tell('Сервер авторизации недоступен. Локальный вход отключён.', true);
     }
-    return { success: false, message: 'Сброс пароля недоступен без сервера.' };
   }
   async function api(path, payload, control, done) {
     if (pending) return;
-    if (isStaticHost) {
-      const res = localAuthFallback(path, payload);
-      if (!res.success) { tell(res.message, true); return; }
-      done(res);
+    if (!readiness.server_available) {
+      tell('Сервер авторизации недоступен. Локальный вход отключён.', true);
       return;
     }
     pending = true;
     control.disabled = true;
     tell('Отправляем запрос…');
     try {
-      const response = await fetch('/api/auth/' + path, {
-        method: 'POST', credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload), signal: AbortSignal.timeout(16000),
+      const apiBase = (window.EduSpace && window.EduSpace.apiBase) ? window.EduSpace.apiBase() : '';
+      const csrf = (window.EduSpace && window.EduSpace.getCsrfToken) ? window.EduSpace.getCsrfToken() : '';
+      const headers = { 'Content-Type': 'application/json' };
+      if (csrf) headers['X-CSRF-Token'] = csrf;
+      const response = await fetch(apiBase + '/api/auth/' + path, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers,
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(16000),
       });
-      const data = await response.json();
+      let data = {};
+      try { data = await response.json(); } catch {}
+      if (data && data.csrf_token && window.EduSpace && window.EduSpace.setCsrfToken) {
+        window.EduSpace.setCsrfToken(data.csrf_token);
+      }
       if (!response.ok || !data.success) {
-        tell(data.message || 'Запрос не выполнен. Попробуйте ещё раз.', true);
+        tell((data && data.message) || 'Запрос не выполнен. Попробуйте ещё раз.', true);
         return;
       }
       done(data);
@@ -96,7 +123,10 @@
   }
   function signedIn(data) {
     if (!data.user) return tell('Сервер не подтвердил вход.', true);
-    try { window.EduSpace?.setActiveUser(data.user); } catch {}
+    try {
+      if (data.csrf_token) window.EduSpace?.setCsrfToken?.(data.csrf_token);
+      window.EduSpace?.setActiveUser?.(data.user);
+    } catch {}
     const destination = { admin: 'admin.html', teacher: 'teacher.html', student: 'student.html' };
     location.assign(destination[data.user.role] || 'student.html');
   }
@@ -111,6 +141,16 @@
   forms.querySelectorAll('form').forEach(form => form.addEventListener('submit', event => {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(form));
+    if (active === 'register') {
+      const check = validatePassword(data.password);
+      if (!check.ok) { tell(check.message, true); return; }
+      if (!readiness.email_verification_required && !data.verification_code) {
+        delete data.verification_code;
+      }
+    } else if (active === 'reset') {
+      const check = validatePassword(data.new_password);
+      if (!check.ok) { tell(check.message, true); return; }
+    }
     const submit = event.submitter || form.querySelector('[type="submit"]');
     if (active === 'reset') {
       api('reset_password', data, submit, response => {
@@ -126,5 +166,6 @@
   if (params.get('role') === 'teacher') registerRole.value = 'teacher';
   setRole();
   setMode(initial);
+  initReadiness();
   forms.hidden = false;
 })();

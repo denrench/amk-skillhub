@@ -1,15 +1,65 @@
 # -*- coding: utf-8 -*-
 """
 EDU SPACE PRO — DATABASE MIGRATION ENGINE (SQLite -> PostgreSQL)
-Safely migrates all 14 tables, users, tasks, grades, submissions,
+Safely migrates all 22 application tables, users, tasks, grades, submissions,
 progress, and settings from local SQLite to production PostgreSQL.
 Zero data loss guarantee: does NOT delete or alter SQLite source.
 """
 
 import os
+import re
 import sys
 import sqlite3
 import urllib.parse
+
+ALLOWED_TABLES = {
+    'ai_conversations',
+    'audit_logs',
+    'course_modules',
+    'courses',
+    'daily_quests_log',
+    'email_verifications',
+    'enrollments',
+    'exam_attempts',
+    'exam_events',
+    'grades',
+    'lesson_block_progress',
+    'lesson_progress',
+    'lessons',
+    'messages',
+    'notification_reads',
+    'notifications',
+    'platform_settings',
+    'portfolio_settings',
+    'student_tools_state',
+    'subscriptions',
+    'task_submissions',
+    'tasks',
+    'teacher_groups',
+    'transactions',
+    'users',
+    'workshop_states',
+    'xp_transactions',
+}
+_IDENT_RE = re.compile(r'^[a-z_][a-z0-9_]*$')
+
+
+def _validate_ident(name):
+    if not isinstance(name, str) or not _IDENT_RE.match(name):
+        raise ValueError(f"Unsafe SQL identifier rejected: {name!r}")
+    return name
+
+
+def _pg_ssl_context(pg_url):
+    import ssl
+    u = urllib.parse.urlparse(pg_url)
+    qs = urllib.parse.parse_qs(u.query)
+    sslmode = (qs.get('sslmode', [None])[0] or os.environ.get('PGSSLMODE') or '').lower()
+    host = (u.hostname or '').lower()
+    is_local = host in ('localhost', '127.0.0.1', '::1', 'db', 'postgres')
+    use_ssl = (sslmode in ('require', 'verify-ca', 'verify-full')) or (not is_local and sslmode != 'disable')
+    return ssl.create_default_context() if use_ssl else None
+
 
 def run_migration(pg_url=None):
     pg_url = pg_url or os.environ.get('DATABASE_URL')
@@ -18,22 +68,19 @@ def run_migration(pg_url=None):
         print("Example: python migrate_to_postgres.py postgresql://user:pass@ep-cool-db.neon.tech/neondb")
         return False
 
-    # Normalize url scheme if necessary
     if pg_url.startswith('postgres://'):
         pg_url = pg_url.replace('postgres://', 'postgresql://', 1)
 
-    print(f"Connecting to PostgreSQL...")
+    print("Connecting to PostgreSQL...")
     try:
         import psycopg2
         import psycopg2.extras
         pg_conn = psycopg2.connect(pg_url)
     except ImportError:
         try:
-            import ssl
             import pg8000.dbapi
-            # Parse url for pg8000
             u = urllib.parse.urlparse(pg_url)
-            ssl_ctx = ssl.create_default_context()
+            ssl_ctx = _pg_ssl_context(pg_url)
             pg_conn = pg8000.dbapi.connect(
                 user=u.username,
                 password=u.password,
@@ -50,7 +97,7 @@ def run_migration(pg_url=None):
         return False
 
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    sqlite_path = os.path.join(base_dir, 'database.db')
+    sqlite_path = os.environ.get('EDUSPACE_DB_PATH') or os.path.join(base_dir, 'database.db')
 
     if not os.path.exists(sqlite_path):
         print(f"ERROR: SQLite database file not found at {sqlite_path}")
@@ -65,10 +112,10 @@ def run_migration(pg_url=None):
     print("Reading SQLite database tables...")
 
     sq_cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';")
-    tables = [row[0] for row in sq_cur.fetchall()]
+    tables = [row[0] for row in sq_cur.fetchall() if row[0] in ALLOWED_TABLES]
     print(f"Found {len(tables)} tables to migrate: {tables}")
 
-    # PostgreSQL DDL statements matching EDU SPACE PRO schema
+    # PostgreSQL DDL statements matching EDU SPACE PRO 22-table schema
     ddl_statements = [
         """
         CREATE TABLE IF NOT EXISTS users (
@@ -77,7 +124,7 @@ def run_migration(pg_url=None):
             password_hash VARCHAR(255) NOT NULL,
             full_name VARCHAR(255) NOT NULL,
             role VARCHAR(50) NOT NULL CHECK(role IN ('student', 'teacher', 'admin')),
-            group_name VARCHAR(100),
+            group_name VARCHAR(100) DEFAULT 'ИС-21',
             student_id VARCHAR(100) UNIQUE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             last_name VARCHAR(100) DEFAULT '',
@@ -88,7 +135,11 @@ def run_migration(pg_url=None):
             email_verified INTEGER DEFAULT 0,
             is_demo INTEGER DEFAULT 0,
             subscription_tier VARCHAR(50) DEFAULT 'free',
-            pro_expires_at TIMESTAMP NULL
+            pro_expires_at TIMESTAMP NULL,
+            bonus_xp INTEGER DEFAULT 0,
+            streak_days INTEGER DEFAULT 1,
+            achievements_json TEXT DEFAULT '[]',
+            session_version INTEGER NOT NULL DEFAULT 1
         );
         """,
         """
@@ -106,14 +157,15 @@ def run_migration(pg_url=None):
             tools_required TEXT DEFAULT '',
             starter_code TEXT DEFAULT '',
             max_score INTEGER DEFAULT 100,
-            mode VARCHAR(50) DEFAULT 'practice',
-            ticket_number INTEGER DEFAULT 1
+            mode VARCHAR(50) DEFAULT 'both',
+            ticket_number INTEGER DEFAULT 1,
+            CONSTRAINT uq_tasks_spec_num UNIQUE(specialty_slug, task_number)
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS task_submissions (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id),
             student_id VARCHAR(100),
             student_name VARCHAR(255),
             group_name VARCHAR(100),
@@ -122,7 +174,7 @@ def run_migration(pg_url=None):
             task_number INTEGER,
             task_title VARCHAR(255),
             score INTEGER DEFAULT 0,
-            grade_letter VARCHAR(10) DEFAULT 'F',
+            grade_letter VARCHAR(10) DEFAULT '—',
             status VARCHAR(50) DEFAULT 'submitted',
             time_spent_seconds INTEGER DEFAULT 0,
             submitted_code TEXT DEFAULT '',
@@ -139,7 +191,7 @@ def run_migration(pg_url=None):
         """
         CREATE TABLE IF NOT EXISTS grades (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id),
             student_id VARCHAR(100),
             specialty_slug VARCHAR(100),
             specialty_name VARCHAR(255),
@@ -155,13 +207,13 @@ def run_migration(pg_url=None):
             group_name VARCHAR(100) NOT NULL,
             specialty_slug VARCHAR(100) DEFAULT 'it',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(teacher_id, group_name)
+            CONSTRAINT uq_teacher_groups_tid_grp UNIQUE(teacher_id, group_name)
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS platform_settings (
             key VARCHAR(100) PRIMARY KEY,
-            value TEXT
+            value TEXT NOT NULL
         );
         """,
         """
@@ -170,36 +222,43 @@ def run_migration(pg_url=None):
             code VARCHAR(20) NOT NULL,
             expires_at BIGINT NOT NULL,
             verified INTEGER DEFAULT 0,
+            purpose TEXT DEFAULT 'legacy',
+            attempts INTEGER DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS enrollments (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id),
             specialty_slug VARCHAR(100) NOT NULL,
-            enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT uq_enrollments_user_spec UNIQUE(user_id, specialty_slug)
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS lesson_progress (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id),
             specialty_slug VARCHAR(100) NOT NULL,
             task_number INTEGER NOT NULL,
             status VARCHAR(50) DEFAULT 'in_progress',
             quiz_score INTEGER DEFAULT 0,
             quiz_total INTEGER DEFAULT 3,
             draft_code TEXT DEFAULT '',
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            current_stage INTEGER DEFAULT 1,
+            mission_state_json TEXT DEFAULT '{}',
+            mission_xp INTEGER DEFAULT 0,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT uq_lesson_prog_user_spec_num UNIQUE(user_id, specialty_slug, task_number)
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS notifications (
             id SERIAL PRIMARY KEY,
             user_id INTEGER,
-            target_role VARCHAR(50),
-            target_group VARCHAR(100),
+            target_role VARCHAR(50) DEFAULT 'student',
+            target_group VARCHAR(100) DEFAULT '',
             title VARCHAR(255) NOT NULL,
             body TEXT NOT NULL,
             type VARCHAR(50) DEFAULT 'info',
@@ -208,12 +267,19 @@ def run_migration(pg_url=None):
         );
         """,
         """
+        CREATE TABLE IF NOT EXISTS notification_reads (
+            user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+            notification_id INTEGER NOT NULL REFERENCES notifications(id) ON DELETE CASCADE,
+            PRIMARY KEY (user_id, notification_id)
+        );
+        """,
+        """
         CREATE TABLE IF NOT EXISTS messages (
             id SERIAL PRIMARY KEY,
-            sender_id INTEGER NOT NULL,
-            sender_name VARCHAR(255),
-            sender_role VARCHAR(50),
-            recipient_key VARCHAR(100),
+            sender_id INTEGER,
+            sender_name VARCHAR(255) NOT NULL,
+            sender_role VARCHAR(50) NOT NULL,
+            recipient_key VARCHAR(100) DEFAULT 'general',
             body TEXT NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
@@ -221,13 +287,13 @@ def run_migration(pg_url=None):
         """
         CREATE TABLE IF NOT EXISTS subscriptions (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
-            plan_code VARCHAR(50) NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id),
+            plan_code VARCHAR(50) NOT NULL DEFAULT 'free',
             billing_period VARCHAR(50) DEFAULT 'monthly',
-            status VARCHAR(50) DEFAULT 'active',
+            status VARCHAR(50) NOT NULL DEFAULT 'active',
             amount INTEGER DEFAULT 0,
-            currency VARCHAR(20) DEFAULT 'KZT',
-            payment_method VARCHAR(50) DEFAULT 'kaspi_qr',
+            currency VARCHAR(10) DEFAULT 'KZT',
+            payment_method VARCHAR(50) DEFAULT 'sandbox',
             starts_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             expires_at TIMESTAMP NULL
         );
@@ -235,20 +301,20 @@ def run_migration(pg_url=None):
         """
         CREATE TABLE IF NOT EXISTS transactions (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id),
             plan_code VARCHAR(50) NOT NULL,
             amount INTEGER NOT NULL,
-            currency VARCHAR(20) DEFAULT 'KZT',
-            status VARCHAR(50) DEFAULT 'completed',
-            payment_method VARCHAR(50) DEFAULT 'kaspi_qr',
-            receipt_number VARCHAR(100) UNIQUE,
+            currency VARCHAR(10) DEFAULT 'KZT',
+            status VARCHAR(50) NOT NULL DEFAULT 'paid',
+            payment_method VARCHAR(50) DEFAULT 'sandbox',
+            receipt_number VARCHAR(100) UNIQUE NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS xp_transactions (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id),
             amount INTEGER NOT NULL,
             source_type VARCHAR(64) NOT NULL,
             source_id VARCHAR(128) NOT NULL,
@@ -273,7 +339,7 @@ def run_migration(pg_url=None):
         """
         CREATE TABLE IF NOT EXISTS daily_quests_log (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id),
             quest_key VARCHAR(64) NOT NULL,
             quest_date VARCHAR(32) NOT NULL,
             completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -295,7 +361,7 @@ def run_migration(pg_url=None):
         """
         CREATE TABLE IF NOT EXISTS course_modules (
             id SERIAL PRIMARY KEY,
-            course_id INTEGER NOT NULL,
+            course_id INTEGER NOT NULL REFERENCES courses(id),
             title VARCHAR(255) NOT NULL,
             order_num INTEGER DEFAULT 1,
             is_published INTEGER DEFAULT 1,
@@ -305,8 +371,8 @@ def run_migration(pg_url=None):
         """
         CREATE TABLE IF NOT EXISTS lessons (
             id SERIAL PRIMARY KEY,
-            course_id INTEGER NOT NULL,
-            module_id INTEGER,
+            course_id INTEGER NOT NULL REFERENCES courses(id),
+            module_id INTEGER REFERENCES course_modules(id),
             title VARCHAR(255) NOT NULL,
             lesson_type VARCHAR(64) DEFAULT 'theory',
             order_num INTEGER DEFAULT 1,
@@ -321,8 +387,8 @@ def run_migration(pg_url=None):
         """
         CREATE TABLE IF NOT EXISTS lesson_block_progress (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
-            lesson_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id),
+            lesson_id INTEGER NOT NULL REFERENCES lessons(id),
             block_id VARCHAR(64) NOT NULL,
             completed INTEGER DEFAULT 0,
             state_json TEXT DEFAULT '{}',
@@ -333,11 +399,77 @@ def run_migration(pg_url=None):
         """
         CREATE TABLE IF NOT EXISTS ai_conversations (
             id SERIAL PRIMARY KEY,
-            user_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES users(id),
             context_type VARCHAR(64) NOT NULL,
             context_id VARCHAR(128) DEFAULT '',
             user_message TEXT NOT NULL,
             assistant_message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS workshop_states (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id),
+            lesson_id INTEGER NOT NULL DEFAULT 1,
+            model_id VARCHAR(128) NOT NULL,
+            disassembled_parts_json TEXT DEFAULT '[]',
+            active_tool VARCHAR(64) DEFAULT 'socket_set',
+            step_history_json TEXT DEFAULT '[]',
+            completed INTEGER DEFAULT 0,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            CONSTRAINT uq_workshop_user_les_mod UNIQUE(user_id, lesson_id, model_id)
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS student_tools_state (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER UNIQUE NOT NULL REFERENCES users(id),
+            tasks_json TEXT DEFAULT '[]',
+            gpa_target REAL DEFAULT 3.5,
+            notes TEXT DEFAULT '',
+            timer_minutes INTEGER DEFAULT 25,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS portfolio_settings (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER UNIQUE NOT NULL REFERENCES users(id),
+            is_public INTEGER DEFAULT 0,
+            show_grades INTEGER DEFAULT 1,
+            show_certificates INTEGER DEFAULT 1,
+            consent_granted INTEGER DEFAULT 0,
+            public_slug VARCHAR(128) UNIQUE,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS exam_attempts (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id),
+            specialty_slug VARCHAR(64) NOT NULL,
+            attempt_nonce VARCHAR(128) NOT NULL,
+            status VARCHAR(32) DEFAULT 'in_progress',
+            score INTEGER DEFAULT 0,
+            passed INTEGER DEFAULT 0,
+            error_log_json TEXT DEFAULT '[]',
+            teacher_status VARCHAR(32) DEFAULT 'pending',
+            teacher_comment TEXT DEFAULT '',
+            reviewer_id INTEGER,
+            started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            submitted_at TIMESTAMP NULL
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS exam_events (
+            id SERIAL PRIMARY KEY,
+            attempt_id INTEGER NOT NULL REFERENCES exam_attempts(id) ON DELETE CASCADE,
+            step_id INTEGER DEFAULT 1,
+            action VARCHAR(64) NOT NULL,
+            part_id VARCHAR(128) DEFAULT '',
+            tool_id VARCHAR(64) DEFAULT '',
+            telemetry_json TEXT DEFAULT '{}',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         """
@@ -355,45 +487,49 @@ def run_migration(pg_url=None):
     pg_conn.commit()
     print("PostgreSQL tables verified.")
 
-    # Data Migration Loop
     total_migrated = 0
     for tbl in tables:
-        sq_cur.execute(f"SELECT * FROM {tbl};")
+        if tbl not in ALLOWED_TABLES:
+            continue
+        safe_tbl = _validate_ident(tbl)
+        sq_cur.execute(f'SELECT * FROM "{safe_tbl}";')
         rows = sq_cur.fetchall()
         if not rows:
-            print(f"  Table '{tbl}': 0 rows (empty)")
+            print(f"  Table '{safe_tbl}': 0 rows (empty)")
             continue
 
-        cols = [d[0] for d in sq_cur.description]
+        cols = [_validate_ident(d[0]) for d in sq_cur.description]
         col_list = ', '.join([f'"{c}"' for c in cols])
         placeholders = ', '.join(['%s' for _ in cols])
 
-        print(f"  Migrating table '{tbl}' ({len(rows)} rows)...")
+        print(f"  Migrating table '{safe_tbl}' ({len(rows)} rows)...")
 
         inserted = 0
         for r in rows:
             vals = [r[c] for c in cols]
             try:
-                # Use ON CONFLICT DO NOTHING to avoid duplicate key issues on repeated migrations
-                insert_sql = f'INSERT INTO "{tbl}" ({col_list}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;'
+                insert_sql = f'INSERT INTO "{safe_tbl}" ({col_list}) VALUES ({placeholders}) ON CONFLICT DO NOTHING;'
                 pg_cur.execute(insert_sql, vals)
                 inserted += 1
             except Exception as e:
-                # Fallback simple insert
+                pg_conn.rollback()
                 try:
-                    pg_cur.execute(f'INSERT INTO "{tbl}" ({col_list}) VALUES ({placeholders});', vals)
+                    pg_cur.execute(f'INSERT INTO "{safe_tbl}" ({col_list}) VALUES ({placeholders});', vals)
                     inserted += 1
                 except Exception as inner_e:
-                    print(f"    Row insert skipped in {tbl}: {inner_e}")
+                    pg_conn.rollback()
+                    print(f"    Row insert skipped in {safe_tbl}: {inner_e}")
 
         pg_conn.commit()
-        print(f"    Table '{tbl}': {inserted} rows successfully migrated.")
+        print(f"    Table '{safe_tbl}': {inserted} rows successfully migrated.")
         total_migrated += inserted
 
-    # Fix PostgreSQL sequence values for serial auto-increment keys
     for tbl in tables:
+        if tbl not in ALLOWED_TABLES:
+            continue
+        safe_tbl = _validate_ident(tbl)
         try:
-            pg_cur.execute(f"SELECT setval(pg_get_serial_sequence('{tbl}', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM \"{tbl}\";")
+            pg_cur.execute(f"SELECT setval(pg_get_serial_sequence('{safe_tbl}', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM \"{safe_tbl}\";")
             pg_conn.commit()
         except Exception:
             pg_conn.rollback()

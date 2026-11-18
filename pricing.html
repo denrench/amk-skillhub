@@ -23,49 +23,6 @@
 
   <!-- Tailwind CSS Local & CDN -->
   <link rel="stylesheet" href="css/tailwind.min.css"/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    if (window.tailwind) tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
-          },
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              200: '#c7d2fe',
-              300: '#a5b4fc',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-              800: '#3730a3',
-              900: '#312e81',
-              950: '#1e1b4b'
-            },
-            dark: {
-              950: '#07090e',
-              900: '#0b0f19',
-              850: '#101524',
-              800: '#161c2e',
-              700: '#1e263d',
-              600: '#2a3452'
-            }
-          },
-          boxShadow: {
-            'glow-indigo': '0 0 50px -10px rgba(99, 102, 241, 0.35)',
-            'glow-purple': '0 0 50px -10px rgba(168, 85, 247, 0.35)',
-            'glow-cyan': '0 0 50px -10px rgba(6, 182, 212, 0.35)',
-            'glow-amber': '0 0 50px -10px rgba(245, 158, 11, 0.35)'
-          }
-        }
-      }
-    };
-  </script>
 
   <style>
     .bg-grid-white {
@@ -87,13 +44,14 @@
     }
   </style>
 
-  <script src="js/courses-catalog.js"></script>
+  <script src="js/courses-catalog-lite.js"></script>
   <script src="js/app-logistics.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
   <link rel="stylesheet" href="css/workshop.css">
   <script src="js/prism-fx.js" defer></script>
   <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
   <link rel="stylesheet" href="css/photoreal-tools.css">
 </head>
 <body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white bg-grid-white relative">
@@ -189,7 +147,7 @@
               <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Вводные уроки №1–3 по выбранному курсу</li>
               <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Автоматическая проверка в тренажёре</li>
               <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Электронная зачётка и текущие баллы</li>
-              <li class="flex items-center gap-2 text-slate-500"><span class="material-symbols-outlined text-[16px]">close</span>Уроки №4–10 заблокированы</li>
+              <li class="flex items-center gap-2 text-slate-500"><span class="material-symbols-outlined text-[16px]">close</span>Уроки №4–20 (Pro / госзаказ)</li>
               <li class="flex items-center gap-2 text-slate-500"><span class="material-symbols-outlined text-[16px]">close</span>Без выдачи сертификата колледжа</li>
             </ul>
           </div>
@@ -211,7 +169,7 @@
               <span id="period-pro-display" class="text-xs text-indigo-300 font-bold">/ месяц</span>
             </div>
             <p class="text-xs text-slate-300 leading-relaxed">
-              Полный безлимитный доступ ко всем 50 модулям пяти профессий, симулятору и официальной сертификации.
+              Полный безлимитный доступ ко всем 100 модулям пяти профессий, симулятору и официальной сертификации.
             </p>
             <ul class="space-y-2.5 text-xs text-slate-200 pt-3 border-t border-white/10">
               <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span><strong>Все 10 практических модулей</strong> по 5 курсам</li>
@@ -243,7 +201,7 @@
             <ul class="space-y-2.5 text-xs text-slate-300 pt-3 border-t border-white/10">
               <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Лицензии для группы до 30 студентов</li>
               <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Сводные академические ведомости по ТиПО</li>
-              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Все 50 модулей по 5 профессиям</li>
+              <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Все 100 модулей по 5 профессиям</li>
               <li class="flex items-center gap-2"><span class="material-symbols-outlined text-[16px] text-emerald-400">check</span>Годовая отчётность для деканата и комиссии</li>
             </ul>
           </div>
@@ -357,7 +315,7 @@
             <span>Режим тестирования (Sandbox Mode)</span>
           </div>
           <p class="text-[11px] text-slate-300 leading-relaxed">
-            Позволяет проверить активацию тарифа Pro, выписку фискального чека и разблокировку всех 50 модулей без списания реальных денег.
+            Позволяет проверить активацию тарифа Pro, выписку фискального чека и разблокировку всех 100 модулей без списания реальных денег.
           </p>
         </div>
 
@@ -382,7 +340,7 @@
         </div>
         <div>
           <h3 class="font-black text-xl text-white">Оплата успешно принята!</h3>
-          <p class="text-xs text-slate-300 mt-1">Тариф Студент Pro активирован. Все 50 модулей открыты!</p>
+          <p class="text-xs text-slate-300 mt-1">Тариф Студент Pro активирован. Все 100 модулей открыты!</p>
         </div>
 
         <div class="p-4 rounded-2xl bg-dark-950/80 border border-white/10 text-xs text-left space-y-2">
@@ -450,7 +408,7 @@
           <div class="text-xs font-bold text-white uppercase tracking-wider mb-4">Навигация</div>
           <ul class="space-y-2 text-slate-400">
             <li><a href="features.html" class="hover:text-indigo-400 transition-colors">Возможности LMS</a></li>
-            <li><a href="tasks.html" class="hover:text-indigo-400 transition-colors">Каталог 50 модулей</a></li>
+            <li><a href="tasks.html" class="hover:text-indigo-400 transition-colors">Каталог 100 модулей</a></li>
             <li><a href="pricing.html" class="hover:text-indigo-400 transition-colors">Тарифы и подписка</a></li>
             <li><a href="gradebook.html" class="hover:text-indigo-400 transition-colors">Ведомость оценок</a></li>
             <li><a href="verify.html" class="hover:text-indigo-400 transition-colors">Реестр сертификатов</a></li>
@@ -565,7 +523,7 @@
       document.getElementById('btn-payment-label').textContent = `Оплатить ${amount.toLocaleString()} ₸ и активировать ${planCode === 'pro' ? 'Pro' : 'B2B'}`;
 
       document.getElementById('checkout-plan-subtitle').textContent = planCode === 'pro'
-        ? 'Тариф Студент Pro • Полный доступ ко всем 50 модулям и официальная сертификация'
+        ? 'Тариф Студент Pro • Полный доступ ко всем 100 модулям и официальная сертификация'
         : 'Тариф Кафедра / Колледж • Групповой доступ и сводные ведомости';
 
       selectPaymentMethod('kaspi');
@@ -600,7 +558,6 @@
       btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">refresh</span><span>Обработка платежа...</span>';
 
       const payload = {
-        user_id: user.id,
         plan_code: currentSelectedPlan,
         billing_period: isYearly ? 'yearly' : 'monthly',
         payment_method: currentPaymentMethod

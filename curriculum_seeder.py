@@ -1,6 +1,6 @@
 """
 EduSpace Interactive Curriculum Seeder & Lesson Schema Definition
-Generates high quality, 8-block modular educational lessons for all 5 college specialties (60 total).
+Generates high quality, 8-block modular educational lessons for all 5 college specialties (100 total).
 Complies with Bloom's Taxonomy & Kolb's Experiential Learning Cycle:
 Hook -> Objectives -> Interactive Topic Game -> Interactive Widget -> Inline Check -> Practical Application -> Assessment Quiz -> Summary & XP Reward
 """
@@ -69,10 +69,9 @@ def _load_raw_catalog_lessons():
             marker = "window.EDU_LESSONS = "
             idx = raw.find(marker)
             if idx != -1:
-                json_str = raw[idx + len(marker):].strip()
-                if json_str.endswith(";"):
-                    json_str = json_str[:-1]
-                return json.loads(json_str)
+                json_str = raw[idx + len(marker):].lstrip()
+                obj, _ = json.JSONDecoder().raw_decode(json_str)
+                return obj
         except Exception as e:
             print(f"[WARN] Failed to load catalog from {catalog_path}: {e}")
     return {}
@@ -399,7 +398,7 @@ def generate_default_courses():
         })
     return courses
 
-# Eagerly load all 60 courses/lessons
+# Eagerly load all 100 courses/lessons
 DEFAULT_COURSES = generate_default_courses()
 
 def seed_interactive_curriculum(cursor):
@@ -472,11 +471,11 @@ def seed_interactive_curriculum(cursor):
 if __name__ == '__main__':
     import sqlite3
     db_path = os.path.join(BASE_DIR, 'database.db')
-    print(f"[SEED] Seeding interactive curriculum with 60 topic games to {db_path}...")
+    print(f"[SEED] Seeding interactive curriculum with 100 topic games to {db_path}...")
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
     seed_interactive_curriculum(cur)
     conn.commit()
     conn.close()
-    print("[SEED SUCCESS] Successfully seeded all 60 lessons with bespoke interactive topic games into database.db!")
+    print("[SEED SUCCESS] Successfully seeded all 100 lessons with bespoke interactive topic games into database.db!")
 
