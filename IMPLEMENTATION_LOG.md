@@ -173,3 +173,22 @@
   - `python -m scripts.capture_release_evidence` -> `EXIT 0` (`25/25` unique GLBs `1.38 MB`, `10` screenshots refreshed)
 - **Status:** `[x] VERIFIED` *(Local Release Verified; External Render/PostgreSQL/LLM/SMTP remain `[!] BLOCKED`)*
 
+---
+
+## [2026-11-19T04:13:00Z] — Independent Skeptical Review Fixes & Full 183/183 Verification
+- **Defects Caught & Fixed:**
+  - `scripts/build_css_bundle.py` (+ rebuilt `css/tailwind.min.css` & `css/app.min.css`): Added solid Tailwind v3 palette emitter (`emerald`, `cyan`, `sky`, `amber`, `rose`, `orange`, `teal`, `violet`, `indigo`, `blue`, `purple`, `red`, `green`, `neo-*`) for `bg-*`, `text-*`, `border-*`, `ring-*`, `from-*`, `via-*`, `to-*` so buttons/badges like `bg-emerald-600` (`career.html` «В поиске»/«Отправить в WhatsApp HR», `tools.html` «+») no longer render invisible white-on-white.
+  - `css/workshop.css`: Added `:root[data-theme="light"]` surface overrides for `.neo-glass`, `.neo-glass-purple`, `.neo-card` and excluded `.from-neo-cyan\/20` from forced white text so `mission.html` has crisp high-contrast light-theme surfaces and visible XP HUD badge while preserving white ink on dark hero banners.
+  - `mission.html`: Wired `?specialty=` query param (and user `specialty_slug` fallback) into `/api/mission/state`, `/api/mission/save_stage`, `/api/mission/submit`, back-links, and dynamic 5-specialty header/hero metadata instead of hardcoding `graphic_design`.
+  - `css/photoreal-tools.css`: Fixed mobile (`<= 768px`) header flex-shrink for `header > .max-w-7xl > a:first-child` and compacted header action link labels so `EDU SPACE`, profile icon, `РУС/ҚАЗ`, and theme switcher fit cleanly at `390×844` without clipping.
+  - `curriculum_seeder.py`: Removed hard `[:65]` mid-word truncation on lesson hook case titles (`b1_hook`).
+- **Full Verification Results (183/183 PASS):**
+  - `python scripts/check_locales.py` -> `EXIT 0` (`198/198` keys)
+  - `python tests/e2e/run_e2e.py --tier 1` -> `EXIT 0` (`62/62` passed)
+  - `python tests/e2e/run_e2e.py --smoke` -> `EXIT 0` (`7/7` passed)
+  - `python tests/e2e/run_e2e.py --tier 2` -> `EXIT 0` (`62/62` passed)
+  - `python -m unittest tests/test_m1_foundation.py tests/test_m2_m6_comprehensive.py tests.e2e.test_tier3_pairwise tests.e2e.test_tier4_scenarios -v` -> `EXIT 0` (`59/59` passed: `29` M1 + `6` M2–M6 + `16` Tier 3 + `8` Tier 4)
+  - `python -m scripts.capture_release_evidence` -> `EXIT 0` (`25/25` unique GLBs `1.38 MB`, all 10 screenshots regenerated and visually verified)
+- **Status:** `[x] VERIFIED` *(Local Release Verified; External Render/PostgreSQL/LLM/SMTP remain `[!] BLOCKED`)*
+
+

@@ -85,6 +85,33 @@ COLOR_RGB = {
     "neo-surface": (17, 24, 42),
 }
 
+TW3_COLORS = {
+    "slate-50": "#f8fafc", "slate-100": "#f1f5f9", "slate-200": "#e2e8f0", "slate-300": "#cbd5e1",
+    "slate-400": "#94a3b8", "slate-500": "#64748b", "slate-600": "#475569", "slate-700": "#334155",
+    "slate-800": "#1e293b", "slate-900": "#0f172a", "slate-950": "#020617",
+    "emerald-200": "#a7f3d0", "emerald-300": "#6ee7b7", "emerald-400": "#34d399",
+    "emerald-500": "#10b981", "emerald-600": "#059669", "emerald-700": "#047857",
+    "emerald-900": "#064e3b", "emerald-950": "#022c22",
+    "cyan-200": "#a5f3fc", "cyan-300": "#67e8f9", "cyan-400": "#22d3ee",
+    "cyan-500": "#06b6d4", "cyan-600": "#0891b2", "cyan-700": "#0e7490",
+    "cyan-900": "#164e63", "cyan-950": "#083344",
+    "sky-300": "#7dd3fc", "sky-400": "#38bdf8", "sky-500": "#0ea5e9", "sky-600": "#0284c7",
+    "amber-200": "#fde68a", "amber-300": "#fcd34d", "amber-400": "#fbbf24",
+    "amber-500": "#f59e0b", "amber-600": "#d97706", "amber-900": "#78350f", "amber-950": "#451a03",
+    "orange-300": "#fdba74", "orange-400": "#fb923c", "orange-500": "#f97316", "orange-600": "#ea580c",
+    "rose-200": "#fecdd3", "rose-300": "#fda4af", "rose-400": "#fb7185",
+    "rose-500": "#f43f5e", "rose-600": "#e11d48",
+    "teal-400": "#2dd4bf", "teal-500": "#14b8a6", "teal-600": "#0d9488",
+    "violet-500": "#8b5cf6", "violet-600": "#7c3aed",
+    "indigo-300": "#a5b4fc", "indigo-400": "#818cf8", "indigo-500": "#6366f1",
+    "indigo-600": "#4f46e5", "indigo-700": "#4338ca", "indigo-900": "#312e81", "indigo-950": "#1e1b4b",
+    "blue-400": "#60a5fa", "blue-500": "#3b82f6", "blue-600": "#2563eb", "blue-700": "#1d4ed8",
+    "purple-300": "#d8b4fe", "purple-400": "#c084fc", "purple-500": "#a855f7",
+    "purple-600": "#9333ea", "purple-700": "#7e22ce", "purple-900": "#581c87", "purple-950": "#3b0764",
+    "red-400": "#f87171", "red-500": "#ef4444", "red-600": "#dc2626", "red-700": "#b91c1c",
+    "green-400": "#4ade80", "green-500": "#22c55e", "green-600": "#16a34a",
+}
+
 
 def css_escape(cls: str) -> str:
     return re.sub(r"([^a-zA-Z0-9_-])", r"\\\1", cls)
@@ -198,16 +225,48 @@ def generate_v3_extras(tokens: set[str]) -> str:
             if m:
                 decl = f"z-index:{m.group(1)}"
 
-        # Opacity slash: bg-white/10, border-indigo-500/30, text-white/80
+        # Opacity slash: bg-white/10, border-indigo-500/30, text-white/80, from-cyan-950/60
         if not decl and "/" in base:
-            m = re.match(r"^(bg|border|text)-([a-z0-9-]+)\/([0-9]+)$", base)
+            m = re.match(r"^(bg|border|text|from|via|to)-([a-z0-9-]+)\/([0-9]+)$", base)
             if m:
                 kind, cname, pct_s = m.group(1), m.group(2), m.group(3)
                 rgb = COLOR_RGB.get(cname)
                 if rgb:
                     alpha = round(int(pct_s) / 100.0, 3)
-                    prop = {"bg": "background-color", "border": "border-color", "text": "color"}[kind]
-                    decl = f"{prop}:rgba({rgb[0]},{rgb[1]},{rgb[2]},{alpha})"
+                    rgba = f"rgba({rgb[0]},{rgb[1]},{rgb[2]},{alpha})"
+                    if kind in ("bg", "border", "text"):
+                        prop = {"bg": "background-color", "border": "border-color", "text": "color"}[kind]
+                        decl = f"{prop}:{rgba}"
+                    elif kind == "from":
+                        decl = f"--tw-gradient-from:{rgba};--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to,rgba({rgb[0]},{rgb[1]},{rgb[2]},0))"
+                    elif kind == "via":
+                        decl = f"--tw-gradient-stops:var(--tw-gradient-from),{rgba},var(--tw-gradient-to,rgba({rgb[0]},{rgb[1]},{rgb[2]},0))"
+                    elif kind == "to":
+                        decl = f"--tw-gradient-to:{rgba}"
+
+        # Solid Tailwind v3 colors: bg-emerald-600, text-cyan-400, border-amber-500, ring-indigo-500, from/via/to
+        if not decl and "/" not in base:
+            m = re.match(r"^(bg|border|text|ring|from|via|to)-([a-z]+-[a-z0-9]+)$", base)
+            if m:
+                kind, cname = m.group(1), m.group(2)
+                hex_val = TW3_COLORS.get(cname)
+                if not hex_val and cname.startswith("neo-"):
+                    hex_val = NEO_PALETTE.get(cname[4:])
+                if hex_val:
+                    if kind == "bg":
+                        decl = f"background-color:{hex_val}"
+                    elif kind == "text":
+                        decl = f"color:{hex_val}"
+                    elif kind == "border":
+                        decl = f"border-color:{hex_val}"
+                    elif kind == "ring":
+                        decl = f"--tw-ring-color:{hex_val}"
+                    elif kind == "from":
+                        decl = f"--tw-gradient-from:{hex_val};--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to,rgba(0,0,0,0))"
+                    elif kind == "via":
+                        decl = f"--tw-gradient-stops:var(--tw-gradient-from),{hex_val},var(--tw-gradient-to,rgba(0,0,0,0))"
+                    elif kind == "to":
+                        decl = f"--tw-gradient-to:{hex_val}"
 
         if decl:
             rule = f"{sel}{{{decl}}}"

@@ -274,7 +274,7 @@ def _build_8_block_lesson(item, spec, num):
         {
             "id": "b1_hook",
             "type": "hook",
-            "title": f"Кейс: {clean_title[:65]}",
+            "title": f"Кейс: {clean_title}",
             "badge": "Реальная ситуация",
             "content": summary,
             "tools": tools or "Профильный инструментарий АМК",

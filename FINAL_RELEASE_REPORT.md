@@ -61,7 +61,7 @@
 | Максимальный размер одной GLB-модели (`mech-turbo.glb`) | `11.78 МБ` (`11 778 688` Б) | **`158 КБ`** (`autoel-can.glb` `162 000` Б; `mech-turbo.glb` `47 516` Б) | **`-98.6%`** |
 | Уникальность SHA-256 хешей `assets/models/*.glb` | `24 / 25` (дубликат `hvac-chiller` ≡ `mech-cylinder`) | **`25 / 25` уникальных SHA-256** | **100% уникальность** |
 | Внешний runtime-скрипт `cdn.tailwindcss.com` | Подключён на 15 из 20 HTML-страниц | **`0` страниц** (полностью удалён) | **100% автономность** |
-| Размер локального CSS (`css/tailwind.min.css` / `css/app.min.css`) | `2.93 МБ` (`3 073 395` Б) | **`341 КБ`** (`tailwind.min.css`) / **`412 КБ`** (`app.min.css`) | **`-86.0%`** |
+| Размер локального CSS (`css/tailwind.min.css` / `css/app.min.css`) | `2.93 МБ` (`3 073 395` Б) | **`375 КБ`** (`tailwind.min.css`) / **`445 КБ`** (`app.min.css`) | **`-84.8%`** |
 | Начальная загрузка каталога на информационных страницах | `1.49 МБ` (`courses-catalog.js` + `topic-games-60.js`) | **`60 КБ`** (`js/courses-catalog-lite.js` + ленивые JSON-чанки) | **`-96.0%`** |
 
 ---
@@ -71,18 +71,18 @@
 Все скриншоты сняты автоматизированным браузером Chrome в изолированном стенде (`scripts/capture_release_evidence.py`) и сохранены в `assets/screenshots/release/`:
 
 ### Desktop (`1440×900`)
-- [index_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/index_desktop.png) (`245 318` Б) — Главная страница, однострочная шапка, 3D-шоукейс и переключатели тем/языка.
-- [lesson_player_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/lesson_player_desktop.png) (`139 223` Б) — Плеер уроков (8 блоков, вкладка «Видео-обзор», 3D-виджет, AI-наставник).
-- [simulator_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/simulator_desktop.png) (`173 454` Б) — Эталонная 3D-мастерская и физический симулятор Автомеханики (с предпросмотром и контрастным UI).
-- [tools_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/tools_desktop.png) (`191 482` Б) — 4 инструмента студента и инженерные калькуляторы.
-- [profile_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/profile_desktop.png) (`93 233` Б) — Цифровой паспорт авторизованного студента и 20-узловой граф компетенций (DAG).
-- [career_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/career_desktop.png) (`246 081` Б) — Автоматическое портфолио и центр карьеры выпускника.
+- [index_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/index_desktop.png) (`245 176` Б) — Главная страница, однострочная шапка, 3D-шоукейс и переключатели тем/языка.
+- [lesson_player_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/lesson_player_desktop.png) (`145 057` Б) — Плеер уроков (8 блоков, полный заголовок кейса, вкладка «Видео-обзор», 3D-виджет, AI-наставник).
+- [simulator_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/simulator_desktop.png) (`174 011` Б) — Эталонная 3D-мастерская и физический симулятор Автомеханики (с предпросмотром и контрастным UI).
+- [tools_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/tools_desktop.png) (`191 966` Б) — 4 инструмента студента и инженерные калькуляторы (исправлены контрастные кнопки `bg-emerald-600`).
+- [profile_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/profile_desktop.png) (`93 548` Б) — Цифровой паспорт авторизованного студента и 20-узловой граф компетенций (DAG).
+- [career_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/career_desktop.png) (`242 776` Б) — Автоматическое портфолио и центр карьеры выпускника (контрастные кнопки и бейдж «В поиске»).
 
 ### Mobile (`390×844`)
 - [index_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/index_mobile.png) (`452 272` Б) — Адаптивная мобильная шапка (`<= 72px`) и главная страница без горизонтального переполнения.
-- [profile_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/profile_mobile.png) (`256 731` Б) — Мобильный профиль и граф навыков (`scrollWidth <= 390`).
-- [tools_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/tools_mobile.png) (`585 777` Б) — Мобильный хаб из 4 инструментов студента.
-- [mission_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/mission_mobile.png) (`453 492` Б) — Мобильный экран практической миссии (`header <= 72px`, `scrollWidth <= 390`).
+- [profile_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/profile_mobile.png) (`260 763` Б) — Мобильный профиль и граф навыков (`scrollWidth <= 390`).
+- [tools_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/tools_mobile.png) (`583 887` Б) — Мобильный хаб из 4 инструментов студента (полный бренд, переключатели языка и темы в одну строку без обрезки).
+- [mission_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/mission_mobile.png) (`443 567` Б) — Мобильный экран практической миссии по выбранной специальности (`?specialty=automechanic`, высокий контраст светлой темы).
 
 ---
 

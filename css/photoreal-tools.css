@@ -385,6 +385,7 @@ header .max-w-7xl.h-20 {
   }
   header > div:first-child,
   header > .max-w-7xl > div:first-child,
+  header > .max-w-7xl > a:first-child,
   .topbar .brand,
   .top-header .breadcrumbs {
     min-width: 0 !important;
@@ -393,9 +394,16 @@ header .max-w-7xl.h-20 {
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
   }
+  header > .max-w-7xl > a:first-child .text-\[10px\],
+  header > .max-w-7xl > div > a > span:not(.material-symbols-outlined) {
+    display: none !important;
+  }
+  header > .max-w-7xl > div > a {
+    padding: 6px 8px !important;
+  }
   header > div:nth-child(2):not(.lang-switch):not(.theme-switch),
   header > .max-w-7xl > div:last-of-type:not(.lang-switch):not(.theme-switch) {
-    flex-shrink: 1 !important;
+    flex-shrink: 0 !important;
     min-width: 0 !important;
     gap: 4px !important;
   }

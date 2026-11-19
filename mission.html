@@ -159,20 +159,20 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
       <!-- Left: Back & Mission Identity -->
       <div class="flex items-center gap-3">
-        <a href="tasks.html?specialty=graphic_design" class="px-3 py-2 rounded-xl bg-neo-surface hover:bg-white/10 border border-white/10 text-neo-gray hover:text-neo-white flex items-center gap-1.5 text-xs font-bold transition-colors">
+        <a id="mission-back-link" href="tasks.html?specialty=graphic_design" class="px-3 py-2 rounded-xl bg-neo-surface hover:bg-white/10 border border-white/10 text-neo-gray hover:text-neo-white flex items-center gap-1.5 text-xs font-bold transition-colors">
           <span class="material-symbols-outlined text-[18px] text-neo-cyan">arrow_back</span>
           <span>К списку миссий</span>
         </a>
         <div class="hidden sm:flex items-center gap-2.5 pl-2 border-l border-white/10">
           <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-neo-cyan to-neo-purple flex items-center justify-center shadow-lg">
-            <span class="material-symbols-outlined text-neo-bg font-bold">palette</span>
+            <span id="mission-header-icon" class="material-symbols-outlined text-neo-bg font-bold">palette</span>
           </div>
           <div>
             <div class="flex items-center gap-2">
               <span class="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-neo-cyan/15 text-neo-cyan border border-neo-cyan/30">МИССИЯ 01</span>
-              <span class="text-xs text-neo-gray">Основы дизайна</span>
+              <span id="mission-header-subtitle" class="text-xs text-neo-gray">Основы дизайна</span>
             </div>
-            <h1 class="text-sm font-extrabold text-neo-white tracking-tight">Архитектор цвета</h1>
+            <h1 id="mission-header-title" class="text-sm font-extrabold text-neo-white tracking-tight">Архитектор цвета</h1>
           </div>
         </div>
       </div>
@@ -267,14 +267,14 @@
         <div class="relative z-10 max-w-3xl space-y-6">
           <div class="inline-flex flex-wrap items-center gap-2 px-3.5 py-1.5 rounded-full bg-neo-surface border border-neo-cyan/40 text-xs font-semibold text-neo-cyan">
             <span class="material-symbols-outlined text-[16px]">auto_awesome</span>
-            <span>ИНТЕРАКТИВНАЯ МИССИЯ • ОСНОВЫ ДИЗАЙНА</span>
+            <span id="mission-hero-badge">ИНТЕРАКТИВНАЯ МИССИЯ • ОСНОВЫ ДИЗАЙНА</span>
           </div>
 
           <h2 class="text-4xl sm:text-6xl font-black tracking-tight text-neo-white leading-none">
-            АРХИТЕКТОР <span class="text-transparent bg-clip-text bg-gradient-to-r from-neo-cyan via-neo-purple to-neo-success">ЦВЕТА</span>
+            <span id="mission-hero-title-main">АРХИТЕКТОР</span> <span id="mission-hero-title-accent" class="text-transparent bg-clip-text bg-gradient-to-r from-neo-cyan via-neo-purple to-neo-success">ЦВЕТА</span>
           </h2>
 
-          <p class="text-base sm:text-lg text-neo-gray leading-relaxed">
+          <p id="mission-hero-desc" class="text-base sm:text-lg text-neo-gray leading-relaxed">
             Добро пожаловать в нейро-лабораторию визуального проектирования <strong class="text-neo-white">EduSpace Neo</strong>.
             Цвет в цифровых продуктах — это не случайный декор, а точная инженерная система управления вниманием, эмоциями и читаемостью интерфейса. В этой миссии вы освоите геометрию цветового круга, пройдёте 4 тактических испытания, соберёте собственную палитру в Цветовой лаборатории и защитите финальный дизайн-проект перед преподавателем.
           </p>
@@ -1219,7 +1219,7 @@
         const res = await window.EduSpace.api('/api/mission/save_stage', {
           method: 'POST',
           body: {
-            specialty_slug: 'graphic_design',
+            specialty_slug: activeMissionSpecialty,
             task_number: 1,
             current_stage: targetStage,
             event_key: eventKey,
@@ -1903,7 +1903,7 @@
         const res = await window.EduSpace.api('/api/mission/submit', {
           method: 'POST',
           body: {
-            specialty_slug: 'graphic_design',
+            specialty_slug: activeMissionSpecialty,
             task_number: 1,
             palette: missionState.labPalette,
             harmony_type: harmonyType,
@@ -2024,10 +2024,83 @@
       }).join('');
     }
 
+    const MISSION_SPECIALTY_META = {
+      graphic_design: {
+        icon: 'palette',
+        subtitle: 'Основы дизайна',
+        headerTitle: 'Архитектор цвета',
+        badge: 'ИНТЕРАКТИВНАЯ МИССИЯ • ОСНОВЫ ДИЗАЙНА',
+        titleMain: 'АРХИТЕКТОР',
+        titleAccent: 'ЦВЕТА',
+        desc: 'Добро пожаловать в нейро-лабораторию визуального проектирования EduSpace Neo. Освойте геометрию цветового круга, пройдите 4 тактических испытания, соберите собственную палитру по стандарту WCAG 2.1 и защитите финальный дизайн-проект перед преподавателем.'
+      },
+      automechanic: {
+        icon: 'build',
+        subtitle: 'Автомеханика (07161300)',
+        headerTitle: 'Мастер ДВС и ГБЦ',
+        badge: 'ИНТЕРАКТИВНАЯ МИССИЯ • АВТОМЕХАНИКА',
+        titleMain: 'ДИАГНОСТ',
+        titleAccent: 'ДВИГАТЕЛЯ',
+        desc: 'Практическая инженерная миссия по ремонту и диагностике ДВС в EduSpace Neo. Отработайте порядок разборки узлов, проверьте компрессию ЦПГ, соблюдите спиральную схему протяжки болтов ГБЦ и отправьте протокол диагностики преподавателю.'
+      },
+      it: {
+        icon: 'code',
+        subtitle: 'Веб-разработка (06130100)',
+        headerTitle: 'Архитектор интерфейсов',
+        badge: 'ИНТЕРАКТИВНАЯ МИССИЯ • ВЕБ-РАЗРАБОТКА (IT)',
+        titleMain: 'АРХИТЕКТОР',
+        titleAccent: 'ВЕБ-UI',
+        desc: 'Практическая миссия по современной фронтенд-разработке в EduSpace Neo. Настройте контрастную дизайн-систему, проверьте адаптивные сетки Flexbox/Grid и защитите итоговый макет интерфейса перед преподавателем.'
+      },
+      autoelectric: {
+        icon: 'bolt',
+        subtitle: 'Автоэлектрика (07161301)',
+        headerTitle: 'Диагност бортовой сети',
+        badge: 'ИНТЕРАКТИВНАЯ МИССИЯ • АВТОЭЛЕКТРИКА',
+        titleMain: 'ИНЖЕНЕР',
+        titleAccent: 'БОРТОСЕТИ',
+        desc: 'Практическая миссия по диагностике цепей 12В и CAN-шины в EduSpace Neo. Проведите расчёты по закону Ома и Кирхгофа, локализуйте падение напряжения, промаркируйте жгуты и сдайте карту измерений преподавателю.'
+      },
+      hvac: {
+        icon: 'ac_unit',
+        subtitle: 'Холодильное оборудование (07130700)',
+        headerTitle: 'Инженер термоцикла',
+        badge: 'ИНТЕРАКТИВНАЯ МИССИЯ • HVAC И ХОЛОД',
+        titleMain: 'МАСТЕР',
+        titleAccent: 'ТЕРМОЦИКЛА',
+        desc: 'Практическая миссия по обслуживанию холодильных установок в EduSpace Neo. Проанализируйте диаграмму P-T для хладагентов R134a/R410A, определите перегрев и переохлаждение контура и защитите сервисный отчёт перед преподавателем.'
+      }
+    };
+
+    let activeMissionSpecialty = 'graphic_design';
+
+    function applyMissionSpecialtyIdentity(specSlug) {
+      const normalized = MISSION_SPECIALTY_META[specSlug] ? specSlug : 'graphic_design';
+      activeMissionSpecialty = normalized;
+      const meta = MISSION_SPECIALTY_META[normalized];
+      const backLink = document.getElementById('mission-back-link');
+      if (backLink) backLink.href = `tasks.html?specialty=${encodeURIComponent(normalized)}`;
+      const iconEl = document.getElementById('mission-header-icon');
+      if (iconEl) iconEl.textContent = meta.icon;
+      const subEl = document.getElementById('mission-header-subtitle');
+      if (subEl) subEl.textContent = meta.subtitle;
+      const titleEl = document.getElementById('mission-header-title');
+      if (titleEl) titleEl.textContent = meta.headerTitle;
+      const badgeEl = document.getElementById('mission-hero-badge');
+      if (badgeEl) badgeEl.textContent = meta.badge;
+      const mainEl = document.getElementById('mission-hero-title-main');
+      if (mainEl) mainEl.textContent = meta.titleMain;
+      const accEl = document.getElementById('mission-hero-title-accent');
+      if (accEl) accEl.textContent = meta.titleAccent;
+      const descEl = document.getElementById('mission-hero-desc');
+      if (descEl) descEl.textContent = meta.desc;
+      document.title = `Миссия 01: ${meta.headerTitle} — EDU SPACE Neo`;
+    }
+
     async function refreshMissionFromServer(notify = false) {
       if (!missionAuthorized) return;
       try {
-        const res = await window.EduSpace.api('/api/mission/state?specialty=graphic_design&task=1');
+        const res = await window.EduSpace.api(`/api/mission/state?specialty=${encodeURIComponent(activeMissionSpecialty)}&task=1`);
         const data = (res && res.data) || {};
         if (res.ok && data.success) {
           const m = data.mission;
@@ -2086,6 +2159,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
       const gateEl = document.getElementById('mission-auth-gate');
       const protectedEl = document.getElementById('mission-protected-content');
+      const urlSpec = new URLSearchParams(window.location.search).get('specialty');
       try {
         const sessResp = await fetch('/api/auth/session', { credentials: 'same-origin' });
         if (!sessResp.ok) throw new Error('session unavailable');
@@ -2095,15 +2169,18 @@
         }
         if (!sess || !sess.authenticated || !sess.user) {
           missionAuthorized = false;
+          applyMissionSpecialtyIdentity(urlSpec || 'graphic_design');
           if (protectedEl) protectedEl.classList.add('hidden');
           if (gateEl) gateEl.classList.remove('hidden');
           return;
         }
         missionAuthorized = true;
+        applyMissionSpecialtyIdentity(urlSpec || sess.user.specialty_slug || 'graphic_design');
         if (gateEl) gateEl.classList.add('hidden');
         if (protectedEl) protectedEl.classList.remove('hidden');
       } catch (e) {
         missionAuthorized = false;
+        applyMissionSpecialtyIdentity(urlSpec || 'graphic_design');
         if (protectedEl) protectedEl.classList.add('hidden');
         if (gateEl) gateEl.classList.remove('hidden');
         return;
