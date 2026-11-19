@@ -155,3 +155,21 @@
   - `python -m unittest tests.e2e.test_tier3_pairwise tests.e2e.test_tier4_scenarios -v` -> `EXIT 0` (`24/24` passed: `16/16` Tier 3 + `8/8` Tier 4)
   - `python -m scripts.capture_release_evidence` -> `EXIT 0` (`25` unique GLBs `1.38 MB`; `10` screenshots saved in `assets/screenshots/release/`)
 - **Status Transition:** `[~] IN PROGRESS` -> `[x] VERIFIED` (Local Release Verified; External Cloud/API Keys Documented as `[!] BLOCKED`)
+
+---
+
+## [2026-11-19T03:52:00Z] — Post-Restart Zero-Trust Verification & Visual Polish Pass
+- **Task IDs Re-Verified:** `T-M1-01..11`, `T-M2-01..06`, `T-M3-01..04`, `T-M4-01..05`, `T-M5-01..05`, `T-M6-01..02`, `T-P12-01..03`
+- **Visual/UX Issues Caught & Fixed During Screenshot Inspection:**
+  - `css/academy.css` (+ rebuilt `css/app.min.css`): Added `@media (min-width: 1024px)` single-row `.topbar .container` flex rules so the theme switcher no longer wraps below the desktop header on `index.html`.
+  - `css/workshop.css`: Preserved translucent `rgba(255,255,255,0.2)` badge background inside colored/gradient CTA buttons so the `AI-Куратор` badge stays legible in light theme.
+  - `simulator.html`: Fixed the topbar Mission CTA gradient contrast and added a real catalog preview fallback in `initLessonPlayer()` for guest visitors instead of leaving `"Загрузка модуля..."` stuck on screen.
+  - `scripts/capture_release_evidence.py`: Added isolated student registration/login before capturing authenticated views (`profile.html`, `simulator.html`, `mission.html`) and regenerated all 10 release screenshots.
+- **Verification Commands & Observed Outputs:**
+  - `python scripts/check_locales.py` -> `EXIT 0` (`198/198` keys, 0 mismatches)
+  - `python -m unittest tests/test_m1_foundation.py -v` -> `EXIT 0` (`29/29` passed)
+  - `python tests/e2e/run_e2e.py --smoke` -> `EXIT 0` (`7/7` passed)
+  - `python -m unittest tests/test_m2_m6_comprehensive.py tests.e2e.test_tier3_pairwise tests.e2e.test_tier4_scenarios -v` -> `EXIT 0` (`30/30` passed: `6/6` M2-M6 + `16/16` Tier 3 + `8/8` Tier 4)
+  - `python -m scripts.capture_release_evidence` -> `EXIT 0` (`25/25` unique GLBs `1.38 MB`, `10` screenshots refreshed)
+- **Status:** `[x] VERIFIED` *(Local Release Verified; External Render/PostgreSQL/LLM/SMTP remain `[!] BLOCKED`)*
+

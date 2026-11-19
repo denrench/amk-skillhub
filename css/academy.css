@@ -2183,3 +2183,20 @@ body[data-mood="cyber"] .hero-highlight {
     transition: none !important;
   }
 }
+
+@media (min-width: 1024px) {
+  .topbar .container {
+    flex-wrap: nowrap;
+    gap: 0.5rem 0.75rem;
+  }
+  .topbar nav {
+    flex-wrap: nowrap;
+    gap: 0.2rem;
+  }
+  .topbar nav a {
+    padding: 0.42rem 0.65rem;
+    font-size: 0.88rem;
+    white-space: nowrap;
+  }
+}
+

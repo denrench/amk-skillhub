@@ -30,16 +30,40 @@ def main():
 
     with IsolatedServer(strip_ai_keys=True) as srv:
         for mode, pages in [
-            ("desktop", ["index.html", "lesson_player.html?course=automechanic&lesson=1", "simulator.html?specialty=automechanic", "tools.html", "profile.html", "career.html"]),
-            ("mobile", ["index.html", "profile.html", "tools.html", "mission.html"]),
+            ("desktop", ["index.html", "lesson_player.html?course=automechanic&lesson=1", "simulator.html?specialty=automechanic&task=1", "tools.html", "profile.html", "career.html"]),
+            ("mobile", ["index.html", "profile.html", "tools.html", "mission.html?specialty=automechanic"]),
         ]:
             drv = create_chrome_driver(mode)
             try:
+                # Register & authenticate an isolated student so profile/simulator/mission render full authenticated UI
+                drv.get(f"{srv.base_url}/auth.html")
+                wait_for_ready(drv)
+                drv.execute_async_script("""
+                    const done = arguments[arguments.length - 1];
+                    const email = 'release_' + Date.now() + '_' + Math.random().toString(36).slice(2,6) + '@amk.kz';
+                    fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        credentials: 'same-origin',
+                        body: JSON.stringify({
+                            full_name: 'Алихан Нурланов',
+                            email: email,
+                            password: 'ReleaseUser123!',
+                            role: 'student',
+                            specialty_slug: 'automechanic'
+                        })
+                    }).then(r => r.json()).then(d => {
+                        if (d && d.user && window.EduSpace && window.EduSpace.setActiveUser) {
+                            window.EduSpace.setActiveUser(d.user);
+                        }
+                        done(Boolean(d && d.user));
+                    }).catch(() => done(false));
+                """)
                 for page in pages:
                     slug = page.split("?")[0].replace(".html", "")
                     drv.get(f"{srv.base_url}/{page}")
                     wait_for_ready(drv)
-                    time.sleep(0.4)
+                    time.sleep(0.8)
                     out_path = os.path.join(OUT_DIR, f"{slug}_{mode}.png")
                     drv.save_screenshot(out_path)
                     print(f"Saved screenshot: {out_path} ({os.path.getsize(out_path)} B)")

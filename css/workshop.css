@@ -471,6 +471,14 @@ body.workshop main [class*="bg-gradient-to-"]:is([class*="900"], [class*="950"],
 ) *:not(.bg-clip-text) {
   color: #ffffff !important;
 }
+:is(
+  .bg-indigo-600, .bg-indigo-500, .bg-blue-600, .bg-cyan-600,
+  .bg-emerald-600, .bg-purple-600, .bg-rose-600, .bg-red-600,
+  [class*="bg-gradient-to-"]:not(.bg-clip-text):not(.text-transparent), .stepper-item-active, #lp-next-btn
+) :is(.bg-white\/10, .bg-white\/15, .bg-white\/20) {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
 
 body.workshop main #cv-avatar-initials,
 body.workshop main [class*="bg-gradient-to-"]:not(.bg-clip-text) .bg-dark-850#cv-avatar-initials {

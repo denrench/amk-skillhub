@@ -71,18 +71,18 @@
 Все скриншоты сняты автоматизированным браузером Chrome в изолированном стенде (`scripts/capture_release_evidence.py`) и сохранены в `assets/screenshots/release/`:
 
 ### Desktop (`1440×900`)
-- [index_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/index_desktop.png) (`244 704` Б) — Главная страница, 3D-шоукейс и переключатели тем/языка.
-- [lesson_player_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/lesson_player_desktop.png) (`139 281` Б) — Плеер уроков (8 блоков, вкладка «Видео-обзор», 3D-виджет, AI-наставник).
-- [simulator_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/simulator_desktop.png) (`123 047` Б) — Эталонная 3D-мастерская и физический симулятор Автомеханики.
-- [tools_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/tools_desktop.png) (`193 381` Б) — 4 инструмента студента и инженерные калькуляторы.
-- [profile_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/profile_desktop.png) (`136 348` Б) — Цифровой паспорт студента и 20-узловой граф компетенций (DAG).
-- [career_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/career_desktop.png) (`250 235` Б) — Автоматическое портфолио и центр карьеры выпускника.
+- [index_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/index_desktop.png) (`245 318` Б) — Главная страница, однострочная шапка, 3D-шоукейс и переключатели тем/языка.
+- [lesson_player_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/lesson_player_desktop.png) (`139 223` Б) — Плеер уроков (8 блоков, вкладка «Видео-обзор», 3D-виджет, AI-наставник).
+- [simulator_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/simulator_desktop.png) (`173 454` Б) — Эталонная 3D-мастерская и физический симулятор Автомеханики (с предпросмотром и контрастным UI).
+- [tools_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/tools_desktop.png) (`191 482` Б) — 4 инструмента студента и инженерные калькуляторы.
+- [profile_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/profile_desktop.png) (`93 233` Б) — Цифровой паспорт авторизованного студента и 20-узловой граф компетенций (DAG).
+- [career_desktop.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/career_desktop.png) (`246 081` Б) — Автоматическое портфолио и центр карьеры выпускника.
 
 ### Mobile (`390×844`)
 - [index_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/index_mobile.png) (`452 272` Б) — Адаптивная мобильная шапка (`<= 72px`) и главная страница без горизонтального переполнения.
-- [profile_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/profile_mobile.png) (`325 273` Б) — Мобильный профиль и граф навыков (`scrollWidth <= 390`).
-- [tools_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/tools_mobile.png) (`588 977` Б) — Мобильный хаб из 4 инструментов студента.
-- [mission_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/mission_mobile.png) (`246 789` Б) — Мобильный экран практической миссии (`header <= 72px`, `scrollWidth <= 390`).
+- [profile_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/profile_mobile.png) (`256 731` Б) — Мобильный профиль и граф навыков (`scrollWidth <= 390`).
+- [tools_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/tools_mobile.png) (`585 777` Б) — Мобильный хаб из 4 инструментов студента.
+- [mission_mobile.png](file:///C:/Users/Пользователь/.gemini/antigravity/scratch/amk-skillhub/assets/screenshots/release/mission_mobile.png) (`453 492` Б) — Мобильный экран практической миссии (`header <= 72px`, `scrollWidth <= 390`).
 
 ---
 

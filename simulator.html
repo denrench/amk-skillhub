@@ -156,9 +156,9 @@
           <span class="material-symbols-outlined text-[16px]">menu_book</span>
           <span class="hidden md:inline">Интерактивный урок</span>
         </a>
-        <a href="mission.html" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-400 to-purple-500 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-md hover:opacity-95 transition-opacity">
+        <a href="mission.html" style="background:linear-gradient(135deg,#0891b2,#7c3aed)" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-cyan-400 to-purple-500 text-white text-xs font-black flex items-center gap-1.5 shadow-md hover:opacity-95 transition-opacity">
           <span class="material-symbols-outlined text-[16px]">palette</span>
-          <span class="hidden sm:inline">Миссия: Архитектор цвета</span>
+          <span class="hidden sm:inline">Миссия: Практика</span>
         </a>
         <button type="button" onclick="saveDraftManual()" class="px-3.5 py-2 rounded-xl border border-white/15 bg-white/5 text-slate-300 hover:text-white text-xs font-bold hover:bg-white/10 transition-colors flex items-center gap-1.5">
           <span class="material-symbols-outlined text-[16px] text-indigo-400">save</span>
@@ -564,10 +564,8 @@
 
     async function initLessonPlayer() {
       const user = window.EduSpace.getActiveUser();
-      if (!user) return;
-
       const params = new URLSearchParams(window.location.search);
-      activeSpecialty = params.get('specialty') || user.specialty_slug || 'it';
+      activeSpecialty = params.get('specialty') || (user && user.specialty_slug) || 'it';
       activeTaskNumber = Math.max(1, Math.min(20, parseInt(params.get('task') || params.get('task_id') || '1', 10) || 1));
 
       const course = window.EduSpace.getCourseBySlug(activeSpecialty);
@@ -578,6 +576,24 @@
       document.getElementById('sim-task-badge').textContent = `Урок №${activeTaskNumber} • ${course.short_title}`;
       document.getElementById('editor-file-label').textContent =
         activeSpecialty === 'it' ? (activeTaskNumber === 2 ? 'card.html' : ([4, 6].includes(activeTaskNumber) ? 'query.sql' : (activeTaskNumber === 9 ? 'docker-compose.yml' : 'solution.js'))) : `case_module_${activeTaskNumber}.txt`;
+
+      if (!user) {
+        activeLessonCatalog = window.EduSpace.getLessonFromCatalog(activeSpecialty, activeTaskNumber);
+        document.getElementById('sim-locked-container').classList.add('hidden');
+        document.getElementById('sim-active-workspace').classList.remove('hidden');
+        document.getElementById('sim-task-spec').textContent = course.title;
+        document.getElementById('sim-task-meta').textContent = 'Демо-просмотр • Войдите для сохранения прогресса';
+        document.getElementById('sim-task-title').textContent = (activeLessonCatalog && activeLessonCatalog.title) || `Модуль №${activeTaskNumber}: ${course.short_title}`;
+        document.getElementById('sim-status-pill').textContent = 'Открытый просмотр';
+        document.getElementById('theory-tools-badge').textContent = (activeLessonCatalog && activeLessonCatalog.tools) || 'Профильный инструмент АМК';
+        document.getElementById('theory-content-body').innerHTML = (activeLessonCatalog && activeLessonCatalog.theory) || `<p>${escapeHtml((activeLessonCatalog && activeLessonCatalog.summary) || 'Войдите в аккаунт для прохождения и сдачи задания.')}</p>`;
+        mountSimulatorTopicGame();
+        renderSpecialtyWorkbench(activeSpecialty, activeTaskNumber);
+        if (window.EduSimulators) {
+          window.EduSimulators.init(activeSpecialty, activeTaskNumber, document.getElementById('specialty-interactive-workbench'));
+        }
+        return;
+      }
 
       const res = await window.EduSpace.api(`/api/tasks?specialty=${encodeURIComponent(activeSpecialty)}&user_id=${user.id}`);
       const tasks = (res.data && res.data.tasks) || [];
