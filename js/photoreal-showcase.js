@@ -493,23 +493,51 @@ window.PhotorealShowcase = (function () {
       modes.querySelectorAll('[data-pr-mode]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       applyMode();
     });
+    const cleanupListeners = [
+      () => document.removeEventListener('amk:theme', applyTheme)
+    ];
+    if (!ro) cleanupListeners.push(() => window.removeEventListener('resize', resize));
     document.addEventListener('amk:theme', applyTheme);
-    window.addEventListener('pagehide', () => {
+
+    let io = null;
+    function dispose() {
       cancelAnimationFrame(rafId);
-      try { renderer.dispose(); } catch (e) {}
-    });
+      if (io && typeof io.disconnect === 'function') io.disconnect();
+      if (typeof window.disposeThreeScene === 'function') {
+        window.disposeThreeScene({
+          rafId,
+          resizeObserver: ro,
+          scene,
+          renderer,
+          controls,
+          composer,
+          rtShadow,
+          rtBlur,
+          cleanupListeners
+        });
+      } else {
+        cleanupListeners.forEach((fn) => { try { fn(); } catch (e) {} });
+        if (ro) ro.disconnect();
+        try { controls?.dispose(); } catch (e) {}
+        try { renderer.dispose(); } catch (e) {}
+      }
+    }
+    const onPageHide = () => dispose();
+    window.addEventListener('pagehide', onPageHide);
+    cleanupListeners.push(() => window.removeEventListener('pagehide', onPageHide));
 
     applyTheme();
     resize();
     let started = false;
     const start = () => { if (!started) { started = true; show(0); } };
     if ('IntersectionObserver' in window) {
-      new IntersectionObserver((entries) => {
+      io = new IntersectionObserver((entries) => {
         entries.forEach((en) => {
           state.visible = en.isIntersecting;
           if (en.isIntersecting) { start(); requestRender(); }
         });
-      }, { rootMargin: '200px' }).observe(container);
+      }, { rootMargin: '200px' });
+      io.observe(container);
     } else {
       state.visible = true;
       start();
@@ -518,6 +546,7 @@ window.PhotorealShowcase = (function () {
 
     state.show = show;
     state.setMode = (m) => { const b = modes.querySelector(`[data-pr-mode="${m}"]`); if (b) b.click(); };
+    state.dispose = dispose;
     return state;
   }
 

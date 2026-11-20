@@ -5068,12 +5068,13 @@ def ai_mentor_chat():
     user_code = (data.get('user_code') or '').strip()
     user_api_key = (data.get('user_api_key') or '').strip()
     provider = (data.get('provider') or '').strip().lower()
+    context = data.get('context') if isinstance(data.get('context'), dict) else {}
 
     if not user_prompt:
         return jsonify({"success": False, "message": "Промпт не может быть пустым"}), 400
 
-    gemini_key = os.environ.get('GEMINI_API_KEY') or (user_api_key if provider == 'gemini' else '')
-    openai_key = os.environ.get('OPENAI_API_KEY') or os.environ.get('OPENROUTER_API_KEY') or (user_api_key if provider in ('openai', 'openrouter', '') and user_api_key and not gemini_key else '')
+    from eduspace_ai import resolve_llm_keys, _call_gemini_api, _call_openai_api
+    gemini_key, openai_key = resolve_llm_keys(user_api_key=user_api_key, provider=provider)
 
     if not gemini_key and not openai_key:
         return jsonify({
@@ -5089,10 +5090,23 @@ def ai_mentor_chat():
         f"Ты AI-наставник AMK SkillHub по специальности «{course['title']}» (модуль #{task_num}). "
         "Помогай студенту понять ошибки и шаги решения без выдачи готового ответа на экзамен."
     )
-    full_user_prompt = user_prompt + (f"\n\nКонтекст кода/ответа студента:\n{user_code[:2000]}" if user_code else "")
+    context_lines = []
+    if context.get("selected_part"):
+        context_lines.append(f"Выбранная 3D-деталь: {context.get('selected_part')}")
+    if context.get("disassembled_parts"):
+        context_lines.append(f"Разобранные детали: {', '.join(map(str, context.get('disassembled_parts') or []))}")
+    if context.get("simulator_state"):
+        context_lines.append(f"Состояние симулятора: {json.dumps(context.get('simulator_state'), ensure_ascii=False)[:600]}")
+    if context.get("recent_errors"):
+        context_lines.append(f"Недавние ошибки: {json.dumps(context.get('recent_errors'), ensure_ascii=False)[:600]}")
+
+    full_user_prompt = (
+        user_prompt
+        + ("\n\nКонтекст 3D/симулятора:\n" + "\n".join(context_lines) if context_lines else "")
+        + (f"\n\nКонтекст кода/ответа студента:\n{user_code[:2000]}" if user_code else "")
+    )
 
     try:
-        from eduspace_ai import _call_gemini_api, _call_openai_api
         reply_text = None
         used_model = None
         if gemini_key:
@@ -5534,12 +5548,14 @@ def save_mission_stage():
     training_done = list(saved_state.get('training_completed') or [])
     lab_palette = list(saved_state.get('lab_palette') or [])
 
+    stage4_done = bool(saved_state.get('lab_completed')) or len(lab_palette) >= 3
+
     max_allowed_stage = 2
     if len(theory_done) >= 5:
         max_allowed_stage = 3
     if len(theory_done) >= 5 and len(training_done) >= 4:
         max_allowed_stage = 4
-    if len(theory_done) >= 5 and len(training_done) >= 4 and len(lab_palette) >= 3:
+    if len(theory_done) >= 5 and len(training_done) >= 4 and stage4_done:
         max_allowed_stage = 5
     if 'stage_5_submit' in awarded_events:
         max_allowed_stage = 7
@@ -5567,7 +5583,7 @@ def save_mission_stage():
             valid_event = True
         elif event_key == "training_4_drag" and 4 in training_done:
             valid_event = True
-        elif event_key == "stage_4_lab" and len(lab_palette) >= 3:
+        elif event_key == "stage_4_lab" and stage4_done:
             valid_event = True
 
         if valid_event:
@@ -5751,6 +5767,66 @@ def submit_mission_project():
             json.dumps(saved_state, ensure_ascii=False),
             new_mission_xp
         ))
+
+        cursor.execute("SELECT full_name, group_name, student_id FROM users WHERE id = ?", (user_id,))
+        u_row = cursor.fetchone()
+        student_name = u_row['full_name'] if u_row else 'Студент'
+        default_grp = (CANONICAL_DEFAULT_GROUPS.get(specialty_slug) or ['ИС-21'])[0]
+        group_name = u_row['group_name'] if u_row and u_row['group_name'] else default_grp
+        student_id = u_row['student_id'] if u_row and u_row['student_id'] else f'KZ-AMK-2026-{10000 + user_id}'
+
+        cursor.execute("SELECT id, title FROM tasks WHERE specialty_slug = ? AND task_number = ?", (specialty_slug, task_number))
+        t_row = cursor.fetchone()
+        task_id = t_row['id'] if t_row else task_number
+        course_meta = COURSES_BY_SLUG.get(specialty_slug, COURSES_META[0])
+        task_title = f"Миссия {task_number:02d}: {course_meta['short_title']}"
+        explanation_str = str(
+            data.get('explanation')
+            or answers.get('explanation')
+            or answers.get('deliverable')
+            or json.dumps(answers, ensure_ascii=False)
+        )[:2000]
+        submitted_code_str = json.dumps({
+            "mission_id": eff_mission_id,
+            "specialty": specialty_slug,
+            "task_number": task_number,
+            "answers": answers,
+            "mission_xp": new_mission_xp,
+        }, ensure_ascii=False, indent=2)
+        status_text = "Зачтено (100/100)"
+        grade_letter = "A"
+
+        cursor.execute("""
+            SELECT id FROM task_submissions
+            WHERE user_id = ? AND specialty_slug = ? AND task_number = ?
+        """, (user_id, specialty_slug, task_number))
+        existing_sub = cursor.fetchone()
+        if existing_sub:
+            sub_id = existing_sub['id']
+            cursor.execute("""
+                UPDATE task_submissions
+                SET student_name = ?, group_name = ?, task_title = ?, score = 100, grade_letter = ?,
+                    status = ?, submitted_code = ?, student_comment = ?, autotest_passed = 4,
+                    autotest_total = 4, quiz_score = 4, updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            """, (
+                student_name, group_name, task_title, grade_letter,
+                status_text, submitted_code_str, explanation_str, sub_id
+            ))
+        else:
+            cursor.execute("""
+                INSERT INTO task_submissions (
+                    user_id, student_id, student_name, group_name, task_id, specialty_slug,
+                    task_number, task_title, score, grade_letter, status, time_spent_seconds,
+                    submitted_code, repo_url, student_comment, autotest_passed, autotest_total, quiz_score
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 100, ?, ?, 600, ?, '', ?, 4, 4, 4)
+            """, (
+                user_id, student_id, student_name, group_name, task_id, specialty_slug,
+                task_number, task_title, grade_letter, status_text,
+                submitted_code_str, explanation_str
+            ))
+            sub_id = cursor.lastrowid
+
         conn.commit()
         return jsonify({
             "success": True,
@@ -5758,6 +5834,16 @@ def submit_mission_project():
             "score": 100,
             "mission_id": eff_mission_id,
             "specialty": specialty_slug,
+            "submission": {
+                "id": sub_id,
+                "task_title": task_title,
+                "status": status_text,
+                "is_pending_review": False,
+                "score": 100,
+                "grade_letter": grade_letter,
+                "student_comment": explanation_str,
+                "teacher_comment": ""
+            },
             "xp_gained": xp_gained,
             "mission_xp": new_mission_xp,
             "total_xp": total_xp,
@@ -5887,8 +5973,14 @@ def submit_mission_project():
         mission_xp
     ))
 
+    course_meta = COURSES_BY_SLUG.get(specialty_slug, COURSES_META[0])
+    cursor.execute("SELECT id, title FROM tasks WHERE specialty_slug = ? AND task_number = ?", (specialty_slug, task_number))
+    t_row = cursor.fetchone()
+    task_id = t_row['id'] if t_row else task_number
+    task_title = f"Миссия {task_number:02d}: {course_meta['short_title']}"
+
     submission_payload = {
-        "mission_title": "Архитектор цвета",
+        "mission_title": task_title,
         "project_name": project_name,
         "harmony_type": harmony_type,
         "palette": clean_palette,
@@ -5898,11 +5990,6 @@ def submit_mission_project():
         "explanation": explanation
     }
     submitted_code_str = json.dumps(submission_payload, ensure_ascii=False, indent=2)
-
-    cursor.execute("SELECT id, title FROM tasks WHERE specialty_slug = ? AND task_number = ?", (specialty_slug, task_number))
-    t_row = cursor.fetchone()
-    task_id = t_row['id'] if t_row else 11
-    task_title = "Миссия 01: Архитектор цвета"
 
     cursor.execute("""
         SELECT id FROM task_submissions
@@ -5972,7 +6059,7 @@ def submit_mission_project():
 # =========================================================================
 
 WORKSHOP_MODELS_CATALOG = {
-    "mech-cylinder", "mech-v8", "mech-gearbox", "mech-brake", "mech-suspension",
+    "mech-cylinder", "mech-v8", "mech-gearbox", "mech-brake", "mech-brakes", "mech-suspension",
     "mech-differential", "mech-turbo", "hvac-chiller", "hvac-manifold", "hvac-compressor",
     "hvac-evaporator", "hvac-split", "elec-dashboard", "elec-multimeter", "elec-alternator",
     "elec-oscilloscope", "elec-relay", "elec-canbus", "web-20-capstone", "web-01-html",
@@ -5986,13 +6073,21 @@ WORKSHOP_PARTS_RULES = {
     "part_cylinder_head": {"allowed_tools": {"socket_set", "torque_wrench"}, "prerequisites": ["valve_cover"]},
     "camshaft_intake": {"allowed_tools": {"socket_set", "torque_wrench", "feeler_gauge"}, "prerequisites": ["valve_cover"]},
     "part_camshaft_intake": {"allowed_tools": {"socket_set", "torque_wrench", "feeler_gauge"}, "prerequisites": ["valve_cover"]},
-    "piston_1": {"allowed_tools": {"socket_set", "torque_wrench"}, "prerequisites": ["valve_cover", "cylinder_head"]},
-    "piston_01": {"allowed_tools": {"socket_set", "torque_wrench"}, "prerequisites": ["valve_cover", "cylinder_head"]},
-    "part_piston_01": {"allowed_tools": {"socket_set", "torque_wrench"}, "prerequisites": ["valve_cover", "cylinder_head"]},
+    "camshaft_exhaust": {"allowed_tools": {"socket_set", "torque_wrench", "feeler_gauge"}, "prerequisites": ["valve_cover"]},
+    "gasket_head": {"allowed_tools": {"socket_set", "inspect_lamp"}, "prerequisites": ["valve_cover", "cylinder_head"]},
+    "piston_1": {"allowed_tools": {"socket_set", "torque_wrench", "feeler_gauge"}, "prerequisites": ["valve_cover", "cylinder_head"]},
+    "piston_01": {"allowed_tools": {"socket_set", "torque_wrench", "feeler_gauge"}, "prerequisites": ["valve_cover", "cylinder_head"]},
+    "part_piston_01": {"allowed_tools": {"socket_set", "torque_wrench", "feeler_gauge"}, "prerequisites": ["valve_cover", "cylinder_head"]},
+    "piston_2": {"allowed_tools": {"socket_set", "torque_wrench", "feeler_gauge"}, "prerequisites": ["valve_cover", "cylinder_head"]},
+    "piston_02": {"allowed_tools": {"socket_set", "torque_wrench", "feeler_gauge"}, "prerequisites": ["valve_cover", "cylinder_head"]},
     "timing_belt": {"allowed_tools": {"socket_set", "torque_wrench"}, "prerequisites": ["valve_cover"]},
     "spark_plug_1": {"allowed_tools": {"socket_set", "torque_wrench"}, "prerequisites": []},
     "crankshaft": {"allowed_tools": {"socket_set", "torque_wrench"}, "prerequisites": ["valve_cover", "cylinder_head"]},
     "engine_block": {"allowed_tools": {"inspect_lamp", "feeler_gauge", "socket_set"}, "prerequisites": []},
+    "caliper_bolts": {"allowed_tools": {"socket_set", "torque_wrench"}, "prerequisites": []},
+    "caliper_body": {"allowed_tools": {"socket_set", "inspect_lamp"}, "prerequisites": ["caliper_bolts"]},
+    "brake_pads": {"allowed_tools": {"socket_set", "feeler_gauge", "inspect_lamp"}, "prerequisites": ["caliper_bolts", "caliper_body"]},
+    "brake_rotor": {"allowed_tools": {"socket_set", "feeler_gauge", "inspect_lamp"}, "prerequisites": ["caliper_bolts", "caliper_body", "brake_pads"]},
 }
 
 
@@ -6002,6 +6097,8 @@ def _normalize_workshop_part(part_id):
         p = p[5:]
     if p == "piston_01":
         p = "piston_1"
+    elif p == "piston_02":
+        p = "piston_2"
     return p
 
 
@@ -6051,6 +6148,46 @@ def get_workshop_state():
     })
 
 
+def _reset_workshop_state_for_user(conn, user_id, lesson_id, model_id):
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO workshop_states (user_id, lesson_id, model_id, disassembled_parts_json, active_tool, step_history_json, completed, updated_at)
+        VALUES (?, ?, ?, '[]', 'socket_set', '[]', 0, CURRENT_TIMESTAMP)
+        ON CONFLICT(user_id, lesson_id, model_id) DO UPDATE SET
+            disassembled_parts_json = '[]',
+            active_tool = 'socket_set',
+            step_history_json = '[]',
+            completed = 0,
+            updated_at = CURRENT_TIMESTAMP
+    """, (user_id, lesson_id, model_id))
+    conn.commit()
+    return jsonify({
+        "success": True,
+        "valid": True,
+        "lesson_id": lesson_id,
+        "model_id": model_id,
+        "disassembled_parts": [],
+        "active_tool": "socket_set",
+        "step_history": [],
+        "completed": False
+    })
+
+
+@app.route('/api/workshop/reset', methods=['POST'])
+@login_required()
+def post_workshop_reset():
+    user_id = g.current_user['id']
+    data = request.get_json() or {}
+    lesson_id, err = _parse_optional_int(data.get('lesson_id'), 'lesson_id', default=1)
+    if err:
+        return err
+    model_id = (data.get('model_id') or 'mech-cylinder').strip()
+    if model_id not in WORKSHOP_MODELS_CATALOG and not os.path.exists(os.path.join(BASE_DIR, 'assets', 'models', f"{model_id}.glb")):
+        return jsonify({"success": False, "valid": False, "error_code": "UNKNOWN_MODEL", "message": "Неизвестная 3D-модель"}), 404
+    conn = get_db()
+    return _reset_workshop_state_for_user(conn, user_id, lesson_id, model_id)
+
+
 @app.route('/api/workshop/action', methods=['POST'])
 @login_required()
 def post_workshop_action():
@@ -6089,18 +6226,7 @@ def post_workshop_action():
             history = []
 
     if action == 'reset':
-        cursor.execute("""
-            INSERT INTO workshop_states (user_id, lesson_id, model_id, disassembled_parts_json, active_tool, step_history_json, completed, updated_at)
-            VALUES (?, ?, ?, '[]', 'socket_set', '[]', 0, CURRENT_TIMESTAMP)
-            ON CONFLICT(user_id, lesson_id, model_id) DO UPDATE SET
-                disassembled_parts_json = '[]',
-                active_tool = 'socket_set',
-                step_history_json = '[]',
-                completed = 0,
-                updated_at = CURRENT_TIMESTAMP
-        """, (user_id, lesson_id, model_id))
-        conn.commit()
-        return jsonify({"success": True, "valid": True, "disassembled_parts": [], "active_tool": "socket_set", "step_history": [], "completed": False})
+        return _reset_workshop_state_for_user(conn, user_id, lesson_id, model_id)
 
     norm_part = _normalize_workshop_part(raw_part_id)
     if not norm_part or norm_part not in WORKSHOP_PARTS_RULES:
@@ -6394,7 +6520,7 @@ def _get_or_init_portfolio_settings(conn, user_id):
     }
 
 
-def _assemble_portfolio_payload(conn, user_row, include_grades=True, include_certs=True):
+def _assemble_portfolio_payload(conn, user_row, include_grades=True, include_certs=True, include_email=True):
     cursor = conn.cursor()
     user_id = int(user_row['id'])
     user_dict = serialize_user(user_row)
@@ -6469,29 +6595,48 @@ def _assemble_portfolio_payload(conn, user_row, include_grades=True, include_cer
         "verify_url": f"/verify.html?cert={cert_code}"
     }] if include_certs else []
 
+    projects_out = []
+    for s in subs:
+        proj = dict(s)
+        if not include_grades:
+            proj["score"] = None
+            proj["grade_letter"] = "—"
+        projects_out.append(proj)
+
+    exams_out = []
+    for ex in exams:
+        ex_item = dict(ex)
+        if not include_grades:
+            ex_item["score"] = None
+            ex_item["passed"] = None
+        exams_out.append(ex_item)
+
     grades_list = subs if include_grades else []
+
+    student_info = {
+        "id": user_id,
+        "first_name": user_dict.get("first_name") or "",
+        "last_name": user_dict.get("last_name") or "",
+        "full_name": user_dict.get("full_name") or "",
+        "group_name": user_dict.get("group_name") or "ИС-21",
+        "specialty_slug": spec_slug,
+        "specialty_title": course_meta["title"],
+        "student_id": user_dict.get("student_id") or ""
+    }
+    if include_email and include_grades:
+        student_info["email"] = user_dict.get("email") or ""
 
     return {
         "success": True,
-        "student": {
-            "id": user_id,
-            "first_name": user_dict.get("first_name") or "",
-            "last_name": user_dict.get("last_name") or "",
-            "full_name": user_dict.get("full_name") or "",
-            "email": user_dict.get("email") or "",
-            "group_name": user_dict.get("group_name") or "ИС-21",
-            "specialty_slug": spec_slug,
-            "specialty_title": course_meta["title"],
-            "student_id": user_dict.get("student_id") or ""
-        },
+        "student": student_info,
         "show_grades": bool(include_grades),
         "show_certificates": bool(include_certs),
         "average_score": avg_score if include_grades else None,
         "skills": skills_out,
-        "projects": subs,
+        "projects": projects_out,
         "grades": grades_list,
         "missions": missions,
-        "exams": exams,
+        "exams": exams_out,
         "certificates": certificates
     }
 
@@ -6508,7 +6653,7 @@ def get_my_portfolio():
         return jsonify({"success": False, "message": "Пользователь не найден"}), 404
 
     settings = _get_or_init_portfolio_settings(conn, user_id)
-    payload = _assemble_portfolio_payload(conn, u_row, include_grades=True, include_certs=True)
+    payload = _assemble_portfolio_payload(conn, u_row, include_grades=True, include_certs=True, include_email=True)
     payload["settings"] = settings
     return jsonify(payload)
 
@@ -6530,25 +6675,38 @@ def portfolio_settings_api():
         raw_slug = str(data.get('public_slug') or current['public_slug'] or f"student-{user_id}").strip()
         clean_slug = re.sub(r'[^a-zA-Z0-9_\-]', '-', raw_slug)[:80] or f"student-{user_id}"
 
-        cursor.execute("""
-            INSERT INTO portfolio_settings (user_id, is_public, show_grades, show_certificates, consent_granted, public_slug, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT(user_id) DO UPDATE SET
-                is_public = excluded.is_public,
-                show_grades = excluded.show_grades,
-                show_certificates = excluded.show_certificates,
-                consent_granted = excluded.consent_granted,
-                public_slug = excluded.public_slug,
-                updated_at = CURRENT_TIMESTAMP
-        """, (
-            user_id,
-            1 if is_public else 0,
-            1 if show_grades else 0,
-            1 if show_certificates else 0,
-            1 if consent_granted else 0,
-            clean_slug
-        ))
-        conn.commit()
+        try:
+            cursor.execute("""
+                INSERT INTO portfolio_settings (user_id, is_public, show_grades, show_certificates, consent_granted, public_slug, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(user_id) DO UPDATE SET
+                    is_public = excluded.is_public,
+                    show_grades = excluded.show_grades,
+                    show_certificates = excluded.show_certificates,
+                    consent_granted = excluded.consent_granted,
+                    public_slug = excluded.public_slug,
+                    updated_at = CURRENT_TIMESTAMP
+            """, (
+                user_id,
+                1 if is_public else 0,
+                1 if show_grades else 0,
+                1 if show_certificates else 0,
+                1 if consent_granted else 0,
+                clean_slug
+            ))
+            conn.commit()
+        except Exception as exc:
+            if _is_integrity_error(exc):
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
+                return jsonify({
+                    "success": False,
+                    "code": "SLUG_TAKEN",
+                    "message": "Этот публичный адрес уже занят другим студентом."
+                }), 409
+            raise
         current = _get_or_init_portfolio_settings(conn, user_id)
 
     return jsonify({"success": True, **current})
@@ -6586,10 +6744,30 @@ def get_public_portfolio(slug):
     payload = _assemble_portfolio_payload(
         conn, u_row,
         include_grades=bool(s_row['show_grades']),
-        include_certs=bool(s_row['show_certificates'])
+        include_certs=bool(s_row['show_certificates']),
+        include_email=False,
     )
     payload["public_slug"] = s_row['public_slug']
     return jsonify(payload)
+
+
+_CYRILLIC_TRANSLIT_MAP = {
+    'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'Yo', 'Ж': 'Zh',
+    'З': 'Z', 'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O',
+    'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'Kh', 'Ц': 'Ts',
+    'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Shch', 'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya',
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh',
+    'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o',
+    'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts',
+    'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+    'Ә': 'A', 'ә': 'a', 'І': 'I', 'і': 'i', 'Ң': 'Ng', 'ң': 'ng', 'Ғ': 'Gh', 'ғ': 'gh',
+    'Ү': 'U', 'ү': 'u', 'Ұ': 'U', 'ұ': 'u', 'Қ': 'Q', 'қ': 'q', 'Ө': 'O', 'ө': 'o', 'Һ': 'H', 'һ': 'h',
+    '«': '"', '»': '"', '—': '-', '–': '-', '№': 'No.'
+}
+
+
+def _transliterate_cyrillic(text):
+    return "".join(_CYRILLIC_TRANSLIT_MAP.get(ch, ch) for ch in str(text or ""))
 
 
 def _generate_minimal_pdf(lines):
@@ -6643,16 +6821,18 @@ def export_portfolio_pdf():
     if not u_row:
         return jsonify({"success": False, "message": "Пользователь не найден"}), 404
 
-    payload = _assemble_portfolio_payload(conn, u_row, include_grades=True, include_certs=True)
+    payload = _assemble_portfolio_payload(conn, u_row, include_grades=True, include_certs=True, include_email=True)
     st = payload["student"]
     cert_code = payload["certificates"][0]["certificate_number"] if payload.get("certificates") else f"KZ-AMK-2026-{10000+user_id}"
 
     lines = [
         "AMK SKILLHUB / EDUSPACE 3.0 - OFFICIAL STUDENT PORTFOLIO",
         "Institution: Almaty Multidisciplinary College (BIN 990440001809)",
+        f"Student: {_transliterate_cyrillic(st.get('full_name') or st.get('first_name') or 'Student')}",
         f"Student ID: {st.get('student_id') or user_id}",
+        f"Group: {_transliterate_cyrillic(st.get('group_name') or '')}",
         f"Email: {st.get('email')}",
-        f"Specialty Slug: {st.get('specialty_slug')}",
+        f"Specialty: {_transliterate_cyrillic(st.get('specialty_title') or st.get('specialty_slug'))}",
         f"Completed Projects: {len(payload.get('projects') or [])}",
         f"Completed Missions: {len(payload.get('missions') or [])}",
         f"Practical 3D Exams: {len(payload.get('exams') or [])}",
@@ -6670,6 +6850,58 @@ def export_portfolio_pdf():
 # =========================================================================
 # M5: PRACTICAL 3D EXAMS & ANTI-TAMPER GRADING (/api/exams/*)
 # =========================================================================
+
+EXAM_SPECIALTY_SPECS = {
+    "automechanic": {
+        "model_id": "mech-cylinder",
+        "required_steps": [
+            {"step": 1, "action": "detach", "part_id": "valve_cover", "tool_id": "socket_set"},
+            {"step": 2, "action": "detach", "part_id": "cylinder_head", "tool_id": "torque_wrench"},
+            {"step": 3, "action": "inspect", "part_id": "piston_1", "tool_id": "feeler_gauge"},
+        ],
+    },
+    "it": {
+        "model_id": "web-20-capstone",
+        "allowed_actions": {"validate_layout", "inspect_dom", "run_autotest", "check_a11y", "inspect"},
+        "allowed_tools": {"dom_inspector", "css_validator", "devtools", "lighthouse", "code_linter"},
+        "required_steps": [
+            {"step": 1, "action": "inspect_dom", "part_id": "semantic_landmarks", "tool_id": "dom_inspector"},
+            {"step": 2, "action": "validate_layout", "part_id": "responsive_grid", "tool_id": "css_validator"},
+            {"step": 3, "action": "run_autotest", "part_id": "accessibility_wcag", "tool_id": "lighthouse"},
+        ],
+    },
+    "graphic_design": {
+        "model_id": "design-01-color",
+        "allowed_actions": {"check_wcag", "verify_palette", "inspect_typography", "inspect"},
+        "allowed_tools": {"contrast_checker", "color_wheel", "swatch_probe", "grid_overlay"},
+        "required_steps": [
+            {"step": 1, "action": "verify_palette", "part_id": "color_harmony", "tool_id": "color_wheel"},
+            {"step": 2, "action": "check_wcag", "part_id": "contrast_pair", "tool_id": "contrast_checker"},
+            {"step": 3, "action": "inspect_typography", "part_id": "type_hierarchy", "tool_id": "grid_overlay"},
+        ],
+    },
+    "autoelectric": {
+        "model_id": "elec-canbus",
+        "allowed_actions": {"measure_voltage", "measure_resistance", "diagnose_fault", "scan_obd", "inspect"},
+        "allowed_tools": {"multimeter", "oscilloscope", "obd_scanner", "test_lamp"},
+        "required_steps": [
+            {"step": 1, "action": "measure_voltage", "part_id": "battery_bus", "tool_id": "multimeter"},
+            {"step": 2, "action": "measure_resistance", "part_id": "can_termination", "tool_id": "multimeter"},
+            {"step": 3, "action": "diagnose_fault", "part_id": "ecu_node", "tool_id": "obd_scanner"},
+        ],
+    },
+    "hvac": {
+        "model_id": "hvac-chiller",
+        "allowed_actions": {"measure_pressure", "measure_superheat", "diagnose_cycle", "vacuum_test", "inspect"},
+        "allowed_tools": {"manifold_gauge", "thermometer", "vacuum_pump", "leak_detector"},
+        "required_steps": [
+            {"step": 1, "action": "measure_pressure", "part_id": "low_high_manifold", "tool_id": "manifold_gauge"},
+            {"step": 2, "action": "measure_superheat", "part_id": "evaporator_suction", "tool_id": "thermometer"},
+            {"step": 3, "action": "diagnose_cycle", "part_id": "refrigerant_circuit", "tool_id": "manifold_gauge"},
+        ],
+    },
+}
+
 
 @app.route('/api/exams/start', methods=['POST'])
 @login_required()
@@ -6693,6 +6925,7 @@ def start_practical_exam():
     attempt_id = cursor.lastrowid
     conn.commit()
 
+    spec_cfg = EXAM_SPECIALTY_SPECS.get(specialty, EXAM_SPECIALTY_SPECS["automechanic"])
     return jsonify({
         "success": True,
         "attempt_id": attempt_id,
@@ -6702,12 +6935,8 @@ def start_practical_exam():
         "time_limit_sec": 900,
         "exam_spec": {
             "specialty": specialty,
-            "model_id": "mech-cylinder" if specialty == "automechanic" else f"{specialty}-exam",
-            "required_steps": [
-                {"step": 1, "action": "detach", "part_id": "valve_cover", "tool_id": "socket_set"},
-                {"step": 2, "action": "detach", "part_id": "cylinder_head", "tool_id": "torque_wrench"},
-                {"step": 3, "action": "inspect", "part_id": "piston_1", "tool_id": "feeler_gauge"}
-            ]
+            "model_id": spec_cfg["model_id"],
+            "required_steps": spec_cfg["required_steps"],
         }
     })
 
@@ -6778,6 +7007,7 @@ def submit_practical_exam():
     """, (attempt_id,))
     events = [dict(r) for r in cursor.fetchall()]
 
+    specialty = str(att['specialty_slug'] or 'automechanic').strip().lower()
     errors = []
     if len(events) == 0:
         score = 0
@@ -6787,7 +7017,7 @@ def submit_practical_exam():
             "error_code": "EMPTY_EXAM_SUBMISSION",
             "message": "Экзамен отправлен без выполнения практических шагов."
         })
-    else:
+    elif specialty == "automechanic":
         disassembled = set()
         deductions = 0
         for ev in events:
@@ -6819,6 +7049,128 @@ def submit_practical_exam():
                     disassembled.add(p_norm)
 
         base_score = 100 if len(errors) > 0 or len(disassembled) >= 2 else 75
+        score = max(0, min(100, base_score - deductions))
+        if len(errors) > 0 and score >= 100:
+            score = 80
+        passed = (score >= 60)
+    else:
+        spec_cfg = EXAM_SPECIALTY_SPECS.get(specialty, {})
+        allowed_actions = spec_cfg.get("allowed_actions", set())
+        allowed_tools = spec_cfg.get("allowed_tools", set())
+        deductions = 0
+        valid_steps = set()
+
+        for idx, ev in enumerate(events, 1):
+            step_id = ev.get('step_id', idx)
+            act = str(ev.get('action') or '').strip().lower()
+            part_id = str(ev.get('part_id') or '').strip().lower()
+            t_id = str(ev.get('tool_id') or '').strip().lower()
+            try:
+                telemetry = json.loads(ev.get('telemetry_json') or '{}')
+                if not isinstance(telemetry, dict):
+                    telemetry = {}
+            except Exception:
+                telemetry = {}
+
+            step_ok = True
+            if allowed_actions and act not in allowed_actions:
+                deductions += 15
+                step_ok = False
+                errors.append({
+                    "step_id": step_id,
+                    "error_code": "INVALID_EXAM_ACTION",
+                    "part_id": part_id,
+                    "tool_id": t_id,
+                    "message": f"Недопустимое действие '{act}' для экзамена '{specialty}'."
+                })
+
+            if t_id and allowed_tools and t_id not in allowed_tools:
+                deductions += 15
+                step_ok = False
+                errors.append({
+                    "step_id": step_id,
+                    "error_code": "WRONG_TOOL",
+                    "part_id": part_id,
+                    "tool_id": t_id,
+                    "message": f"Неверный инструмент '{t_id}' для специальности '{specialty}'."
+                })
+
+            if specialty == "it" and act == "validate_layout":
+                passed_rules = telemetry.get("passed_rules")
+                t_score = telemetry.get("score")
+                if (passed_rules is not None and int(passed_rules) < 2) or (t_score is not None and float(t_score) < 60):
+                    deductions += 20
+                    step_ok = False
+                    errors.append({
+                        "step_id": step_id,
+                        "error_code": "LAYOUT_VALIDATION_FAILED",
+                        "part_id": part_id,
+                        "tool_id": t_id,
+                        "message": "Макет не прошёл проверку CSS-правил (passed_rules < 2 или score < 60)."
+                    })
+            elif specialty == "graphic_design" and act == "check_wcag":
+                ratio = telemetry.get("contrast_ratio")
+                if ratio is not None and float(ratio) < 4.5:
+                    deductions += 20
+                    step_ok = False
+                    errors.append({
+                        "step_id": step_id,
+                        "error_code": "WCAG_CONTRAST_FAILED",
+                        "part_id": part_id,
+                        "tool_id": t_id,
+                        "message": f"Контрастность {ratio}:1 ниже минимального порога WCAG AA (4.5:1)."
+                    })
+            elif specialty == "autoelectric":
+                if act in ("measure_resistance", "measure_voltage"):
+                    r_val = telemetry.get("total_resistance")
+                    if r_val is not None and float(r_val) <= 0:
+                        deductions += 20
+                        step_ok = False
+                        errors.append({
+                            "step_id": step_id,
+                            "error_code": "INVALID_RESISTANCE_READING",
+                            "part_id": part_id,
+                            "tool_id": t_id,
+                            "message": "Некорректное сопротивление цепи (<= 0 Ом)."
+                        })
+                elif act == "diagnose_fault" and not str(telemetry.get("fault_diagnosis") or "").strip():
+                    deductions += 20
+                    step_ok = False
+                    errors.append({
+                        "step_id": step_id,
+                        "error_code": "DIAGNOSIS_MISSING",
+                        "part_id": part_id,
+                        "tool_id": t_id,
+                        "message": "Не указан диагноз неисправности бортовой сети."
+                    })
+            elif specialty == "hvac":
+                refrig = telemetry.get("refrigerant")
+                if refrig is not None and str(refrig) not in ("R134a", "R410A", "R32", "R600a"):
+                    deductions += 15
+                    step_ok = False
+                    errors.append({
+                        "step_id": step_id,
+                        "error_code": "INVALID_REFRIGERANT",
+                        "part_id": part_id,
+                        "tool_id": t_id,
+                        "message": f"Неизвестный тип хладагента '{refrig}'."
+                    })
+                sh_val = telemetry.get("superheat_k")
+                if sh_val is not None and (float(sh_val) < 2.0 or float(sh_val) > 15.0) and not str(telemetry.get("fault_diagnosis") or "").strip():
+                    deductions += 15
+                    step_ok = False
+                    errors.append({
+                        "step_id": step_id,
+                        "error_code": "SUPERHEAT_OUT_OF_RANGE",
+                        "part_id": part_id,
+                        "tool_id": t_id,
+                        "message": f"Перегрев {sh_val} K выходит за допустимый диапазон без диагностического вывода."
+                    })
+
+            if step_ok:
+                valid_steps.add(f"{act}:{part_id or step_id}")
+
+        base_score = 100 if len(errors) > 0 or len(valid_steps) >= 2 else 75
         score = max(0, min(100, base_score - deductions))
         if len(errors) > 0 and score >= 100:
             score = 80

@@ -860,6 +860,39 @@ window.WorkshopModels = (() => {
         const gltfRoot = new T.Group();
         scene.add(gltfRoot);
 
+        const meshToPartIdx = new WeakMap();
+        const PART_KEYWORDS = [
+          ['block', 'cylinder_block', 'hull', 'body', 'chassis', 'housing', 'frame', 'rack', 'блок', 'корпус', 'кузов', 'картер'],
+          ['piston', 'conrod', 'pad', 'rotor', 'coil', 'fan', 'condenser', 'blade', 'порш', 'шатун', 'колод', 'диск', 'конденс'],
+          ['crank', 'shaft', 'axle', 'caliper', 'evap', 'txv', 'alternator', 'stator', 'колен', 'вал', 'суппорт', 'испар'],
+          ['cam', 'valve', 'head', 'gasket', 'bolt', 'turbo', 'intercooler', 'manifold', 'клап', 'грм', 'гбц', 'турб', 'манометр']
+        ];
+        const resolveSemanticPartIdx = (meshNode, fallbackIdx) => {
+          const names = [];
+          let cur = meshNode;
+          while (cur) {
+            if (cur.name) {
+              names.push(String(cur.name).toLowerCase().replace(/^mesh_/, '').replace(/^part_/, ''));
+            }
+            cur = cur.parent;
+          }
+          const joined = names.join(' ');
+          for (let i = 0; i < parts.length; i++) {
+            const partText = (String(parts[i][0] || '') + ' ' + String(parts[i][1] || '')).toLowerCase();
+            const tokens = partText.split(/[\s,./()\-–—:]+/).filter(w => w.length >= 3);
+            for (let tIdx = 0; tIdx < tokens.length; tIdx++) {
+              if (joined.includes(tokens[tIdx])) return i;
+            }
+          }
+          for (let i = 0; i < Math.min(parts.length, PART_KEYWORDS.length); i++) {
+            const kws = PART_KEYWORDS[i];
+            for (let k = 0; k < kws.length; k++) {
+              if (joined.includes(kws[k])) return i;
+            }
+          }
+          return fallbackIdx % Math.max(1, parts.length);
+        };
+
         if (T.GLTFLoader) {
           const loader = new T.GLTFLoader();
           loader.load(
@@ -882,6 +915,7 @@ window.WorkshopModels = (() => {
               modelScene.position.y -= scaledBox.min.y + 0.08;
 
               gltfMeshes = [];
+              let unnamedIdx = 0;
               modelScene.traverse((child) => {
                 if (child.isMesh) {
                   child.userData.origPos = child.position.clone();
@@ -894,6 +928,8 @@ window.WorkshopModels = (() => {
                       child.material.envMapIntensity = 1.25;
                     }
                   }
+                  const matchedIdx = resolveSemanticPartIdx(child, unnamedIdx++);
+                  meshToPartIdx.set(child, matchedIdx);
                   gltfMeshes.push(child);
                 }
               });
@@ -922,6 +958,8 @@ window.WorkshopModels = (() => {
         }
 
         let dragging = false;
+        let downX = 0;
+        let downY = 0;
         let lastX = 0;
         let lastY = 0;
         let rafId = null;
@@ -942,18 +980,42 @@ window.WorkshopModels = (() => {
         resize.observe(stage);
         syncSize();
 
-        stage.addEventListener('pointerdown', (e) => {
+        const raycaster = new T.Raycaster();
+        const pointerNdc = new T.Vector2();
+
+        const onStagePointerDown = (e) => {
           dragging = true;
+          downX = e.clientX;
+          downY = e.clientY;
           lastX = e.clientX;
           lastY = e.clientY;
           stage.style.cursor = 'grabbing';
-        });
-        const onPointerUp = () => {
+        };
+        const onPointerUp = (e) => {
+          const wasDragging = dragging;
           dragging = false;
           stage.style.cursor = 'grab';
+          if (wasDragging && e && renderer && renderer.domElement && Math.hypot(e.clientX - downX, e.clientY - downY) < 6) {
+            const rect = renderer.domElement.getBoundingClientRect();
+            if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
+              pointerNdc.x = ((e.clientX - rect.left) / Math.max(rect.width, 1)) * 2 - 1;
+              pointerNdc.y = -((e.clientY - rect.top) / Math.max(rect.height, 1)) * 2 + 1;
+              raycaster.setFromCamera(pointerNdc, camera);
+              const targets = gltfMeshes.length > 0 ? gltfMeshes : fallbackMeshes;
+              const hits = raycaster.intersectObjects(targets, false);
+              if (hits.length > 0) {
+                const hitObj = hits[0].object;
+                const pIdx = meshToPartIdx.has(hitObj)
+                  ? meshToPartIdx.get(hitObj)
+                  : fallbackMeshes.indexOf(hitObj);
+                if (pIdx >= 0 && pIdx < parts.length) {
+                  selectPart(pIdx);
+                }
+              }
+            }
+          }
         };
-        window.addEventListener('pointerup', onPointerUp);
-        stage.addEventListener('pointermove', (e) => {
+        const onStagePointerMove = (e) => {
           if (!dragging) return;
           const dx = e.clientX - lastX;
           const dy = e.clientY - lastY;
@@ -961,11 +1023,16 @@ window.WorkshopModels = (() => {
           lastY = e.clientY;
           angle -= dx * 0.01;
           pitch = Math.max(0.65, Math.min(4.8, pitch + dy * 0.01));
-        });
-        stage.addEventListener('wheel', (e) => {
+        };
+        const onStageWheel = (e) => {
           e.preventDefault();
           radius = Math.max(2.4, Math.min(8.5, radius + e.deltaY * 0.003));
-        }, { passive: false });
+        };
+
+        stage.addEventListener('pointerdown', onStagePointerDown);
+        window.addEventListener('pointerup', onPointerUp);
+        stage.addEventListener('pointermove', onStagePointerMove);
+        stage.addEventListener('wheel', onStageWheel, { passive: false });
 
         thumbBtns.forEach((btn) => {
           btn.addEventListener('click', () => {
@@ -1032,7 +1099,6 @@ window.WorkshopModels = (() => {
           }
 
           if (gltfMeshes.length > 0) {
-            const groupSize = Math.max(1, Math.ceil(gltfMeshes.length / parts.length));
             gltfMeshes.forEach((m, mIdx) => {
               const orig = m.userData.origPos;
               const dir = m.userData.explodeDir;
@@ -1044,7 +1110,9 @@ window.WorkshopModels = (() => {
                 );
               }
               if (m.material && m.material.emissive) {
-                const belongGroup = Math.floor(mIdx / groupSize);
+                const belongGroup = meshToPartIdx.has(m)
+                  ? meshToPartIdx.get(m)
+                  : (mIdx % Math.max(1, parts.length));
                 if (selectedIndex >= 0 && belongGroup === selectedIndex) {
                   const pulse = 0.28 + Math.sin(t * 4.5) * 0.16;
                   m.material.emissive.setHex(0x0284c7);
@@ -1075,17 +1143,31 @@ window.WorkshopModels = (() => {
           window.EduGraphicsProfile.registerRenderer(renderer);
         }
         innerCleanup = () => {
+          gltfMeshes.forEach((m) => {
+            if (m.userData && m.userData.clayMat && typeof m.userData.clayMat.dispose === 'function') {
+              try { m.userData.clayMat.dispose(); } catch {}
+            }
+            if (m.userData && m.userData.origMat && typeof m.userData.origMat.dispose === 'function') {
+              try { m.userData.origMat.dispose(); } catch {}
+            }
+          });
+          const cleanupFns = [
+            () => stage.removeEventListener('pointerdown', onStagePointerDown),
+            () => window.removeEventListener('pointerup', onPointerUp),
+            () => stage.removeEventListener('pointermove', onStagePointerMove),
+            () => stage.removeEventListener('wheel', onStageWheel)
+          ];
           if (typeof window.disposeThreeScene === 'function') {
             window.disposeThreeScene({
               rafId,
               resizeObserver: resize,
               scene,
               renderer,
-              cleanupListeners: [() => window.removeEventListener('pointerup', onPointerUp)]
+              cleanupListeners: cleanupFns
             });
           } else {
             if (rafId) cancelAnimationFrame(rafId);
-            window.removeEventListener('pointerup', onPointerUp);
+            cleanupFns.forEach(fn => { try { fn(); } catch {} });
             resize.disconnect();
             renderer.dispose();
           }

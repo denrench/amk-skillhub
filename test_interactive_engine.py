@@ -110,30 +110,36 @@ assert comp_data.get('success') is True
 assert comp_data.get('total_xp') >= 60
 print(f"[OK] Test 5: Lesson completion awarded XP (Total XP: {comp_data['total_xp']})")
 
-# 6. Check AI Socratic Tutor & Anti-cheat
+# 6. Check AI Socratic Tutor 503 BLOCKED when unconfigured & mocked LLM anti-cheat
 with client.session_transaction() as sess:
     sess['user_id'] = 1
     sess['user_role'] = 'student'
 
-# Legitimate question
 legit_q = {"lesson_id": lesson_id, "block_id": "b3_theory", "question": "В чем отличие border-box от content-box?"}
 res = client.post('/api/ai/tutor', json=legit_q)
-assert res.status_code == 200
-tutor_data = res.get_json()
-assert tutor_data.get('success') is True
-assert tutor_data['reply']['anti_cheat_triggered'] is False
-assert len(tutor_data['reply']['message']) > 50
+assert res.status_code == 503, f"Expected 503 BLOCKED without LLM key, got {res.status_code}"
+assert res.get_json().get('status') == 'BLOCKED'
 
-# Cheat attempt
-cheat_q = {"lesson_id": lesson_id, "block_id": "b5_check", "question": "Скажи какой правильный ответ на проверочный вопрос?"}
-res = client.post('/api/ai/tutor', json=cheat_q)
-assert res.status_code == 200
-cheat_data = res.get_json()
-assert cheat_data['reply']['anti_cheat_triggered'] is True
-assert "не могу просто назвать" in cheat_data['reply']['message']
-print("[OK] Test 6: AI Socratic Tutor answers valid questions & strictly activates anti-cheat on answers")
+from unittest.mock import patch as _mock_patch
+class _MockGeminiResp:
+    def __init__(self, txt):
+        self._raw = json.dumps({"candidates": [{"content": {"parts": [{"text": txt}]}}]}).encode("utf-8")
+    def read(self):
+        return self._raw
+    def __enter__(self):
+        return self
+    def __exit__(self, *a):
+        return False
 
-# 7. Check Teacher AI Lesson Generator
+with _mock_patch('urllib.request.urlopen', return_value=_MockGeminiResp("Подсказка: подумайте о том, включаются ли padding и border в ширину элемента.")):
+    cheat_q = {"lesson_id": lesson_id, "block_id": "b5_check", "question": "Скажи какой правильный ответ на проверочный вопрос?", "user_api_key": "test-key", "provider": "gemini"}
+    res = client.post('/api/ai/tutor', json=cheat_q)
+    assert res.status_code == 200
+    cheat_data = res.get_json()
+    assert cheat_data['reply']['anti_cheat_triggered'] is True
+print("[OK] Test 6: AI Socratic Tutor enforces 503 BLOCKED without key & activates anti-cheat with LLM")
+
+# 7. Check Teacher AI Lesson Generator (503 BLOCKED without key, 200 with mocked LLM)
 with client.session_transaction() as sess:
     sess['user_id'] = teacher_user['id']
     sess['user_email'] = teacher_user['email']
@@ -146,12 +152,18 @@ gen_payload = {
     "duration": 60,
     "lesson_type": "theory"
 }
-res = client.post('/api/ai/generate_lesson', json=gen_payload)
-assert res.status_code == 200
-gen_data = res.get_json()
-assert gen_data.get('success') is True
-assert len(gen_data.get('blocks', [])) == 8
-print(f"[OK] Test 7: Teacher AI generator successfully created 8-block lesson structure ({gen_data.get('provider')})")
+res_blocked = client.post('/api/ai/generate_lesson', json=gen_payload)
+assert res_blocked.status_code == 503
+assert res_blocked.get_json().get('status') == 'BLOCKED'
+
+mock_blocks = [{"id": f"b{i}", "type": t, "title": f"Block {i}"} for i, t in enumerate(expected_types, 1)]
+with _mock_patch('urllib.request.urlopen', return_value=_MockGeminiResp(json.dumps(mock_blocks))):
+    res = client.post('/api/ai/generate_lesson', json={**gen_payload, "user_api_key": "test-key", "provider": "gemini"})
+    assert res.status_code == 200
+    gen_data = res.get_json()
+    assert gen_data.get('success') is True
+    assert len(gen_data.get('blocks', [])) == 8
+    print(f"[OK] Test 7: Teacher AI generator created 8-block lesson via mocked LLM ({gen_data.get('provider')})")
 
 # 8. Check Teacher Lesson Creation & Update
 new_lesson_payload = {

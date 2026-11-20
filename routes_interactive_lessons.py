@@ -795,14 +795,24 @@ def ai_generate_lesson():
             difficulty=difficulty,
             duration=duration,
             objectives=objectives,
-            lesson_type=lesson_type
+            lesson_type=lesson_type,
+            user_api_key=user_api_key,
+            provider=provider,
         )
-    except (AIProviderUnconfiguredError, AIProviderCallError) as exc:
+    except AIProviderUnconfiguredError as exc:
         return jsonify({
             "ok": False,
             "success": False,
             "status": "BLOCKED",
             "code": "AI_PROVIDER_UNCONFIGURED",
+            "message": str(exc)
+        }), 503
+    except AIProviderCallError as exc:
+        return jsonify({
+            "ok": False,
+            "success": False,
+            "status": "BLOCKED",
+            "code": "AI_PROVIDER_ERROR",
             "message": str(exc)
         }), 503
 
@@ -986,13 +996,26 @@ def ai_review_submission():
         code_or_text = s_row["submitted_code"] or s_row["student_comment"] or code_or_text
 
     try:
-        review = review_submission_ai({"submitted_code": code_or_text}, task_data)
-    except (AIProviderUnconfiguredError, AIProviderCallError) as exc:
+        review = review_submission_ai(
+            {"submitted_code": code_or_text},
+            task_data,
+            user_api_key=user_api_key,
+            provider=provider,
+        )
+    except AIProviderUnconfiguredError as exc:
         return jsonify({
             "ok": False,
             "success": False,
             "status": "BLOCKED",
             "code": "AI_PROVIDER_UNCONFIGURED",
+            "message": str(exc)
+        }), 503
+    except AIProviderCallError as exc:
+        return jsonify({
+            "ok": False,
+            "success": False,
+            "status": "BLOCKED",
+            "code": "AI_PROVIDER_ERROR",
             "message": str(exc)
         }), 503
     return jsonify({"ok": True, "success": True, "review": review})

@@ -99,7 +99,7 @@
     <!-- ========================================================================= -->
     <!-- 4 ПЕРСОНАЛЬНЫХ ИНСТРУМЕНТА СТУДЕНТА (ПОИСК, GPA, ХАБ ЗАДАЧ, ТАЙМЕР/КОНСПЕКТ) -->
     <!-- ========================================================================= -->
-    <section id="four-student-tools-hub" class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Персональные учебные инструменты">
+    <section id="four-student-tools-hub" data-no-reveal class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Персональные учебные инструменты">
       <!-- 1. Глобальный поиск -->
       <div class="p-5 rounded-3xl bg-dark-900 border border-white/10 space-y-3 flex flex-col justify-between">
         <div class="space-y-2">
@@ -141,7 +141,7 @@
           </div>
           <div class="flex items-center gap-1.5">
             <input type="text" id="student-tool-task-input" placeholder="Новая учебная задача..." class="flex-1 px-2.5 py-1.5 rounded-xl bg-dark-850 border border-white/15 text-xs text-white" />
-            <button type="button" onclick="addStudentToolTask()" class="px-2.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold">+</button>
+            <button type="button" id="student-tool-task-add-btn" onclick="addStudentToolTask()" class="px-2.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold">+</button>
           </div>
         </div>
         <ul id="student-tool-task-list" class="text-[11px] text-slate-300 space-y-1 max-h-24 overflow-y-auto"></ul>
@@ -150,18 +150,27 @@
       <!-- 4. Таймер фокуса и конспекты -->
       <div class="p-5 rounded-3xl bg-dark-900 border border-white/10 space-y-3 flex flex-col justify-between">
         <div class="space-y-2">
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between gap-2">
             <div class="text-xs font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[18px]">timer</span>
               <span>4. Таймер и конспект</span>
             </div>
-            <span id="student-tool-timer-display" class="font-mono font-bold text-xs text-amber-300">25:00</span>
+            <div class="flex items-center gap-1.5">
+              <select id="student-tool-timer-minutes" aria-label="Длительность таймера (мин)" onchange="setStudentTimerMinutes(this.value)" class="px-1.5 py-0.5 rounded bg-dark-850 border border-white/15 text-[10px] font-mono text-white">
+                <option value="15">15м</option>
+                <option value="25" selected>25м</option>
+                <option value="45">45м</option>
+                <option value="60">60м</option>
+              </select>
+              <span id="student-tool-timer-display" class="font-mono font-bold text-xs text-amber-300">25:00</span>
+            </div>
           </div>
           <textarea id="student-tool-notes" rows="2" onchange="saveStudentToolsState()" placeholder="Быстрый конспект по уроку..." class="w-full px-2.5 py-1.5 rounded-xl bg-dark-850 border border-white/15 text-xs text-white"></textarea>
         </div>
         <div class="flex items-center justify-between gap-2">
-          <button type="button" onclick="toggleStudentTimer()" id="student-tool-timer-btn" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">Старт 25м</button>
-          <button type="button" onclick="saveStudentToolsState()" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white text-[11px] font-bold">Сохранить</button>
+          <button type="button" onclick="toggleStudentTimer()" id="student-tool-timer-btn" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">Старт</button>
+          <span id="student-tools-save-status" class="text-[10px] text-slate-400 truncate"></span>
+          <button type="button" id="student-tool-save-btn" onclick="saveStudentToolsState()" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white text-[11px] font-bold">Сохранить</button>
         </div>
       </div>
     </section>
@@ -652,7 +661,8 @@
     let studentToolsData = {
       tasks: [{ id: 'st-1', title: 'Повторить регламент момента затяжки ГБЦ', done: false }],
       gpa_target: 3.6,
-      notes: ''
+      notes: '',
+      timer_minutes: 25
     };
     let studentTimerSec = 1500;
     let studentTimerId = null;
@@ -661,14 +671,40 @@
       const box = document.getElementById('student-tool-search-results');
       if (!box) return;
       const q = String(query || '').trim().toLowerCase();
-      const catalog = [
-        { slug: 'it', title: 'Web-разработка (IT): HTML, CSS Flexbox, Grid, адаптив' },
-        { slug: 'graphic_design', title: 'Графический дизайн: композиция, колористика WCAG, Prepress' },
-        { slug: 'autoelectric', title: 'Автоэлектрика: мультиметр, закон Ома, CAN-шина, OBD-II' },
-        { slug: 'hvac', title: 'Холодильное оборудование (HVAC): фреоны R134a/R410A, перегрев' },
-        { slug: 'automechanic', title: 'Автомеханика: ДВС, ГБЦ, ГРМ, тормозная система, подвеска' }
-      ];
-      const matches = !q ? catalog : catalog.filter(c => c.title.toLowerCase().includes(q) || c.slug.includes(q));
+      const courses = Array.isArray(window.EDU_COURSES) && window.EDU_COURSES.length
+        ? window.EDU_COURSES
+        : [
+            { slug: 'it', title: 'Web-разработка (IT): HTML, CSS Flexbox, Grid, адаптив', description: '' },
+            { slug: 'graphic_design', title: 'Графический дизайн: композиция, колористика WCAG, Prepress', description: '' },
+            { slug: 'autoelectric', title: 'Автоэлектрика: мультиметр, закон Ома, CAN-шина, OBD-II', description: '' },
+            { slug: 'hvac', title: 'Холодильное оборудование (HVAC): фреоны R134a/R410A, перегрев', description: '' },
+            { slug: 'automechanic', title: 'Автомеханика: ДВС, ГБЦ, ГРМ, тормозная система, подвеска', description: '' }
+          ];
+      const lessonsObj = (window.EDU_LESSONS && typeof window.EDU_LESSONS === 'object') ? window.EDU_LESSONS : {};
+      const entries = [];
+      courses.forEach(c => {
+        entries.push({
+          slug: c.slug,
+          task: null,
+          title: c.short_title || c.title,
+          searchText: `${c.slug} ${c.title} ${c.short_title || ''} ${c.description || ''}`.toLowerCase()
+        });
+        const list = Array.isArray(lessonsObj[c.slug]) ? lessonsObj[c.slug] : [];
+        list.forEach((les, idx) => {
+          const num = Number(les.task_number || les.order_num || (idx + 1));
+          entries.push({
+            slug: c.slug,
+            task: num,
+            title: `${c.short_title || c.slug} #${num}: ${les.title || ''}`,
+            searchText: `${c.slug} ${c.title} ${les.title || ''} ${les.summary || ''} ${les.tools || ''}`.toLowerCase()
+          });
+        });
+      });
+
+      const matches = !q
+        ? entries.filter(e => e.task === null)
+        : entries.filter(e => e.searchText.includes(q)).slice(0, 12);
+
       box.innerHTML = '';
       if (!matches.length) {
         const empty = document.createElement('div');
@@ -679,7 +715,9 @@
       matches.forEach(m => {
         const row = document.createElement('div');
         const link = document.createElement('a');
-        link.href = `tasks.html?specialty=${encodeURIComponent(m.slug)}`;
+        link.href = m.task
+          ? `simulator.html?specialty=${encodeURIComponent(m.slug)}&task=${m.task}`
+          : `tasks.html?specialty=${encodeURIComponent(m.slug)}`;
         link.className = 'hover:text-cyan-300 underline block truncate';
         link.textContent = m.title;
         row.appendChild(link);
@@ -698,16 +736,51 @@
       out.textContent = `${val.toFixed(2)} / 4.00 (${pct}%)`;
     }
 
+    function toggleStudentToolTask(taskId) {
+      studentToolsData.tasks = (studentToolsData.tasks || []).map(t => {
+        if (t && t.id === taskId) {
+          return Object.assign({}, t, { done: !t.done });
+        }
+        return t;
+      });
+      renderStudentTasksList();
+      saveStudentToolsState();
+    }
+
+    function deleteStudentToolTask(taskId) {
+      studentToolsData.tasks = (studentToolsData.tasks || []).filter(t => !t || t.id !== taskId);
+      renderStudentTasksList();
+      saveStudentToolsState();
+    }
+
     function renderStudentTasksList() {
       const listEl = document.getElementById('student-tool-task-list');
       if (!listEl) return;
       listEl.innerHTML = '';
       (studentToolsData.tasks || []).forEach(t => {
+        if (!t) return;
         const li = document.createElement('li');
         li.className = 'flex items-center justify-between gap-2 py-0.5';
+        const left = document.createElement('label');
+        left.className = 'flex items-center gap-1.5 flex-1 min-w-0 cursor-pointer';
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = Boolean(t.done);
+        cb.className = 'accent-emerald-500 shrink-0';
+        cb.addEventListener('change', () => toggleStudentToolTask(t.id));
         const span = document.createElement('span');
-        span.textContent = (t && t.title) ? String(t.title) : '';
-        li.appendChild(span);
+        span.className = 'truncate ' + (t.done ? 'line-through text-slate-500' : '');
+        span.textContent = t.title ? String(t.title) : '';
+        left.append(cb, span);
+
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.setAttribute('aria-label', 'Удалить задачу');
+        delBtn.className = 'text-slate-500 hover:text-red-400 px-1 font-bold shrink-0';
+        delBtn.textContent = '×';
+        delBtn.addEventListener('click', () => deleteStudentToolTask(t.id));
+
+        li.append(left, delBtn);
         listEl.appendChild(li);
       });
     }
@@ -724,27 +797,47 @@
       saveStudentToolsState();
     }
 
-    function toggleStudentTimer() {
+    function syncStudentTimerDisplay() {
       const disp = document.getElementById('student-tool-timer-display');
+      if (!disp) return;
+      const m = String(Math.floor(studentTimerSec / 60)).padStart(2, '0');
+      const s = String(studentTimerSec % 60).padStart(2, '0');
+      disp.textContent = `${m}:${s}`;
+    }
+
+    function setStudentTimerMinutes(mins) {
+      const val = Math.max(1, Math.min(180, parseInt(mins, 10) || 25));
+      studentToolsData.timer_minutes = val;
+      if (studentTimerId) {
+        clearInterval(studentTimerId);
+        studentTimerId = null;
+        const btn = document.getElementById('student-tool-timer-btn');
+        if (btn) btn.textContent = 'Старт';
+      }
+      studentTimerSec = val * 60;
+      syncStudentTimerDisplay();
+      saveStudentToolsState();
+    }
+
+    function toggleStudentTimer() {
       const btn = document.getElementById('student-tool-timer-btn');
       if (studentTimerId) {
         clearInterval(studentTimerId);
         studentTimerId = null;
-        if (btn) btn.textContent = 'Старт 25м';
+        if (btn) btn.textContent = 'Старт';
         return;
       }
       if (btn) btn.textContent = 'Пауза';
       studentTimerId = setInterval(() => {
         studentTimerSec = Math.max(0, studentTimerSec - 1);
-        const m = String(Math.floor(studentTimerSec / 60)).padStart(2, '0');
-        const s = String(studentTimerSec % 60).padStart(2, '0');
-        if (disp) disp.textContent = `${m}:${s}`;
+        syncStudentTimerDisplay();
       }, 1000);
     }
 
     async function loadStudentToolsState() {
       renderStudentTasksList();
       updateStudentGpaTool();
+      runStudentCourseSearch('');
       try {
         const sessRes = await fetch('/api/auth/session', { credentials: 'same-origin' });
         if (!sessRes.ok) return;
@@ -765,6 +858,22 @@
             const nIn = document.getElementById('student-tool-notes');
             if (nIn) nIn.value = data.notes;
           }
+          if (data.timer_minutes !== undefined) {
+            const tm = Math.max(1, Math.min(180, parseInt(data.timer_minutes, 10) || 25));
+            studentToolsData.timer_minutes = tm;
+            studentTimerSec = tm * 60;
+            const tSel = document.getElementById('student-tool-timer-minutes');
+            if (tSel) {
+              if (![15, 25, 45, 60].includes(tm)) {
+                const opt = document.createElement('option');
+                opt.value = String(tm);
+                opt.textContent = tm + 'м';
+                tSel.appendChild(opt);
+              }
+              tSel.value = String(tm);
+            }
+            syncStudentTimerDisplay();
+          }
           renderStudentTasksList();
           updateStudentGpaTool();
         }
@@ -774,18 +883,29 @@
     async function saveStudentToolsState() {
       const nIn = document.getElementById('student-tool-notes');
       if (nIn) studentToolsData.notes = nIn.value;
+      const tSel = document.getElementById('student-tool-timer-minutes');
+      if (tSel) studentToolsData.timer_minutes = Math.max(1, Math.min(180, parseInt(tSel.value, 10) || 25));
       updateStudentGpaTool();
+      const statusEl = document.getElementById('student-tools-save-status');
+      if (statusEl) statusEl.textContent = 'Сохранение...';
       if (window.EduSpace && typeof window.EduSpace.api === 'function') {
         try {
-          await window.EduSpace.api('/api/tools/state', {
+          const res = await window.EduSpace.api('/api/tools/state', {
             method: 'POST',
             body: {
               tasks: studentToolsData.tasks,
               gpa_target: studentToolsData.gpa_target,
-              notes: studentToolsData.notes
+              notes: studentToolsData.notes,
+              timer_minutes: studentToolsData.timer_minutes
             }
           });
-        } catch (e) {}
+          if (statusEl) {
+            statusEl.textContent = (res && res.ok) ? 'Сохранено ✓' : 'Локально';
+            statusEl.className = 'text-[10px] truncate ' + ((res && res.ok) ? 'text-emerald-400 font-bold' : 'text-slate-400');
+          }
+        } catch (e) {
+          if (statusEl) statusEl.textContent = 'Ошибка сети';
+        }
       }
     }
 

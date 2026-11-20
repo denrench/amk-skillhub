@@ -136,6 +136,8 @@
   </style>
   <script src="js/courses-catalog.js"></script>
   <script src="js/app-logistics.js"></script>
+  <script src="js/interactive-simulators.js"></script>
+  <script src="js/missions/mission-registry.js"></script>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
   <link rel="stylesheet" href="css/workshop.css">
@@ -159,7 +161,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
       <!-- Left: Back & Mission Identity -->
       <div class="flex items-center gap-3">
-        <a id="mission-back-link" href="tasks.html?specialty=graphic_design" class="px-3 py-2 rounded-xl bg-neo-surface hover:bg-white/10 border border-white/10 text-neo-gray hover:text-neo-white flex items-center gap-1.5 text-xs font-bold transition-colors">
+        <a id="mission-back-link" href="tasks.html" class="px-3 py-2 rounded-xl bg-neo-surface hover:bg-white/10 border border-white/10 text-neo-gray hover:text-neo-white flex items-center gap-1.5 text-xs font-bold transition-colors">
           <span class="material-symbols-outlined text-[18px] text-neo-cyan">arrow_back</span>
           <span>К списку миссий</span>
         </a>
@@ -169,7 +171,7 @@
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-neo-cyan/15 text-neo-cyan border border-neo-cyan/30">МИССИЯ 01</span>
+              <span id="mission-header-task-badge" class="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-neo-cyan/15 text-neo-cyan border border-neo-cyan/30">МИССИЯ 01</span>
               <span id="mission-header-subtitle" class="text-xs text-neo-gray">Основы дизайна</span>
             </div>
             <h1 id="mission-header-title" class="text-sm font-extrabold text-neo-white tracking-tight">Архитектор цвета</h1>
@@ -215,6 +217,26 @@
   <!-- Main Mission Viewport -->
   <main id="academy-main" tabindex="-1" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
+    <!-- 5-Specialty & Multi-Task Selector Bar -->
+    <section id="mission-selector-bar" class="neo-glass p-4 rounded-2xl border border-neo-cyan/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="flex items-center gap-2 text-xs font-bold text-neo-cyan uppercase tracking-wider">
+        <span class="material-symbols-outlined text-[18px]">explore</span>
+        <span>Навигатор миссий (5 специальностей × 20 модулей)</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-2.5 text-xs">
+        <select id="mission-specialty-select" aria-label="Специальность" onchange="onMissionSelectorChange()" class="px-3 py-2 rounded-xl bg-neo-bg border border-white/15 text-neo-white font-bold focus:border-neo-cyan focus:outline-none">
+          <option value="it">06130100 — Веб-разработка (IT)</option>
+          <option value="graphic_design">02130100 — Графический дизайн</option>
+          <option value="autoelectric">07161301 — Автоэлектрика</option>
+          <option value="hvac">07130700 — Холодильное оборудование (HVAC)</option>
+          <option value="automechanic">07161300 — Автомеханика</option>
+        </select>
+        <select id="mission-task-select" aria-label="Номер миссии" onchange="onMissionSelectorChange()" class="px-3 py-2 rounded-xl bg-neo-bg border border-white/15 text-neo-white font-bold focus:border-neo-cyan focus:outline-none">
+          <option value="1">Миссия #1</option>
+        </select>
+      </div>
+    </section>
+
     <!-- 7-Stage Interactive Progress Stepper -->
     <div class="rounded-2xl bg-neo-bg/80 border border-white/10 overflow-hidden">
       <div class="px-4 sm:px-6 py-2.5 overflow-x-auto">
@@ -232,7 +254,7 @@
       </div>
       <h2 class="text-xl font-extrabold text-neo-white">Требуется авторизация для прохождения миссии</h2>
       <p id="mission-auth-gate-msg" class="text-xs text-neo-gray max-w-md mx-auto">
-        Прогресс этапов, начисление XP и отправка дизайн-палитры преподавателю привязаны к вашему аккаунту. Войдите, чтобы продолжить миссию.
+        Прогресс этапов, начисление XP и отправка итоговой работы преподавателю привязаны к вашему аккаунту. Войдите, чтобы продолжить миссию.
       </p>
       <div class="flex justify-center gap-3 pt-1">
         <a href="auth.html?mode=login" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-neo-cyan to-neo-purple text-neo-bg text-xs font-extrabold">Войти в аккаунт</a>
@@ -241,6 +263,21 @@
     </section>
 
     <div id="mission-protected-content">
+
+    <!-- Schedule Lock Panel (403 is_locked: true) -->
+    <section id="mission-locked-panel" class="hidden p-8 rounded-3xl neo-glass border border-amber-500/40 text-center space-y-4">
+      <div class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-[30px]">schedule</span>
+      </div>
+      <h2 id="mission-locked-title" class="text-xl font-extrabold text-neo-white">Миссия заблокирована по расписанию</h2>
+      <p id="mission-locked-message" class="text-xs text-neo-gray max-w-md mx-auto">
+        Эта миссия откроется в соответствующий учебный день потока. Вы можете перейти к доступной Миссии #1.
+      </p>
+      <div class="flex flex-wrap justify-center gap-3 pt-2">
+        <button type="button" onclick="openUnlockedTask1()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-neo-cyan to-neo-purple text-neo-bg text-xs font-extrabold">Перейти к Миссии #1</button>
+        <a id="mission-locked-tasks-link" href="tasks.html" class="px-5 py-2.5 rounded-xl bg-neo-surface hover:bg-white/10 border border-white/15 text-neo-white text-xs font-bold">Открыть карту модулей</a>
+      </div>
+    </section>
 
     <!-- Notification / Feedback Banner -->
     <div id="mission-toast" class="hidden fixed bottom-6 right-6 z-50 max-w-md neo-glass border-l-4 border-neo-cyan px-5 py-4 rounded-2xl shadow-2xl flex items-start gap-3">
@@ -339,15 +376,31 @@
       <div class="neo-glass p-6 rounded-3xl flex flex-wrap items-center justify-between gap-4">
         <div>
           <span class="text-xs font-mono uppercase text-neo-cyan">ЭТАП 02 • ИНТЕРАКТИВНАЯ БАЗА ЗНАНИЙ</span>
-          <h2 class="text-2xl font-black text-neo-white mt-0.5">Геометрия цвета и законы гармонии</h2>
-          <p class="text-xs text-neo-gray mt-1">Взаимодействуйте с каждым из 5 интерактивных модулей ниже, чтобы разблокировать тренировочный полигон (+75 XP).</p>
+          <h2 id="stage2-heading" class="text-2xl font-black text-neo-white mt-0.5">Геометрия цвета и законы гармонии</h2>
+          <p id="stage2-subheading" class="text-xs text-neo-gray mt-1">Взаимодействуйте с каждым из 5 интерактивных модулей ниже, чтобы разблокировать тренировочный полигон (+75 XP).</p>
         </div>
         <div class="px-4 py-2.5 rounded-2xl bg-neo-bg border border-neo-cyan/30 text-xs font-bold">
           Изучено модулей: <span id="theory-progress-count" class="text-neo-cyan font-mono text-sm">0 / 5</span>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div id="stage2-domain-workspace" class="hidden space-y-4">
+        <div id="domain-theory-cards" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+        <div id="domain-theory-telemetry" class="p-4 rounded-2xl bg-neo-bg/80 border border-neo-cyan/30 text-xs font-mono text-neo-cyan">
+          Нажмите кнопку интерактива в любом из 5 блоков, чтобы зафиксировать расчёт и изучить модуль.
+        </div>
+        <div class="pt-2 flex items-center justify-between gap-4">
+          <button type="button" onclick="goToStage(1)" class="px-4 py-2.5 rounded-xl bg-neo-surface hover:bg-white/10 border border-white/10 text-xs font-bold text-neo-gray">
+            ← Назад к брифингу
+          </button>
+          <button type="button" id="btn-complete-domain-stage-2" onclick="completeStage2Theory()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-neo-cyan to-neo-purple text-neo-bg font-extrabold text-xs sm:text-sm opacity-50 cursor-not-allowed flex items-center gap-2">
+            <span>Перейти к интерактивной тренировке (Этап 3)</span>
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="stage2-gd-workspace" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <!-- Left Column: Interactive SVG Color Wheel & Harmony Visualizer (Cols 5) -->
         <div class="lg:col-span-5 neo-glass p-6 rounded-3xl flex flex-col items-center justify-between space-y-5">
           <div class="w-full flex items-center justify-between">
@@ -499,6 +552,7 @@
           </div>
         </div>
       </div>
+      </div>
     </section>
 
     <!-- =================================================================== -->
@@ -508,7 +562,7 @@
       <div class="neo-glass p-6 rounded-3xl flex flex-wrap items-center justify-between gap-4">
         <div>
           <span class="text-xs font-mono uppercase text-neo-purple">ЭТАП 03 • ТАКТИЧЕСКИЙ ПОЛИГОН</span>
-          <h2 class="text-2xl font-black text-neo-white mt-0.5">Интерактивная тренировка (4 испытания)</h2>
+          <h2 id="stage3-heading" class="text-2xl font-black text-neo-white mt-0.5">Интерактивная тренировка (4 испытания)</h2>
           <p class="text-xs text-neo-gray mt-1">Каждое испытание требует осмысленного выбора и подтверждения кнопкой проверки. За каждое верное решение начисляется +50 XP.</p>
         </div>
         <div class="px-4 py-2.5 rounded-2xl bg-neo-bg border border-neo-purple/40 text-xs font-bold">
@@ -516,7 +570,9 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div id="stage3-domain-workspace" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+
+      <div id="stage3-gd-workspace" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         <!-- ИСПЫТАНИЕ 1: Определить правильное сочетание цветов -->
         <div class="neo-glass p-6 rounded-3xl space-y-4 border border-white/10" id="challenge-box-1">
@@ -699,29 +755,30 @@
           <div id="ch4-feedback" class="hidden p-3.5 rounded-xl text-xs leading-relaxed"></div>
         </div>
       </div>
+      </div>
 
       <div class="flex items-center justify-between pt-2">
         <button type="button" onclick="goToStage(2)" class="px-4 py-2.5 rounded-xl bg-neo-surface hover:bg-white/10 border border-white/10 text-xs font-bold text-neo-gray">
           ← Назад к теории
         </button>
         <button type="button" id="btn-complete-stage-3" onclick="goToStage(4)" class="px-6 py-3 rounded-xl bg-gradient-to-r from-neo-purple to-neo-cyan text-neo-bg font-extrabold text-xs sm:text-sm opacity-50 cursor-not-allowed flex items-center gap-2">
-          <span>Открыть Цветовую лабораторию (Этап 4)</span>
+          <span id="btn-stage3-next-label">Открыть практическую лабораторию (Этап 4)</span>
           <span class="material-symbols-outlined text-[18px]">science</span>
         </button>
       </div>
     </section>
 
     <!-- =================================================================== -->
-    <!-- ЭТАП 4. ЦВЕТОВАЯ ЛАБОРАТОРИЯ (CREATIVE COLOR LAB)                    -->
+    <!-- ЭТАП 4. ПРАКТИЧЕСКАЯ ЛАБОРАТОРИЯ (5 СПЕЦИАЛЬНОСТЕЙ + EduPhysics)     -->
     <!-- =================================================================== -->
     <section id="stage-4" class="stage-panel hidden space-y-6">
       <div class="neo-glass p-6 rounded-3xl flex flex-wrap items-center justify-between gap-4">
         <div>
-          <span class="text-xs font-mono uppercase text-neo-cyan">ЭТАП 04 • ТВОРЧЕСКАЯ ЛАБОРАТОРИЯ (+100 XP)</span>
-          <h2 class="text-2xl font-black text-neo-white mt-0.5">Цветовая лаборатория: Сборка собственной палитры</h2>
-          <p class="text-xs text-neo-gray mt-1">Экспериментируйте с оттенками, меняйте HEX-коды, добавляйте или удаляйте цвета и проверяйте контрастность на живом макете.</p>
+          <span class="text-xs font-mono uppercase text-neo-cyan">ЭТАП 04 • ПРАКТИЧЕСКАЯ ЛАБОРАТОРИЯ (+100 XP)</span>
+          <h2 id="stage4-heading" class="text-2xl font-black text-neo-white mt-0.5">Цветовая лаборатория: Сборка собственной палитры</h2>
+          <p id="stage4-subheading" class="text-xs text-neo-gray mt-1">Экспериментируйте с оттенками, меняйте HEX-коды, добавляйте или удаляйте цвета и проверяйте контрастность на живом макете.</p>
         </div>
-        <div class="flex flex-wrap gap-2">
+        <div id="stage4-gd-toolbar" class="flex flex-wrap gap-2">
           <button type="button" onclick="applyLabPreset('cyber')" class="px-3 py-2 rounded-xl bg-neo-surface hover:bg-neo-cyan/20 border border-neo-cyan/30 text-xs font-bold text-neo-cyan">
             ⚡ Генератор: Cyber Neon
           </button>
@@ -734,7 +791,10 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Domain Stage 4 Lab Workspace (it, autoelectric, hvac, automechanic) -->
+      <div id="stage4-domain-workspace" class="hidden space-y-6"></div>
+
+      <div id="stage4-gd-workspace" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <!-- Left: Interactive Palette Slots & HSL/HEX Controls (Cols 7) -->
         <div class="lg:col-span-7 neo-glass p-6 rounded-3xl space-y-5">
           <div class="flex items-center justify-between">
@@ -830,55 +890,59 @@
         <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
           <div>
             <span class="text-xs font-mono uppercase text-neo-cyan">ЭТАП 05 • ФИНАЛЬНОЕ ПРОЕКТНОЕ ЗАДАНИЕ (+100 XP)</span>
-            <h2 class="text-2xl sm:text-3xl font-black text-neo-white mt-1">Дизайн-код для образовательного приложения «EduSpace Mobile»</h2>
-            <p class="text-xs sm:text-sm text-neo-gray mt-1">
-              Утвердите вашу итоговую гармоничную палитру, напишите короткое профессиональное обоснование выбора цветов и отправьте работу преподавателю на проверку.
+            <h2 id="stage5-heading" class="text-2xl sm:text-3xl font-black text-neo-white mt-1">Защита практического проекта миссии</h2>
+            <p id="stage5-subheading" class="text-xs sm:text-sm text-neo-gray mt-1">
+              Проверьте результаты лабораторного этапа, напишите профессиональное обоснование решения и отправьте отчёт на сервер.
             </p>
           </div>
-          <span class="px-3.5 py-1.5 rounded-xl bg-neo-purple/20 border border-neo-purple/40 text-xs font-mono font-bold text-neo-white">
-            Куратор: Сейдахметова А. К.
+          <span id="stage5-curator-badge" class="px-3.5 py-1.5 rounded-xl bg-neo-purple/20 border border-neo-purple/40 text-xs font-mono font-bold text-neo-white">
+            Куратор: АМК
           </span>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <!-- Left: Final Palette Summary & Harmony Selector (Cols 5) -->
+          <!-- Left: Deliverable Summary (Cols 5) -->
           <div class="lg:col-span-5 space-y-4">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase text-neo-white">Итоговая палитра проекта:</span>
+              <span id="stage5-deliverable-label" class="text-xs font-bold uppercase text-neo-white">Итоговый результат лаборатории:</span>
               <button type="button" onclick="goToStage(4)" class="text-xs text-neo-cyan hover:underline font-semibold">
                 Изменить в лаборатории →
               </button>
             </div>
 
-            <div id="final-palette-preview" class="space-y-2.5">
-              <!-- Populated by JS from labPalette -->
-            </div>
+            <div id="stage5-domain-summary" class="hidden space-y-2.5"></div>
 
-            <div class="pt-2">
-              <label class="block text-xs font-bold text-neo-gray mb-1.5">Использованная схема гармонии:</label>
-              <select id="final-harmony-type" onchange="scheduleAutoSaveDraft()" class="w-full px-3.5 py-2.5 rounded-xl bg-neo-bg border border-white/15 text-neo-white text-xs font-semibold">
-                <option value="Триадная неоновая гармония (120°)">Триадная неоновая гармония (120°)</option>
-                <option value="Комплементарный высокий контраст (180°)">Комплементарный высокий контраст (180°)</option>
-                <option value="Аналоговая технологичная гамма (±30°)">Аналоговая технологичная гамма (±30°)</option>
-                <option value="Авторская смешанная схема (Dark UI)">Авторская смешанная схема (Dark UI)</option>
-              </select>
+            <div id="stage5-gd-palette-box" class="space-y-4">
+              <div id="final-palette-preview" class="space-y-2.5">
+                <!-- Populated by JS from labPalette -->
+              </div>
+
+              <div class="pt-2">
+                <label class="block text-xs font-bold text-neo-gray mb-1.5">Использованная схема гармонии:</label>
+                <select id="final-harmony-type" onchange="scheduleAutoSaveDraft()" class="w-full px-3.5 py-2.5 rounded-xl bg-neo-bg border border-white/15 text-neo-white text-xs font-semibold">
+                  <option value="Триадная неоновая гармония (120°)">Триадная неоновая гармония (120°)</option>
+                  <option value="Комплементарный высокий контраст (180°)">Комплементарный высокий контраст (180°)</option>
+                  <option value="Аналоговая технологичная гамма (±30°)">Аналоговая технологичная гамма (±30°)</option>
+                  <option value="Авторская смешанная схема (Dark UI)">Авторская смешанная схема (Dark UI)</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <!-- Right: Student Design Explanation & Submit to Teacher (Cols 7) -->
+          <!-- Right: Student Explanation & Submit (Cols 7) -->
           <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
             <div class="space-y-2">
-              <label for="final-explanation" class="block text-sm font-extrabold text-neo-white">
-                Объяснение вашего цветового решения для преподавателя:
+              <label for="final-explanation" id="stage5-explanation-label" class="block text-sm font-extrabold text-neo-white">
+                Инженерное / проектное обоснование вашего решения:
               </label>
-              <p class="text-xs text-neo-gray">
-                Опишите, какой цвет выбран для фона и карточек, какие цвета отвечают за акценты (CTA) и почему ваша палитра комфортна для длительного обучения студента:
+              <p id="stage5-explanation-hint" class="text-xs text-neo-gray">
+                Опишите ключевые параметры, выбранные в лаборатории (минимум 15 символов), и выводы по диагностике/проекту:
               </p>
               <textarea
                 id="final-explanation"
                 rows="6"
                 oninput="scheduleAutoSaveDraft()"
-                placeholder="Например: Для базового фона я выбрал глубокий тёмно-синий оттенок #080B16 и поверхность #11182A, чтобы снизить нагрузку на зрение в вечернее время. В качестве главного акцента использован неоновый циан #00D9FF (высокий контраст AAA), а для геймификации и XP — фиолетовый #8957FF..."
+                placeholder="Опишите ход выполнения задания, полученные параметры расчётов и выводы..."
                 class="w-full p-4 rounded-2xl bg-neo-bg border border-white/15 focus:border-neo-cyan focus:outline-none text-sm text-neo-white leading-relaxed"
               ></textarea>
               <div class="flex justify-between text-[11px] text-neo-gray">
@@ -890,7 +954,7 @@
             <div class="p-4 rounded-2xl bg-neo-bg/80 border border-neo-cyan/25 text-xs text-neo-gray flex items-start gap-3">
               <span class="material-symbols-outlined text-neo-cyan text-xl shrink-0">verified</span>
               <div>
-                <strong class="text-neo-white">Честная академическая проверка:</strong> после нажатия кнопки ваша палитра и объяснение сохраняются в таблице <code class="text-neo-cyan">task_submissions</code> PostgreSQL. Работа получит статус <em>«Отправлено на проверку»</em> до тех пор, пока преподаватель не выставит реальную оценку в своём кабинете.
+                <strong class="text-neo-white">Честная академическая проверка:</strong> после отправки данные и показатели лабораторного расчёта сохраняются в базе данных платформы, а прогресс и XP синхронизируются с вашим профилем.
               </div>
             </div>
 
@@ -900,7 +964,7 @@
               </button>
               <button type="button" id="btn-submit-mission" onclick="submitFinalMissionToTeacher()" class="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-neo-cyan via-neo-purple to-neo-success text-neo-bg font-black text-sm glow-cyan flex items-center gap-2">
                 <span class="material-symbols-outlined">send</span>
-                <span>Отправить работу преподавателю (+100 XP)</span>
+                <span>Отправить итоговую миссию (+100 XP)</span>
               </button>
             </div>
           </div>
@@ -916,7 +980,7 @@
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
             <span class="text-xs font-mono uppercase text-neo-cyan">ЭТАП 06 • СТАТУС ПРОВЕРКИ РАБОТЫ</span>
-            <h2 class="text-2xl sm:text-3xl font-black text-neo-white mt-1">Отчёт об отправке проекта преподавателю</h2>
+            <h2 class="text-2xl sm:text-3xl font-black text-neo-white mt-1">Отчёт об отправке проекта</h2>
           </div>
           <div id="stage6-status-pill" class="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 font-extrabold text-xs flex items-center gap-2">
             <span class="material-symbols-outlined text-[18px]">hourglass_top</span>
@@ -925,10 +989,11 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <!-- Submitted Palette & Explanation -->
+          <!-- Submitted Deliverable & Explanation -->
           <div class="lg:col-span-7 p-6 rounded-2xl bg-neo-bg/90 border border-white/10 space-y-4">
-            <div class="text-xs font-bold uppercase text-neo-gray">Отправленная цветовая палитра (сохранена в PostgreSQL):</div>
+            <div id="stage6-deliverable-title" class="text-xs font-bold uppercase text-neo-gray">Отправленные материалы миссии:</div>
             <div id="stage6-palette-swatches" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5"></div>
+            <div id="stage6-domain-deliverable" class="hidden space-y-2 text-xs"></div>
 
             <div class="pt-2">
               <div class="text-xs font-bold uppercase text-neo-gray mb-1">Ваше обоснование проекта:</div>
@@ -939,7 +1004,7 @@
           <!-- Teacher Grade & Comment Card -->
           <div class="lg:col-span-5 p-6 rounded-2xl bg-neo-bg/90 border border-white/10 flex flex-col justify-between space-y-4">
             <div class="space-y-3">
-              <div class="text-xs font-bold uppercase text-neo-gray">Рецензия и академическая оценка куратора:</div>
+              <div class="text-xs font-bold uppercase text-neo-gray">Рецензия и академическая оценка:</div>
               <div id="stage6-grade-box" class="p-5 rounded-2xl bg-neo-surface border border-white/10 space-y-2">
                 <div class="flex items-center justify-between">
                   <span class="text-xs text-neo-gray">Академический балл:</span>
@@ -952,9 +1017,9 @@
               </div>
 
               <div class="p-4 rounded-2xl bg-neo-surface/70 border border-white/10 space-y-1">
-                <div class="text-xs font-bold text-neo-cyan">Комментарий преподавателя:</div>
+                <div class="text-xs font-bold text-neo-cyan">Комментарий куратора:</div>
                 <p id="stage6-teacher-comment" class="text-xs text-neo-gray leading-relaxed">
-                  Работа передана в электронную ведомость кафедры дизайна. Как только преподаватель проверит вашу палитру в кабинете куратора, здесь появятся оценка и разбор.
+                  Работа сохранена на сервере. Статус обновится автоматически после проверки.
                 </p>
               </div>
             </div>
@@ -987,18 +1052,18 @@
             <div class="space-y-2">
               <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neo-success/20 border border-neo-success/40 text-neo-success text-xs font-extrabold">
                 <span class="material-symbols-outlined text-[16px]">verified</span>
-                <span>МИССИЯ 01 УСПЕШНО ЗАВЕРШЕНА</span>
+                <span id="stage7-badge-text">МИССИЯ УСПЕШНО ЗАВЕРШЕНА</span>
               </div>
-              <h2 class="text-3xl sm:text-5xl font-black text-neo-white">Поздравляем, Архитектор цвета!</h2>
-              <p class="text-sm text-neo-gray max-w-2xl">
-                Вы прошли все интерактивные модули спектра, выполнили 4 тренировочных испытания, собрали рабочую палитру в Цветовой лаборатории и защитили дизайн-проект.
+              <h2 id="stage7-congrats-title" class="text-3xl sm:text-5xl font-black text-neo-white">Поздравляем с выполнением миссии!</h2>
+              <p id="stage7-congrats-desc" class="text-sm text-neo-gray max-w-2xl">
+                Вы изучили все 5 модулей теории, прошли 4 тактических испытания, выполнили практическую лабораторную работу и защитили проект.
               </p>
             </div>
 
             <div class="p-5 rounded-3xl bg-neo-bg/90 border border-neo-cyan/40 text-center min-w-[180px] glow-cyan">
               <div class="text-xs font-mono uppercase text-neo-gray">Заработано в миссии</div>
               <div id="stage7-xp-earned" class="text-3xl font-black text-neo-cyan font-mono mt-1">+500 XP</div>
-              <div id="stage7-level-label" class="text-xs font-bold text-neo-purple mt-1">Уровень 2 • Опыт синхронизирован</div>
+              <div id="stage7-level-label" class="text-xs font-bold text-neo-purple mt-1">Уровень 1 • Опыт синхронизирован</div>
             </div>
           </div>
 
@@ -1013,14 +1078,14 @@
             <div class="neo-card p-5 rounded-2xl space-y-1">
               <div class="text-xs text-neo-gray">Комментарий преподавателя</div>
               <div id="stage7-teacher-feedback" class="text-xs font-semibold text-neo-white leading-relaxed">
-                Ожидает проверки преподавателем кафедры графического дизайна.
+                Ожидает проверки преподавателем профильной кафедры.
               </div>
             </div>
 
             <div class="neo-card p-5 rounded-2xl space-y-1">
               <div class="text-xs text-neo-gray">Следующая интерактивная миссия</div>
-              <div class="text-base font-extrabold text-neo-cyan">Миссия 02: Типографика и Сетки</div>
-              <div class="text-xs text-neo-gray">Доступна в каталоге заданий курса</div>
+              <div id="stage7-next-mission-title" class="text-base font-extrabold text-neo-cyan">Миссия #2</div>
+              <div class="text-xs text-neo-gray">Выберите следующий модуль в навигаторе сверху</div>
             </div>
           </div>
 
@@ -1037,11 +1102,11 @@
               <span class="material-symbols-outlined text-[18px]">dashboard</span>
               <span>Вернуться в кабинет студента</span>
             </a>
-            <a href="tasks.html?specialty=graphic_design" class="px-5 py-3.5 rounded-2xl bg-neo-surface hover:bg-white/10 border border-white/15 text-neo-white font-bold text-xs sm:text-sm">
+            <a id="mission-stage7-tasks-link" href="tasks.html" class="px-5 py-3.5 rounded-2xl bg-neo-surface hover:bg-white/10 border border-white/15 text-neo-white font-bold text-xs sm:text-sm">
               Открыть карту миссий курса
             </a>
             <button type="button" onclick="goToStage(5)" class="px-4 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 text-neo-gray font-bold text-xs">
-              Редактировать отправленную палитру
+              Редактировать отправленную работу
             </button>
           </div>
         </div>
@@ -1108,15 +1173,26 @@
         { hex: '#8957FF', role: 'Secondary Accent (Геймификация)' },
         { hex: '#36E6A0', role: 'Success (Статус успеха)' }
       ],
+      labCompleted: false,
+      labResult: null,
+      completed: false,
       finalExplanation: '',
       harmonyType: 'Триадная неоновая гармония (120°)',
       submission: null
     };
 
+    let activeMissionSpecialty = 'graphic_design';
+    let activeMissionTaskNumber = 1;
+    let isMissionLocked = false;
+
     let selectedCh1 = null;
     let selectedCh2 = null;
     let ch4Placements = {}; // chipId -> 'pool' | 'surface' | 'accent' | 'semantic'
     let selectedChipForTap = null;
+    let domainSelectedCh1 = null;
+    let domainSelectedCh2 = null;
+    let domainCh4Placements = {};
+    let domainSelectedChip = null;
     let activeLabSlotIndex = 2;
     let draftSaveTimer = null;
     let missionAuthorized = false;
@@ -1161,8 +1237,15 @@
       let maxSt = 2;
       if (missionState.theoryCompleted.length >= 5) maxSt = 3;
       if (missionState.theoryCompleted.length >= 5 && missionState.trainingCompleted.length >= 4) maxSt = 4;
-      if (missionState.theoryCompleted.length >= 5 && missionState.trainingCompleted.length >= 4 && missionState.labPalette.length >= 3) maxSt = 5;
-      if (missionState.awardedEvents.includes('stage_5_submit') || missionState.submission) maxSt = 7;
+      const stage4Done = activeMissionSpecialty === 'graphic_design'
+        ? (missionState.labPalette.length >= 3 && (missionState.awardedEvents.includes('stage_4_lab') || missionState.trainingCompleted.length >= 4))
+        : (missionState.labCompleted || missionState.awardedEvents.includes('stage_4_lab'));
+      if (missionState.theoryCompleted.length >= 5 && missionState.trainingCompleted.length >= 4 && stage4Done) {
+        maxSt = 5;
+      }
+      if (missionState.awardedEvents.includes('stage_5_submit') || missionState.submission || missionState.completed) {
+        maxSt = 7;
+      }
       missionState.maxAllowedStage = maxSt;
       return maxSt;
     }
@@ -1179,11 +1262,11 @@
       const stepper = document.getElementById('stage-stepper');
       stepper.innerHTML = STAGE_META.map(st => {
         const isCurrent = (missionState.currentStage === st.num);
-        const isUnlocked = (st.num <= missionState.maxAllowedStage);
-        const isDone = (st.num < missionState.currentStage) || (st.num === 2 && missionState.theoryCompleted.length >= 5) || (st.num === 3 && missionState.trainingCompleted.length >= 4) || (st.num >= 6 && missionState.submission);
+        const isUnlocked = !isMissionLocked && (st.num <= missionState.maxAllowedStage);
+        const isDone = !isMissionLocked && ((st.num < missionState.currentStage) || (st.num === 2 && missionState.theoryCompleted.length >= 5) || (st.num === 3 && missionState.trainingCompleted.length >= 4) || (st.num === 4 && (missionState.labCompleted || missionState.awardedEvents.includes('stage_4_lab'))) || (st.num >= 6 && (missionState.submission || missionState.completed)));
 
         let cls = 'border-white/10 bg-neo-surface/50 text-neo-gray opacity-55 cursor-not-allowed';
-        if (isCurrent) {
+        if (isCurrent && !isMissionLocked) {
           cls = 'border-neo-cyan bg-neo-cyan/20 text-neo-white glow-cyan cursor-pointer';
         } else if (isDone && isUnlocked) {
           cls = 'border-neo-success/50 bg-neo-success/10 text-neo-success cursor-pointer hover:bg-neo-success/20';
@@ -1209,27 +1292,33 @@
     }
 
     async function saveStageToServer(targetStage, eventKey = '') {
-      if (!missionAuthorized) return false;
+      if (!missionAuthorized || isMissionLocked) return false;
       const dot = document.getElementById('autosave-dot');
       const txt = document.getElementById('autosave-text');
       dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
       txt.textContent = 'Сохранение...';
+
+      const payloadState = {
+        theory_completed: missionState.theoryCompleted,
+        training_completed: missionState.trainingCompleted,
+        lab_completed: missionState.labCompleted,
+        lab_result: missionState.labResult,
+        lab_palette: activeMissionSpecialty === 'graphic_design'
+          ? missionState.labPalette
+          : (missionState.labCompleted ? missionState.labPalette : []),
+        final_palette: activeMissionSpecialty === 'graphic_design' ? missionState.labPalette : [],
+        final_explanation: missionState.finalExplanation
+      };
 
       try {
         const res = await window.EduSpace.api('/api/mission/save_stage', {
           method: 'POST',
           body: {
             specialty_slug: activeMissionSpecialty,
-            task_number: 1,
+            task_number: activeMissionTaskNumber,
             current_stage: targetStage,
             event_key: eventKey,
-            state: {
-              theory_completed: missionState.theoryCompleted,
-              training_completed: missionState.trainingCompleted,
-              lab_palette: missionState.labPalette,
-              final_palette: missionState.labPalette,
-              final_explanation: missionState.finalExplanation
-            }
+            state: payloadState
           }
         });
         const data = (res && res.data) || {};
@@ -1269,6 +1358,7 @@
     }
 
     async function goToStage(stageNum) {
+      if (isMissionLocked) return;
       computeMaxAllowedStage();
       if (stageNum > missionState.maxAllowedStage) {
         showMissionToast(
@@ -1284,6 +1374,8 @@
       const activePanel = document.getElementById(`stage-${stageNum}`);
       if (activePanel) activePanel.classList.remove('hidden');
 
+      if (stageNum === 2) renderStage2Workspace();
+      if (stageNum === 3) renderStage3Workspace();
       if (stageNum === 4) renderLabUI();
       if (stageNum === 5) renderStage5ProjectUI();
       if (stageNum === 6) renderStage6VerificationUI();
@@ -1295,9 +1387,11 @@
     }
 
     async function startMissionStage1() {
+      if (isMissionLocked) return;
       await saveStageToServer(2, 'stage_1_start');
       document.querySelectorAll('.stage-panel').forEach(el => el.classList.add('hidden'));
       document.getElementById('stage-2').classList.remove('hidden');
+      renderStage2Workspace();
       renderHUD();
     }
 
@@ -2071,8 +2165,6 @@
         desc: 'Практическая миссия по обслуживанию холодильных установок в EduSpace Neo. Проанализируйте диаграмму P-T для хладагентов R134a/R410A, определите перегрев и переохлаждение контура и защитите сервисный отчёт перед преподавателем.'
       }
     };
-
-    let activeMissionSpecialty = 'graphic_design';
 
     function applyMissionSpecialtyIdentity(specSlug) {
       const normalized = MISSION_SPECIALTY_META[specSlug] ? specSlug : 'graphic_design';

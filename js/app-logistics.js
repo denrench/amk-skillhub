@@ -1448,20 +1448,57 @@
     showToast('Ведомость успеваемости выгружена в формате CSV (Excel)!', 'success');
   }
 
-  function exportPdfStatement() {
-    showToast('Подготовка печатной академической ведомости / сертификата...', 'info');
-    setTimeout(() => window.print(), 400);
+  async function exportPdfStatement() {
+    showToast('Формирование официального PDF-портфолио...', 'info');
+    try {
+      const res = await fetch(`${getApiBaseUrl()}/api/portfolio/export.pdf`, {
+        method: 'GET',
+        credentials: 'same-origin'
+      });
+      if (res.status === 401) {
+        showToast('Войдите в аккаунт для выгрузки официального PDF.', 'warning');
+        return;
+      }
+      if (!res.ok) {
+        showToast('Не удалось сформировать PDF-файл на сервере.', 'error');
+        return;
+      }
+      const blob = await res.blob();
+      const user = getActiveUser();
+      const fname = `portfolio_${user && user.id ? user.id : 'eduspace'}.pdf`;
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fname;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast('Официальное PDF-портфолио скачано!', 'success');
+    } catch (e) {
+      showToast('Ошибка соединения при выгрузке PDF.', 'error');
+    }
   }
 
-  function sharePortfolio() {
-    const user = getActiveUser();
-    const url = `${window.location.origin}${window.location.pathname}?student=${user ? (user.student_id || user.id) : 'profile'}`;
-
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(() => showToast('Ссылка на цифровой профиль скопирована в буфер обмена!', 'success'));
-    } else {
-      showToast('Ссылка на цифровой профиль сформирована!', 'success');
-    }
+  async function sharePortfolio() {
+    try {
+      const res = await api('/api/portfolio/settings');
+      if (res && res.ok && res.data) {
+        const s = res.data.settings || res.data;
+        if (s && s.is_public && s.consent_granted && s.public_slug) {
+          const publicUrl = `${window.location.origin}/career.html?public=${encodeURIComponent(s.public_slug)}`;
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(publicUrl);
+          }
+          showToast('Публичная ссылка на портфолио скопирована в буфер обмена!', 'success');
+          return publicUrl;
+        }
+        showToast('Включите публичный доступ и согласие на публикацию в разделе «Карьера и настройки приватности».', 'info');
+        return null;
+      }
+    } catch (e) {}
+    showToast('Войдите в аккаунт и настройте публичный адрес в разделе «Карьера & Резюме».', 'info');
+    return null;
   }
   // Legacy modal helpers kept interactive and accurate
   // (openZoomModal stub removed per T-M2-04)
@@ -2184,6 +2221,11 @@
 
     const markReveal = (el, index = 0) => {
       if (!el || el.nodeType !== 1 || el.dataset.shRevealed === '1') return;
+      if (el.id === 'four-student-tools-hub' || el.hasAttribute('data-no-reveal') || el.closest('[data-no-reveal]')) {
+        el.dataset.shRevealed = '1';
+        el.style.opacity = '1';
+        return;
+      }
       el.dataset.shRevealed = '1';
       const staggerIdx = index < 8 ? index : 0;
       el.style.setProperty('--i', String(staggerIdx));
@@ -2194,7 +2236,7 @@
       }
     };
 
-    const selector = 'main section, main article, #tasks-grid > *, #lp-block-canvas > *, .glass-card, .card, .workshop-course';
+    const selector = 'main section:not(#four-student-tools-hub):not([data-no-reveal]), main article:not([data-no-reveal]), #tasks-grid > *, #lp-block-canvas > *, .glass-card, .card, .workshop-course';
     const io = 'IntersectionObserver' in window ? new IntersectionObserver((entries, obs) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -2205,8 +2247,15 @@
     }, { threshold: 0.15 }) : null;
 
     document.querySelectorAll(selector).forEach((el, idx) => {
-      if (idx < 6 || !io) markReveal(el, idx);
-      else io.observe(el);
+      if (idx < 6 || !io) {
+        // Above-the-fold elements must remain immediately visible at opacity: 1 on initial paint
+        el.dataset.shRevealed = '1';
+        if (el.classList.contains('reveal') || el.hasAttribute('data-reveal')) {
+          el.classList.add('is-visible');
+        }
+      } else {
+        io.observe(el);
+      }
     });
 
     if ('MutationObserver' in window && document.body) {

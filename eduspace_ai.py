@@ -1,5 +1,5 @@
 """
-EduSpace AI Engine: Multi-provider integration (Gemini / OpenAI / Deterministic Pedagogical Heuristics).
+EduSpace AI Engine: Multi-provider integration (Gemini / OpenAI).
 Provides:
 1. Teacher Lesson Generator (8-block structure)
 2. Student Socratic Tutor (with anti-cheat guardrails)
@@ -65,6 +65,7 @@ def _call_gemini_api(api_key, system_prompt, user_prompt):
                 return parts[0]["text"]
     return None
 
+
 def _call_openai_api(api_key, system_prompt, user_prompt):
     """Calls OpenAI API safely via standard urllib."""
     url = "https://api.openai.com/v1/chat/completions"
@@ -92,14 +93,31 @@ def _call_openai_api(api_key, system_prompt, user_prompt):
             return choices[0]["message"].get("content")
     return None
 
-def generate_lesson_content(topic, discipline="IT", difficulty="beginner", duration=45, objectives="", lesson_type="theory"):
+
+def _strip_json_fences(raw_text):
+    return re.sub(r"^```json\s*|^```\s*|```$", "", (raw_text or "").strip(), flags=re.MULTILINE).strip()
+
+
+def generate_lesson_content(
+    topic,
+    discipline="IT",
+    difficulty="beginner",
+    duration=45,
+    objectives="",
+    lesson_type="theory",
+    user_api_key="",
+    provider="",
+):
     """
     Generates a complete 8-block lesson structure for the Teacher Builder.
-    Uses Gemini/OpenAI if API keys exist; otherwise produces high-quality deterministic pedagogical curriculum.
+    Strictly requires a configured LLM provider key; never falls back to canned offline blocks.
     """
-    gemini_key = os.environ.get("GEMINI_API_KEY")
-    openai_key = os.environ.get("OPENAI_API_KEY")
-    
+    gemini_key, openai_key = resolve_llm_keys(user_api_key=user_api_key, provider=provider)
+    if not gemini_key and not openai_key:
+        raise AIProviderUnconfiguredError(
+            "AI-конструктор недоступен: не задан API-ключ LLM (укажите в настройках или переменных окружения)."
+        )
+
     system_prompt = (
         "Ты — ведущий методист и эксперт образовательной платформы EduSpace. "
         "Твоя задача — создать профессиональный интерактивный урок из 8 обязательных блоков. "
@@ -124,163 +142,35 @@ def generate_lesson_content(topic, discipline="IT", difficulty="beginner", durat
         f"Формат урока: {lesson_type}\n"
         "Создай реалистичный, глубокий образовательный контент с практическими ситуациями."
     )
-    
-    # Try Live API if configured
+
+    last_error = None
     if gemini_key:
         try:
             raw_text = _call_gemini_api(gemini_key, system_prompt, user_prompt)
             if raw_text:
-                clean_json = re.sub(r"^```json\s*|^```\s*|```$", "", raw_text.strip(), flags=re.MULTILINE)
-                blocks = json.loads(clean_json)
-                return {"provider": "gemini", "blocks": blocks}
+                blocks = json.loads(_strip_json_fences(raw_text))
+                if isinstance(blocks, list) and len(blocks) >= 1 and all(isinstance(b, dict) for b in blocks):
+                    return {"provider": "gemini", "blocks": blocks}
+                last_error = ValueError("Invalid lesson blocks JSON structure")
         except Exception as e:
+            last_error = e
             print(f"[WARN] Gemini lesson generation failed: {e}")
-            
+
     if openai_key:
         try:
             raw_text = _call_openai_api(openai_key, system_prompt, user_prompt)
             if raw_text:
-                clean_json = re.sub(r"^```json\s*|^```\s*|```$", "", raw_text.strip(), flags=re.MULTILINE)
-                blocks = json.loads(clean_json)
-                return {"provider": "openai", "blocks": blocks}
+                blocks = json.loads(_strip_json_fences(raw_text))
+                if isinstance(blocks, list) and len(blocks) >= 1 and all(isinstance(b, dict) for b in blocks):
+                    return {"provider": "openai", "blocks": blocks}
+                last_error = ValueError("Invalid lesson blocks JSON structure")
         except Exception as e:
+            last_error = e
             print(f"[WARN] OpenAI lesson generation failed: {e}")
 
-    # Deterministic Pedagogical Generator (Offline Engine)
-    clean_topic = topic.strip()
-    xp_val = 60 if difficulty == "beginner" else (80 if difficulty == "intermediate" else 100)
-    
-    blocks = [
-        {
-            "id": "b1_hook",
-            "type": "hook",
-            "title": f"Кейс из практики: {clean_topic}",
-            "badge": "Производственная ситуация",
-            "content": f"В реальном проекте перед специалистом возникает задача: эффективно внедрить решения по теме «{clean_topic}». Ошибки на этом этапе приводят к задержкам релизов и финансовым потерям. Как действовать профессионально и методически грамотно?"
-        },
-        {
-            "id": "b2_objectives",
-            "type": "objectives",
-            "title": "Цели обучения и результаты",
-            "items": [
-                f"Изучить ключевые принципы и стандарты в области «{clean_topic}»",
-                "Овладеть профессиональной терминологией и методологией",
-                "Научиться находить и устранять типовые ошибки при реализации",
-                "Выполнить прикладное практическое задание по заданным критериям"
-            ]
-        },
-        {
-            "id": "b3_theory",
-            "type": "theory",
-            "title": f"Теоретический базис: {clean_topic}",
-            "chunks": [
-                {
-                    "heading": "Фундаментальные концепции",
-                    "text": f"При изучении темы «{clean_topic}» ключевое значение имеет понимание внутренней структуры процессов. Разделение ответственности между компонентами обеспечивает надежность и масштабируемость системы.",
-                    "callout": {
-                        "type": "tip",
-                        "title": "Совет эксперта EduSpace",
-                        "text": f"Всегда документируйте архитектурные решения при работе с «{clean_topic}»."
-                    }
-                },
-                {
-                    "heading": "Стандарты качества и лучшие практики",
-                    "text": "Соблюдение отраслевых стандартов сокращает время отладки на 40% и гарантирует совместимость с внешними подсистемами.",
-                    "callout": {
-                        "type": "term",
-                        "title": "Ключевой термин",
-                        "text": f"Регламент реализации «{clean_topic}» — набор обязательных технико-технологических правил выполнения операций."
-                    }
-                }
-            ]
-        },
-        {
-            "id": "b4_interactive",
-            "type": "interactive",
-            "widget_type": "flip_cards",
-            "title": "Интерактивное закрепление понятий",
-            "instructions": "Переверните карточки, чтобы закрепить ключевые формулировки.",
-            "cards": [
-                {
-                    "front": f"Концепт 1: {clean_topic}",
-                    "back": "Базовый принцип организации эффективного рабочего процесса."
-                },
-                {
-                    "front": "Критерий верификации",
-                    "back": "Проверка соответствия итогового артефакта техническому заданию."
-                },
-                {
-                    "front": "Оптимизация",
-                    "back": "Устранение узких мест и сокращение накладных расходов."
-                }
-            ]
-        },
-        {
-            "id": "b5_check",
-            "type": "inline_check",
-            "title": "Экспресс-проверка понимания",
-            "question": f"Какой подход является наиболее корректным при первом шаге реализации «{clean_topic}»?",
-            "options": [
-                "Сразу приступить к чистовой сдаче без составления плана и анализа рисков",
-                "Проанализировать входные требования, критерии приёмки и составить пошаговый план",
-                "Игнорировать документацию и технические стандарты отрасли",
-                "Передать задачу непрофильным специалистам"
-            ],
-            "correct_index": 1,
-            "explanation": "Грамотный специалист всегда начинает с анализа исходных данных, спецификации требований и построения плана действий.",
-            "hint": "Вспомните принципы инженерного подхода: сначала анализ и план, затем реализация."
-        },
-        {
-            "id": "b6_practice",
-            "type": "practical",
-            "title": f"Практическое задание: {clean_topic}",
-            "task_description": f"Разработайте решение или техническую спецификацию для задачи по теме «{clean_topic}» с соблюдением критериев надежности и читаемости.",
-            "guidelines": [
-                "Опишите пошаговый алгоритм выполнения",
-                "Укажите используемые инструменты и стандарты",
-                "Проведите самопроверку по чек-листу приёмки"
-            ]
-        },
-        {
-            "id": "b7_assessment",
-            "type": "assessment",
-            "title": "Итоговое испытание по уроку",
-            "questions": [
-                {
-                    "question": f"Что гарантирует успешное освоение темы «{clean_topic}»?",
-                    "options": [
-                        "Случайный подбор параметров",
-                        "Системное понимание принципов и регулярная практика",
-                        "Отказ от проверки результатов",
-                        "Работа без обратной связи преподавателя"
-                    ],
-                    "correct": 1
-                },
-                {
-                    "question": "Какова главная цель итогового тестирования?",
-                    "options": [
-                        "Наказать студента за ошибки",
-                        "Объективно зафиксировать уровень освоения материала и дать рекомендации",
-                        "Замедлить учебный процесс",
-                        "Скрыть реальные пробелы в знаниях"
-                    ],
-                    "correct": 1
-                }
-            ]
-        },
-        {
-            "id": "b8_summary",
-            "type": "summary",
-            "title": "Результаты урока",
-            "xp": xp_val,
-            "skills_acquired": [
-                f"Теоретический фундамент по направлению «{clean_topic}»",
-                "Умение применять стандарты на практике",
-                f"Начислено {xp_val} XP в копилку прогресса"
-            ]
-        }
-    ]
-    return {"provider": "heuristic_offline", "blocks": blocks}
+    raise AIProviderCallError(
+        f"Провайдер LLM не вернул корректную структуру урока ({type(last_error).__name__ if last_error else 'EmptyOrInvalidJSON'})."
+    )
 
 def student_socratic_tutor(lesson_data, current_block, student_question, history=None, context=None, user_api_key="", provider=""):
     """
@@ -364,29 +254,86 @@ def student_socratic_tutor(lesson_data, current_block, student_question, history
         f"Провайдер LLM не вернул ответ ({type(last_error).__name__ if last_error else 'EmptyResponse'})."
     )
 
-def review_submission_ai(submission_data, task_data):
-    """
-    Teacher AI Assistant: Pre-grades and drafts feedback for student submissions.
-    Teacher maintains full authority over final grade and approval.
-    """
-    code_or_text = submission_data.get("submitted_code") or submission_data.get("student_comment") or ""
-    task_title = task_data.get("title", "Практическое задание")
-    max_score = task_data.get("max_score", 100)
-    
-    # Analyze submission length and keywords
-    has_content = len(code_or_text.strip()) > 20
-    score_estimate = 90 if has_content else 60
-    
+def _parse_review_json(raw_text, max_score, provider_name):
+    parsed = json.loads(_strip_json_fences(raw_text))
+    if not isinstance(parsed, dict):
+        raise ValueError("Review response must be a JSON object")
+    if "recommended_score" not in parsed:
+        raise ValueError("Missing recommended_score in review JSON")
+    score = int(round(float(parsed["recommended_score"])))
+    if score < 0 or score > max_score:
+        raise ValueError(f"recommended_score {score} out of range 0..{max_score}")
+    criteria = parsed.get("criteria_checks")
+    if not isinstance(criteria, list):
+        raise ValueError("criteria_checks must be a list")
+    draft_feedback = str(parsed.get("draft_feedback") or "").strip()
+    if not draft_feedback:
+        raise ValueError("draft_feedback must not be empty")
     return {
-        "recommended_score": score_estimate,
+        "recommended_score": score,
         "max_score": max_score,
-        "criteria_checks": [
-            {"criterion": "Соответствие теме задания", "status": "passed" if has_content else "partial"},
-            {"criterion": "Качество оформления и структура", "status": "passed" if len(code_or_text) > 50 else "needs_work"},
-            {"criterion": "Самостоятельность выполнения", "status": "verified"}
-        ],
-        "draft_feedback": (
-            f"Работа по заданию «{task_title}» выполнена на хорошем инженерном уровне. "
-            f"Основные требования соблюдены. Рекомендуется обратить внимание на детализацию комментариев и форматирование кода."
-        )
+        "criteria_checks": criteria,
+        "draft_feedback": draft_feedback,
+        "provider": provider_name,
     }
+
+
+def review_submission_ai(submission_data, task_data, user_api_key="", provider=""):
+    """
+    Teacher AI Assistant: Pre-grades and drafts feedback for student submissions via real LLM API.
+    Strictly requires a configured LLM provider key; never returns canned or length-based scores.
+    """
+    gemini_key, openai_key = resolve_llm_keys(user_api_key=user_api_key, provider=provider)
+    if not gemini_key and not openai_key:
+        raise AIProviderUnconfiguredError(
+            "AI-проверка недоступна: не задан API-ключ LLM (укажите в настройках или переменных окружения)."
+        )
+
+    submission_data = submission_data or {}
+    task_data = task_data or {}
+    code_or_text = (submission_data.get("submitted_code") or submission_data.get("student_comment") or "").strip()
+    task_title = task_data.get("title", "Практическое задание")
+    max_score = int(task_data.get("max_score", 100) or 100)
+
+    system_prompt = (
+        "Ты — методист-эксперт образовательной платформы EduSpace. "
+        "Оцени практическую работу студента объективно по критериям задания. "
+        "Строго верни только валидный JSON без markdown-обёртки вида:\n"
+        "{\n"
+        f'  "recommended_score": <целое число от 0 до {max_score}>,\n'
+        f'  "max_score": {max_score},\n'
+        '  "criteria_checks": [{"criterion": "...", "status": "passed|partial|needs_work"}],\n'
+        '  "draft_feedback": "<конструктивный отзыв преподавателю и студенту>"\n'
+        "}"
+    )
+    user_prompt = (
+        f"Задание: {task_title}\n"
+        f"Максимальный балл: {max_score}\n"
+        f"Ответ / код студента:\n{code_or_text[:6000] if code_or_text else '(пустой ответ)'}"
+    )
+
+    last_error = None
+    if gemini_key:
+        try:
+            raw_text = _call_gemini_api(gemini_key, system_prompt, user_prompt)
+            if raw_text:
+                return _parse_review_json(raw_text, max_score, "gemini")
+            last_error = ValueError("Empty Gemini review response")
+        except Exception as e:
+            last_error = e
+            print(f"[WARN] Gemini submission review failed: {e}")
+
+    if openai_key:
+        try:
+            raw_text = _call_openai_api(openai_key, system_prompt, user_prompt)
+            if raw_text:
+                return _parse_review_json(raw_text, max_score, "openai")
+            last_error = ValueError("Empty OpenAI review response")
+        except Exception as e:
+            last_error = e
+            print(f"[WARN] OpenAI submission review failed: {e}")
+
+    raise AIProviderCallError(
+        f"Провайдер LLM не вернул корректную оценку работы ({type(last_error).__name__ if last_error else 'EmptyOrInvalidJSON'})."
+    )
+

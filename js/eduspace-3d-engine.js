@@ -16,10 +16,17 @@ window.EduSpace3D = (function () {
   function cleanupScene(containerId) {
     const prev = activeScenes[containerId];
     if (!prev) return;
-    if (prev.animId) cancelAnimationFrame(prev.animId);
-    if (prev.resizeObs) prev.resizeObs.disconnect();
-    if (prev.renderer) {
-      try { prev.renderer.dispose(); } catch (e) {}
+    if (typeof window.disposeThreeScene === 'function') {
+      window.disposeThreeScene(prev);
+    } else {
+      if (prev.animId) cancelAnimationFrame(prev.animId);
+      if (prev.resizeObs) prev.resizeObs.disconnect();
+      if (Array.isArray(prev.cleanupListeners)) {
+        prev.cleanupListeners.forEach((fn) => { try { fn(); } catch (e) {} });
+      }
+      if (prev.renderer) {
+        try { prev.renderer.dispose(); } catch (e) {}
+      }
     }
     delete activeScenes[containerId];
   }
@@ -32,9 +39,15 @@ window.EduSpace3D = (function () {
 
     const w = container.clientWidth || 500;
     const h = container.clientHeight || 300;
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const pCfg = (window.EduGraphicsProfile && typeof window.EduGraphicsProfile.getConfig === 'function')
+      ? window.EduGraphicsProfile.getConfig()
+      : { dpr: Math.min(window.devicePixelRatio || 1, 2), antialias: true, shadows: true, hdri: true };
+    const renderer = new THREE.WebGLRenderer({ antialias: Boolean(pCfg.antialias), alpha: true });
     renderer.setSize(w, h);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(pCfg.dpr || Math.min(window.devicePixelRatio || 1, 2));
+    if (window.EduGraphicsProfile && typeof window.EduGraphicsProfile.registerRenderer === 'function') {
+      window.EduGraphicsProfile.registerRenderer(renderer);
+    }
     if (renderer.outputEncoding !== undefined && THREE.sRGBEncoding !== undefined) {
       renderer.outputEncoding = THREE.sRGBEncoding;
     }
@@ -42,6 +55,7 @@ window.EduSpace3D = (function () {
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.25;
     }
+    let pmremTarget = null;
     try {
       const envCanvas = document.createElement('canvas');
       envCanvas.width = 256;
@@ -63,13 +77,23 @@ window.EduSpace3D = (function () {
       const rawEnvTex = new THREE.CanvasTexture(envCanvas);
       rawEnvTex.mapping = THREE.EquirectangularReflectionMapping;
       if (THREE.sRGBEncoding !== undefined) rawEnvTex.encoding = THREE.sRGBEncoding;
-      if (typeof THREE.PMREMGenerator === 'function') {
-        const pmrem = new THREE.PMREMGenerator(renderer);
-        pmrem.compileEquirectangularShader();
-        scene.environment = pmrem.fromEquirectangular(rawEnvTex).texture;
-        rawEnvTex.dispose();
-        pmrem.dispose();
+      const supportsHalfFloat = Boolean(
+        renderer.capabilities && (renderer.capabilities.isWebGL2 || renderer.extensions?.get('OES_texture_half_float'))
+      );
+      if (pCfg.hdri !== false && typeof THREE.PMREMGenerator === 'function' && supportsHalfFloat) {
+        try {
+          const pmrem = new THREE.PMREMGenerator(renderer);
+          pmrem.compileEquirectangularShader();
+          pmremTarget = pmrem.fromEquirectangular(rawEnvTex);
+          scene.environment = pmremTarget.texture;
+          rawEnvTex.dispose();
+          pmrem.dispose();
+        } catch (pmErr) {
+          rawEnvTex.type = THREE.UnsignedByteType;
+          scene.environment = rawEnvTex;
+        }
       } else {
+        rawEnvTex.type = THREE.UnsignedByteType;
         scene.environment = rawEnvTex;
       }
     } catch (e) {}
@@ -141,17 +165,17 @@ window.EduSpace3D = (function () {
     let rotX = 0.12;
     let zoom = camera.position.length() || 5.8;
 
-    container.addEventListener('pointerdown', (e) => {
+    const onPointerDown = (e) => {
       dragging = true;
       lastX = e.clientX;
       lastY = e.clientY;
       container.style.cursor = 'grabbing';
-    });
-    window.addEventListener('pointerup', () => {
+    };
+    const onPointerUp = () => {
       dragging = false;
       container.style.cursor = 'grab';
-    });
-    container.addEventListener('pointermove', (e) => {
+    };
+    const onPointerMove = (e) => {
       if (!dragging) return;
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
@@ -159,11 +183,16 @@ window.EduSpace3D = (function () {
       lastY = e.clientY;
       rotY += dx * 0.009;
       rotX = Math.max(-0.55, Math.min(0.85, rotX + dy * 0.008));
-    });
-    container.addEventListener('wheel', (e) => {
+    };
+    const onWheel = (e) => {
       e.preventDefault();
       zoom = Math.max(3.2, Math.min(9.5, zoom + e.deltaY * 0.003));
-    }, { passive: false });
+    };
+
+    container.addEventListener('pointerdown', onPointerDown);
+    window.addEventListener('pointerup', onPointerUp);
+    container.addEventListener('pointermove', onPointerMove);
+    container.addEventListener('wheel', onWheel, { passive: false });
 
     const resizeObs = 'ResizeObserver' in window ? new ResizeObserver(() => {
       const nw = container.clientWidth || 500;
@@ -174,7 +203,19 @@ window.EduSpace3D = (function () {
     }) : null;
     if (resizeObs) resizeObs.observe(container);
 
-    const state = { renderer, resizeObs, animId: null };
+    const state = {
+      scene,
+      renderer,
+      resizeObs,
+      pmremTarget,
+      animId: null,
+      cleanupListeners: [
+        () => container.removeEventListener('pointerdown', onPointerDown),
+        () => window.removeEventListener('pointerup', onPointerUp),
+        () => container.removeEventListener('pointermove', onPointerMove),
+        () => container.removeEventListener('wheel', onWheel)
+      ]
+    };
     activeScenes[containerId] = state;
 
     let t = 0;
@@ -198,7 +239,7 @@ window.EduSpace3D = (function () {
       renderer.render(scene, camera);
     }
     animate();
-    return { scene, camera, renderer, group };
+    return { scene, camera, renderer, group, dispose: () => cleanupScene(containerId) };
   }
 
   function initHeroCanvas(containerId) {
@@ -214,9 +255,15 @@ window.EduSpace3D = (function () {
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
     camera.position.set(0, 0, 7);
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const pCfg = (window.EduGraphicsProfile && typeof window.EduGraphicsProfile.getConfig === 'function')
+      ? window.EduGraphicsProfile.getConfig()
+      : { dpr: Math.min(window.devicePixelRatio || 1, 2), antialias: true };
+    const renderer = new THREE.WebGLRenderer({ antialias: Boolean(pCfg.antialias), alpha: true });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(pCfg.dpr || Math.min(window.devicePixelRatio || 1, 2));
+    if (window.EduGraphicsProfile && typeof window.EduGraphicsProfile.registerRenderer === 'function') {
+      window.EduGraphicsProfile.registerRenderer(renderer);
+    }
     container.appendChild(renderer.domElement);
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.65));
@@ -256,13 +303,19 @@ window.EduSpace3D = (function () {
     scene.add(group);
 
     let mouseX = 0, mouseY = 0;
-    container.addEventListener('mousemove', (e) => {
+    const onMouseMove = (e) => {
       const rect = container.getBoundingClientRect();
       mouseX = ((e.clientX - rect.left) / (rect.width || 1)) * 2 - 1;
       mouseY = -(((e.clientY - rect.top) / (rect.height || 1)) * 2 - 1);
-    });
+    };
+    container.addEventListener('mousemove', onMouseMove);
 
-    const state = { renderer, animId: null };
+    const state = {
+      scene,
+      renderer,
+      animId: null,
+      cleanupListeners: [() => container.removeEventListener('mousemove', onMouseMove)]
+    };
     activeScenes[containerId] = state;
 
     function animate() {
@@ -282,7 +335,7 @@ window.EduSpace3D = (function () {
       renderer.render(scene, camera);
     }
     animate();
-    return { scene, camera, renderer, group };
+    return { scene, camera, renderer, group, dispose: () => cleanupScene(containerId) };
   }
 
   // 1. IT: 3D Server Node Cluster + Data Ring
@@ -785,21 +838,28 @@ window.EduWorkshop3D = (function () {
     var host = typeof containerEl === 'string' ? document.getElementById(containerEl) : containerEl;
     if (!host) return null;
 
+    if (host.__eduWorkshopCtx) {
+      try { window.disposeThreeScene(host.__eduWorkshopCtx); } catch (e) {}
+      host.__eduWorkshopCtx = null;
+    }
+
     var modelId = cfg.modelId || 'mech-cylinder';
     var spec = WORKSHOP_SPECS[modelId] || WORKSHOP_SPECS['mech-cylinder'];
     var state = {
       modelId: spec.modelId,
       lessonId: cfg.lessonId || 1,
-      activeTool: cfg.activeTool || 'socket_set',
+      activeTool: (cfg.savedState && cfg.savedState.active_tool) || cfg.activeTool || 'socket_set',
       selectedPart: null,
       disassembledParts: Array.isArray(cfg.savedState && cfg.savedState.disassembled_parts)
         ? cfg.savedState.disassembled_parts.slice()
         : [],
-      stepHistory: [],
+      stepHistory: Array.isArray(cfg.savedState && cfg.savedState.step_history)
+        ? cfg.savedState.step_history.slice()
+        : [],
       profile: window.EduGraphicsProfile ? window.EduGraphicsProfile.get() : 'BALANCED'
     };
 
-    window.__active3dDisassembledParts = state.disassembledParts;
+    window.__active3dDisassembledParts = state.disassembledParts.slice();
 
     var ctx = {
       scene: null,
@@ -810,15 +870,69 @@ window.EduWorkshop3D = (function () {
       rafId: null,
       cleanupListeners: []
     };
+    host.__eduWorkshopCtx = ctx;
+
+    var partNodes = {};
+    var partMeshesMap = {};
+    var keyLight = null;
+    var disposed = false;
+
+    function applyVisualState() {
+      Object.keys(spec.parts).forEach(function (pKey) {
+        var partSpec = spec.parts[pKey];
+        var isDetached = state.disassembledParts.indexOf(pKey) !== -1;
+        var isSelected = state.selectedPart === pKey;
+        var rootNode = partNodes[pKey];
+        if (rootNode && rootNode.userData && rootNode.userData.origPos) {
+          var orig = rootNode.userData.origPos;
+          var off = isDetached && Array.isArray(partSpec.explodeOffset) ? partSpec.explodeOffset : [0, 0, 0];
+          rootNode.position.set(orig.x + off[0], orig.y + off[1], orig.z + off[2]);
+        }
+        var meshes = partMeshesMap[pKey] || [];
+        meshes.forEach(function (m) {
+          if (m.material && m.material.emissive) {
+            if (isSelected) {
+              m.material.emissive.setHex(0x38bdf8);
+              m.material.emissiveIntensity = 0.45;
+            } else if (isDetached) {
+              m.material.emissive.setHex(0x10b981);
+              m.material.emissiveIntensity = 0.16;
+            } else {
+              m.material.emissive.setHex(0x000000);
+              m.material.emissiveIntensity = 0;
+            }
+          }
+          if (m.material) {
+            m.material.transparent = isDetached ? true : Boolean(m.userData.origTransparent);
+            m.material.opacity = isDetached ? 0.55 : (m.userData.origOpacity !== undefined ? m.userData.origOpacity : 1);
+          }
+        });
+      });
+    }
+
+    function selectPart(partId) {
+      if (!partId || !spec.parts[partId]) return null;
+      state.selectedPart = partId;
+      window.__active3dSelectedPart = partId;
+      applyVisualState();
+      if (typeof cfg.onPartSelect === 'function') {
+        cfg.onPartSelect(partId, spec.parts[partId]);
+      }
+      return spec.parts[partId];
+    }
 
     if (window.THREE) {
       try {
         var T = window.THREE;
         var w = host.clientWidth || 640;
         var h = host.clientHeight || 380;
-        var pCfg = window.EduGraphicsProfile ? window.EduGraphicsProfile.getConfig(state.profile) : { dpr: 1.5, antialias: true, shadows: true };
-        var renderer = new T.WebGLRenderer({ antialias: pCfg.antialias, alpha: true });
+        var pCfg = window.EduGraphicsProfile ? window.EduGraphicsProfile.getConfig(state.profile) : { dpr: 1.5, antialias: true, shadows: true, shadowMapSize: 1024 };
+        var renderer = new T.WebGLRenderer({ antialias: Boolean(pCfg.antialias), alpha: true });
         renderer.setSize(w, h);
+        if (renderer.shadowMap) {
+          renderer.shadowMap.enabled = Boolean(pCfg.shadows);
+          if (T.PCFSoftShadowMap) renderer.shadowMap.type = T.PCFSoftShadowMap;
+        }
         window.EduGraphicsProfile?.registerRenderer(renderer);
         host.innerHTML = '';
         host.appendChild(renderer.domElement);
@@ -829,9 +943,13 @@ window.EduWorkshop3D = (function () {
         camera.lookAt(0, 0.9, 0);
 
         scene.add(new T.AmbientLight(0xffffff, 0.85));
-        var keyLight = new T.DirectionalLight(0xffffff, 1.8);
+        keyLight = new T.DirectionalLight(0xffffff, 1.8);
         keyLight.position.set(3, 5, 4);
         keyLight.castShadow = Boolean(pCfg.shadows);
+        if (keyLight.shadow && keyLight.shadow.mapSize) {
+          var smSize = pCfg.shadowMapSize || 1024;
+          keyLight.shadow.mapSize.set(smSize, smSize);
+        }
         scene.add(keyLight);
 
         var controls = null;
@@ -842,21 +960,46 @@ window.EduWorkshop3D = (function () {
           controls.target.set(0, 0.9, 0);
         }
 
-        var partMeshes = {};
         if (T.GLTFLoader) {
           var loader = new T.GLTFLoader();
           loader.load(spec.glb, function (gltf) {
+            if (disposed) return;
             var root = gltf.scene || (gltf.scenes && gltf.scenes[0]);
             if (!root) return;
+            var nodeToKey = {};
+            Object.keys(spec.parts).forEach(function (pKey) {
+              nodeToKey[spec.parts[pKey].nodeName] = pKey;
+            });
+
             root.traverse(function (node) {
+              node.userData.origPos = node.position.clone();
+              var normName = String(node.name || '').replace(/^mesh_/, '');
+              if (nodeToKey[normName] && !partNodes[nodeToKey[normName]]) {
+                partNodes[nodeToKey[normName]] = node;
+              }
               if (node.isMesh) {
-                node.castShadow = true;
-                node.receiveShadow = true;
-                partMeshes[node.name] = node;
-                node.userData.origPos = node.position.clone();
+                node.castShadow = Boolean(pCfg.shadows);
+                node.receiveShadow = Boolean(pCfg.shadows);
+                if (node.material) {
+                  node.material = node.material.clone();
+                  node.userData.origTransparent = Boolean(node.material.transparent);
+                  node.userData.origOpacity = node.material.opacity !== undefined ? node.material.opacity : 1;
+                }
+                var cur = node;
+                var ownerKey = null;
+                while (cur && !ownerKey) {
+                  var cname = String(cur.name || '').replace(/^mesh_/, '');
+                  if (nodeToKey[cname]) ownerKey = nodeToKey[cname];
+                  cur = cur.parent;
+                }
+                if (ownerKey) {
+                  if (!partMeshesMap[ownerKey]) partMeshesMap[ownerKey] = [];
+                  partMeshesMap[ownerKey].push(node);
+                }
               }
             });
             scene.add(root);
+            applyVisualState();
           });
         }
 
@@ -869,15 +1012,18 @@ window.EduWorkshop3D = (function () {
           raycaster.setFromCamera(pointer, camera);
           var hits = raycaster.intersectObjects(scene.children, true);
           if (hits.length > 0) {
-            var hitObj = hits[0].object;
-            var hitName = hitObj.name || (hitObj.parent && hitObj.parent.name) || '';
-            Object.keys(spec.parts).forEach(function (pKey) {
-              if (spec.parts[pKey].nodeName === hitName) {
-                state.selectedPart = pKey;
-                window.__active3dSelectedPart = pKey;
-                if (typeof cfg.onPartSelect === 'function') cfg.onPartSelect(pKey, spec.parts[pKey]);
-              }
-            });
+            var cur = hits[0].object;
+            var matchedKey = null;
+            while (cur && !matchedKey) {
+              var cname = String(cur.name || '').replace(/^mesh_/, '');
+              Object.keys(spec.parts).forEach(function (pKey) {
+                if (spec.parts[pKey].nodeName === cname) matchedKey = pKey;
+              });
+              cur = cur.parent;
+            }
+            if (matchedKey) {
+              selectPart(matchedKey);
+            }
           }
         };
         renderer.domElement.addEventListener('pointerdown', onPointerDown);
@@ -885,12 +1031,25 @@ window.EduWorkshop3D = (function () {
           renderer.domElement.removeEventListener('pointerdown', onPointerDown);
         });
 
+        if ('ResizeObserver' in window) {
+          ctx.resizeObserver = new ResizeObserver(function () {
+            if (disposed) return;
+            var nw = host.clientWidth || 640;
+            var nh = host.clientHeight || 380;
+            camera.aspect = nw / Math.max(nh, 1);
+            camera.updateProjectionMatrix();
+            renderer.setSize(nw, nh);
+          });
+          ctx.resizeObserver.observe(host);
+        }
+
         ctx.scene = scene;
         ctx.camera = camera;
         ctx.renderer = renderer;
         ctx.controls = controls;
 
         var animate = function () {
+          if (disposed) return;
           ctx.rafId = requestAnimationFrame(animate);
           if (controls) controls.update();
           renderer.render(scene, camera);
@@ -900,28 +1059,67 @@ window.EduWorkshop3D = (function () {
     }
 
     return {
-      dispose: function () { window.disposeThreeScene(ctx); },
+      dispose: function () {
+        disposed = true;
+        window.disposeThreeScene(ctx);
+        if (host.__eduWorkshopCtx === ctx) {
+          host.__eduWorkshopCtx = null;
+        }
+      },
+      getRenderer: function () { return ctx.renderer; },
       setProfile: function (p) {
         state.profile = window.EduGraphicsProfile ? window.EduGraphicsProfile.set(p) : p;
+        var nextCfg = window.EduGraphicsProfile ? window.EduGraphicsProfile.getConfig(state.profile) : { shadows: true, shadowMapSize: 1024 };
+        if (keyLight) {
+          keyLight.castShadow = Boolean(nextCfg.shadows);
+          if (keyLight.shadow && keyLight.shadow.mapSize) {
+            var sm = nextCfg.shadowMapSize || 1024;
+            keyLight.shadow.mapSize.set(sm, sm);
+          }
+        }
+        if (ctx.renderer && ctx.renderer.shadowMap) {
+          ctx.renderer.shadowMap.enabled = Boolean(nextCfg.shadows);
+          ctx.renderer.shadowMap.needsUpdate = true;
+        }
         return state.profile;
       },
       selectTool: function (toolId) {
         state.activeTool = toolId;
         return state.activeTool;
       },
+      selectPart: selectPart,
       performAction: function (action, partId) {
         var res = evaluateAction(state.modelId, state.disassembledParts, action, partId, state.activeTool);
         if (res.valid) {
           state.disassembledParts = res.disassembled_parts;
-          window.__active3dDisassembledParts = state.disassembledParts;
+          window.__active3dDisassembledParts = state.disassembledParts.slice();
+          applyVisualState();
         }
         state.stepHistory.push({ action: action, part_id: partId, tool_id: state.activeTool, valid: res.valid });
         return res;
       },
+      syncState: function (serverState) {
+        if (!serverState || typeof serverState !== 'object') return state;
+        if (Array.isArray(serverState.disassembled_parts)) {
+          state.disassembledParts = serverState.disassembled_parts.slice();
+          window.__active3dDisassembledParts = state.disassembledParts.slice();
+        }
+        if (serverState.active_tool) {
+          state.activeTool = serverState.active_tool;
+        }
+        if (Array.isArray(serverState.step_history)) {
+          state.stepHistory = serverState.step_history.slice();
+        }
+        applyVisualState();
+        return state;
+      },
       resetAssembly: function () {
         state.disassembledParts = [];
         state.stepHistory = [];
+        state.selectedPart = null;
+        window.__active3dSelectedPart = null;
         window.__active3dDisassembledParts = [];
+        applyVisualState();
         return state;
       },
       getStateSnapshot: function () {

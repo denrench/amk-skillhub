@@ -296,6 +296,15 @@ body.workshop main .tilt-3d:hover {
 .workshop-visual canvas { display: block; width: 100%; height: 100%; }
 .workshop .workshop-visual[hidden] { display: none; }
 
+/* Immediate interactive hubs must never be hidden at opacity: 0 on first paint */
+#four-student-tools-hub,
+[data-no-reveal],
+.workshop #four-student-tools-hub.sh-reveal-enter {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: none !important;
+}
+
 /* Dynamic Task Cards, Lesson Player Blocks, Modals & Table Rows Soft Reveal + Hover */
 .workshop #tasks-grid > *,
 .workshop #lp-block-canvas > *,

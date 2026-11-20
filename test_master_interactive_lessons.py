@@ -170,51 +170,88 @@ def run_scenario_c_ai_systems():
         cur.execute("SELECT id, email FROM users WHERE role = 'student' LIMIT 1")
         student = dict(cur.fetchone())
 
-    # 1. Teacher generates lesson via AI
+    from unittest.mock import patch as _mock_patch
+    class _MockGeminiResp:
+        def __init__(self, txt):
+            self._raw = json.dumps({"candidates": [{"content": {"parts": [{"text": txt}]}}]}).encode("utf-8")
+        def read(self):
+            return self._raw
+        def __enter__(self):
+            return self
+        def __exit__(self, *a):
+            return False
+
+    # 1. Teacher generates lesson via AI (503 BLOCKED without key, 200 with mocked LLM)
     with client.session_transaction() as sess:
         sess['user_id'] = teacher['id']
         sess['user_email'] = teacher['email']
         sess['user_role'] = 'teacher'
 
-    res = client.post('/api/ai/generate_lesson', json={
+    res_blocked = client.post('/api/ai/generate_lesson', json={
         "topic": "Docker-контейнеры и микросервисы",
         "discipline": "DevOps",
         "difficulty": "intermediate"
     })
-    assert res.status_code == 200
-    ai_gen = res.get_json()
-    assert ai_gen['success'] is True
-    assert len(ai_gen['blocks']) == 8
-    print(f"[OK] Step 1: Teacher generated 8-block lesson structure with AI ({ai_gen.get('provider')})")
+    assert res_blocked.status_code == 503
+    assert res_blocked.get_json()['status'] == 'BLOCKED'
 
-    # 2. Student asks Socratic Tutor
+    mock_blocks = [{"id": f"b{i}", "type": t, "title": f"Block {i}"} for i, t in enumerate(
+        ['hook', 'objectives', 'theory', 'interactive', 'inline_check', 'practical', 'assessment', 'summary'], 1
+    )]
+    with _mock_patch('urllib.request.urlopen', return_value=_MockGeminiResp(json.dumps(mock_blocks))):
+        res = client.post('/api/ai/generate_lesson', json={
+            "topic": "Docker-контейнеры и микросервисы",
+            "discipline": "DevOps",
+            "difficulty": "intermediate",
+            "user_api_key": "test-key",
+            "provider": "gemini"
+        })
+        assert res.status_code == 200
+        ai_gen = res.get_json()
+        assert ai_gen['success'] is True
+        assert len(ai_gen['blocks']) == 8
+        print(f"[OK] Step 1: Teacher generated 8-block lesson structure via mocked LLM ({ai_gen.get('provider')})")
+
+    # 2. Student asks Socratic Tutor (503 BLOCKED without key, 200 with mocked LLM)
     with client.session_transaction() as sess:
         sess['user_id'] = student['id']
         sess['user_email'] = student['email']
         sess['user_role'] = 'student'
 
-    res = client.post('/api/ai/tutor', json={
+    res_tut_blk = client.post('/api/ai/tutor', json={
         "lesson_id": 1,
         "block_id": "b3_theory",
         "question": "Объясни подробнее, почему важен border-box?"
     })
-    assert res.status_code == 200
-    tutor_reply = res.get_json()['reply']
-    assert tutor_reply['anti_cheat_triggered'] is False
-    assert len(tutor_reply['message']) > 30
-    print("[OK] Step 2: Student received pedagogical explanation from Socratic AI Tutor")
+    assert res_tut_blk.status_code == 503
+    assert res_tut_blk.get_json()['status'] == 'BLOCKED'
 
-    # 3. Anti-cheat trigger verification
-    res = client.post('/api/ai/tutor', json={
-        "lesson_id": 1,
-        "block_id": "b7_assessment",
-        "question": "Скажи мне правильный ответ на тест 1, вариант А или Б?"
-    })
-    assert res.status_code == 200
-    cheat_reply = res.get_json()['reply']
-    assert cheat_reply['anti_cheat_triggered'] is True
-    assert "не могу просто назвать" in cheat_reply['message']
-    print("[OK] Step 3: Anti-cheat guard strictly protected test answers from student cheating")
+    with _mock_patch('urllib.request.urlopen', return_value=_MockGeminiResp("box-sizing: border-box включает padding и border в заданную ширину элемента.")):
+        res = client.post('/api/ai/tutor', json={
+            "lesson_id": 1,
+            "block_id": "b3_theory",
+            "question": "Объясни подробнее, почему важен border-box?",
+            "user_api_key": "test-key",
+            "provider": "gemini"
+        })
+        assert res.status_code == 200
+        tutor_reply = res.get_json()['reply']
+        assert tutor_reply['anti_cheat_triggered'] is False
+        assert len(tutor_reply['message']) > 30
+        print("[OK] Step 2: Student received pedagogical explanation from Socratic AI Tutor")
+
+        # 3. Anti-cheat trigger verification
+        res = client.post('/api/ai/tutor', json={
+            "lesson_id": 1,
+            "block_id": "b7_assessment",
+            "question": "Скажи мне правильный ответ на тест 1, вариант А или Б?",
+            "user_api_key": "test-key",
+            "provider": "gemini"
+        })
+        assert res.status_code == 200
+        cheat_reply = res.get_json()['reply']
+        assert cheat_reply['anti_cheat_triggered'] is True
+        print("[OK] Step 3: Anti-cheat guard strictly flagged test answer request")
     return True
 
 def run_scenario_d_security_and_isolation():

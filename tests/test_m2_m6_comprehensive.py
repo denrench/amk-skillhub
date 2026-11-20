@@ -14,9 +14,12 @@ from __future__ import annotations
 
 import glob
 import hashlib
+import json
 import os
 import tempfile
 import unittest
+import urllib.error
+from unittest.mock import patch
 
 import server
 
@@ -167,6 +170,220 @@ class TestM2ToM6WhiteBoxSuite(unittest.TestCase):
         pdf_resp = client.get("/api/portfolio/export.pdf")
         self.assertEqual(pdf_resp.status_code, 200)
         self.assertTrue(pdf_resp.data.startswith(b"%PDF-1.4"))
+        self.assertIn(b"Akhmetov Timur", pdf_resp.data)
+
+    def test_07_ai_generate_lesson_and_review_submission_no_stubs(self):
+        teach_client, _ = self._register_and_client("ai_teach", role="teacher", specialty="it", group="ИС-21")
+
+        # 1. With user_api_key when provider call fails -> must return 503 BLOCKED (never heuristic_offline or 90/60)
+        with patch("urllib.request.urlopen", side_effect=urllib.error.URLError("offline")):
+            r_gen_fail = teach_client.post(
+                "/api/ai/generate_lesson",
+                json={"topic": "Flexbox Grid", "discipline": "IT", "user_api_key": "bad-key", "provider": "gemini"},
+            )
+            self.assertEqual(r_gen_fail.status_code, 503)
+            self.assertEqual(r_gen_fail.get_json()["status"], "BLOCKED")
+            self.assertEqual(r_gen_fail.get_json()["code"], "AI_PROVIDER_ERROR")
+
+            r_rev_fail = teach_client.post(
+                "/api/ai/review_submission",
+                json={"code": "print('hello world from student solution')", "user_api_key": "bad-key", "provider": "gemini"},
+            )
+            self.assertEqual(r_rev_fail.status_code, 503)
+            self.assertEqual(r_rev_fail.get_json()["status"], "BLOCKED")
+            self.assertEqual(r_rev_fail.get_json()["code"], "AI_PROVIDER_ERROR")
+
+        # 2. Mocked Gemini response -> verify x-goog-api-key header and real JSON parsing
+        class _FakeHTTPResp:
+            def __init__(self, text_payload):
+                self._raw = json.dumps({
+                    "candidates": [{"content": {"parts": [{"text": text_payload}]}}]
+                }).encode("utf-8")
+
+            def read(self):
+                return self._raw
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+        captured_headers = []
+        captured_bodies = []
+
+        def _fake_urlopen(req, timeout=12):
+            captured_headers.append({k.lower(): v for k, v in req.header_items()})
+            body_obj = json.loads(req.data.decode("utf-8"))
+            captured_bodies.append(body_obj)
+            prompt_txt = body_obj["contents"][0]["parts"][0]["text"]
+            if "Оцени практическую работу" in prompt_txt:
+                return _FakeHTTPResp(json.dumps({
+                    "recommended_score": 42,
+                    "max_score": 100,
+                    "criteria_checks": [{"criterion": "Семантика", "status": "partial"}],
+                    "draft_feedback": "Нужно доработать медиа-запросы."
+                }, ensure_ascii=False))
+            return _FakeHTTPResp(json.dumps([
+                {"id": "b1_hook", "type": "hook", "title": "Реальный LLM кейс", "content": "Сгенерировано моделью"},
+                {"id": "b2_objectives", "type": "objectives", "title": "Цели", "items": ["Цель 1"]},
+            ], ensure_ascii=False))
+
+        with patch("urllib.request.urlopen", side_effect=_fake_urlopen):
+            r_gen_ok = teach_client.post(
+                "/api/ai/generate_lesson",
+                json={"topic": "Grid Layout", "discipline": "IT", "user_api_key": "test-gemini-key", "provider": "gemini"},
+            )
+            self.assertEqual(r_gen_ok.status_code, 200, r_gen_ok.get_data(as_text=True))
+            gen_json = r_gen_ok.get_json()
+            self.assertEqual(gen_json["provider"], "gemini")
+            self.assertEqual(gen_json["blocks"][0]["title"], "Реальный LLM кейс")
+
+            r_rev_ok = teach_client.post(
+                "/api/ai/review_submission",
+                json={"code": "x" * 100, "user_api_key": "test-gemini-key", "provider": "gemini"},
+            )
+            self.assertEqual(r_rev_ok.status_code, 200, r_rev_ok.get_data(as_text=True))
+            rev_json = r_rev_ok.get_json()["review"]
+            self.assertEqual(rev_json["recommended_score"], 42)
+            self.assertEqual(rev_json["provider"], "gemini")
+            self.assertEqual(rev_json["draft_feedback"], "Нужно доработать медиа-запросы.")
+
+            # 3. /api/ai/chat forwards context & x-goog-api-key
+            r_chat_ok = teach_client.post(
+                "/api/ai/chat",
+                json={
+                    "message": "Проверь деталь",
+                    "specialty": "automechanic",
+                    "user_api_key": "test-gemini-key",
+                    "provider": "gemini",
+                    "context": {
+                        "selected_part": "valve_cover",
+                        "disassembled_parts": ["spark_plug_1"],
+                        "simulator_state": {"torque_nm": 45},
+                        "recent_errors": ["WRONG_TOOL"],
+                    },
+                },
+            )
+            self.assertEqual(r_chat_ok.status_code, 200, r_chat_ok.get_data(as_text=True))
+
+        self.assertEqual(len(captured_headers), 3)
+        for hdrs in captured_headers:
+            self.assertEqual(hdrs.get("x-goog-api-key"), "test-gemini-key")
+        chat_prompt = captured_bodies[2]["contents"][0]["parts"][0]["text"]
+        self.assertIn("valve_cover", chat_prompt)
+        self.assertIn("WRONG_TOOL", chat_prompt)
+
+    def test_08_workshop_brakes_parts_and_reset_alias(self):
+        client, _ = self._register_and_client("ws_brakes", specialty="automechanic")
+        r_bad = client.post(
+            "/api/workshop/action",
+            json={"lesson_id": 9, "model_id": "mech-brakes", "action": "detach", "part_id": "brake_pads", "tool_id": "socket_set"},
+        )
+        self.assertEqual(r_bad.status_code, 200)
+        self.assertFalse(r_bad.get_json()["valid"])
+        self.assertEqual(r_bad.get_json()["error_code"], "PREREQUISITE_LOCKED")
+
+        for part in ("caliper_bolts", "caliper_body", "brake_pads", "brake_rotor"):
+            r_ok = client.post(
+                "/api/workshop/action",
+                json={"lesson_id": 9, "model_id": "mech-brakes", "action": "detach", "part_id": part, "tool_id": "socket_set"},
+            )
+            self.assertTrue(r_ok.get_json()["valid"], r_ok.get_data(as_text=True))
+
+        # Check piston_02 -> piston_2 normalization on mech-cylinder
+        for part in ("valve_cover", "camshaft_exhaust", "cylinder_head", "gasket_head", "piston_02"):
+            r_cyl = client.post(
+                "/api/workshop/action",
+                json={"lesson_id": 1, "model_id": "mech-cylinder", "action": "detach", "part_id": part, "tool_id": "socket_set"},
+            )
+            self.assertTrue(r_cyl.get_json()["valid"], r_cyl.get_data(as_text=True))
+        self.assertIn("piston_2", r_cyl.get_json()["disassembled_parts"])
+
+        r_reset = client.post("/api/workshop/reset", json={"lesson_id": 9, "model_id": "mech-brakes"})
+        self.assertEqual(r_reset.status_code, 200)
+        self.assertEqual(r_reset.get_json()["disassembled_parts"], [])
+
+    def test_09_mission_stage4_lab_completed_and_portfolio_privacy(self):
+        c1, _ = self._register_and_client("mis_p1", specialty="hvac", group="ХО-21")
+        r_st = c1.post(
+            "/api/mission/save_stage",
+            json={
+                "specialty": "hvac",
+                "task_number": 1,
+                "current_stage": 5,
+                "event_key": "stage_4_lab",
+                "state": {
+                    "theory_completed": [1, 2, 3, 4, 5],
+                    "training_completed": [1, 2, 3, 4],
+                    "lab_completed": True,
+                },
+            },
+        )
+        self.assertEqual(r_st.status_code, 200, r_st.get_data(as_text=True))
+        self.assertEqual(r_st.get_json()["max_allowed_stage"], 5)
+        self.assertEqual(r_st.get_json()["xp_gained"], 100)
+
+        r_sub = c1.post(
+            "/api/mission/submit",
+            json={"specialty": "hvac", "task_number": 1, "mission_id": "hvac_m1", "answers": {"superheat_k": 6.5}},
+        )
+        self.assertEqual(r_sub.status_code, 200)
+        sub_json = r_sub.get_json()
+        self.assertIn("submission", sub_json)
+        self.assertIn("Ремонт Холодильного Оборудования", sub_json["submission"]["task_title"])
+
+        # Portfolio privacy masking & duplicate slug 409
+        slug = f"unique-hvac-{os.urandom(3).hex()}"
+        r_set1 = c1.put(
+            "/api/portfolio/settings",
+            json={"is_public": True, "consent_granted": True, "show_grades": False, "public_slug": slug},
+        )
+        self.assertEqual(r_set1.status_code, 200)
+
+        anon = server.app.test_client()
+        r_pub = anon.get(f"/api/portfolio/public/{slug}")
+        self.assertEqual(r_pub.status_code, 200)
+        pub_json = r_pub.get_json()
+        self.assertNotIn("email", pub_json["student"])
+        self.assertIsNone(pub_json["average_score"])
+        self.assertEqual(pub_json["grades"], [])
+        self.assertTrue(len(pub_json["projects"]) >= 1)
+        self.assertIsNone(pub_json["projects"][0]["score"])
+        self.assertEqual(pub_json["projects"][0]["grade_letter"], "—")
+
+        c2, _ = self._register_and_client("mis_p2", specialty="it")
+        r_dup = c2.put("/api/portfolio/settings", json={"public_slug": slug})
+        self.assertEqual(r_dup.status_code, 409)
+        self.assertEqual(r_dup.get_json()["code"], "SLUG_TAKEN")
+
+    def test_10_exams_five_specialty_rubrics(self):
+        client, _ = self._register_and_client("ex_hvac", specialty="hvac")
+        start = client.post("/api/exams/start", json={"specialty": "hvac"}).get_json()
+        self.assertEqual(start["exam_spec"]["model_id"], "hvac-chiller")
+        att_id = start["attempt_id"]
+        nonce = start["attempt_nonce"]
+
+        # Invalid tool + out-of-range superheat without diagnosis -> deducts points & logs errors
+        client.post(
+            "/api/exams/event",
+            json={
+                "attempt_id": att_id,
+                "attempt_nonce": nonce,
+                "step_id": 1,
+                "action": "measure_superheat",
+                "part_id": "evaporator_suction",
+                "tool_id": "socket_set",
+                "telemetry": {"refrigerant": "R134a", "superheat_k": 22.0},
+            },
+        )
+        sub = client.post("/api/exams/submit", json={"attempt_id": att_id, "attempt_nonce": nonce})
+        self.assertEqual(sub.status_code, 200)
+        res = sub.get_json()
+        self.assertLess(res["score"], 100)
+        err_codes = {e["error_code"] for e in res["error_log_json"]}
+        self.assertIn("WRONG_TOOL", err_codes)
+        self.assertIn("SUPERHEAT_OUT_OF_RANGE", err_codes)
 
 
 if __name__ == "__main__":

@@ -381,16 +381,19 @@ class TestFullLmsSuite(unittest.TestCase):
         self.assertIn('<svg', r_logo.get_data(as_text=True))
 
     def test_17_ai_mentor_api(self):
+        with self.app.session_transaction() as sess:
+            sess['user_id'] = 1
+            sess['user_role'] = 'student'
         r_ai = self.app.post('/api/ai/chat', json={
             'prompt': 'Дай подсказку по коду',
             'specialty': 'autoelectric',
             'task_number': 3,
             'prompt_type': 'hint'
         })
-        self.assertEqual(r_ai.status_code, 200)
+        self.assertEqual(r_ai.status_code, 503)
         data = r_ai.get_json()
-        self.assertTrue(data['success'])
-        self.assertIn('5.0 В', data['reply'])
+        self.assertEqual(data.get('status'), 'BLOCKED')
+        self.assertEqual(data.get('code'), 'AI_PROVIDER_UNCONFIGURED')
 
     def test_18_admin_portal_and_roles(self):
         with self.app.session_transaction() as sess:
