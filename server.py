@@ -275,6 +275,8 @@ _CSRF_EXEMPT_PATHS = {
     '/api/auth/send_code',
     '/api/auth/verify_code',
     '/api/auth/reset_password',
+    '/api/ai/tutor',
+    '/api/ai/chat',
 }
 
 

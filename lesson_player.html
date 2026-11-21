@@ -684,8 +684,14 @@
 
     let _lpCsrfToken = '';
     function lpReadCookieCsrf() {
-      const m = document.cookie.match(/(?:^|;\s*)eduspace_csrf=([^;]+)/);
-      return m ? decodeURIComponent(m[1]) : '';
+      try {
+        const m = document.cookie.match(/(?:^|;\s*)eduspace_csrf=([^;]+)/);
+        if (m) return decodeURIComponent(m[1]);
+      } catch (e) {}
+      try {
+        return sessionStorage.getItem('eduspace_csrf') || localStorage.getItem('eduspace_csrf') || '';
+      } catch (e) {}
+      return '';
     }
 
     async function lpEnsureCsrf() {
@@ -696,7 +702,10 @@
         const res = await fetch(lpApiBase() + '/api/auth/session', { credentials: lpApiBase() ? 'include' : 'same-origin', signal: AbortSignal.timeout(4000) });
         if (res.ok) {
           const data = await res.json();
-          if (data && data.csrf_token) _lpCsrfToken = data.csrf_token;
+          if (data && data.csrf_token) {
+            _lpCsrfToken = data.csrf_token;
+            try { sessionStorage.setItem('eduspace_csrf', data.csrf_token); } catch (_) {}
+          }
         }
       } catch (e) {}
       return _lpCsrfToken;
