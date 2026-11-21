@@ -30,6 +30,24 @@ if __name__ == '__main__':
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_DIR = BASE_DIR
+
+# Auto-load .env configuration if present (without overriding existing environment)
+_env_file = os.path.join(BASE_DIR, ".env")
+if os.path.isfile(_env_file):
+    try:
+        with open(_env_file, "r", encoding="utf-8") as _ef:
+            for _line in _ef:
+                _line = _line.strip()
+                if not _line or _line.startswith("#") or "=" not in _line:
+                    continue
+                _k, _v = _line.split("=", 1)
+                _k = _k.strip()
+                _v = _v.strip().strip("'\"")
+                if _k and _k not in os.environ:
+                    os.environ[_k] = _v
+    except Exception:
+        pass
+
 DB_PATH = os.environ.get("EDUSPACE_DB_PATH") or os.path.join(BASE_DIR, "database.db")
 
 app = Flask(__name__, static_folder=None)
