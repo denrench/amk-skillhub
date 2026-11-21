@@ -235,7 +235,7 @@ if not SESSION_SECRET:
 app.config['SECRET_KEY'] = SESSION_SECRET
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 app.config['SESSION_COOKIE_HTTPONLY'] = True
-app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SAMESITE'] = 'None' if HOSTED else 'Lax'
 app.config['SESSION_COOKIE_SECURE'] = HOSTED or os.environ.get('HTTPS') == 'on'
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=14)
 TRUST_PROXY_HEADERS = (
@@ -406,7 +406,7 @@ def _set_security_and_cors_headers(response):
             'eduspace_csrf',
             csrf_tok,
             httponly=False,
-            samesite='Lax',
+            samesite='None' if HOSTED else 'Lax',
             secure=app.config['SESSION_COOKIE_SECURE'],
             path='/'
         )

@@ -693,7 +693,7 @@
       const cookieTok = lpReadCookieCsrf();
       if (cookieTok) { _lpCsrfToken = cookieTok; return _lpCsrfToken; }
       try {
-        const res = await fetch(lpApiBase() + '/api/auth/session', { credentials: 'same-origin', signal: AbortSignal.timeout(4000) });
+        const res = await fetch(lpApiBase() + '/api/auth/session', { credentials: lpApiBase() ? 'include' : 'same-origin', signal: AbortSignal.timeout(4000) });
         if (res.ok) {
           const data = await res.json();
           if (data && data.csrf_token) _lpCsrfToken = data.csrf_token;
