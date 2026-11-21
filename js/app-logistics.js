@@ -302,8 +302,13 @@
   // ==========================================
 
   function apiBase() {
-    if (typeof window !== 'undefined' && window.EDUSPACE_API_BASE) {
-      return String(window.EDUSPACE_API_BASE).replace(/\/+$/, '');
+    if (typeof window !== 'undefined') {
+      if (window.EDUSPACE_API_BASE) {
+        return String(window.EDUSPACE_API_BASE).replace(/\/+$/, '');
+      }
+      if (window.location && window.location.hostname && window.location.hostname.endsWith('github.io')) {
+        return 'https://amk-skillhub.onrender.com';
+      }
     }
     return '';
   }
