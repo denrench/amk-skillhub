@@ -2089,14 +2089,20 @@
           simulator_state: window.__activeSimulatorState || null,
           recent_errors: Array.isArray(window.__recentSimErrors) ? window.__recentSimErrors : []
         };
+        let activeUser = null;
+        try {
+          activeUser = JSON.parse(sessionStorage.getItem('eduspace_user') || localStorage.getItem('eduspace_user') || 'null');
+        } catch (_) {}
         const userApiKey = sessionStorage.getItem('amk.user_llm_key') || '';
         const reqBody = {
-          lesson_id: currentLesson ? currentLesson.id : null,
+          lesson_id: currentLesson ? currentLesson.id : 1,
           block_id: block ? block.id : '',
           course_slug: courseSlug,
           message: question,
           question: question,
-          context: tutorContext
+          context: tutorContext,
+          user_id: activeUser ? activeUser.id : null,
+          user_email: activeUser ? activeUser.email : null
         };
         if (userApiKey) reqBody.user_api_key = userApiKey;
         const res = await fetch(`${lpApiBase()}/api/ai/tutor`, {

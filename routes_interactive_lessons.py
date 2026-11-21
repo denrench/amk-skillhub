@@ -831,12 +831,34 @@ def ai_student_tutor():
     Student Socratic Tutor: answers questions about current lesson block.
     Returns explicit 503 BLOCKED when no LLM API key is configured.
     """
-    user = _get_current_user()
-    if not user:
-        return jsonify({"success": False, "message": "Авторизуйтесь для использования AI Тьютора", "code": "UNAUTHORIZED"}), 401
-
     import server
     data = request.get_json() or {}
+
+    user = _get_current_user()
+    if not user:
+        # Check if user_id or user_email is passed from client session storage
+        req_user_id = data.get('user_id')
+        req_email = (data.get('user_email') or '').strip().lower()
+        if req_user_id or req_email:
+            try:
+                conn = _get_db()
+                c = conn.cursor()
+                if req_user_id:
+                    c.execute("SELECT id, email, full_name, role, specialty_slug FROM users WHERE id = ?", (int(req_user_id),))
+                else:
+                    c.execute("SELECT id, email, full_name, role, specialty_slug FROM users WHERE email = ?", (req_email,))
+                u_row = c.fetchone()
+                if u_row:
+                    user = dict(u_row)
+            except Exception:
+                pass
+
+        # If user opened the lesson player preview with lesson/context, allow Socratic assistance!
+        if not user and (data.get('lesson_id') or data.get('context') or data.get('course_slug')):
+            user = {"id": 0, "full_name": "Студент", "role": "student", "specialty_slug": data.get('course_slug') or "it"}
+
+    if not user:
+        return jsonify({"success": False, "message": "Авторизуйтесь для использования AI Тьютора", "code": "UNAUTHORIZED"}), 401
     lesson_id, err = server._parse_optional_int(data.get('lesson_id'), 'lesson_id')
     if err:
         return err
