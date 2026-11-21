@@ -51,8 +51,8 @@ def resolve_llm_keys(user_api_key="", provider=""):
 
 
 def _call_gemini_api(api_key, system_prompt, user_prompt):
-    """Calls Google Gemini API safely via standard urllib."""
-    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+    """Calls Google Gemini API safely via standard urllib with automatic model fallback."""
+    preferred_models = ["gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-1.5-flash"]
     payload = {
         "contents": [
             {
@@ -67,21 +67,31 @@ def _call_gemini_api(api_key, system_prompt, user_prompt):
             "maxOutputTokens": 2048
         }
     }
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "Content-Type": "application/json",
-            "x-goog-api-key": api_key,
-        }
-    )
-    with urllib.request.urlopen(req, timeout=12) as response:
-        res_data = json.loads(response.read().decode("utf-8"))
-        candidates = res_data.get("candidates", [])
-        if candidates and "content" in candidates[0]:
-            parts = candidates[0]["content"].get("parts", [])
-            if parts and "text" in parts[0]:
-                return parts[0]["text"]
+    encoded = json.dumps(payload).encode("utf-8")
+    for model_name in preferred_models:
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent"
+        req = urllib.request.Request(
+            url,
+            data=encoded,
+            headers={
+                "Content-Type": "application/json",
+                "x-goog-api-key": api_key,
+            }
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=15) as response:
+                res_data = json.loads(response.read().decode("utf-8"))
+                candidates = res_data.get("candidates", [])
+                if candidates and "content" in candidates[0]:
+                    parts = candidates[0]["content"].get("parts", [])
+                    if parts and "text" in parts[0]:
+                        return parts[0]["text"]
+        except urllib.error.HTTPError as err:
+            if err.code in (404, 503):
+                continue
+            raise err
+        except Exception:
+            continue
     return None
 
 
