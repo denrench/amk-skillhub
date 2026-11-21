@@ -31,22 +31,23 @@ if __name__ == '__main__':
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_DIR = BASE_DIR
 
-# Auto-load .env configuration if present (without overriding existing environment)
-_env_file = os.path.join(BASE_DIR, ".env")
-if os.path.isfile(_env_file):
-    try:
-        with open(_env_file, "r", encoding="utf-8") as _ef:
-            for _line in _ef:
-                _line = _line.strip()
-                if not _line or _line.startswith("#") or "=" not in _line:
-                    continue
-                _k, _v = _line.split("=", 1)
-                _k = _k.strip()
-                _v = _v.strip().strip("'\"")
-                if _k and _k not in os.environ:
-                    os.environ[_k] = _v
-    except Exception:
-        pass
+# Auto-load .env configuration if present (without overriding existing environment or test harnesses)
+if not os.environ.get("EDUSPACE_DB_PATH") and not os.environ.get("EDUSPACE_TESTING"):
+    _env_file = os.path.join(BASE_DIR, ".env")
+    if os.path.isfile(_env_file):
+        try:
+            with open(_env_file, "r", encoding="utf-8") as _ef:
+                for _line in _ef:
+                    _line = _line.strip()
+                    if not _line or _line.startswith("#") or "=" not in _line:
+                        continue
+                    _k, _v = _line.split("=", 1)
+                    _k = _k.strip()
+                    _v = _v.strip().strip("'\"")
+                    if _k and _k not in os.environ:
+                        os.environ[_k] = _v
+        except Exception:
+            pass
 
 DB_PATH = os.environ.get("EDUSPACE_DB_PATH") or os.path.join(BASE_DIR, "database.db")
 
@@ -302,7 +303,11 @@ def get_or_create_csrf_token():
 
 @app.before_request
 def _enforce_origin_and_csrf():
-    if request.method == 'OPTIONS' and (request.path or '').startswith('/api/'):
+    path = request.path or ''
+    if request.method == 'GET' and not path.startswith(('/assets/', '/css/', '/js/', '/locales/')):
+        get_or_create_csrf_token()
+
+    if request.method == 'OPTIONS' and path.startswith('/api/'):
         return make_response('', 204)
 
     path = request.path or ''
@@ -328,17 +333,23 @@ def _enforce_origin_and_csrf():
                 "message": "Cross-origin state modification rejected"
             }), 403
 
-        if path not in _CSRF_EXEMPT_PATHS and (
-            session.get('user_id') or request.cookies.get('eduspace_csrf') or origin
-        ):
+        if path not in _CSRF_EXEMPT_PATHS:
             expected_csrf = session.get('csrf_token') or request.cookies.get('eduspace_csrf') or ''
-            sent_csrf = request.headers.get('X-CSRF-Token') or ''
-            if not expected_csrf or not sent_csrf or not hmac.compare_digest(str(sent_csrf), str(expected_csrf)):
-                return jsonify({
-                    "success": False,
-                    "code": "CSRF_TOKEN_INVALID",
-                    "message": "Недействительный или отсутствующий CSRF-токен."
-                }), 403
+            sent_csrf = request.headers.get('X-CSRF-Token') or request.form.get('csrf_token') or ''
+            if session.get('user_id'):
+                if not expected_csrf or not sent_csrf or not hmac.compare_digest(str(sent_csrf), str(expected_csrf)):
+                    return jsonify({
+                        "success": False,
+                        "code": "CSRF_TOKEN_INVALID",
+                        "message": "Недействительный или отсутствующий CSRF-токен."
+                    }), 403
+            elif expected_csrf and sent_csrf:
+                if not hmac.compare_digest(str(sent_csrf), str(expected_csrf)):
+                    return jsonify({
+                        "success": False,
+                        "code": "CSRF_TOKEN_INVALID",
+                        "message": "Недействительный или отсутствующий CSRF-токен."
+                    }), 403
     return None
 
 

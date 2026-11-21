@@ -23,29 +23,15 @@ def resolve_llm_keys(user_api_key="", provider=""):
     user_api_key = (user_api_key or "").strip()
     provider = (provider or "").strip().lower()
 
-    # Fallback to load .env if not yet in os.environ
-    if "GEMINI_API_KEY" not in os.environ and "OPENAI_API_KEY" not in os.environ and "OPENROUTER_API_KEY" not in os.environ:
-        _env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env")
-        if os.path.isfile(_env_path):
-            try:
-                with open(_env_path, "r", encoding="utf-8") as _ef:
-                    for _line in _ef:
-                        _line = _line.strip()
-                        if not _line or _line.startswith("#") or "=" not in _line:
-                            continue
-                        _k, _v = _line.split("=", 1)
-                        _k = _k.strip()
-                        _v = _v.strip().strip("'\"")
-                        if _k and _k not in os.environ:
-                            os.environ[_k] = _v
-            except Exception:
-                pass
+    if user_api_key:
+        if provider == "gemini" or user_api_key.startswith("AIzaSy") or user_api_key.startswith("AQ.") or "gemini" in user_api_key.lower():
+            return user_api_key, ""
+        return "", user_api_key
 
-    gemini_key = os.environ.get("GEMINI_API_KEY") or (user_api_key if provider == "gemini" else "")
+    gemini_key = os.environ.get("GEMINI_API_KEY", "")
     openai_key = (
         os.environ.get("OPENAI_API_KEY")
-        or os.environ.get("OPENROUTER_API_KEY")
-        or (user_api_key if provider in ("openai", "openrouter", "") and user_api_key and not gemini_key else "")
+        or os.environ.get("OPENROUTER_API_KEY", "")
     )
     return gemini_key, openai_key
 
