@@ -859,9 +859,15 @@ def ai_student_tutor():
 
     if not user:
         return jsonify({"success": False, "message": "Авторизуйтесь для использования AI Тьютора", "code": "UNAUTHORIZED"}), 401
-    lesson_id, err = server._parse_optional_int(data.get('lesson_id'), 'lesson_id')
-    if err:
-        return err
+    raw_lid = data.get('lesson_id')
+    lesson_id = None
+    if raw_lid is not None:
+        try:
+            m = re.search(r'\d+', str(raw_lid))
+            if m:
+                lesson_id = int(m.group(0))
+        except Exception:
+            lesson_id = 1
     block_id = (data.get('block_id') or '').strip()
     raw_spec = (data.get('course_slug') or data.get('specialty') or '').strip().lower()
     course_slug = SPECIALTY_ALIASES.get(raw_spec, raw_spec)

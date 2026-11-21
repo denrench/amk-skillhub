@@ -2094,8 +2094,10 @@
           activeUser = JSON.parse(sessionStorage.getItem('eduspace_user') || localStorage.getItem('eduspace_user') || 'null');
         } catch (_) {}
         const userApiKey = sessionStorage.getItem('amk.user_llm_key') || '';
+        const rawLid = currentLesson ? currentLesson.id : 1;
+        const numLid = parseInt(String(rawLid).replace(/\D+/g, ''), 10) || 1;
         const reqBody = {
-          lesson_id: currentLesson ? currentLesson.id : 1,
+          lesson_id: numLid,
           block_id: block ? block.id : '',
           course_slug: courseSlug,
           message: question,
