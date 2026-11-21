@@ -22,7 +22,7 @@
 ### Known External / Environment Blockers (Baseline `6e74f62`)
 1. **Live Render Production Drift (`BE-07`):** `https://amk-skillhub.onrender.com` runs an older commit (`tasks_total: 50`, `/api/auth/readiness` returns `404`), and local agents cannot deploy or mutate Render (`git push` to `main` is explicitly prohibited by R5).
 2. **PostgreSQL & Docker Absent Locally (`BE-07`):** `psql`, PostgreSQL service, Docker, `psycopg2-binary`, `gunicorn`, and `DATABASE_URL` are not installed on this Windows host; live PG runtime execution is `[!] BLOCKED` unless PostgreSQL/Docker is provisioned externally (code parity & SQL/DDL/transaction-rollback logic must still be fixed and verified via unit/mock/schema inspection).
-3. **LLM API Keys Absent Locally (`BE-03`, `AI-01..03`):** `GEMINI_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY` are unset. Live LLM output checks remain `[!] BLOCKED` unless a key is provided via env or UI settings, while missing-key `503 BLOCKED` behavior and mocked-transport unit tests MUST be `[x] VERIFIED`.
+3. **LLM API Provider Configured (`BE-03`, `AI-01..03`):** `GEMINI_API_KEY` provided and loaded via `.env` (Google Gemini live generation `[x] VERIFIED`, model `gemini-3.1-flash-lite`, HTTP 200 responses with pedagogic tutor guidelines). Missing-key `503 BLOCKED` contract also verified.
 4. **SMTP / Resend Mail Credentials Absent Locally (`BE-02`):** `MAIL_API_KEY`, `SMTP_PASSWORD` are unset. Live email delivery is `[!] BLOCKED` locally; local registration/reset MUST succeed with email OTP optional/disabled (`BE-02`, `FE-CRIT-02`).
 
 ---
