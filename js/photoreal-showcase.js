@@ -317,26 +317,594 @@ window.PhotorealShowcase = (function () {
       obj.position.y -= b2.min.y;
     }
 
+    function buildProceduralScene(sceneType) {
+      const group = new T.Group();
+      const animators = [];
+
+      function makeScreenTex(title, accent, mode) {
+        const c = document.createElement('canvas');
+        c.width = 512; c.height = 288;
+        const ctx = c.getContext('2d');
+        const g = ctx.createLinearGradient(0, 0, 512, 288);
+        g.addColorStop(0, '#090d1f');
+        g.addColorStop(1, '#111b36');
+        ctx.fillStyle = g;
+        ctx.fillRect(0, 0, 512, 288);
+        ctx.strokeStyle = 'rgba(56,189,248,0.18)';
+        for (let x = 0; x < 512; x += 32) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 288); ctx.stroke(); }
+        for (let y = 0; y < 288; y += 32) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke(); }
+
+        if (mode === 'code') {
+          ctx.fillStyle = '#0f172a';
+          ctx.fillRect(18, 18, 130, 252);
+          ctx.fillStyle = '#1e293b';
+          ctx.fillRect(162, 18, 332, 252);
+          const colors = ['#38bdf8', '#c084fc', '#34d399', '#fbbf24', '#f472b6'];
+          for (let r = 0; r < 11; r++) {
+            ctx.fillStyle = colors[r % colors.length];
+            ctx.fillRect(180 + (r % 3) * 18, 36 + r * 20, 75 + ((r * 37) % 160), 9);
+          }
+          ctx.fillStyle = '#38bdf8';
+          ctx.font = 'bold 20px monospace';
+          ctx.fillText('AMK SKILLHUB IDE', 28, 52);
+          ctx.fillStyle = '#34d399';
+          ctx.fillRect(28, 72, 95, 10);
+          ctx.fillStyle = '#818cf8';
+          ctx.fillRect(28, 94, 78, 10);
+          ctx.fillStyle = '#38bdf8';
+          ctx.fillRect(28, 116, 102, 10);
+        } else if (mode === 'scope') {
+          ctx.strokeStyle = '#34d399';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          for (let x = 20; x < 492; x += 4) {
+            const y = 144 + Math.sin(x * 0.06) * 58 + Math.sin(x * 0.18) * 18;
+            if (x === 20) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          for (let x = 20; x < 492; x += 4) {
+            const sq = (Math.floor(x / 36) % 2 === 0) ? -42 : 42;
+            const y = 144 + sq;
+            if (x === 20) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+          ctx.fillStyle = '#34d399';
+          ctx.font = 'bold 22px monospace';
+          ctx.fillText('CAN-BUS 500 kbps · 14.2V', 26, 42);
+        } else if (mode === 'design') {
+          const rg = ctx.createRadialGradient(256, 144, 15, 256, 144, 130);
+          rg.addColorStop(0, '#f43f5e');
+          rg.addColorStop(0.5, '#8b5cf6');
+          rg.addColorStop(1, '#06b6d4');
+          ctx.fillStyle = rg;
+          ctx.beginPath(); ctx.arc(256, 144, 96, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(110, 42, 292, 204);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 22px sans-serif';
+          ctx.fillText('CMYK · 300 DPI · BLEED 5mm', 100, 272);
+        }
+        const tex = new T.CanvasTexture(c);
+        tex.encoding = T.sRGBEncoding;
+        return tex;
+      }
+
+      if (sceneType === 'sport_wheel_garage') {
+        // === AUTO WORKSHOP ENVIRONMENT ===
+        const floorCanvas = document.createElement('canvas');
+        floorCanvas.width = 512; floorCanvas.height = 512;
+        const fctx = floorCanvas.getContext('2d');
+        fctx.fillStyle = '#1d212b';
+        fctx.fillRect(0, 0, 512, 512);
+        for (let y = 0; y < 512; y += 64) {
+          for (let x = 0; x < 512; x += 64) {
+            fctx.fillStyle = ((x / 64 + y / 64) % 2 === 0) ? '#232834' : '#181c24';
+            fctx.fillRect(x, y, 64, 64);
+          }
+        }
+        fctx.fillStyle = '#f59e0b';
+        fctx.fillRect(0, 468, 512, 16);
+        const floorTex = new T.CanvasTexture(floorCanvas);
+        floorTex.encoding = T.sRGBEncoding;
+        const floor = new T.Mesh(
+          new T.CylinderGeometry(2.3, 2.3, 0.08, 48),
+          new T.MeshStandardMaterial({ map: floorTex, roughness: 0.35, metalness: 0.25 })
+        );
+        floor.position.y = -0.04;
+        group.add(floor);
+
+        // Garage back wall + hydraulic lift pillars + red mechanic cabinet
+        const backWall = new T.Mesh(
+          new T.BoxGeometry(3.6, 2.1, 0.08),
+          new T.MeshStandardMaterial({ color: 0x1a1e28, roughness: 0.75, metalness: 0.2 })
+        );
+        backWall.position.set(0, 1.05, -1.35);
+        group.add(backWall);
+
+        // Overhead neon garage light tube
+        const ledTube = new T.Mesh(
+          new T.BoxGeometry(2.4, 0.05, 0.06),
+          new T.MeshStandardMaterial({ color: 0xe0f2fe, emissive: 0x38bdf8, emissiveIntensity: 2.2 })
+        );
+        ledTube.position.set(0, 1.92, -1.26);
+        group.add(ledTube);
+
+        // Two-post hydraulic lift columns
+        const liftMat = new T.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.35, metalness: 0.7 });
+        [-1.35, 1.35].forEach((lx) => {
+          const post = new T.Mesh(new T.BoxGeometry(0.14, 1.95, 0.14), liftMat);
+          post.position.set(lx, 0.98, -0.95);
+          group.add(post);
+        });
+
+        // Red Mechanic Tool Chest Cabinet
+        const chest = new T.Mesh(
+          new T.BoxGeometry(0.85, 0.78, 0.42),
+          new T.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.28, metalness: 0.55 })
+        );
+        chest.position.set(-1.1, 0.39, -0.82);
+        chest.rotation.y = 0.28;
+        group.add(chest);
+        for (let d = 0; d < 4; d++) {
+          const handle = new T.Mesh(
+            new T.BoxGeometry(0.62, 0.03, 0.03),
+            new T.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.9, roughness: 0.18 })
+          );
+          handle.position.set(-1.05, 0.16 + d * 0.16, -0.61);
+          handle.rotation.y = 0.28;
+          group.add(handle);
+        }
+
+        // Display Podium Stand
+        const stand = new T.Mesh(
+          new T.CylinderGeometry(0.65, 0.78, 0.12, 32),
+          new T.MeshStandardMaterial({ color: 0x111827, roughness: 0.3, metalness: 0.8 })
+        );
+        stand.position.y = 0.06;
+        group.add(stand);
+        const standRing = new T.Mesh(
+          new T.TorusGeometry(0.71, 0.014, 12, 48),
+          new T.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 2.0 })
+        );
+        standRing.rotation.x = Math.PI / 2;
+        standRing.position.y = 0.12;
+        group.add(standRing);
+
+        // === HERO: FORGED 10-SPOKE SPORT ALLOY WHEEL + BREMBO BRAKE ===
+        const wheelAssembly = new T.Group();
+        wheelAssembly.position.set(0, 0.92, 0.05);
+        wheelAssembly.rotation.y = -0.32;
+        group.add(wheelAssembly);
+
+        const spinGroup = new T.Group();
+        wheelAssembly.add(spinGroup);
+
+        // Low-profile Sport Tire (matte carbon rubber)
+        const tireMat = new T.MeshStandardMaterial({ color: 0x16181e, roughness: 0.86, metalness: 0.06 });
+        const tire = new T.Mesh(new T.TorusGeometry(0.62, 0.19, 28, 64), tireMat);
+        spinGroup.add(tire);
+
+        // Tread ribs around tire
+        for (let i = 0; i < 36; i++) {
+          const a = (i / 36) * Math.PI * 2;
+          const rib = new T.Mesh(new T.BoxGeometry(0.035, 0.04, 0.34), tireMat);
+          rib.position.set(Math.cos(a) * 0.805, Math.sin(a) * 0.805, 0);
+          rib.rotation.z = a + Math.PI / 2;
+          spinGroup.add(rib);
+        }
+
+        // Polished Machined Chrome Outer Barrel & Rim Lip
+        const chromeMat = new T.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.96, roughness: 0.12 });
+        const gunmetalMat = new T.MeshStandardMaterial({ color: 0x334155, metalness: 0.88, roughness: 0.22 });
+
+        const barrel = new T.Mesh(new T.CylinderGeometry(0.49, 0.49, 0.34, 48, 1, true), gunmetalMat);
+        barrel.rotation.x = Math.PI / 2;
+        spinGroup.add(barrel);
+
+        const frontLip = new T.Mesh(new T.TorusGeometry(0.49, 0.028, 16, 48), chromeMat);
+        frontLip.position.z = 0.165;
+        spinGroup.add(frontLip);
+
+        // 10 Y-Spokes (Forged Sport Pattern)
+        for (let i = 0; i < 5; i++) {
+          const baseA = (i / 5) * Math.PI * 2;
+          [-0.17, 0.17].forEach((offset) => {
+            const a = baseA + offset;
+            const spoke = new T.Mesh(new T.BoxGeometry(0.048, 0.42, 0.042), gunmetalMat);
+            spoke.position.set(Math.cos(a) * 0.27, Math.sin(a) * 0.27, 0.12);
+            spoke.rotation.z = a - Math.PI / 2;
+            spinGroup.add(spoke);
+
+            const accentStrip = new T.Mesh(new T.BoxGeometry(0.018, 0.40, 0.012), chromeMat);
+            accentStrip.position.set(Math.cos(a) * 0.27, Math.sin(a) * 0.27, 0.145);
+            accentStrip.rotation.z = a - Math.PI / 2;
+            spinGroup.add(accentStrip);
+          });
+        }
+
+        // Center Hub + Carbon Cap + 5 Chrome Lug Nuts
+        const hub = new T.Mesh(new T.CylinderGeometry(0.14, 0.16, 0.14, 24), gunmetalMat);
+        hub.rotation.x = Math.PI / 2;
+        hub.position.z = 0.11;
+        spinGroup.add(hub);
+
+        const cap = new T.Mesh(
+          new T.CylinderGeometry(0.065, 0.065, 0.03, 24),
+          new T.MeshStandardMaterial({ color: 0xef4444, metalness: 0.7, roughness: 0.22 })
+        );
+        cap.rotation.x = Math.PI / 2;
+        cap.position.z = 0.18;
+        spinGroup.add(cap);
+
+        for (let n = 0; n < 5; n++) {
+          const a = (n / 5) * Math.PI * 2;
+          const nut = new T.Mesh(new T.CylinderGeometry(0.018, 0.018, 0.04, 6), chromeMat);
+          nut.rotation.x = Math.PI / 2;
+          nut.position.set(Math.cos(a) * 0.105, Math.sin(a) * 0.105, 0.175);
+          spinGroup.add(nut);
+        }
+
+        // Drilled Ventilated Brake Rotor (behind spokes)
+        const rotor = new T.Mesh(
+          new T.CylinderGeometry(0.37, 0.37, 0.045, 40),
+          new T.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.92, roughness: 0.26 })
+        );
+        rotor.rotation.x = Math.PI / 2;
+        rotor.position.z = -0.02;
+        spinGroup.add(rotor);
+
+        // Fixed Brembo-Red Sport Brake Caliper (doesn't spin!)
+        const caliper = new T.Mesh(
+          new T.BoxGeometry(0.16, 0.34, 0.15),
+          new T.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.22, metalness: 0.45, emissive: 0x4c0519, emissiveIntensity: 0.4 })
+        );
+        caliper.position.set(0.32, 0.08, -0.01);
+        caliper.rotation.z = -0.25;
+        wheelAssembly.add(caliper);
+
+        // Subtle warm/cool garage lights
+        const gLight1 = new T.PointLight(0x38bdf8, 3.2, 5);
+        gLight1.position.set(1.4, 1.8, 1.2);
+        group.add(gLight1);
+        const gLight2 = new T.PointLight(0xf59e0b, 2.4, 5);
+        gLight2.position.set(-1.5, 1.4, 0.8);
+        group.add(gLight2);
+
+        animators.push((t) => { spinGroup.rotation.z = -t * 0.42; });
+      } else if (sceneType === 'gaming_room_rig') {
+        // === CYBER GAMING ROOM ENVIRONMENT ===
+        const floor = new T.Mesh(
+          new T.CylinderGeometry(2.3, 2.3, 0.08, 48),
+          new T.MeshStandardMaterial({ color: 0x111522, roughness: 0.55, metalness: 0.2 })
+        );
+        floor.position.y = -0.04;
+        group.add(floor);
+
+        // Back wall with glowing acoustic RGB hex strips
+        const wall = new T.Mesh(
+          new T.BoxGeometry(3.4, 2.1, 0.08),
+          new T.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8, metalness: 0.15 })
+        );
+        wall.position.set(0, 1.05, -1.05);
+        group.add(wall);
+
+        const rgbStrips = [];
+        [
+          { pos: [-0.85, 1.48, -0.99], rot: 0.35, color: 0x38bdf8 },
+          { pos: [0, 1.65, -0.99], rot: 0, color: 0xa855f7 },
+          { pos: [0.85, 1.48, -0.99], rot: -0.35, color: 0xec4899 },
+        ].forEach((s) => {
+          const mat = new T.MeshStandardMaterial({ color: s.color, emissive: s.color, emissiveIntensity: 2.4 });
+          const bar = new T.Mesh(new T.BoxGeometry(0.68, 0.045, 0.03), mat);
+          bar.position.set(...s.pos);
+          bar.rotation.z = s.rot;
+          group.add(bar);
+          rgbStrips.push(mat);
+        });
+
+        // Carbon Gaming Desk
+        const deskTop = new T.Mesh(
+          new T.BoxGeometry(2.3, 0.065, 1.15),
+          new T.MeshStandardMaterial({ color: 0x181c28, roughness: 0.32, metalness: 0.45 })
+        );
+        deskTop.position.set(0, 0.72, -0.15);
+        group.add(deskTop);
+
+        // Desk RGB Underglow Edge Strip
+        const deskLedMat = new T.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x06b6d4, emissiveIntensity: 2.5 });
+        const deskLed = new T.Mesh(new T.BoxGeometry(2.32, 0.02, 0.02), deskLedMat);
+        deskLed.position.set(0, 0.71, 0.43);
+        group.add(deskLed);
+        rgbStrips.push(deskLedMat);
+
+        // Desk Legs
+        const legMat = new T.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.3 });
+        [[-1.02, -0.58], [1.02, -0.58], [-1.02, 0.28], [1.02, 0.28]].forEach(([x, z]) => {
+          const leg = new T.Mesh(new T.BoxGeometry(0.06, 0.72, 0.06), legMat);
+          leg.position.set(x, 0.36, z);
+          group.add(leg);
+        });
+
+        // XXL Deskmat
+        const matMesh = new T.Mesh(
+          new T.BoxGeometry(1.32, 0.008, 0.56),
+          new T.MeshStandardMaterial({ color: 0x0b1120, roughness: 0.9 })
+        );
+        matMesh.position.set(-0.22, 0.757, 0.08);
+        group.add(matMesh);
+
+        // === HERO 1: POWERFUL GAMING LAPTOP (LEFT-CENTER) ===
+        const laptop = new T.Group();
+        laptop.position.set(-0.28, 0.765, 0.05);
+        laptop.rotation.y = 0.14;
+        group.add(laptop);
+
+        const chassisMat = new T.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.85, roughness: 0.22 });
+        const base = new T.Mesh(new T.BoxGeometry(0.62, 0.028, 0.42), chassisMat);
+        laptop.add(base);
+
+        // Glowing RGB Keyboard Deck
+        const kbMat = new T.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x6366f1, emissiveIntensity: 1.4, roughness: 0.4 });
+        const kb = new T.Mesh(new T.BoxGeometry(0.52, 0.006, 0.22), kbMat);
+        kb.position.set(0, 0.017, -0.02);
+        laptop.add(kb);
+        rgbStrips.push(kbMat);
+
+        // Tilted Laptop Lid with Glowing IDE Screen
+        const lidGroup = new T.Group();
+        lidGroup.position.set(0, 0.014, -0.205);
+        lidGroup.rotation.x = -0.26;
+        laptop.add(lidGroup);
+        const lid = new T.Mesh(new T.BoxGeometry(0.62, 0.39, 0.016), chassisMat);
+        lid.position.y = 0.195;
+        lidGroup.add(lid);
+        const screenTex = makeScreenTex('AMK IDE', '#38bdf8', 'code');
+        const screen = new T.Mesh(
+          new T.PlaneGeometry(0.57, 0.34),
+          new T.MeshStandardMaterial({ map: screenTex, emissiveMap: screenTex, emissive: 0xffffff, emissiveIntensity: 0.95, roughness: 0.15 })
+        );
+        screen.position.set(0, 0.198, 0.01);
+        lidGroup.add(screen);
+
+        // === HERO 2: ULTRA-WIDE CURVED MONITOR (BEHIND) ===
+        const monStand = new T.Mesh(new T.BoxGeometry(0.08, 0.24, 0.06), legMat);
+        monStand.position.set(-0.22, 0.87, -0.48);
+        group.add(monStand);
+        const monFrame = new T.Mesh(new T.BoxGeometry(1.16, 0.48, 0.03), chassisMat);
+        monFrame.position.set(-0.22, 1.15, -0.45);
+        group.add(monFrame);
+        const monScreen = new T.Mesh(
+          new T.PlaneGeometry(1.11, 0.43),
+          new T.MeshStandardMaterial({ map: screenTex, emissiveMap: screenTex, emissive: 0xffffff, emissiveIntensity: 0.9, roughness: 0.15 })
+        );
+        monScreen.position.set(-0.22, 1.15, -0.433);
+        group.add(monScreen);
+
+        // === HERO 3: TEMPERED GLASS RGB GAMING PC TOWER (RIGHT) ===
+        const pc = new T.Group();
+        pc.position.set(0.76, 1.05, -0.14);
+        pc.rotation.y = -0.22;
+        group.add(pc);
+        const pcBody = new T.Mesh(
+          new T.BoxGeometry(0.36, 0.62, 0.62),
+          new T.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.78, roughness: 0.24 })
+        );
+        pc.add(pcBody);
+        const glass = new T.Mesh(
+          new T.PlaneGeometry(0.54, 0.54),
+          new T.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.18, roughness: 0.06, metalness: 0.9 })
+        );
+        glass.rotation.y = -Math.PI / 2;
+        glass.position.x = -0.182;
+        pc.add(glass);
+
+        // 3 Front Glowing RGB Cooling Fans
+        const fans = [];
+        for (let f = 0; f < 3; f++) {
+          const fanRingMat = new T.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 2.2 });
+          const ring = new T.Mesh(new T.TorusGeometry(0.075, 0.012, 12, 28), fanRingMat);
+          ring.position.set(0, -0.17 + f * 0.17, 0.315);
+          pc.add(ring);
+          rgbStrips.push(fanRingMat);
+          const hub = new T.Mesh(new T.BoxGeometry(0.11, 0.02, 0.01), chromeMatSafe(T));
+          hub.position.set(0, -0.17 + f * 0.17, 0.314);
+          pc.add(hub);
+          fans.push(hub);
+        }
+
+        // RGB Wireless Gaming Mouse
+        const mouse = new T.Mesh(new T.BoxGeometry(0.09, 0.036, 0.15), chassisMat);
+        mouse.position.set(0.24, 0.778, 0.16);
+        group.add(mouse);
+        const mouseLed = new T.Mesh(new T.BoxGeometry(0.02, 0.01, 0.06), deskLedMat);
+        mouseLed.position.set(0.24, 0.798, 0.16);
+        group.add(mouseLed);
+
+        // Neon Room Point Lights
+        const nl1 = new T.PointLight(0x38bdf8, 3.0, 5);
+        nl1.position.set(-1.1, 1.6, 0.8);
+        group.add(nl1);
+        const nl2 = new T.PointLight(0xc084fc, 2.8, 5);
+        nl2.position.set(1.2, 1.5, 0.9);
+        group.add(nl2);
+
+        animators.push((t) => {
+          const hue = (t * 0.08) % 1;
+          const col = new T.Color().setHSL(hue, 0.9, 0.56);
+          rgbStrips.forEach((m, idx) => {
+            const c2 = new T.Color().setHSL((hue + idx * 0.14) % 1, 0.92, 0.58);
+            m.emissive.copy(c2);
+            m.color.copy(c2);
+          });
+          fans.forEach((fan) => { fan.rotation.z = t * 5.2; });
+          nl2.color.copy(col);
+        });
+      } else if (sceneType === 'autoelectric_lab') {
+        const floor = new T.Mesh(
+          new T.CylinderGeometry(2.1, 2.1, 0.08, 48),
+          new T.MeshStandardMaterial({ color: 0x131926, roughness: 0.48, metalness: 0.25 })
+        );
+        floor.position.y = -0.04;
+        group.add(floor);
+        // ESD Anti-Static Bench
+        const bench = new T.Mesh(
+          new T.BoxGeometry(2.1, 0.08, 1.15),
+          new T.MeshStandardMaterial({ color: 0x0f2942, roughness: 0.65, metalness: 0.2 })
+        );
+        bench.position.set(0, 0.55, 0);
+        group.add(bench);
+        // Pro Digital Oscilloscope & Diagnostic Station
+        const scopeBody = new T.Mesh(
+          new T.BoxGeometry(1.08, 0.66, 0.34),
+          new T.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.65, roughness: 0.3 })
+        );
+        scopeBody.position.set(-0.18, 0.92, -0.08);
+        group.add(scopeBody);
+        const sTex = makeScreenTex('CAN-BUS', '#34d399', 'scope');
+        const sMesh = new T.Mesh(
+          new T.PlaneGeometry(0.72, 0.46),
+          new T.MeshStandardMaterial({ map: sTex, emissiveMap: sTex, emissive: 0xffffff, emissiveIntensity: 1.0 })
+        );
+        sMesh.position.set(-0.32, 0.94, 0.095);
+        group.add(sMesh);
+        // Knobs
+        for (let k = 0; k < 4; k++) {
+          const knob = new T.Mesh(new T.CylinderGeometry(0.036, 0.04, 0.05, 20), chromeMatSafe(T));
+          knob.rotation.x = Math.PI / 2;
+          knob.position.set(0.22, 0.74 + k * 0.12, 0.11);
+          group.add(knob);
+        }
+        // Smart Digital Multimeter beside it
+        const multi = new T.Mesh(
+          new T.BoxGeometry(0.32, 0.52, 0.12),
+          new T.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.42, metalness: 0.2 })
+        );
+        multi.position.set(0.68, 0.85, 0.12);
+        multi.rotation.y = -0.35;
+        multi.rotation.x = -0.25;
+        group.add(multi);
+        const led = new T.PointLight(0x34d399, 2.8, 5);
+        led.position.set(0, 1.8, 1.2);
+        group.add(led);
+      } else if (sceneType === 'hvac_rooftop') {
+        const floor = new T.Mesh(
+          new T.CylinderGeometry(2.2, 2.2, 0.08, 48),
+          new T.MeshStandardMaterial({ color: 0x222731, roughness: 0.82 })
+        );
+        floor.position.y = -0.04;
+        group.add(floor);
+        // Inverter Condenser Unit
+        const box = new T.Mesh(
+          new T.BoxGeometry(1.36, 0.98, 0.56),
+          new T.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.35, metalness: 0.45 })
+        );
+        box.position.set(-0.1, 0.56, 0);
+        group.add(box);
+        const grille = new T.Mesh(
+          new T.TorusGeometry(0.36, 0.025, 14, 36),
+          new T.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.3 })
+        );
+        grille.position.set(-0.28, 0.58, 0.285);
+        group.add(grille);
+        const fan = new T.Group();
+        fan.position.set(-0.28, 0.58, 0.27);
+        group.add(fan);
+        const bladeMat = new T.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.65, roughness: 0.25 });
+        for (let b = 0; b < 5; b++) {
+          const a = (b / 5) * Math.PI * 2;
+          const blade = new T.Mesh(new T.BoxGeometry(0.09, 0.31, 0.02), bladeMat);
+          blade.position.set(Math.cos(a) * 0.16, Math.sin(a) * 0.16, 0);
+          blade.rotation.z = a + Math.PI / 2;
+          blade.rotation.y = 0.25;
+          fan.add(blade);
+        }
+        // Copper Refrigerant Coils & Pressure Manifold Gauges
+        const copperMat = new T.MeshStandardMaterial({ color: 0xd97706, metalness: 0.92, roughness: 0.22 });
+        const pipe1 = new T.Mesh(new T.CylinderGeometry(0.032, 0.032, 0.72, 16), copperMat);
+        pipe1.position.set(0.74, 0.42, 0.1);
+        group.add(pipe1);
+        const lpGauge = new T.Mesh(new T.CylinderGeometry(0.11, 0.11, 0.05, 24), new T.MeshStandardMaterial({ color: 0x0284c7, emissive: 0x0284c7, emissiveIntensity: 0.6 }));
+        lpGauge.rotation.x = Math.PI / 2;
+        lpGauge.position.set(0.68, 0.82, 0.12);
+        group.add(lpGauge);
+        const hpGauge = new T.Mesh(new T.CylinderGeometry(0.11, 0.11, 0.05, 24), new T.MeshStandardMaterial({ color: 0xe11d48, emissive: 0xe11d48, emissiveIntensity: 0.6 }));
+        hpGauge.rotation.x = Math.PI / 2;
+        hpGauge.position.set(0.92, 0.82, 0.12);
+        group.add(hpGauge);
+        animators.push((t) => { fan.rotation.z = -t * 3.8; });
+      } else {
+        // === DESIGN STUDIO ===
+        const floor = new T.Mesh(
+          new T.CylinderGeometry(2.1, 2.1, 0.08, 48),
+          new T.MeshStandardMaterial({ color: 0x161822, roughness: 0.5 })
+        );
+        floor.position.y = -0.04;
+        group.add(floor);
+        const desk = new T.Mesh(
+          new T.BoxGeometry(2.1, 0.07, 1.1),
+          new T.MeshStandardMaterial({ color: 0x452c1e, roughness: 0.55 })
+        );
+        desk.position.set(0, 0.55, 0);
+        group.add(desk);
+        // Pro Pen Display Tablet
+        const tablet = new T.Group();
+        tablet.position.set(-0.12, 0.84, 0);
+        tablet.rotation.x = -0.42;
+        group.add(tablet);
+        const body = new T.Mesh(new T.BoxGeometry(1.18, 0.72, 0.035), new T.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.75, roughness: 0.25 }));
+        tablet.add(body);
+        const dTex = makeScreenTex('CMYK', '#f43f5e', 'design');
+        const scr = new T.Mesh(new T.PlaneGeometry(1.08, 0.63), new T.MeshStandardMaterial({ map: dTex, emissiveMap: dTex, emissive: 0xffffff, emissiveIntensity: 0.9 }));
+        scr.position.z = 0.02;
+        tablet.add(scr);
+        // Pantone Swatches
+        [0x06b6d4, 0xec4899, 0xfacc15, 0x8b5cf6].forEach((col, idx) => {
+          const sw = new T.Mesh(new T.BoxGeometry(0.14, 0.36, 0.015), new T.MeshStandardMaterial({ color: col, roughness: 0.35 }));
+          sw.position.set(0.76, 0.62, 0.16);
+          sw.rotation.x = -Math.PI / 2;
+          sw.rotation.z = -0.35 + idx * 0.24;
+          group.add(sw);
+        });
+      }
+
+      return { group, animators };
+    }
+
+    function chromeMatSafe(T) {
+      return new T.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.94, roughness: 0.14 });
+    }
+
     async function buildItem(i) {
       if (state.loaded[i]) return state.loaded[i];
       if (state.pending[i]) return state.pending[i];
       state.pending[i] = (async () => {
         const it = items[i];
-        const group = new T.Group();
-        const parts = await Promise.all(it.parts.map(loadPart));
-        parts.forEach((sceneObj, pi) => {
-          const p = it.parts[pi];
-          const holder = new T.Group();
-          if (p.rotation) sceneObj.rotation.set(...p.rotation);
-          holder.add(sceneObj);
-          normalize(holder, p.size || 1.6);
-          if (p.offset) holder.position.add(new T.Vector3(...p.offset));
-          group.add(holder);
-        });
-        // Итоговая нормализация всей композиции
         const wrap = new T.Group();
-        wrap.add(group);
-        normalize(wrap, it.size || 1.9);
+        let animators = [];
+        if (it.sceneType) {
+          const built = buildProceduralScene(it.sceneType);
+          wrap.add(built.group);
+          animators = built.animators || [];
+          normalize(wrap, it.size || 2.35);
+        } else {
+          const group = new T.Group();
+          const parts = await Promise.all(it.parts.map(loadPart));
+          parts.forEach((sceneObj, pi) => {
+            const p = it.parts[pi];
+            const holder = new T.Group();
+            if (p.rotation) sceneObj.rotation.set(...p.rotation);
+            holder.add(sceneObj);
+            normalize(holder, p.size || 1.6);
+            if (p.offset) holder.position.add(new T.Vector3(...p.offset));
+            group.add(holder);
+          });
+          wrap.add(group);
+          normalize(wrap, it.size || 1.9);
+        }
 
         const meshes = [];
         let maps = { normal: 0, rough: 0, ao: 0, color: 0 };
@@ -351,7 +919,6 @@ window.PhotorealShowcase = (function () {
             if (m.aoMap) maps.ao++;
             if (m.map) maps.color++;
             m.envMapIntensity = it.envIntensity || 1.0;
-            // aoMap в glTF использует uv2 — дублируем uv при отсутствии
             if (m.aoMap && o.geometry && !o.geometry.attributes.uv2 && o.geometry.attributes.uv) {
               o.geometry.setAttribute('uv2', o.geometry.attributes.uv);
             }
@@ -365,7 +932,7 @@ window.PhotorealShowcase = (function () {
           }
           meshes.push(o);
         });
-        const entry = { object: wrap, meshes, maps };
+        const entry = { object: wrap, meshes, maps, animators };
         state.loaded[i] = entry;
         delete state.pending[i];
         return entry;
@@ -412,7 +979,7 @@ window.PhotorealShowcase = (function () {
       const token = ++loadToken;
       tabs.querySelectorAll('[data-pr-tab]').forEach((b) => b.setAttribute('aria-selected', String(Number(b.dataset.prTab) === i)));
       renderInfo(i);
-      if (!gltfLoader) { loader.textContent = 'GLTFLoader не найден'; return; }
+      if (!items[i].sceneType && !gltfLoader) { loader.textContent = 'GLTFLoader не найден'; return; }
       loader.hidden = false;
       state.ready = false;
       try {
@@ -435,7 +1002,7 @@ window.PhotorealShowcase = (function () {
         }
       } catch (err) {
         state.errors.push(String(err && err.message || err));
-        loader.innerHTML = 'Не удалось загрузить 3D-скан. Проверьте соединение.';
+        loader.innerHTML = 'Не удалось загрузить 3D-сцену. Проверьте соединение.';
       }
       requestRender();
     }
@@ -458,11 +1025,18 @@ window.PhotorealShowcase = (function () {
     let needsRender = true, shadowDirty = true, rafId = 0;
     function requestRender() { needsRender = true; }
     let frames = 0;
+    const t0 = performance.now();
     function loop() {
       rafId = requestAnimationFrame(loop);
       if (!state.visible || document.hidden) return;
       let changed = false;
-      if (controls) changed = controls.update() || controls.autoRotate;
+      const activeEntry = state.loaded[state.active];
+      if (activeEntry && activeEntry.animators && activeEntry.animators.length) {
+        const sec = (performance.now() - t0) * 0.001;
+        activeEntry.animators.forEach((fn) => fn(sec));
+        changed = true;
+      }
+      if (controls) changed = controls.update() || controls.autoRotate || changed;
       if (!changed && !needsRender) return;
       needsRender = false;
       if (shadowDirty && state.mode !== 'wire' && state.ready) {

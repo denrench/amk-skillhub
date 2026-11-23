@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Программа курса и модули — EDU SPACE | Цифровая образовательная платформа АМК"/>
+  <meta name="description" content="Программа курса и модули — AMK SkillHub | Цифровая образовательная платформа АМК"/>
   <meta name="theme-color" content="#f1f5f9"/>
-  <title>Программа курса и модули — EDU SPACE | АМК</title>
+  <title>Программа курса и модули — AMK SkillHub</title>
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg"/>
 
   <!-- SEO hreflang & Alternate Locale Links -->
@@ -1206,13 +1206,13 @@
     <aside id="app-sidebar" class="app-sidebar reveal reveal--left" data-reveal="left" aria-label="Боковая навигация" data-i18n-attr="aria-label:a11y.sidebarNav">
       <div>
         <div class="sidebar-top-row">
-          <a href="index.html" class="brand-link" title="На главную EDU SPACE" data-i18n-attr="title:brand.homeTitle">
+          <a href="index.html" class="brand-link" title="На главную AMK SkillHub" data-i18n-attr="title:brand.homeTitle">
             <div class="brand-mark">
-              <img alt="EDU SPACE" width="20" height="20" src="assets/eduspace-logo.svg"/>
+              <img alt="AMK SkillHub" width="20" height="20" src="assets/eduspace-logo.svg"/>
             </div>
             <div class="brand-text">
-              <span style="font-weight:800;font-size:var(--fs-14);letter-spacing:-0.01em;">EDU SPACE</span>
-              <span style="font-size:var(--fs-12);color:var(--text-muted);" data-i18n="brand.cabinetSubtitle">Кабинет АМК</span>
+              <span style="font-weight:800;font-size:var(--fs-14);letter-spacing:-0.01em;">AMK SkillHub</span>
+              <span style="font-size:var(--fs-12);color:var(--text-muted);" data-i18n="brand.cabinetSubtitle">Платформа колледжа</span>
             </div>
           </a>
           <button type="button" id="sidebar-collapse-btn" class="collapse-btn" onclick="toggleSidebarCollapse()" aria-label="Свернуть или развернуть меню" title="Свернуть меню" data-i18n-attr="aria-label:a11y.collapseSidebar;title:a11y.collapseSidebarTitle">
@@ -1262,21 +1262,15 @@
             </a>
           </div>
 
-          <!-- Группа 3: Общение / Байланыс -->
+          <!-- Группа 3: AI Помощник -->
           <div class="nav-group">
-            <div class="nav-group-title" data-i18n="nav.group.communication">Общение</div>
-            <a href="javascript:void(0)" onclick="openMessengerModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:6;--stagger:40ms" data-tooltip="Чат с куратором" data-i18n-attr="data-tooltip:nav.curatorChatTooltip">
+            <div class="nav-group-title">ИИ-наставник</div>
+            <a href="javascript:void(0)" onclick="openAiTutorModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:6;--stagger:40ms" data-tooltip="AI Тьютор (Gemini)" data-i18n-attr="data-tooltip:nav.curatorChatTooltip">
               <span class="nav-item-main">
-                <span class="material-symbols-outlined" style="font-size:20px;">chat_bubble</span>
-                <span class="nav-label" data-i18n="nav.curatorChat">Чат с куратором</span>
+                <span class="material-symbols-outlined" style="font-size:20px;">smart_toy</span>
+                <span class="nav-label" data-i18n="nav.curatorChat">AI Тьютор</span>
               </span>
-              <span class="nav-live-dot" title="Куратор онлайн" data-i18n-attr="title:nav.curatorOnlineTitle"></span>
-            </a>
-            <a href="javascript:void(0)" onclick="openNotificationsModal()" class="nav-item reveal reveal--left" data-reveal="left" style="--i:7;--stagger:40ms" data-tooltip="Уведомления" data-i18n-attr="data-tooltip:nav.notificationsTooltip">
-              <span class="nav-item-main">
-                <span class="material-symbols-outlined" style="font-size:20px;">notifications</span>
-                <span class="nav-label" data-i18n="nav.notifications">Уведомления</span>
-              </span>
+              <span class="nav-live-dot" title="AI Тьютор онлайн" data-i18n-attr="title:nav.curatorOnlineTitle"></span>
             </a>
           </div>
 
@@ -1289,13 +1283,7 @@
                 <span class="nav-label" data-i18n="nav.profileAndCert">Профиль и сертификат</span>
               </span>
             </a>
-            <a href="career.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:9;--stagger:40ms" data-tooltip="Карьера и резюме" data-i18n-attr="data-tooltip:nav.careerTooltip">
-              <span class="nav-item-main">
-                <span class="material-symbols-outlined" style="font-size:20px;">work</span>
-                <span class="nav-label" data-i18n="nav.career">Карьера</span>
-              </span>
-            </a>
-            <a href="tools.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:10;--stagger:40ms" data-tooltip="Учебные инструменты" data-i18n-attr="data-tooltip:nav.toolsTooltip">
+            <a href="tools.html" class="nav-item reveal reveal--left" data-reveal="left" style="--i:10;--stagger:40ms" data-tooltip="Учебные инструменты и шпаргалки" data-i18n-attr="data-tooltip:nav.toolsTooltip">
               <span class="nav-item-main">
                 <span class="material-symbols-outlined" style="font-size:20px;">handyman</span>
                 <span class="nav-label" data-i18n="nav.tools">Инструменты</span>
@@ -1350,11 +1338,8 @@
             <button type="button" class="lang-switch-btn" data-lang-switch="kk" onclick="window.I18n.setLocale('kk')" aria-pressed="false" title="Қазақша" lang="kk">ҚАЗ</button>
           </div>
 
-          <button type="button" onclick="openMessengerModal()" class="collapse-btn" title="Чат с куратором" aria-label="Чат с куратором" data-i18n-attr="title:nav.curatorChatTooltip;aria-label:nav.curatorChatTooltip">
-            <span class="material-symbols-outlined" style="font-size:20px;">chat</span>
-          </button>
-          <button type="button" onclick="openNotificationsModal()" class="collapse-btn" title="Уведомления" aria-label="Уведомления" data-i18n-attr="title:nav.notificationsTooltip;aria-label:nav.notificationsTooltip">
-            <span class="material-symbols-outlined" style="font-size:20px;">notifications</span>
+          <button type="button" onclick="openAiTutorModal()" class="collapse-btn" title="AI Тьютор (Gemini)" aria-label="AI Тьютор" data-i18n-attr="title:nav.curatorChatTooltip;aria-label:nav.curatorChatTooltip">
+            <span class="material-symbols-outlined" style="font-size:20px;">smart_toy</span>
           </button>
           <a href="profile.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text-primary);padding-left:8px;border-left:1px solid var(--border-subtle);">
             <div style="width:32px;height:32px;border-radius:50%;background:var(--accent-secondary-soft);border:1px solid rgba(139,92,246,0.45);color:#ddd6fe;font-size:var(--fs-12);font-weight:700;display:flex;align-items:center;justify-content:center;" data-user-initials>
@@ -1469,9 +1454,6 @@
           </div>
         </section>
 
-        <!-- DYNAMIC COURSE 3D DIGITAL TWIN & INTERACTIVE WORKBENCH -->
-        <section id="tasks-course-3d-showcase" class="reveal reveal--up is-visible" aria-label="Интерактивный 3D-стенд и симулятор выбранного направления"></section>
-
         <!-- 3. SEGMENTED STATUS FILTERS & SEARCH -->
         <section class="controls-bar" aria-label="Фильтры и поиск уроков" data-i18n-attr="aria-label:a11y.controlsRegion">
           <div class="segmented-control reveal reveal--scale" data-reveal="scale" style="--i:5" id="status-filters" role="tablist" aria-label="Фильтр по статусу уроков" data-i18n-attr="aria-label:a11y.statusFilterGroup">
@@ -1537,9 +1519,9 @@
       <span class="material-symbols-outlined" style="font-size:20px;">route</span>
       <span data-i18n="nav.mobile.roadmap">Карта</span>
     </button>
-    <button type="button" onclick="openMessengerModal()" class="mobile-nav-btn">
-      <span class="material-symbols-outlined" style="font-size:20px;">chat_bubble</span>
-      <span data-i18n="nav.mobile.chat">Чат</span>
+    <button type="button" onclick="openAiTutorModal()" class="mobile-nav-btn">
+      <span class="material-symbols-outlined" style="font-size:20px;">smart_toy</span>
+      <span>AI Тьютор</span>
     </button>
     <a href="profile.html" class="mobile-nav-btn">
       <span class="material-symbols-outlined" style="font-size:20px;">person</span>
@@ -1833,7 +1815,7 @@
             task_number: num,
             title: l.title,
             description: l.task_prompt || '',
-            tools_required: l.tools || 'Практикум EDU SPACE',
+            tools_required: l.tools || 'Практикум AMK SkillHub',
             difficulty: l.difficulty || 'Базовый',
             time_limit: l.time_limit || '60 мин',
             unlock_day: num,

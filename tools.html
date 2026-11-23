@@ -1,922 +1,524 @@
 <!DOCTYPE html>
 <html lang="ru" class="h-full scroll-smooth">
 <head>
-  <title>Инженерные инструменты & Диагностика | EDU SPACE PRO</title>
+  <title>Инструменты, зачётка и шпаргалки курсов | AMK SkillHub</title>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <!-- Open Graph -->
-  <meta property="og:type" content="website"/>
-  <meta property="og:url" content="https://amk-skillhub.onrender.com/tools.html"/>
-  <meta property="og:title" content="Профессиональные инструменты & Сканер OBD-II — EDU SPACE PRO"/>
-  <meta property="og:description" content="Интерактивный декодер ошибок OBD-II (DTC), таблицы давления хладагентов (R134a/R404a), моменты затяжки ДВС и CSS/Web шпаргалки."/>
-  <meta property="og:image" content="https://amk-skillhub.onrender.com/assets/eduspace-logo.svg"/>
-  <meta name="theme-color" content="#4f46e5"/>
-
+  <meta name="theme-color" content="#070B14"/>
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-  
   <link rel="stylesheet" href="css/tailwind.min.css"/>
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/components.css"/>
-  <link rel="stylesheet" href="css/starter-lesson.css"/>
-  <link rel="stylesheet" href="css/workshop.css">
-  <script src="js/vendor/three.min.js"></script>
-  <script src="js/workshop-models.js"></script>
-  <script src="js/lesson-interactives.js"></script>
+  <link rel="stylesheet" href="css/workshop.css"/>
+  <script src="js/courses-catalog.js"></script>
+  <script src="js/app-logistics.js"></script>
   <script src="js/prism-fx.js" defer></script>
   <script src="js/theme.js"></script>
   <script src="js/i18n.js"></script>
-  <link rel="stylesheet" href="css/photoreal-tools.css">
+  <link rel="stylesheet" href="css/photoreal-tools.css"/>
 </head>
-<body class="workshop bg-dark-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+<body class="workshop bg-dark-950 text-slate-100 font-sans antialiased min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950">
   <a class="academy-skip" href="#academy-main">К содержимому</a>
 
   <!-- Header -->
-  <header class="fixed top-0 left-0 right-0 z-50 bg-dark-900/80 backdrop-blur-xl border-b border-white/10 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
-      <a href="index.html" class="flex items-center gap-3.5 group">
-        <div class="relative w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-glow-indigo transition-transform group-hover:scale-105">
-          <div class="w-full h-full bg-dark-900 rounded-[14px] flex items-center justify-center">
-            <img alt="EDU SPACE Logo" width="24" height="24" class="h-6 w-6 object-contain" src="assets/eduspace-logo.svg"/>
+  <header class="fixed top-0 left-0 right-0 z-50 bg-dark-900/85 backdrop-blur-xl border-b border-white/10 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-cyan-500 to-emerald-400 p-0.5 shadow-glow-indigo">
+          <div class="w-full h-full bg-dark-900 rounded-[10px] flex items-center justify-center">
+            <img alt="AMK SkillHub" width="20" height="20" class="h-5 w-5 object-contain" src="assets/eduspace-logo.svg"/>
           </div>
         </div>
         <div class="flex flex-col">
-          <span class="font-extrabold text-lg tracking-tight text-white flex items-center gap-1.5 leading-none">
-            EDU SPACE
-            <span class="px-1.5 py-0.5 rounded-md bg-cyan-500/20 text-cyan-300 text-[10px] font-bold border border-cyan-400/30">TOOLS</span>
-          </span>
-          <span class="text-[10px] text-slate-400 font-semibold tracking-wider uppercase mt-1">Инженерный хаб</span>
+          <span class="font-extrabold text-base tracking-tight text-white leading-none">AMK SkillHub</span>
+          <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">Инструменты и шпаргалки</span>
         </div>
       </a>
 
-      <!-- Desktop Nav -->
-      <nav class="hidden md:flex items-center gap-1 bg-white/5 border border-white/10 p-1.5 rounded-2xl backdrop-blur-md">
-        <a href="index.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Главная</a>
-        <a href="student.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Каталог</a>
-        <a href="tasks.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Задания</a>
-        <a href="gradebook.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Журнал</a>
-        <a href="tools.html" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-cyan-600 text-white shadow-glow-cyan transition-all flex items-center gap-1">
-          <span class="material-symbols-outlined text-[16px] text-white">construction</span>Инструменты
+      <nav class="hidden md:flex items-center gap-1 bg-white/5 border border-white/10 p-1 rounded-2xl">
+        <a href="index.html" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Главная</a>
+        <a href="learn.html" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Учебник</a>
+        <a href="tasks.html" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Практикум</a>
+        <a href="tools.html" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-cyan-600 text-white shadow-glow-cyan transition-all flex items-center gap-1">
+          <span class="material-symbols-outlined text-[15px]">construction</span>Инструменты
         </a>
-        <a href="career.html" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors flex items-center gap-1">
-          <span class="material-symbols-outlined text-[16px] text-amber-300">work</span>Карьера & Резюме
-        </a>
+        <a href="profile.html" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/5 transition-colors">Профиль</a>
       </nav>
 
-      <div class="flex items-center gap-3">
-        <a href="profile.html" class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold transition-all">
-          <span class="material-symbols-outlined text-[18px] text-cyan-400">person</span>
-          <span>Кабинет</span>
+      <div class="flex items-center gap-2">
+        <a href="tasks.html" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold transition-all">
+          <span class="material-symbols-outlined text-[17px] text-cyan-400">arrow_back</span>
+          <span>В кабинет</span>
         </a>
       </div>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main id="academy-main" tabindex="-1" class="flex-1 pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-
-    <!-- Top Banner -->
-    <div class="mb-8 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-cyan-950/60 via-dark-900 to-indigo-950/50 border border-cyan-500/20 backdrop-blur-xl">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        <div>
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-bold mb-3">
-            <span class="material-symbols-outlined text-[16px] text-cyan-400">precision_manufacturing</span>
-            Профессиональный инструментарий и справочники колледжа АМК
-          </div>
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Инженерная база знаний & Калькуляторы
-          </h1>
-          <p class="text-sm text-slate-400 mt-2 max-w-2xl leading-relaxed">
-            Быстрый доступ к расшифровке 40+ кодов неисправностей OBD-II, расчёту давления хладагентов, моментам затяжки двигателей и шпаргалкам веб-разработчика.
-          </p>
-        </div>
+  <main id="academy-main" tabindex="-1" class="flex-1 pt-24 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-8">
+    <!-- Hero Banner -->
+    <section class="cyber-card p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-indigo-950/70 via-dark-900/90 to-cyan-950/60 border border-cyan-500/25">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-bold mb-3">
+        <span class="material-symbols-outlined text-[16px]">auto_awesome</span>
+        AMK SkillHub · Зачётка практикума и шпаргалки 5 курсов
       </div>
-    </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+        Калькулятор оценок практикума и шпаргалки по курсам
+      </h1>
+      <p class="text-sm text-slate-300 mt-2 max-w-2xl leading-relaxed">
+        Здесь автоматически собираются ваши реальные оценки за пройденные уроки и тесты с расчётом среднего балла, а ниже собраны лёгкие наводящие шпаргалки по всем 5 направлениям (без готовых ответов).
+      </p>
+    </section>
 
-    <!-- ========================================================================= -->
-    <!-- 4 ПЕРСОНАЛЬНЫХ ИНСТРУМЕНТА СТУДЕНТА (ПОИСК, GPA, ХАБ ЗАДАЧ, ТАЙМЕР/КОНСПЕКТ) -->
-    <!-- ========================================================================= -->
-    <section id="four-student-tools-hub" data-no-reveal class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Персональные учебные инструменты">
-      <!-- 1. Глобальный поиск -->
-      <div class="p-5 rounded-3xl bg-dark-900 border border-white/10 space-y-3 flex flex-col justify-between">
-        <div class="space-y-2">
-          <div class="text-xs font-extrabold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[18px]">search</span>
-            <span>1. Поиск по курсам</span>
+    <!-- REAL PRACTICUM GRADEBOOK & GPA CALCULATOR (POINT 3) -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6" aria-label="Калькулятор среднего балла практикума">
+      <div class="lg:col-span-2 cyber-card p-6 rounded-3xl bg-dark-900 border border-white/10 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div class="text-xs font-extrabold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[18px]">calculate</span>
+              <span>Калькулятор среднего балла по практикуму</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">Автоматически отображает оценки за каждый пройденный урок и пересчитывает общий средний балл.</p>
           </div>
-          <input type="search" id="student-tool-search" oninput="runStudentCourseSearch(this.value)" placeholder="Поиск по темам и курсам (HVAC, ГРМ, Flexbox)..." class="w-full px-3 py-2 rounded-xl bg-dark-850 border border-white/15 text-xs text-white" />
+          <div class="flex items-center gap-2">
+            <select id="gpa-course-filter" onchange="renderPracticumGpa()" class="px-3 py-1.5 rounded-xl bg-dark-850 border border-white/15 text-xs text-white font-semibold">
+              <option value="all">Все курсы</option>
+              <option value="it">Веб-дизайн (IT)</option>
+              <option value="automechanic">Автомеханика</option>
+              <option value="autoelectric">Автоэлектрика</option>
+              <option value="hvac">Холодильные (HVAC)</option>
+              <option value="graphic_design">Графдизайн</option>
+            </select>
+            <button type="button" onclick="addWhatIfGrade()" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold">+ Прогноз</button>
+          </div>
         </div>
-        <div id="student-tool-search-results" class="text-[11px] text-slate-300 space-y-1 max-h-28 overflow-y-auto">
-          <div>Найдено направлений: 5 (IT, Графдизайн, Автоэлектрика, HVAC, Автомеханика)</div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div class="p-4 rounded-2xl bg-dark-950/70 border border-white/10">
+            <div class="text-[11px] text-slate-400 font-semibold">Средний балл (5.0)</div>
+            <div id="practicum-avg-5" class="text-3xl font-black font-mono text-emerald-400 mt-1">—</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-dark-950/70 border border-white/10">
+            <div class="text-[11px] text-slate-400 font-semibold">GPA (4.0)</div>
+            <div id="student-tool-gpa-out" class="text-3xl font-black font-mono text-cyan-400 mt-1">—</div>
+          </div>
+          <div class="p-4 rounded-2xl bg-dark-950/70 border border-white/10">
+            <div class="text-[11px] text-slate-400 font-semibold">Пройдено уроков</div>
+            <div id="practicum-passed-cnt" class="text-3xl font-black font-mono text-indigo-300 mt-1">0</div>
+          </div>
         </div>
+
+        <div class="w-full h-2.5 rounded-full bg-white/10 overflow-hidden">
+          <div id="practicum-gpa-bar" class="h-full bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400 transition-all duration-500" style="width:0%"></div>
+        </div>
+
+        <div id="practicum-grades-list" class="space-y-2.5 max-h-72 overflow-y-auto pr-1"></div>
       </div>
 
-      <!-- 2. Калькулятор GPA -->
-      <div class="p-5 rounded-3xl bg-dark-900 border border-white/10 space-y-3 flex flex-col justify-between">
-        <div class="space-y-2">
-          <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[18px]">calculate</span>
-            <span>2. Калькулятор GPA</span>
-          </div>
-          <div class="flex items-center gap-2 text-xs">
-            <label for="student-tool-gpa-target" class="text-slate-400">Целевой GPA:</label>
-            <input type="number" id="student-tool-gpa-target" min="0" max="4.0" step="0.1" value="3.6" oninput="updateStudentGpaTool()" class="w-20 px-2.5 py-1.5 rounded-xl bg-dark-850 border border-white/15 text-xs font-mono text-white" />
-          </div>
-        </div>
-        <div class="flex items-center justify-between pt-2 border-t border-white/10 text-xs">
-          <span class="text-slate-400">Прогноз балла:</span>
-          <strong id="student-tool-gpa-out" class="font-mono text-emerald-400">3.60 / 4.00 (90%)</strong>
-        </div>
-      </div>
-
-      <!-- 3. Хаб учебных задач -->
-      <div class="p-5 rounded-3xl bg-dark-900 border border-white/10 space-y-3 flex flex-col justify-between">
-        <div class="space-y-2">
+      <!-- Compact Student Productivity Column (Search, Task Hub, Focus Timer & Notes) -->
+      <div class="space-y-4">
+        <div class="cyber-card p-5 rounded-3xl bg-dark-900 border border-white/10 space-y-3">
           <div class="text-xs font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
             <span class="material-symbols-outlined text-[18px]">checklist</span>
-            <span>3. Хаб задач</span>
+            <span>Личный трекер задач</span>
           </div>
           <div class="flex items-center gap-1.5">
-            <input type="text" id="student-tool-task-input" placeholder="Новая учебная задача..." class="flex-1 px-2.5 py-1.5 rounded-xl bg-dark-850 border border-white/15 text-xs text-white" />
-            <button type="button" id="student-tool-task-add-btn" onclick="addStudentToolTask()" class="px-2.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-bold">+</button>
+            <input type="text" id="student-tool-task-input" placeholder="Новая учебная задача..." class="flex-1 px-3 py-2 rounded-xl bg-dark-850 border border-white/15 text-xs text-white"/>
+            <button type="button" id="student-tool-task-add-btn" onclick="addStudentToolTask()" class="px-3 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold">+</button>
           </div>
+          <ul id="student-tool-task-list" class="text-xs text-slate-300 space-y-1.5 max-h-28 overflow-y-auto"></ul>
         </div>
-        <ul id="student-tool-task-list" class="text-[11px] text-slate-300 space-y-1 max-h-24 overflow-y-auto"></ul>
-      </div>
 
-      <!-- 4. Таймер фокуса и конспекты -->
-      <div class="p-5 rounded-3xl bg-dark-900 border border-white/10 space-y-3 flex flex-col justify-between">
-        <div class="space-y-2">
+        <div class="cyber-card p-5 rounded-3xl bg-dark-900 border border-white/10 space-y-3">
           <div class="flex items-center justify-between gap-2">
             <div class="text-xs font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[18px]">timer</span>
-              <span>4. Таймер и конспект</span>
+              <span>Таймер фокуса и конспект</span>
             </div>
             <div class="flex items-center gap-1.5">
-              <select id="student-tool-timer-minutes" aria-label="Длительность таймера (мин)" onchange="setStudentTimerMinutes(this.value)" class="px-1.5 py-0.5 rounded bg-dark-850 border border-white/15 text-[10px] font-mono text-white">
+              <select id="student-tool-timer-minutes" aria-label="Минуты" onchange="setStudentTimerMinutes(this.value)" class="px-1.5 py-0.5 rounded bg-dark-850 border border-white/15 text-[10px] font-mono text-white">
                 <option value="15">15м</option>
                 <option value="25" selected>25м</option>
                 <option value="45">45м</option>
-                <option value="60">60м</option>
               </select>
               <span id="student-tool-timer-display" class="font-mono font-bold text-xs text-amber-300">25:00</span>
             </div>
           </div>
-          <textarea id="student-tool-notes" rows="2" onchange="saveStudentToolsState()" placeholder="Быстрый конспект по уроку..." class="w-full px-2.5 py-1.5 rounded-xl bg-dark-850 border border-white/15 text-xs text-white"></textarea>
-        </div>
-        <div class="flex items-center justify-between gap-2">
-          <button type="button" onclick="toggleStudentTimer()" id="student-tool-timer-btn" class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">Старт</button>
-          <span id="student-tools-save-status" class="text-[10px] text-slate-400 truncate"></span>
-          <button type="button" id="student-tool-save-btn" onclick="saveStudentToolsState()" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white text-[11px] font-bold">Сохранить</button>
+          <textarea id="student-tool-notes" rows="3" onchange="saveStudentToolsState()" placeholder="Быстрые заметки по текущему уроку..." class="w-full px-3 py-2 rounded-xl bg-dark-850 border border-white/15 text-xs text-white"></textarea>
+          <div class="flex items-center justify-between gap-2">
+            <button type="button" onclick="toggleStudentTimer()" id="student-tool-timer-btn" class="px-3 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-bold">Старт</button>
+            <span id="student-tools-save-status" class="text-[10px] text-slate-400 truncate"></span>
+            <button type="button" id="student-tool-save-btn" onclick="saveStudentToolsState()" class="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold">Сохранить</button>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Tab Selector -->
-    <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-8 no-scrollbar">
-      <button type="button" onclick="switchToolsTab('obd')" id="tab-btn-obd" class="tool-tab px-5 py-3 rounded-2xl bg-cyan-600 text-white font-bold text-xs shadow-glow-cyan flex items-center gap-2 whitespace-nowrap transition-all">
-        <span class="material-symbols-outlined text-[18px]">car_repair</span>
-        <span>Сканер кодов OBD-II (DTC)</span>
-      </button>
-      <button type="button" onclick="switchToolsTab('hvac')" id="tab-btn-hvac" class="tool-tab px-5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all">
-        <span class="material-symbols-outlined text-[18px]">ac_unit</span>
-        <span>Калькулятор хладагентов (HVAC)</span>
-      </button>
-      <button type="button" onclick="switchToolsTab('torque')" id="tab-btn-torque" class="tool-tab px-5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all">
-        <span class="material-symbols-outlined text-[18px]">build</span>
-        <span>Моменты затяжки ДВС & Зазоры</span>
-      </button>
-      <button type="button" onclick="switchToolsTab('web')" id="tab-btn-web" class="tool-tab px-5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all">
-        <span class="material-symbols-outlined text-[18px]">code</span>
-        <span>Шпаргалка Web &amp; CSS Flex/Grid</span>
-      </button>
-      <button type="button" onclick="switchToolsTab('design')" id="tab-btn-design" class="tool-tab px-5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all">
-        <span class="material-symbols-outlined text-[18px]">palette</span>
-        <span>Графический дизайн: CMYK &amp; Prepress</span>
-      </button>
-    </div>
-
-    <!-- DYNAMIC 3D MODEL FOR SELECTED TOOL / PROFESSION -->
-    <div id="tools-course-3d-mount" class="mb-8"></div>
-
-    <!-- ========================================================================= -->
-    <!-- TAB 1: OBD-II SCANNER -->
-    <!-- ========================================================================= -->
-    <div id="tool-pane-obd" class="space-y-6">
-      
-      <!-- Filter Bar -->
-      <div class="p-5 rounded-2xl bg-dark-900 border border-white/10 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-        <div class="relative flex-1">
-          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
-          <input type="text" id="obd-search-input" oninput="filterObdCodes()" placeholder="Быстрый поиск кода ошибки (P0300, P0171, CAN, лямбда, пропуск...)" class="w-full pl-11 pr-4 py-2.5 rounded-xl bg-dark-850 border border-white/10 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-cyan-500 font-medium"/>
+    <!-- 5 COURSE TABS WITH LIGHT CHEAT-SHEET HINTS (POINT 13 - NO DIRECT ANSWERS!) -->
+    <section class="space-y-5" aria-label="Шпаргалки и лёгкие подсказки по 5 курсам">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-white">Шпаргалки и лёгкие подсказки по курсам</h2>
+          <p class="text-xs text-slate-400 mt-1">Выберите специальность — внутри короткие ориентиры и памятки, которые направляют ход мысли, не сливая готовых ответов.</p>
         </div>
-        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
-          <button type="button" onclick="setObdCategory('all')" class="obd-cat-btn px-3.5 py-2 rounded-xl bg-cyan-600 text-white font-bold text-xs whitespace-nowrap" data-cat="all">Все</button>
-          <button type="button" onclick="setObdCategory('P')" class="obd-cat-btn px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10" data-cat="P">Двигатель (P)</button>
-          <button type="button" onclick="setObdCategory('U')" class="obd-cat-btn px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10" data-cat="U">Сеть CAN (U)</button>
-          <button type="button" onclick="setObdCategory('B')" class="obd-cat-btn px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10" data-cat="B">Кузов (B)</button>
-          <button type="button" onclick="setObdCategory('C')" class="obd-cat-btn px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10" data-cat="C">Шасси/ABS (C)</button>
+        <div class="relative w-full sm:w-72">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+          <input type="search" id="student-tool-search" oninput="renderCourseCheatsheets()" placeholder="Найти подсказку..." class="w-full pl-9 pr-3 py-2 rounded-xl bg-dark-900 border border-white/15 text-xs text-white"/>
         </div>
       </div>
 
-      <!-- Codes Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="obd-codes-container">
-        <!-- Rendered dynamically -->
-      </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- TAB 2: HVAC REFRIGERANT CALCULATOR -->
-    <!-- ========================================================================= -->
-    <div id="tool-pane-hvac" class="hidden space-y-6">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Live Calculator Form -->
-        <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 space-y-5">
-          <div class="flex items-center gap-2 text-cyan-400 font-extrabold text-sm">
-            <span class="material-symbols-outlined text-[20px]">calculate</span>
-            <span>Диагностический калькулятор перегрева</span>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Тип хладагента (Фреон)</label>
-            <select id="hvac-refrigerant" onchange="calculateHvac()" class="w-full px-3.5 py-2.5 rounded-xl bg-dark-850 border border-white/15 text-white text-xs font-medium focus:outline-none focus:border-cyan-500">
-              <option value="R134a">R134a (Автокондиционеры & Холодильники)</option>
-              <option value="R404A">R404A (Низкотемпературные витрины)</option>
-              <option value="R410A">R410A (Бытовые сплит-системы)</option>
-              <option value="R600a">R600a (Изобутан, бытовой холод)</option>
-              <option value="R32">R32 (Новые инверторные кондиционеры)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Манометрическое давление всасывания (bar)</label>
-            <input type="number" step="0.1" id="hvac-pressure" value="2.0" oninput="calculateHvac()" class="w-full px-3.5 py-2.5 rounded-xl bg-dark-850 border border-white/15 text-white text-xs font-mono font-medium focus:outline-none focus:border-cyan-500"/>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Фактическая температура трубки всасывания (°C)</label>
-            <input type="number" step="0.5" id="hvac-pipe-temp" value="2.0" oninput="calculateHvac()" class="w-full px-3.5 py-2.5 rounded-xl bg-dark-850 border border-white/15 text-white text-xs font-mono font-medium focus:outline-none focus:border-cyan-500"/>
-          </div>
-
-          <!-- Result Card -->
-          <div class="p-4 rounded-2xl bg-dark-850 border border-white/10 space-y-3" id="hvac-result-box">
-            <div class="flex items-center justify-between text-xs">
-              <span class="text-slate-400">Температура кипения (T sat):</span>
-              <span class="font-bold text-white font-mono" id="hvac-tsat">-5.5 °C</span>
-            </div>
-            <div class="flex items-center justify-between text-xs">
-              <span class="text-slate-400">Фактический перегрев (SH):</span>
-              <span class="font-bold text-cyan-400 font-mono text-sm" id="hvac-sh">7.5 K</span>
-            </div>
-            <div class="pt-2 border-t border-white/10">
-              <div class="text-[11px] font-bold text-emerald-400" id="hvac-verdict">✓ Норма заправки (Целевой перегрев 5–8 K)</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Reference Table -->
-        <div class="lg:col-span-2 p-6 rounded-3xl bg-dark-900 border border-white/10 space-y-4">
-          <div class="flex items-center justify-between">
-            <div class="font-extrabold text-sm text-white flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px] text-cyan-400">table_chart</span>
-              Справочная таблица рабочих параметров
-            </div>
-            <span class="text-[11px] text-slate-400">Стандарты АМК 2026</span>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-white/5 text-[11px] uppercase font-bold text-slate-400">
-                <tr>
-                  <th class="p-3 rounded-l-xl">Хладагент</th>
-                  <th class="p-3">Давление низк. (bar)</th>
-                  <th class="p-3">Давление выс. (bar)</th>
-                  <th class="p-3">Кипение (°C)</th>
-                  <th class="p-3 rounded-r-xl">Норма перегрева</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-white/5 font-mono">
-                <tr>
-                  <td class="p-3 font-sans font-bold text-white">R134a</td>
-                  <td class="p-3 text-cyan-300">1.8 – 2.4 bar</td>
-                  <td class="p-3 text-amber-300">12 – 16 bar</td>
-                  <td class="p-3">-8 ... -3 °C</td>
-                  <td class="p-3 font-sans text-emerald-400">5 – 8 K</td>
-                </tr>
-                <tr>
-                  <td class="p-3 font-sans font-bold text-white">R404A</td>
-                  <td class="p-3 text-cyan-300">1.2 – 2.0 bar</td>
-                  <td class="p-3 text-amber-300">16 – 22 bar</td>
-                  <td class="p-3">-28 ... -18 °C</td>
-                  <td class="p-3 font-sans text-emerald-400">6 – 9 K</td>
-                </tr>
-                <tr>
-                  <td class="p-3 font-sans font-bold text-white">R410A</td>
-                  <td class="p-3 text-cyan-300">7.5 – 9.0 bar</td>
-                  <td class="p-3 text-amber-300">26 – 32 bar</td>
-                  <td class="p-3">0 ... +5 °C</td>
-                  <td class="p-3 font-sans text-emerald-400">5 – 7 K</td>
-                </tr>
-                <tr>
-                  <td class="p-3 font-sans font-bold text-white">R600a</td>
-                  <td class="p-3 text-cyan-300">-0.3 – +0.2 bar</td>
-                  <td class="p-3 text-amber-300">6 – 8 bar</td>
-                  <td class="p-3">-25 ... -15 °C</td>
-                  <td class="p-3 font-sans text-emerald-400">4 – 6 K</td>
-                </tr>
-                <tr>
-                  <td class="p-3 font-sans font-bold text-white">R32</td>
-                  <td class="p-3 text-cyan-300">8.0 – 9.5 bar</td>
-                  <td class="p-3 text-amber-300">28 – 34 bar</td>
-                  <td class="p-3">+1 ... +6 °C</td>
-                  <td class="p-3 font-sans text-emerald-400">4 – 7 K</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- TAB 3: TORQUE SPECS & VALVE CLEARANCES -->
-    <!-- ========================================================================= -->
-    <div id="tool-pane-torque" class="hidden space-y-6">
-      
-      <!-- Engine Selector -->
-      <div class="p-5 rounded-2xl bg-dark-900 border border-white/10 flex flex-wrap items-center gap-2">
-        <span class="text-xs font-bold text-slate-300 mr-2">Выберите двигатель:</span>
-        <button type="button" onclick="selectEngine('toyota')" class="eng-btn px-4 py-2 rounded-xl bg-cyan-600 text-white font-bold text-xs" data-eng="toyota">Toyota 1NZ-FE / 2AR-FE</button>
-        <button type="button" onclick="selectEngine('hyundai')" class="eng-btn px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10" data-eng="hyundai">Hyundai/Kia G4FC / G4NA</button>
-        <button type="button" onclick="selectEngine('vag')" class="eng-btn px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10" data-eng="vag">VAG 1.4 TSI (EA211)</button>
-        <button type="button" onclick="selectEngine('lada')" class="eng-btn px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10" data-eng="lada">ВАЗ-21129 / 1.6 16V</button>
+      <!-- 5 Course Tabs -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar" role="tablist" aria-label="Выбор курса шпаргалок">
+        <button type="button" onclick="selectCourseTab('automechanic')" id="tab-btn-automechanic" class="tool-tab px-4 py-2.5 rounded-2xl bg-cyan-600 text-white font-bold text-xs shadow-glow-cyan flex items-center gap-2 whitespace-nowrap transition-all">
+          <span class="material-symbols-outlined text-[18px]">build</span>
+          <span>Автомеханика</span>
+        </button>
+        <button type="button" onclick="selectCourseTab('autoelectric')" id="tab-btn-autoelectric" class="tool-tab px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all">
+          <span class="material-symbols-outlined text-[18px]">electric_bolt</span>
+          <span>Автоэлектрика и диагностика</span>
+        </button>
+        <button type="button" onclick="selectCourseTab('hvac')" id="tab-btn-hvac" class="tool-tab px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all">
+          <span class="material-symbols-outlined text-[18px]">ac_unit</span>
+          <span>Холодильные системы (HVAC)</span>
+        </button>
+        <button type="button" onclick="selectCourseTab('it')" id="tab-btn-it" class="tool-tab px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all">
+          <span class="material-symbols-outlined text-[18px]">code</span>
+          <span>Веб-дизайн и IT</span>
+        </button>
+        <button type="button" onclick="selectCourseTab('graphic_design')" id="tab-btn-graphic_design" class="tool-tab px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all">
+          <span class="material-symbols-outlined text-[18px]">palette</span>
+          <span>Графический дизайн</span>
+        </button>
       </div>
 
-      <!-- Engine Specs Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="engine-specs-container">
-        <!-- Rendered dynamically -->
-      </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- TAB 4: WEB DEV & CSS CHEATSHEET -->
-    <!-- ========================================================================= -->
-    <div id="tool-pane-web" class="hidden space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <!-- Flexbox Cheat -->
-        <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 space-y-4">
-          <div class="font-extrabold text-sm text-white flex items-center gap-2">
-            <span class="material-symbols-outlined text-[18px] text-indigo-400">splitscreen</span>
-            CSS Flexbox Шпаргалка
-          </div>
-          <div class="space-y-2 text-xs">
-            <div class="p-3 rounded-xl bg-dark-850 border border-white/5 font-mono">
-              <span class="text-indigo-400">justify-content</span>: center | space-between | flex-start;
-              <div class="text-[11px] font-sans text-slate-400 mt-1">Выравнивание элементов по главной оси (X при row)</div>
-            </div>
-            <div class="p-3 rounded-xl bg-dark-850 border border-white/5 font-mono">
-              <span class="text-indigo-400">align-items</span>: center | stretch | flex-start;
-              <div class="text-[11px] font-sans text-slate-400 mt-1">Выравнивание элементов по поперечной оси (Y при row)</div>
-            </div>
-            <div class="p-3 rounded-xl bg-dark-850 border border-white/5 font-mono">
-              <span class="text-indigo-400">flex-direction</span>: row | column | row-reverse;
-              <div class="text-[11px] font-sans text-slate-400 mt-1">Направление главной оси контейнера</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- HTTP Codes -->
-        <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 space-y-4">
-          <div class="font-extrabold text-sm text-white flex items-center gap-2">
-            <span class="material-symbols-outlined text-[18px] text-cyan-400">http</span>
-            HTTP Коды ответов сервера
-          </div>
-          <div class="space-y-2 text-xs font-mono">
-            <div class="p-2.5 rounded-xl bg-dark-850 border border-white/5 flex items-center justify-between">
-              <span class="font-bold text-emerald-400">200 OK</span>
-              <span class="font-sans text-slate-400 text-[11px]">Успешный запрос с телом данных</span>
-            </div>
-            <div class="p-2.5 rounded-xl bg-dark-850 border border-white/5 flex items-center justify-between">
-              <span class="font-bold text-emerald-400">201 Created</span>
-              <span class="font-sans text-slate-400 text-[11px]">Ресурс успешно создан (регистрация/запись)</span>
-            </div>
-            <div class="p-2.5 rounded-xl bg-dark-850 border border-white/5 flex items-center justify-between">
-              <span class="font-bold text-amber-400">400 Bad Request</span>
-              <span class="font-sans text-slate-400 text-[11px]">Неверный формат данных (валидация не прошла)</span>
-            </div>
-            <div class="p-2.5 rounded-xl bg-dark-850 border border-white/5 flex items-center justify-between">
-              <span class="font-bold text-red-400">401 / 403 Forbidden</span>
-              <span class="font-sans text-slate-400 text-[11px]">Требуется авторизация или доступ заблокирован</span>
-            </div>
-            <div class="p-2.5 rounded-xl bg-dark-850 border border-white/5 flex items-center justify-between">
-              <span class="font-bold text-red-400">500 Server Error</span>
-              <span class="font-sans text-slate-400 text-[11px]">Исключение или сбой в коде бэкенда Python/Node</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- TAB 5: GRAPHIC DESIGN & PREPRESS LAB -->
-    <!-- ========================================================================= -->
-    <div id="tool-pane-design" class="hidden space-y-6">
-      <div id="tools-design-interactive-mount" class="p-6 rounded-3xl bg-dark-900 border border-white/10"></div>
-    </div>
-
+      <div id="course-cheatsheet-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
   </main>
 
-  <!-- Footer -->
-  <footer class="bg-dark-900 border-t border-white/10 py-10 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500 space-y-2">
-      <div>КГКП «Алматинский многопрофильный колледж» • БИН 990440001809</div>
-      <div>г. Алматы, ул. Жандосова, 63 • Директор Бейсетбаев Асылхан Косылханович</div>
-      <div>WhatsApp поддержки: +7 707 907 97 64 • Email: danidanilov333@gmail.com</div>
-    </div>
-  </footer>
-
-  <script src="js/courses-catalog.js"></script>
-  <script src="js/app-logistics.js"></script>
   <script>
-    const OBD_DATABASE = [
-      { code: 'P0300', title: 'Случайные/множественные пропуски зажигания', cat: 'P', severity: 'Критично', cause: 'Свечи зажигания, катушки, подсос воздуха во впуск, низкое давление топлива', fix: '1. Проверить коррекцию топлива LTFT/STFT. 2. Осмотреть свечи и катушки. 3. Проверить компрессию в цилиндрах.' },
-      { code: 'P0171', title: 'Слишком бедная смесь (Банк 1 / System Too Lean)', cat: 'P', severity: 'Важно', cause: 'Неучтённый подсос воздуха после ДМРВ, засор форсунок, неисправность MAF', fix: '1. Провести дымогенератором тест впуска на герметичность. 2. Проверить показания MAF на ХХ (должно быть 2.0-2.5 г/с).' },
-      { code: 'P0172', title: 'Слишком богатая смесь (Банк 1 / System Too Rich)', cat: 'P', severity: 'Важно', cause: 'Течь форсунки, высокое давление топлива, засор воздушного фильтра', fix: '1. Проверить регулятор давления топлива. 2. Оценить время впрыска форсунок сканером.' },
-      { code: 'P0420', title: 'Эффективность катализатора ниже порога (Банк 1)', cat: 'P', severity: 'Внимание', cause: 'Деградация сот нейтрализатора, старение 2-го датчика кислорода (лямбда)', fix: '1. Сравнить синусоиду B1S1 и прямую линию B1S2. Если B1S2 повторяет B1S1 — катализатор разрушен.' },
-      { code: 'P0335', title: 'Ошибка цепи датчика положения коленвала (ДПКВ)', cat: 'P', severity: 'Критично', cause: 'Обрыв проводки ДПКВ, биение задающего диска, стружка на магнитном торце', fix: '1. Замерить сопротивление обмотки индуктивного ДПКВ (500–1200 Ом). 2. Подключить осциллограф.' },
-      { code: 'P0340', title: 'Сбой цепи датчика положения распредвала (ДПРВ)', cat: 'P', severity: 'Важно', cause: 'Растяжение цепи ГРМ, повреждение проводки опорного питания 5.0 В', fix: '1. Проверить опорное напряжение 5.0 В и массу. 2. Снять синхронизацию ДПКВ+ДПРВ осциллографом.' },
-      { code: 'P0115', title: 'Неисправность датчика температуры ОЖ (ДТОЖ)', cat: 'P', severity: 'Внимание', cause: 'Обрыв или КЗ датчика температуры, термостат завис в открытом положении', fix: '1. Замерить сопротивление NTC термистора (при 20°C: ~2.5 кОм, при 80°C: ~300 Ом).' },
-      { code: 'P0500', title: 'Датчик скорости автомобиля (VSS) — отсутствие сигнала', cat: 'P', severity: 'Внимание', cause: 'Обрыв сигнального провода, неисправность датчика на КПП или блока ABS', fix: '1. Проверить вращение колёс в датастриме блока ABS. 2. Проверить шестерню привода спидометра.' },
-      { code: 'U0100', title: 'Потеря связи с блоком управления двигателем (ECM/PCM)', cat: 'U', severity: 'Критично', cause: 'Обрыв шины CAN, отсутствие питания/массы на ЭБУ, сгорел главный предохранитель', fix: '1. Замерить сопротивление CAN-High и CAN-Low на разъёме OBD (контакты 6 и 14: должно быть строго 60 Ом).' },
-      { code: 'U0001', title: 'Высокоскоростная шина CAN-Bus — сбой связи', cat: 'U', severity: 'Критично', cause: 'КЗ шины CAN на массу или +12В, сбой трансивера одного из блоков', fix: '1. Отключать блоки управления поочерёдно, контролируя форму сигнала на осциллографе.' },
-      { code: 'B0001', title: 'Цепь пиропатрона подушки безопасности водителя', cat: 'B', severity: 'Критично', cause: 'Обрыв подрулевого спирального шлейфа (улитки)', fix: '1. Прозвонить шлейф при вращении руля от упора до упора. Не подавать тестер на пиропатрон напрямую!' },
-      { code: 'C0035', title: 'Левый передний датчик скорости колеса (ABS) — обрыв цепи', cat: 'C', severity: 'Важно', cause: 'Перетёрт кабель в колёсной арке, грязь на магнитном кольце ступицы', fix: '1. Осмотреть проводку в арке. 2. Проверить сопротивление или частотный сигнал датчика Холла.' }
-    ];
+    const COURSE_CHEATSHEETS = {
+      automechanic: [
+        { tag: 'Крепёж и динамометр', title: 'Порядок протяжки узлов', hint: 'При сборке фланцев, колёс и ГБЦ всегда распределяйте усилие равномерно (крест-накрест или от центра к краям), чтобы деталь не перекосило.' },
+        { tag: 'Диагностика подвески', title: 'Как отличать стук от гула', hint: 'Монотонный гул, меняющий тональность в поворотах, обычно связан с вращающимися подшипниками; резкий стук на мелких кочках — с люфтами шарниров.' },
+        { tag: 'ДВС и ГРМ', title: 'Проверка меток и тепловых зазоров', hint: 'Зазоры клапанов измеряют на строго заданной температуре двигателя; проверните коленвал вручную на два полных оборота перед запуском.' },
+        { tag: 'Тормозная система', title: 'Признаки износа ротора и суппорта', hint: 'Обращайте внимание на биение педали при торможении, неравномерный износ внутренней/внешней колодки и состояние пыльников направляющих.' },
+        { tag: 'Шиномонтаж', title: 'Балансировка и углы УУК', hint: 'Неравномерный износ только одного края протектора указывает на уход развала или схождения; износ по центру — на завышенное давление.' },
+        { tag: 'Дефектовка', title: 'Правило трёх измерений', hint: 'Микрометром и нутромером проверяйте цилиндрические детали в нескольких поясах и плоскостях, чтобы выявить овал и конусность.' }
+      ],
+      autoelectric: [
+        { tag: 'Коды DTC (OBD-II)', title: 'Как читать первую букву ошибки', hint: 'P — силовая установка (Powertrain), C — шасси (Chassis), B — кузов (Body), U — сеть обмена данными (CAN/LIN). Сама буква уже сужает зону поиска.' },
+        { tag: 'Закон Ома в авто', title: 'Почему греется проводка', hint: 'В 12-вольтовой сети большая мощность требует высокого тока. Если жила тонкая или контакт окислен — на этом участке падает напряжение и выделяется тепло.' },
+        { tag: 'Шина CAN-Bus', title: 'Логика проверки без питания', hint: 'Два согласующих резистора на концах витой пары подключены параллельно. Измеряя общее сопротивление при отключённой АКБ, легко понять — обрыв в сети или КЗ.' },
+        { tag: 'Мультиметр', title: 'Замер под нагрузкой', hint: 'Напряжение на холостом ходу может выглядеть нормальным даже при плохом контакте. Проверяйте падение напряжения (ΔU) именно при включённом потребителе.' },
+        { tag: 'Осциллограф', title: 'На что смотреть на сигнале', hint: 'Сравнивайте форму волны: у индуктивных датчиков синусоида растёт с оборотами, а у датчиков Холла — чёткий прямоугольник стабильной амплитуды.' },
+        { tag: 'Зарядка и АКБ', title: 'Разделяйте батарею и генератор', hint: 'Напряжение в покое показывает заряд самой батареи, а на запущенном моторе с включёнными фарами — исправность регулятора и диодного моста.' }
+      ],
+      hvac: [
+        { tag: 'Термодинамика', title: 'Перегрев vs Переохлаждение', hint: 'Перегрев (Superheat) показывает, весь ли хладагент выкипел на выходе испарителя; переохлаждение (Subcooling) — насколько хорошо сконденсировалась жидкость.' },
+        { tag: 'Подготовка трассы', title: 'Зачем нужен глубокий вакуум', hint: 'Влага внутри контура при низких температурах замерзает в ТРВ/капилляре и реагирует с маслом с образованием кислот. Вакуумирование удаляет именно влагу и воздух.' },
+        { tag: 'Манометрический коллектор', title: 'Связь давления и температуры кипения', hint: 'У каждого хладагента своя кривая «давление ↔ температура насыщения». Всегда сверяйте показания манометра с таблицей конкретного фреона.' },
+        { tag: 'Диагностика утечек', title: 'Логика опрессовки', hint: 'Контур проверяют сухим инертным газом (азотом), а не воздухом с влагой; следите за падением давления с учётом поправки на температуру окружающей среды.' },
+        { tag: 'Компрессор', title: 'Опасность гидроудара', hint: 'Компрессор рассчитан на сжатие газа, а не жидкости. Слишком низкий перегрев на всасывании сигнализирует о риске попадания жидкого фреона.' },
+        { tag: 'Теплообменники', title: 'Контроль воздушного потока', hint: 'Перед тем как винить фреон, проверьте чистоту фильтров, ламелей конденсатора и работу крыльчатки вентилятора — 50% проблем кроются в обдуве.' }
+      ],
+      it: [
+        { tag: 'Веб-графика', title: 'Выбор формата и плотности', hint: 'Подумайте, нужна ли прозрачность (альфа-канал) и масштабируемость (вектор). Для браузера экранная плотность и современные сжатые форматы критичны для скорости.' },
+        { tag: 'CSS Box Model', title: 'Из чего складывается размер блока', hint: 'Помните разницу между внутренним отступом (padding) и внешним (margin), и как box-sizing: border-box предотвращает «разъезжание» ширины.' },
+        { tag: 'Flexbox и Grid', title: 'Оси выравнивания', hint: 'В Flexbox justify-content управляет главной осью, а align-items — поперечной. Для двумерных сеток карточек удобнее CSS Grid с repeat и minmax.' },
+        { tag: 'Адаптивность', title: 'Сетка 8px и мобильный экран', hint: 'Кратные 8 пикселям отступы создают визуальный ритм. Проверяйте, чтобы на узком экране (375px) не появлялся горизонтальный скролл.' },
+        { tag: 'Доступность (WCAG)', title: 'Контраст и фокус', hint: 'Текст должен легко читаться на фоне без напряжения глаз, а интерактивные кнопки — иметь понятное состояние при наведении и с клавиатуры.' },
+        { tag: 'Git и публикация', title: 'Чистый рабочий цикл', hint: 'Держите осмысленные короткие коммиты по одной задаче, перед отправкой проверяйте консоль браузера на отсутствие ошибок.' }
+      ],
+      graphic_design: [
+        { tag: 'Цветовые модели', title: 'Экран vs Типография', hint: 'Светящиеся экраны смешивают свет (RGB), а бумага поглощает краску (CMYK). Неоновые экранные оттенки при печати становятся спокойнее — проверяйте профиль заранее.' },
+        { tag: 'Предпечатная подготовка', title: 'Зачем нужны вылеты (Bleed)', hint: 'Нож гильотины в типографии имеет микропогрешность. Фон должен заходить за линию реза, а важный текст — отступать внутрь в безопасную зону.' },
+        { tag: 'Растр и вектор', title: 'Разрешение для печати', hint: 'Логотипы и мелкий шрифт лучше держать в кривых (векторе), а фотографии для полиграфии — в высоком разрешении без сильного сжатия.' },
+        { tag: 'Типографика', title: 'Иерархия и читаемость', hint: 'Не используйте слишком много разных шрифтов на одном макете: достаточно чёткого контраста между заголовком, подзаголовком и основным текстом.' },
+        { tag: 'Композиция', title: 'Воздух и выравнивание', hint: 'Свободное пространство (негативное пространство) помогает зрителю сфокусироваться на главном. Все элементы должны опираться на общую направляющую сетку.' },
+        { tag: 'Суммарная краска', title: 'Контроль чёрного цвета', hint: 'Слишком большой суммарный процент четырёх красок не успевает высохнуть на бумаге и отмарывает тираж; для мелкого текста используйте чистый чёрный канал.' }
+      ]
+    };
 
-    let currentObdCat = 'all';
+    const SPEC_TITLES = {
+      it: 'Веб-дизайн (IT)',
+      automechanic: 'Автомеханика',
+      autoelectric: 'Автоэлектрика',
+      hvac: 'HVAC',
+      graphic_design: 'Графдизайн'
+    };
 
-    function filterObdCodes() {
-      const q = (document.getElementById('obd-search-input').value || '').trim().toLowerCase();
-      const cont = document.getElementById('obd-codes-container');
-      
-      const filtered = OBD_DATABASE.filter(item => {
-        const matchesCat = (currentObdCat === 'all' || item.cat === currentObdCat);
-        const matchesQuery = (!q || item.code.toLowerCase().includes(q) || item.title.toLowerCase().includes(q) || item.cause.toLowerCase().includes(q));
-        return matchesCat && matchesQuery;
+    let activeCourseTab = 'automechanic';
+    let whatIfRows = [];
+
+    function selectCourseTab(slug) {
+      activeCourseTab = slug;
+      document.querySelectorAll('.tool-tab').forEach(btn => {
+        const on = btn.id === `tab-btn-${slug}`;
+        btn.className = on
+          ? 'tool-tab px-4 py-2.5 rounded-2xl bg-cyan-600 text-white font-bold text-xs shadow-glow-cyan flex items-center gap-2 whitespace-nowrap transition-all'
+          : 'tool-tab px-4 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all';
       });
+      renderCourseCheatsheets();
+    }
 
-      if (!filtered.length) {
-        cont.innerHTML = `<div class="col-span-2 p-8 text-center text-slate-400 bg-dark-900 rounded-3xl border border-white/10">По запросу «${q}» кодов не найдено. Попробуйте поискать P0300, CAN или пропуск.</div>`;
+    function renderCourseCheatsheets() {
+      const grid = document.getElementById('course-cheatsheet-grid');
+      if (!grid) return;
+      const q = (document.getElementById('student-tool-search')?.value || '').trim().toLowerCase();
+      let items = COURSE_CHEATSHEETS[activeCourseTab] || [];
+      if (q) {
+        const all = Object.entries(COURSE_CHEATSHEETS).flatMap(([spec, arr]) => arr.map(x => ({ ...x, spec })));
+        items = all.filter(it => (it.title + ' ' + it.hint + ' ' + it.tag).toLowerCase().includes(q));
+      }
+      if (!items.length) {
+        grid.innerHTML = '<div class="col-span-full p-6 rounded-2xl bg-dark-900 border border-white/10 text-sm text-slate-400">По запросу ничего не найдено. Попробуйте другое ключевое слово.</div>';
         return;
       }
-
-      cont.innerHTML = filtered.map(c => `
-        <div class="p-5 rounded-3xl bg-dark-900 border border-white/10 hover:border-cyan-500/40 transition-all space-y-3">
-          <div class="flex items-center justify-between">
-            <span class="text-base font-black text-cyan-400 font-mono tracking-wider">${c.code}</span>
-            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${c.severity === 'Критично' ? 'bg-red-500/20 text-red-300 border border-red-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">${c.severity}</span>
+      grid.innerHTML = items.map(it => `
+        <article class="cyber-card p-5 rounded-2xl bg-dark-900 border border-white/10 flex flex-col justify-between gap-3">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-[10px] font-bold uppercase tracking-wider">${it.tag}</span>
+              <span class="text-[10px] font-mono text-slate-400">Подсказка</span>
+            </div>
+            <h3 class="text-sm font-extrabold text-white">${it.title}</h3>
+            <p class="text-xs text-slate-300 leading-relaxed">${it.hint}</p>
           </div>
-          <div class="text-xs font-bold text-white">${c.title}</div>
-          <div class="p-3 rounded-2xl bg-dark-850 border border-white/5 space-y-1 text-[11px]">
-            <div class="text-slate-400"><strong class="text-slate-300">Вероятные причины:</strong> ${c.cause}</div>
-            <div class="text-emerald-400 pt-1"><strong class="text-emerald-300">Алгоритм решения:</strong> ${c.fix}</div>
+          <div class="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
+            <span>Ориентир для самостоятельного решения</span>
+            <a href="tasks.html?specialty=${it.spec || activeCourseTab}" class="text-cyan-400 font-bold hover:underline">К урокам →</a>
           </div>
-        </div>
+        </article>
       `).join('');
     }
 
-    function setObdCategory(cat) {
-      currentObdCat = cat;
-      document.querySelectorAll('.obd-cat-btn').forEach(b => {
-        if (b.dataset.cat === cat) {
-          b.className = 'obd-cat-btn px-3.5 py-2 rounded-xl bg-cyan-600 text-white font-bold text-xs whitespace-nowrap';
-        } else {
-          b.className = 'obd-cat-btn px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs whitespace-nowrap border border-white/10';
+    // === PRACTICUM GRADEBOOK GPA CALCULATOR ===
+    function loadRealPracticumGrades() {
+      try {
+        const raw = localStorage.getItem('amk_practicum_grades_v1');
+        const arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function addWhatIfGrade() {
+      const filter = document.getElementById('gpa-course-filter')?.value || 'all';
+      const spec = filter === 'all' ? 'it' : filter;
+      const nextNum = loadRealPracticumGrades().length + whatIfRows.length + 1;
+      whatIfRows.push({
+        id: 'sim_' + Date.now(),
+        specialty: spec,
+        lesson_num: nextNum,
+        title: `Прогноз: Урок ${nextNum}`,
+        grade_5: 5,
+        isSim: true
+      });
+      renderPracticumGpa();
+    }
+
+    function updateWhatIfGrade(id, val) {
+      const item = whatIfRows.find(x => x.id === id);
+      if (item) {
+        item.grade_5 = Number(val);
+        renderPracticumGpa();
+      }
+    }
+
+    function removeWhatIfGrade(id) {
+      whatIfRows = whatIfRows.filter(x => x.id !== id);
+      renderPracticumGpa();
+    }
+
+    function renderPracticumGpa() {
+      const filter = document.getElementById('gpa-course-filter')?.value || 'all';
+      const real = loadRealPracticumGrades().map(r => ({ ...r, isSim: false }));
+      const combined = [...real, ...whatIfRows].filter(r => filter === 'all' || r.specialty === filter);
+
+      const listEl = document.getElementById('practicum-grades-list');
+      const avg5El = document.getElementById('practicum-avg-5');
+      const gpa4El = document.getElementById('student-tool-gpa-out');
+      const cntEl = document.getElementById('practicum-passed-cnt');
+      const barEl = document.getElementById('practicum-gpa-bar');
+
+      const map4 = { 5: 4.0, 4: 3.0, 3: 2.0, 2: 0.0 };
+      if (!combined.length) {
+        if (avg5El) avg5El.textContent = '—';
+        if (gpa4El) gpa4El.textContent = '—';
+        if (cntEl) cntEl.textContent = '0';
+        if (barEl) barEl.style.width = '0%';
+        if (listEl) {
+          listEl.innerHTML = `
+            <div class="p-5 rounded-2xl bg-dark-950/60 border border-dashed border-white/15 text-xs text-slate-300 leading-relaxed">
+              Пока нет оценённых уроков практикума. Пройдите любой интерактивный урок и отправьте решение на проверку Gemini AI — здесь сразу появится строка вида:
+              <div class="mt-2 font-mono text-cyan-300">Урок 1 · Photoshop: подготовка баннера — Оценка: 5</div>
+              <a href="tasks.html" class="inline-flex items-center gap-1 mt-3 px-3.5 py-2 rounded-xl bg-indigo-600 text-white font-bold text-xs">Перейти к урокам практикума →</a>
+            </div>`;
         }
-      });
-      filterObdCodes();
-    }
-
-    let disposeTools3D = null;
-    const TOOL_TAB_TO_SPEC = {
-      obd: 'autoelectric',
-      hvac: 'hvac',
-      torque: 'automechanic',
-      web: 'it',
-      design: 'graphic_design'
-    };
-
-    function mountTools3DForTab(tab) {
-      const spec = TOOL_TAB_TO_SPEC[tab] || 'autoelectric';
-      const m3d = document.getElementById('tools-course-3d-mount');
-      if (m3d && window.WorkshopModels) {
-        disposeTools3D?.();
-        const def = window.WorkshopModels.forCourse(spec, 0);
-        disposeTools3D = window.WorkshopModels.show(m3d, def, { courseSlug: spec, allowModelSwitch: true });
-      }
-      if (tab === 'design' && window.LessonInteractives) {
-        const dMount = document.getElementById('tools-design-interactive-mount');
-        if (dMount && !dMount.hasChildNodes()) {
-          window.LessonInteractives.renderTopicLab(
-            dMount,
-            { course_slug: 'graphic_design', order_num: 2, title: 'Цветовой профиль CMYK vs RGB и Prepress' },
-            {},
-            () => {}
-          );
-        }
-      }
-    }
-
-    function switchToolsTab(tab) {
-      document.querySelectorAll('.tool-tab').forEach(b => {
-        b.className = 'tool-tab px-5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10 flex items-center gap-2 whitespace-nowrap transition-all';
-      });
-      ['obd', 'hvac', 'torque', 'web', 'design'].forEach(k => {
-        const p = document.getElementById('tool-pane-' + k);
-        if (p) p.classList.add('hidden');
-      });
-
-      const btn = document.getElementById('tab-btn-' + tab);
-      if (btn) btn.className = 'tool-tab px-5 py-3 rounded-2xl bg-cyan-600 text-white font-bold text-xs shadow-glow-cyan flex items-center gap-2 whitespace-nowrap transition-all';
-
-      const pane = document.getElementById('tool-pane-' + tab);
-      if (pane) pane.classList.remove('hidden');
-
-      mountTools3DForTab(tab);
-    }
-
-    // HVAC Saturation Formula Approximator
-    function calculateHvac() {
-      const rawP = parseFloat(document.getElementById('hvac-pressure').value);
-      const rawT = parseFloat(document.getElementById('hvac-pipe-temp').value);
-      const p = Number.isFinite(rawP) ? Math.max(-0.5, Math.min(45, rawP)) : 2.0;
-      const pipeT = Number.isFinite(rawT) ? Math.max(-50, Math.min(120, rawT)) : 2.0;
-      const ref = document.getElementById('hvac-refrigerant').value;
-
-      let tsat = 0;
-      if (ref === 'R134a') {
-        tsat = -26.0 + (p * 10.5);
-      } else if (ref === 'R404A') {
-        tsat = -45.0 + (p * 11.0);
-      } else if (ref === 'R410A') {
-        tsat = -50.0 + (p * 6.2);
-      } else {
-        tsat = -10.0 + (p * 12.0);
-      }
-
-      const sh = pipeT - tsat;
-
-      document.getElementById('hvac-tsat').textContent = tsat.toFixed(1) + ' °C';
-      document.getElementById('hvac-sh').textContent = sh.toFixed(1) + ' K';
-
-      const verd = document.getElementById('hvac-verdict');
-      if (sh < 3.0) {
-        verd.textContent = '⚠️ ВНИМАНИЕ: Опасность гидроудара компрессора (перегрев слишком мал, жидкость всасывается)';
-        verd.className = 'text-[11px] font-bold text-red-400';
-      } else if (sh > 10.0) {
-        verd.textContent = '⚠️ ВНИМАНИЕ: Недостаток хладагента / утечка (перегрев выше 10 K)';
-        verd.className = 'text-[11px] font-bold text-amber-400';
-      } else {
-        verd.textContent = '✓ Нормальная заправка контура (Целевой перегрев 5–8 K)';
-        verd.className = 'text-[11px] font-bold text-emerald-400';
-      }
-    }
-
-    const ENGINES = {
-      toyota: {
-        name: 'Toyota 1NZ-FE (1.5L) / 2AR-FE (2.5L)',
-        head: 'Этап 1: 30 Н·м ➔ Этап 2: Доворот на 90° ➔ Этап 3: Доворот на 90°',
-        crank: 'Коренные крышки: 22 Н·м + 90°. Шатунные болты: 15 Н·м + 90°',
-        valves: 'Впускные: 0.15 – 0.25 мм. Выпускные: 0.25 – 0.35 мм (на холодную 20°C)'
-      },
-      hyundai: {
-        name: 'Hyundai / Kia Gamma 1.6 (G4FC / G4FG)',
-        head: 'Этап 1: 30 Н·м ➔ Этап 2: 60 Н·м ➔ Этап 3: Доворот 90-95°',
-        crank: 'Коренные крышки: 27 Н·м + 90°. Шатунные болты: 18 Н·м + 90°',
-        valves: 'Впускные: 0.17 – 0.23 мм. Выпускные: 0.22 – 0.28 мм (на холодную 20°C)'
-      },
-      vag: {
-        name: 'Volkswagen Group 1.4 TSI EA211',
-        head: 'Этап 1: 30 Н·м ➔ Этап 2: Доворот 90° ➔ Этап 3: Доворот 90°',
-        crank: 'Постель коленвала: 50 Н·м + 90°. Шатунные крышки: 25 Н·м + 90°',
-        valves: 'Гидрокомпенсаторы (регулировка не требуется, проверка давления масла 1.5-2.0 bar на 2000 об/мин)'
-      },
-      lada: {
-        name: 'ВАЗ-21129 / 21127 (1.6L 16-клапанный)',
-        head: 'Этап 1: 20 Н·м ➔ Этап 2: 70–85 Н·м ➔ Этап 3: Доворот 90° ➔ Этап 4: Доворот 90°',
-        crank: 'Коренные: 68–84 Н·м. Шатунные болты: 43–53 Н·м',
-        valves: 'Гидротолкатели клапанов (проверка на продавливание после 10 мин простоя)'
-      }
-    };
-
-    function selectEngine(key) {
-      document.querySelectorAll('.eng-btn').forEach(b => {
-        if (b.dataset.eng === key) {
-          b.className = 'eng-btn px-4 py-2 rounded-xl bg-cyan-600 text-white font-bold text-xs';
-        } else {
-          b.className = 'eng-btn px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-semibold text-xs border border-white/10';
-        }
-      });
-
-      const e = ENGINES[key];
-      const cont = document.getElementById('engine-specs-container');
-      cont.innerHTML = `
-        <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 space-y-3">
-          <div class="text-xs uppercase font-extrabold text-cyan-400">ГБЦ (Блок цилиндров)</div>
-          <div class="text-base font-bold text-white">${e.name}</div>
-          <div class="p-3.5 rounded-2xl bg-dark-850 border border-white/5 text-xs text-slate-300 leading-relaxed font-mono">
-            ${e.head}
-          </div>
-          <div class="text-[10px] text-slate-500">Затяжка строго по схеме «от центра по спирали» с заменой болтов на новые.</div>
-        </div>
-
-        <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 space-y-3">
-          <div class="text-xs uppercase font-extrabold text-indigo-400">КШМ (Коленвал & Шатуны)</div>
-          <div class="text-base font-bold text-white">Моменты кривошипа</div>
-          <div class="p-3.5 rounded-2xl bg-dark-850 border border-white/5 text-xs text-slate-300 leading-relaxed font-mono">
-            ${e.crank}
-          </div>
-          <div class="text-[10px] text-slate-500">Обязательно смазывать резьбу и опорные шайбы свежим моторным маслом.</div>
-        </div>
-
-        <div class="p-6 rounded-3xl bg-dark-900 border border-white/10 space-y-3">
-          <div class="text-xs uppercase font-extrabold text-amber-400">ГРМ & Клапаны</div>
-          <div class="text-base font-bold text-white">Тепловые зазоры при 20°C</div>
-          <div class="p-3.5 rounded-2xl bg-dark-850 border border-white/5 text-xs text-slate-300 leading-relaxed font-mono">
-            ${e.valves}
-          </div>
-          <div class="text-[10px] text-slate-500">Замеры производить только калиброванным веерным щупом в ВМТ такта сжатия.</div>
-        </div>
-      `;
-    }
-
-    // --- 4 STUDENT TOOLS LOGIC + BACKEND /api/tools/state PERSISTENCE ---
-    let studentToolsData = {
-      tasks: [{ id: 'st-1', title: 'Повторить регламент момента затяжки ГБЦ', done: false }],
-      gpa_target: 3.6,
-      notes: '',
-      timer_minutes: 25
-    };
-    let studentTimerSec = 1500;
-    let studentTimerId = null;
-
-    function runStudentCourseSearch(query) {
-      const box = document.getElementById('student-tool-search-results');
-      if (!box) return;
-      const q = String(query || '').trim().toLowerCase();
-      const courses = Array.isArray(window.EDU_COURSES) && window.EDU_COURSES.length
-        ? window.EDU_COURSES
-        : [
-            { slug: 'it', title: 'Web-разработка (IT): HTML, CSS Flexbox, Grid, адаптив', description: '' },
-            { slug: 'graphic_design', title: 'Графический дизайн: композиция, колористика WCAG, Prepress', description: '' },
-            { slug: 'autoelectric', title: 'Автоэлектрика: мультиметр, закон Ома, CAN-шина, OBD-II', description: '' },
-            { slug: 'hvac', title: 'Холодильное оборудование (HVAC): фреоны R134a/R410A, перегрев', description: '' },
-            { slug: 'automechanic', title: 'Автомеханика: ДВС, ГБЦ, ГРМ, тормозная система, подвеска', description: '' }
-          ];
-      const lessonsObj = (window.EDU_LESSONS && typeof window.EDU_LESSONS === 'object') ? window.EDU_LESSONS : {};
-      const entries = [];
-      courses.forEach(c => {
-        entries.push({
-          slug: c.slug,
-          task: null,
-          title: c.short_title || c.title,
-          searchText: `${c.slug} ${c.title} ${c.short_title || ''} ${c.description || ''}`.toLowerCase()
-        });
-        const list = Array.isArray(lessonsObj[c.slug]) ? lessonsObj[c.slug] : [];
-        list.forEach((les, idx) => {
-          const num = Number(les.task_number || les.order_num || (idx + 1));
-          entries.push({
-            slug: c.slug,
-            task: num,
-            title: `${c.short_title || c.slug} #${num}: ${les.title || ''}`,
-            searchText: `${c.slug} ${c.title} ${les.title || ''} ${les.summary || ''} ${les.tools || ''}`.toLowerCase()
-          });
-        });
-      });
-
-      const matches = !q
-        ? entries.filter(e => e.task === null)
-        : entries.filter(e => e.searchText.includes(q)).slice(0, 12);
-
-      box.innerHTML = '';
-      if (!matches.length) {
-        const empty = document.createElement('div');
-        empty.textContent = 'Совпадений не найдено';
-        box.appendChild(empty);
         return;
       }
-      matches.forEach(m => {
-        const row = document.createElement('div');
-        const link = document.createElement('a');
-        link.href = m.task
-          ? `simulator.html?specialty=${encodeURIComponent(m.slug)}&task=${m.task}`
-          : `tasks.html?specialty=${encodeURIComponent(m.slug)}`;
-        link.className = 'hover:text-cyan-300 underline block truncate';
-        link.textContent = m.title;
-        row.appendChild(link);
-        box.appendChild(row);
+
+      let sum5 = 0, sum4 = 0;
+      combined.forEach(r => {
+        const g = Math.max(2, Math.min(5, Number(r.grade_5) || 4));
+        sum5 += g;
+        sum4 += (map4[g] ?? 0);
       });
+      const avg5 = sum5 / combined.length;
+      const gpa4 = sum4 / combined.length;
+      if (avg5El) avg5El.textContent = avg5.toFixed(2);
+      if (gpa4El) gpa4El.textContent = gpa4.toFixed(2);
+      if (cntEl) cntEl.textContent = String(combined.length);
+      if (barEl) barEl.style.width = `${Math.min(100, (avg5 / 5) * 100).toFixed(1)}%`;
+
+      if (listEl) {
+        listEl.innerHTML = combined.map(r => {
+          const g = Math.max(2, Math.min(5, Number(r.grade_5) || 4));
+          const col = g >= 5 ? '#34d399' : (g === 4 ? '#38bdf8' : (g === 3 ? '#fbbf24' : '#fb7185'));
+          return `
+            <div class="p-3.5 rounded-2xl bg-dark-950/70 border border-white/10 flex flex-wrap items-center justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[10px] font-mono font-bold text-cyan-300">Урок ${r.lesson_num}</span>
+                  <span class="text-[10px] text-slate-400 font-semibold">${SPEC_TITLES[r.specialty] || r.specialty}</span>
+                  ${r.isSim ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300">Прогноз</span>' : '<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300">✓ Зачтено ИИ</span>'}
+                </div>
+                <div class="text-xs sm:text-sm font-bold text-white mt-1 truncate">${r.title}</div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                ${r.isSim ? `
+                  <select onchange="updateWhatIfGrade('${r.id}', this.value)" class="px-2.5 py-1 rounded-xl bg-dark-850 border border-white/15 font-mono font-black text-sm" style="color:${col};">
+                    ${[5,4,3,2].map(v => `<option value="${v}" ${v === g ? 'selected' : ''}>Оценка ${v}</option>`).join('')}
+                  </select>
+                  <button type="button" onclick="removeWhatIfGrade('${r.id}')" class="p-1.5 rounded-lg bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 text-xs">✕</button>
+                ` : `
+                  <div class="px-3 py-1.5 rounded-xl font-mono font-black text-sm border" style="color:${col};border-color:${col};background:rgba(255,255,255,0.04);">
+                    Оценка ${g}
+                  </div>
+                `}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
     }
 
-    function updateStudentGpaTool() {
-      const inp = document.getElementById('student-tool-gpa-target');
-      const out = document.getElementById('student-tool-gpa-out');
-      if (!inp || !out) return;
-      const raw = parseFloat(inp.value);
-      const val = Number.isFinite(raw) ? Math.max(0.0, Math.min(4.0, raw)) : 0.0;
-      studentToolsData.gpa_target = val;
-      const pct = Math.round((val / 4.0) * 100);
-      out.textContent = `${val.toFixed(2)} / 4.00 (${pct}%)`;
+    // === STUDENT TASKS, TIMER & NOTES (PERSISTENT) ===
+    const TOOLS_STATE_KEY = 'amk_tools_personal_v2';
+    let toolsState = { tasks: [], notes: '', timerMins: 25 };
+    let timerInt = null;
+    let timerLeft = 25 * 60;
+
+    function loadToolsState() {
+      try {
+        const raw = localStorage.getItem(TOOLS_STATE_KEY);
+        if (raw) toolsState = Object.assign(toolsState, JSON.parse(raw));
+      } catch (e) {}
+      const nEl = document.getElementById('student-tool-notes');
+      if (nEl) nEl.value = toolsState.notes || '';
+      timerLeft = (toolsState.timerMins || 25) * 60;
+      updateTimerDisplay();
+      renderStudentToolTasks();
     }
 
-    function toggleStudentToolTask(taskId) {
-      studentToolsData.tasks = (studentToolsData.tasks || []).map(t => {
-        if (t && t.id === taskId) {
-          return Object.assign({}, t, { done: !t.done });
-        }
-        return t;
-      });
-      renderStudentTasksList();
-      saveStudentToolsState();
-    }
-
-    function deleteStudentToolTask(taskId) {
-      studentToolsData.tasks = (studentToolsData.tasks || []).filter(t => !t || t.id !== taskId);
-      renderStudentTasksList();
-      saveStudentToolsState();
-    }
-
-    function renderStudentTasksList() {
-      const listEl = document.getElementById('student-tool-task-list');
-      if (!listEl) return;
-      listEl.innerHTML = '';
-      (studentToolsData.tasks || []).forEach(t => {
-        if (!t) return;
-        const li = document.createElement('li');
-        li.className = 'flex items-center justify-between gap-2 py-0.5';
-        const left = document.createElement('label');
-        left.className = 'flex items-center gap-1.5 flex-1 min-w-0 cursor-pointer';
-        const cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.checked = Boolean(t.done);
-        cb.className = 'accent-emerald-500 shrink-0';
-        cb.addEventListener('change', () => toggleStudentToolTask(t.id));
-        const span = document.createElement('span');
-        span.className = 'truncate ' + (t.done ? 'line-through text-slate-500' : '');
-        span.textContent = t.title ? String(t.title) : '';
-        left.append(cb, span);
-
-        const delBtn = document.createElement('button');
-        delBtn.type = 'button';
-        delBtn.setAttribute('aria-label', 'Удалить задачу');
-        delBtn.className = 'text-slate-500 hover:text-red-400 px-1 font-bold shrink-0';
-        delBtn.textContent = '×';
-        delBtn.addEventListener('click', () => deleteStudentToolTask(t.id));
-
-        li.append(left, delBtn);
-        listEl.appendChild(li);
-      });
+    function saveStudentToolsState() {
+      const nEl = document.getElementById('student-tool-notes');
+      if (nEl) toolsState.notes = nEl.value;
+      try { localStorage.setItem(TOOLS_STATE_KEY, JSON.stringify(toolsState)); } catch (e) {}
+      const st = document.getElementById('student-tools-save-status');
+      if (st) st.textContent = '✓ Сохранено';
     }
 
     function addStudentToolTask() {
       const inp = document.getElementById('student-tool-task-input');
-      if (!inp) return;
-      const title = (inp.value || '').trim();
-      if (!title) return;
-      studentToolsData.tasks = studentToolsData.tasks || [];
-      studentToolsData.tasks.push({ id: 't-' + Date.now(), title: title, done: false });
+      const txt = (inp && inp.value || '').trim();
+      if (!txt) return;
+      toolsState.tasks.unshift({ id: Date.now(), text: txt, done: false });
       inp.value = '';
-      renderStudentTasksList();
       saveStudentToolsState();
+      renderStudentToolTasks();
     }
 
-    function syncStudentTimerDisplay() {
-      const disp = document.getElementById('student-tool-timer-display');
-      if (!disp) return;
-      const m = String(Math.floor(studentTimerSec / 60)).padStart(2, '0');
-      const s = String(studentTimerSec % 60).padStart(2, '0');
-      disp.textContent = `${m}:${s}`;
+    function toggleStudentToolTask(id) {
+      const t = toolsState.tasks.find(x => x.id === id);
+      if (t) t.done = !t.done;
+      saveStudentToolsState();
+      renderStudentToolTasks();
     }
 
-    function setStudentTimerMinutes(mins) {
-      const val = Math.max(1, Math.min(180, parseInt(mins, 10) || 25));
-      studentToolsData.timer_minutes = val;
-      if (studentTimerId) {
-        clearInterval(studentTimerId);
-        studentTimerId = null;
-        const btn = document.getElementById('student-tool-timer-btn');
-        if (btn) btn.textContent = 'Старт';
+    function deleteStudentToolTask(id) {
+      toolsState.tasks = toolsState.tasks.filter(x => x.id !== id);
+      saveStudentToolsState();
+      renderStudentToolTasks();
+    }
+
+    function renderStudentToolTasks() {
+      const ul = document.getElementById('student-tool-task-list');
+      if (!ul) return;
+      if (!toolsState.tasks.length) {
+        ul.innerHTML = '<li class="text-slate-500">Добавьте первую учебную задачу...</li>';
+        return;
       }
-      studentTimerSec = val * 60;
-      syncStudentTimerDisplay();
-      saveStudentToolsState();
+      ul.innerHTML = toolsState.tasks.map(t => `
+        <li class="flex items-center justify-between gap-2 p-2 rounded-xl bg-dark-950/60 border border-white/10">
+          <label class="flex items-center gap-2 cursor-pointer min-w-0 flex-1">
+            <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleStudentToolTask(${t.id})"/>
+            <span class="${t.done ? 'line-through opacity-50' : ''} truncate">${t.text}</span>
+          </label>
+          <button type="button" onclick="deleteStudentToolTask(${t.id})" class="text-slate-500 hover:text-rose-400">✕</button>
+        </li>
+      `).join('');
+    }
+
+    function setStudentTimerMinutes(m) {
+      toolsState.timerMins = Number(m) || 25;
+      if (timerInt) { clearInterval(timerInt); timerInt = null; }
+      timerLeft = toolsState.timerMins * 60;
+      const btn = document.getElementById('student-tool-timer-btn');
+      if (btn) btn.textContent = 'Старт';
+      updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+      const el = document.getElementById('student-tool-timer-display');
+      if (!el) return;
+      const m = String(Math.floor(timerLeft / 60)).padStart(2, '0');
+      const s = String(timerLeft % 60).padStart(2, '0');
+      el.textContent = `${m}:${s}`;
     }
 
     function toggleStudentTimer() {
       const btn = document.getElementById('student-tool-timer-btn');
-      if (studentTimerId) {
-        clearInterval(studentTimerId);
-        studentTimerId = null;
+      if (timerInt) {
+        clearInterval(timerInt);
+        timerInt = null;
         if (btn) btn.textContent = 'Старт';
         return;
       }
       if (btn) btn.textContent = 'Пауза';
-      studentTimerId = setInterval(() => {
-        studentTimerSec = Math.max(0, studentTimerSec - 1);
-        syncStudentTimerDisplay();
+      timerInt = setInterval(() => {
+        if (timerLeft > 0) {
+          timerLeft--;
+          updateTimerDisplay();
+        } else {
+          clearInterval(timerInt);
+          timerInt = null;
+          if (btn) btn.textContent = 'Старт';
+          if (window.AMKTheme && window.AMKTheme.playSfx) window.AMKTheme.playSfx('success');
+        }
       }, 1000);
     }
 
-    async function loadStudentToolsState() {
-      renderStudentTasksList();
-      updateStudentGpaTool();
-      runStudentCourseSearch('');
-      try {
-        const sessRes = await fetch('/api/auth/session', { credentials: 'same-origin' });
-        if (!sessRes.ok) return;
-        const sess = await sessRes.json();
-        if (!sess || !sess.authenticated) return;
-        const res = await fetch('/api/tools/state', { credentials: 'same-origin' });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data && typeof data === 'object') {
-          if (Array.isArray(data.tasks)) studentToolsData.tasks = data.tasks;
-          if (data.gpa_target !== undefined) {
-            studentToolsData.gpa_target = Number(data.gpa_target) || 3.6;
-            const gIn = document.getElementById('student-tool-gpa-target');
-            if (gIn) gIn.value = String(studentToolsData.gpa_target);
-          }
-          if (typeof data.notes === 'string') {
-            studentToolsData.notes = data.notes;
-            const nIn = document.getElementById('student-tool-notes');
-            if (nIn) nIn.value = data.notes;
-          }
-          if (data.timer_minutes !== undefined) {
-            const tm = Math.max(1, Math.min(180, parseInt(data.timer_minutes, 10) || 25));
-            studentToolsData.timer_minutes = tm;
-            studentTimerSec = tm * 60;
-            const tSel = document.getElementById('student-tool-timer-minutes');
-            if (tSel) {
-              if (![15, 25, 45, 60].includes(tm)) {
-                const opt = document.createElement('option');
-                opt.value = String(tm);
-                opt.textContent = tm + 'м';
-                tSel.appendChild(opt);
-              }
-              tSel.value = String(tm);
-            }
-            syncStudentTimerDisplay();
-          }
-          renderStudentTasksList();
-          updateStudentGpaTool();
-        }
-      } catch (e) {}
-    }
-
-    async function saveStudentToolsState() {
-      const nIn = document.getElementById('student-tool-notes');
-      if (nIn) studentToolsData.notes = nIn.value;
-      const tSel = document.getElementById('student-tool-timer-minutes');
-      if (tSel) studentToolsData.timer_minutes = Math.max(1, Math.min(180, parseInt(tSel.value, 10) || 25));
-      updateStudentGpaTool();
-      const statusEl = document.getElementById('student-tools-save-status');
-      if (statusEl) statusEl.textContent = 'Сохранение...';
-      if (window.EduSpace && typeof window.EduSpace.api === 'function') {
-        try {
-          const res = await window.EduSpace.api('/api/tools/state', {
-            method: 'POST',
-            body: {
-              tasks: studentToolsData.tasks,
-              gpa_target: studentToolsData.gpa_target,
-              notes: studentToolsData.notes,
-              timer_minutes: studentToolsData.timer_minutes
-            }
-          });
-          if (statusEl) {
-            statusEl.textContent = (res && res.ok) ? 'Сохранено ✓' : 'Локально';
-            statusEl.className = 'text-[10px] truncate ' + ((res && res.ok) ? 'text-emerald-400 font-bold' : 'text-slate-400');
-          }
-        } catch (e) {
-          if (statusEl) statusEl.textContent = 'Ошибка сети';
-        }
-      }
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
-      filterObdCodes();
-      selectEngine('toyota');
-      calculateHvac();
-      mountTools3DForTab('obd');
-      loadStudentToolsState();
+      loadToolsState();
+      renderPracticumGpa();
+      renderCourseCheatsheets();
     });
   </script>
-  <script src="js/eduspace-animations.js" defer></script>
 </body>
 </html>

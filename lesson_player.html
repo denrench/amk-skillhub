@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EduSpace — Интерактивный плеер урока</title>
+  <title>AMK SkillHub — Интерактивный плеер урока</title>
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg">
   <link rel="stylesheet" href="css/tailwind.min.css"/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -45,9 +45,9 @@
   <!-- TOP APP BAR -->
   <header class="h-16 flex-shrink-0 bg-dark-900/90 backdrop-blur-xl border-b border-white/10 px-3 sm:px-6 flex items-center justify-between z-30">
     <div class="flex items-center gap-2 sm:gap-4 min-w-0">
-      <a href="student.html" aria-label="Выйти из урока" class="flex items-center gap-1 text-slate-400 hover:text-white p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-xs font-semibold shrink-0">
+      <a href="tasks.html" aria-label="В кабинет к урокам" class="flex items-center gap-1 text-slate-400 hover:text-white p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-xs font-semibold shrink-0">
         <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-        <span class="hidden sm:inline">Выйти</span>
+        <span class="hidden sm:inline">В кабинет</span>
       </a>
       <div class="h-4 w-[1px] bg-white/10 shrink-0"></div>
       <div class="min-w-0">
@@ -59,13 +59,19 @@
       </div>
     </div>
 
-    <div class="flex items-center gap-2 sm:gap-4 shrink-0">
+    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+      <!-- Real-Time AI Proctor Session Stopwatch -->
+      <div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono font-bold text-xs" title="Время работы над уроком учитывается при проверке ИИ">
+        <span class="material-symbols-outlined text-cyan-400 text-[15px]">timer</span>
+        <span id="lp-timer-badge">00:00</span>
+      </div>
+
       <!-- Progress Pill -->
       <div class="flex items-center gap-2 bg-dark-950/60 px-2 sm:px-3.5 py-1.5 rounded-2xl border border-white/10">
-        <div class="w-14 sm:w-32 bg-slate-800 rounded-full h-2 overflow-hidden">
-          <div id="lp-progress-bar" class="bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400 h-2 rounded-full transition-all duration-500" style="width: 12.5%"></div>
+        <div class="w-14 sm:w-28 bg-slate-800 rounded-full h-2 overflow-hidden">
+          <div id="lp-progress-bar" class="bg-gradient-to-r from-indigo-500 via-cyan-400 to-emerald-400 h-2 rounded-full transition-all duration-500" style="width: 14%"></div>
         </div>
-        <span id="lp-progress-text" class="text-xs font-bold font-mono text-cyan-300">1/8</span>
+        <span id="lp-progress-text" class="text-xs font-bold font-mono text-cyan-300">1/7</span>
       </div>
 
       <!-- XP Badge -->
@@ -83,43 +89,39 @@
     </div>
   </header>
 
-  <!-- STEPPERS STRIP -->
+  <!-- STEPPERS STRIP (7 Steps — inline spoiler quiz removed) -->
   <nav class="h-12 flex-shrink-0 bg-dark-950/70 border-b border-white/5 px-4 sm:px-6 overflow-x-auto no-scrollbar flex items-center gap-1 sm:gap-2 text-xs">
-    <button type="button" onclick="jumpToBlock(0)" id="step-btn-0" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all bg-indigo-600 text-white">
+    <button type="button" onclick="jumpToBlock(0)" id="step-btn-0" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all bg-indigo-600 text-white shrink-0">
       <span class="material-symbols-outlined text-[16px]">lightbulb</span>
       <span>1. Вступление</span>
     </button>
-    <button type="button" onclick="jumpToBlock(1)" id="step-btn-1" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all">
+    <button type="button" onclick="jumpToBlock(1)" id="step-btn-1" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all shrink-0">
       <span class="material-symbols-outlined text-[16px]">flag</span>
       <span>2. Цели</span>
     </button>
-    <button type="button" onclick="jumpToBlock(2)" id="step-btn-2" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all">
+    <button type="button" onclick="jumpToBlock(2)" id="step-btn-2" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all shrink-0">
       <span class="material-symbols-outlined text-[16px]">sports_esports</span>
-      <span>3. Игра-тема</span>
+      <span>3. Интерактив-тема</span>
     </button>
-    <button type="button" onclick="jumpToBlock(3)" id="step-btn-3" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all">
+    <button type="button" onclick="jumpToBlock(3)" id="step-btn-3" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all shrink-0">
       <span class="material-symbols-outlined text-[16px]">touch_app</span>
-      <span>4. Интерактив</span>
+      <span>4. Тренажёр</span>
     </button>
-    <button type="button" onclick="jumpToBlock(4)" id="step-btn-4" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all">
-      <span class="material-symbols-outlined text-[16px]">help</span>
-      <span>5. Проверка</span>
-    </button>
-    <button type="button" onclick="jumpToBlock(5)" id="step-btn-5" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all">
+    <button type="button" onclick="jumpToBlock(4)" id="step-btn-4" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all shrink-0">
       <span class="material-symbols-outlined text-[16px]">terminal</span>
-      <span>6. Практика</span>
+      <span>5. Практика + ИИ</span>
     </button>
-    <button type="button" onclick="jumpToBlock(6)" id="step-btn-6" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all">
+    <button type="button" onclick="jumpToBlock(5)" id="step-btn-5" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all shrink-0">
       <span class="material-symbols-outlined text-[16px]">quiz</span>
-      <span>7. Испытание</span>
+      <span>6. Испытание</span>
     </button>
-    <button type="button" onclick="jumpToBlock(7)" id="step-btn-7" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all">
+    <button type="button" onclick="jumpToBlock(6)" id="step-btn-6" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-slate-400 hover:text-white transition-all shrink-0">
       <span class="material-symbols-outlined text-[16px]">emoji_events</span>
-      <span>8. Результат</span>
+      <span>7. Результат</span>
     </button>
-    <button type="button" onclick="openLpVideoOverview()" id="step-btn-video" data-tab="video" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-indigo-300 bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 transition-all shrink-0">
-      <span class="material-symbols-outlined text-[16px]">play_circle</span>
-      <span>Видео-обзор урока</span>
+    <button type="button" onclick="openLpVideoOverview()" id="step-btn-video" data-tab="video" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold text-cyan-300 bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/30 transition-all shrink-0">
+      <span class="material-symbols-outlined text-[16px]">record_voice_over</span>
+      <span>Разбор с озвучкой</span>
     </button>
   </nav>
 
@@ -154,7 +156,7 @@
             </div>
             <div>
               <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
-                AI Тьютор EduSpace
+                AI Тьютор AMK SkillHub
                 <span id="lp-ai-status-badge" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-500/20 text-slate-300 border border-slate-500/30">Проверка...</span>
               </h3>
               <p class="text-[11px] text-slate-400">Персональный контекстный 3D/LLM-наставник</p>
@@ -275,8 +277,8 @@
           <span>К списку заданий курса</span>
           <span class="material-symbols-outlined text-[16px]">list_alt</span>
         </a>
-        <a href="student.html" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-slate-400 hover:text-white text-xs transition-all">
-          <span>Вернуться в дашборд студента</span>
+        <a href="tasks.html" class="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-slate-400 hover:text-white text-xs transition-all">
+          <span>Вернуться в рабочий кабинет</span>
         </a>
       </div>
     </div>
@@ -286,6 +288,43 @@
   <script>
     let currentLesson = null;
     let currentBlockIdx = 0;
+    let lessonStartTs = Date.now();
+    let lpElapsedSeconds = 0;
+    let lpLastAiEvaluation = null;
+    setInterval(() => {
+      lpElapsedSeconds = Math.max(0, Math.floor((Date.now() - lessonStartTs) / 1000));
+      const badge = document.getElementById('lp-timer-badge');
+      if (badge) {
+        const m = String(Math.floor(lpElapsedSeconds / 60)).padStart(2, '0');
+        const s = String(lpElapsedSeconds % 60).padStart(2, '0');
+        badge.textContent = `${m}:${s}`;
+      }
+    }, 1000);
+
+    function savePracticumGradeRecord(spec, num, title, grade5, score100, elapsedSec, feedback) {
+      try {
+        const KEY = 'amk_practicum_grades_v1';
+        const raw = localStorage.getItem(KEY);
+        const list = raw ? JSON.parse(raw) : [];
+        const id = `${spec}:${num}`;
+        const rec = {
+          id,
+          specialty: spec,
+          lesson_num: Number(num),
+          title: String(title || `Урок ${num}`).replace(/^Урок\s*\d+\.\s*/i, ''),
+          grade_5: Math.max(2, Math.min(5, Number(grade5) || 4)),
+          score_100: Math.max(0, Math.min(100, Number(score100) || 80)),
+          elapsed_seconds: Number(elapsedSec || 0),
+          feedback: String(feedback || ''),
+          updated_at: new Date().toISOString()
+        };
+        const idx = list.findIndex(x => x && x.id === id);
+        if (idx >= 0) list[idx] = rec;
+        else list.push(rec);
+        list.sort((a, b) => (a.specialty === b.specialty ? a.lesson_num - b.lesson_num : a.specialty.localeCompare(b.specialty)));
+        localStorage.setItem(KEY, JSON.stringify(list));
+      } catch (e) {}
+    }
     let savedProgress = {};
 
     function escapeHtml(str) {
@@ -459,21 +498,9 @@
           {
             id: 'b4_interactive',
             type: 'interactive',
-            title: 'Интерактивное исследование узла',
+            title: 'Интерактивный тренажёр по теме',
             widget_type: '3d_model',
-            instructions: 'Исследуйте архитектуру 3D-модели в реальном времени WebGL.'
-          },
-          {
-            id: 'b5_inline_check',
-            type: 'inline_check',
-            title: 'Экспресс-проверка понимания',
-            question: (catLesson && catLesson.quiz && catLesson.quiz[0]) ? catLesson.quiz[0].q : 'Какой формат или стандарт является актуальным для этого модуля?',
-            options: (catLesson && catLesson.quiz && catLesson.quiz[0]) ? catLesson.quiz[0].options : ['Стандарт АМК', 'Устаревший метод', 'Черновой вариант'],
-            correct_index: (catLesson && catLesson.quiz && catLesson.quiz[0]) ? catLesson.quiz[0].correct : 0,
-            correct: (catLesson && catLesson.quiz && catLesson.quiz[0]) ? catLesson.quiz[0].correct : 0,
-            explanation: (catLesson && catLesson.quiz && catLesson.quiz[0]) ? catLesson.quiz[0].explain : 'Верный ответ подтверждён стандартами программы.',
-            explain: (catLesson && catLesson.quiz && catLesson.quiz[0]) ? catLesson.quiz[0].explain : 'Верный ответ подтверждён стандартами программы.',
-            hint: (catLesson && catLesson.quiz && catLesson.quiz[0] && catLesson.quiz[0].explain) || 'Обратите внимание на ключевые правила и допуски в теоретическом блоке урока.'
+            instructions: 'Отработайте практические параметры в живом тренажёре.'
           },
           {
             id: 'b6_practical',
@@ -484,7 +511,7 @@
             tools: toolsText,
             guidelines: criteriaList,
             criteria: criteriaList,
-            starter_code: starter
+            starter_code: ''
           },
           {
             id: 'b7_assessment',
@@ -610,66 +637,60 @@
       const defaultStarter = (catLesson && catLesson.starter_code) || '// Ваше решение по заданию';
 
       if (Array.isArray(lesson.blocks)) {
-        lesson.blocks = lesson.blocks.map(b => {
-          const copy = Object.assign({}, b);
-          if (copy.type === 'hook') {
-            copy.content = copy.content || copy.description || (catLesson && catLesson.summary) || defaultTaskDesc;
-            copy.tools = copy.tools || toolsText;
-            copy.difficulty = copy.difficulty || (catLesson && catLesson.difficulty) || 'Профессиональный';
-            copy.time_limit = copy.time_limit || (catLesson && catLesson.time_limit) || '60 мин';
-          } else if (copy.type === 'objectives') {
-            if (!Array.isArray(copy.items) || !copy.items.length) {
-              copy.items = defaultCriteria;
+        lesson.blocks = lesson.blocks
+          .filter(b => b && b.type !== 'inline_check')
+          .map(b => {
+            const copy = Object.assign({}, b);
+            if (copy.type === 'hook') {
+              copy.content = copy.content || copy.description || (catLesson && catLesson.summary) || defaultTaskDesc;
+              copy.tools = copy.tools || toolsText;
+              copy.difficulty = copy.difficulty || (catLesson && catLesson.difficulty) || 'Профессиональный';
+              copy.time_limit = copy.time_limit || (catLesson && catLesson.time_limit) || '60 мин';
+            } else if (copy.type === 'objectives') {
+              if (!Array.isArray(copy.items) || !copy.items.length) {
+                copy.items = defaultCriteria;
+              }
+            } else if (copy.type === 'theory') {
+              if (!Array.isArray(copy.chunks) || !copy.chunks.length || (copy.chunks.length === 1 && catLesson && catLesson.theory && /<h[34]>/i.test(catLesson.theory))) {
+                copy.chunks = parseTheoryChunksFromHtml(catLesson && catLesson.theory, cleanTitle, toolsText);
+              }
+              if (!copy.game && window.EDU_TOPIC_GAMES?.[specSlug]?.[String(orderNum)]) {
+                copy.game = window.EDU_TOPIC_GAMES[specSlug][String(orderNum)];
+              }
+              if (!Array.isArray(copy.cheatsheet) || !copy.cheatsheet.length) {
+                copy.cheatsheet = [
+                  `Инструмент / стандарт: ${toolsText}`,
+                  `Ключевой принцип темы «${cleanTitle}» — опирайтесь на нормативы и практический смысл`,
+                  'Проверяйте результат измерениями и логикой работы узла перед сдачей'
+                ];
+              }
+            } else if (copy.type === 'practical') {
+              copy.task_description = copy.task_description || copy.prompt || copy.description || defaultTaskDesc;
+              copy.prompt = copy.prompt || copy.task_description;
+              copy.guidelines = (Array.isArray(copy.guidelines) && copy.guidelines.length)
+                ? copy.guidelines
+                : ((Array.isArray(copy.criteria) && copy.criteria.length) ? copy.criteria : defaultCriteria);
+              copy.criteria = copy.guidelines;
+              copy.tools = copy.tools || toolsText;
+              // Never prefill ready solution answers — student writes independently!
+              copy.starter_code = '';
+            } else if (copy.type === 'assessment') {
+              if (!Array.isArray(copy.questions) || !copy.questions.length) {
+                copy.questions = (catLesson && Array.isArray(catLesson.quiz) && catLesson.quiz.length)
+                  ? catLesson.quiz.map(q => ({ question: q.q, options: q.options, correct: q.correct, explain: q.explain || '' }))
+                  : [{ question: `Выберите ключевой стандарт выполнения темы «${cleanTitle}»:`, options: ['Соблюдение регламента и критериев ТЗ', 'Отказ от проверки качества'], correct: 0 }];
+              }
+            } else if (copy.type === 'summary') {
+              if (!Array.isArray(copy.skills_acquired) || !copy.skills_acquired.length) {
+                copy.skills_acquired = [
+                  `Освоена тема: ${cleanTitle}`,
+                  `Изучен инструментарий: ${toolsText}`,
+                  `Начислено +${copy.xp || lesson.xp_reward || 60} XP в профиль студента`
+                ];
+              }
             }
-          } else if (copy.type === 'theory') {
-            if (!Array.isArray(copy.chunks) || !copy.chunks.length || (copy.chunks.length === 1 && catLesson && catLesson.theory && /<h[34]>/i.test(catLesson.theory))) {
-              copy.chunks = parseTheoryChunksFromHtml(catLesson && catLesson.theory, cleanTitle, toolsText);
-            }
-            if (!copy.game && window.EDU_TOPIC_GAMES?.[specSlug]?.[String(orderNum)]) {
-              copy.game = window.EDU_TOPIC_GAMES[specSlug][String(orderNum)];
-            }
-            if (!Array.isArray(copy.cheatsheet) || !copy.cheatsheet.length) {
-              copy.cheatsheet = [
-                `Инструмент / стандарт: ${toolsText}`,
-                defaultCriteria[0] || `Контроль допусков по теме «${cleanTitle}»`,
-                (catLesson && catLesson.quiz && catLesson.quiz[0] && catLesson.quiz[0].explain) || 'Сверка результата с эталонным значением перед сдачей'
-              ];
-            }
-          } else if (copy.type === 'inline_check') {
-            const q0 = (catLesson && catLesson.quiz && catLesson.quiz[0]) || null;
-            copy.question = copy.question || copy.q || (q0 && q0.q) || `Какое требование является ключевым при выполнении темы «${cleanTitle}»?`;
-            if (!Array.isArray(copy.options) || !copy.options.length) {
-              copy.options = (q0 && q0.options) || ['Соблюдение технологического регламента и допусков АМК', 'Случайный выбор параметров', 'Игнорирование техники безопасности'];
-            }
-            copy.explanation = copy.explanation || copy.explain || (q0 && q0.explain) || 'Верный ответ подтверждён технологическим регламентом программы.';
-            copy.explain = copy.explanation;
-            copy.hint = copy.hint || copy.explanation;
-          } else if (copy.type === 'practical') {
-            copy.task_description = copy.task_description || copy.prompt || copy.description || defaultTaskDesc;
-            copy.prompt = copy.prompt || copy.task_description;
-            copy.guidelines = (Array.isArray(copy.guidelines) && copy.guidelines.length)
-              ? copy.guidelines
-              : ((Array.isArray(copy.criteria) && copy.criteria.length) ? copy.criteria : defaultCriteria);
-            copy.criteria = copy.guidelines;
-            copy.tools = copy.tools || toolsText;
-            copy.starter_code = copy.starter_code || defaultStarter;
-          } else if (copy.type === 'assessment') {
-            if (!Array.isArray(copy.questions) || !copy.questions.length) {
-              copy.questions = (catLesson && Array.isArray(catLesson.quiz) && catLesson.quiz.length)
-                ? catLesson.quiz.map(q => ({ question: q.q, options: q.options, correct: q.correct, explain: q.explain || '' }))
-                : [{ question: `Выберите ключевой стандарт выполнения темы «${cleanTitle}»:`, options: ['Соблюдение регламента и критериев ТЗ', 'Отказ от проверки качества'], correct: 0 }];
-            }
-          } else if (copy.type === 'summary') {
-            if (!Array.isArray(copy.skills_acquired) || !copy.skills_acquired.length) {
-              copy.skills_acquired = [
-                `Освоена тема: ${cleanTitle}`,
-                `Изучен инструментарий: ${toolsText}`,
-                `Начислено +${copy.xp || lesson.xp_reward || 60} XP в профиль студента`
-              ];
-            }
-          }
-          return copy;
-        });
+            return copy;
+          });
       }
       return lesson;
     }
@@ -1150,15 +1171,215 @@
       return { spec, num };
     }
 
-    function buildLpVideoHtml(spec, num) {
-      const mp4 = `assets/lesson-intros/${encodeURIComponent(spec)}-${num}.mp4`;
-      const poster = `assets/lesson-intros/${encodeURIComponent(spec)}-${num}.jpg`;
-      const vtt = `assets/lesson-intros/${encodeURIComponent(spec)}-${num}.vtt`;
+    let _lpVoiceState = { playing: false, step: 0, steps: [], mountId: '' };
+
+    function stripHtmlText(html) {
+      return String(html || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+
+    function buildNarratedStepsForLesson(spec, num) {
+      const cat = getCatalogLessonFor(spec, num);
+      const rawTitle = (currentLesson && currentLesson.title) || (cat && cat.title) || `Урок ${num}`;
+      const cleanTitle = rawTitle.replace(/^Урок\s*\d+\.\s*/i, '');
+      const tools = (cat && cat.tools) || 'профильный инструментарий';
+      const summary = stripHtmlText((cat && cat.summary) || (currentLesson && currentLesson.blocks?.[0]?.content) || '');
+      const theoryChunks = parseTheoryChunksFromHtml(cat && cat.theory, cleanTitle, tools);
+      const chunk0 = stripHtmlText(theoryChunks[0]?.content || '');
+      const chunk1 = stripHtmlText(theoryChunks[1]?.content || '');
+      const chunk2 = stripHtmlText(theoryChunks[2]?.content || '');
+
+      const specIntros = {
+        it: 'В современной веб-разработке мелочи решают всё: от скорости открытия сайта до удобства на мобильных экранах.',
+        graphic_design: 'В коммерческом дизайне макет должен одинаково идеально выглядеть на экране и без брака выходить из типографии.',
+        automechanic: 'В автосервисе точность измерений и соблюдение моментов затяжки напрямую отвечают за ресурс узла и безопасность водителя.',
+        autoelectric: 'В современной автоэлектрике нельзя менять детали наугад — точная диагностика цепи экономит часы работы и защищает ЭБУ.',
+        hvac: 'В холодильных и климатических системах правильное давление, вакуумирование и баланс температур определяют КПД и срок службы компрессора.'
+      };
+
+      const step1Text = summary
+        ? `${specIntros[spec] || ''} В уроке «${cleanTitle}» мы разбираем главную задачу: ${summary}`
+        : `${specIntros[spec] || ''} В уроке «${cleanTitle}» разберём, какие ошибки чаще всего допускают новички и как работать профессионально.`;
+
+      const step2Text = chunk0
+        ? `Как это работает на практике: ${chunk0.slice(0, 320)}${chunk1 ? ' ' + chunk1.slice(0, 220) : ''}`
+        : `Для решения задачи используется ${tools}. Важно последовательно настроить ключевые параметры, наблюдать за откликом системы на живом стенде и сверяться с допусками.`;
+
+      const step3Text = chunk2
+        ? `Итог и стандарт мастера: ${chunk2.slice(0, 320)} После просмотра закрепите понимание в интерактивном тренажёре и сформулируйте собственное решение для проверки ИИ.`
+        : `Когда все параметры приведены к норме с помощью ${tools}, система работает стабильно и без сбоев. Переходите к интерактивному тренажёру, а затем опишите своё решение для оценки Gemini AI.`;
+
+      return [
+        {
+          badge: 'ШАГ 1 · СУТЬ И ПРОБЛЕМА',
+          color: '#fb7185',
+          title: `Зачем нужна тема «${cleanTitle}»`,
+          visualIcon: 'report_problem',
+          highlight: `Инструмент: ${tools}`,
+          text: step1Text
+        },
+        {
+          badge: 'ШАГ 2 · КАК ЭТО РАБОТАЕТ',
+          color: '#38bdf8',
+          title: 'Механика процесса простыми словами',
+          visualIcon: 'precision_manufacturing',
+          highlight: 'Смотрите, как меняется система на практике',
+          text: step2Text
+        },
+        {
+          badge: 'ШАГ 3 · РЕЗУЛЬТАТ МАСТЕРА',
+          color: '#34d399',
+          title: 'Что должно получиться в итоге',
+          visualIcon: 'verified',
+          highlight: 'Готовность к интерактиву и проверке ИИ',
+          text: step3Text
+        }
+      ];
+    }
+
+    function stopLpNarration() {
+      _lpVoiceState.playing = false;
+      try {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+      } catch (e) {}
+      updateLpBriefingUi();
+    }
+
+    function playLpStepVoice(stepIdx) {
+      if (!_lpVoiceState.steps.length) return;
+      const idx = Math.max(0, Math.min(_lpVoiceState.steps.length - 1, Number(stepIdx) || 0));
+      _lpVoiceState.step = idx;
+      _lpVoiceState.playing = true;
+      updateLpBriefingUi();
+      if (window.AMKTheme && window.AMKTheme.playSfx) window.AMKTheme.playSfx('step');
+
+      try {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
+        const item = _lpVoiceState.steps[idx];
+        const utt = new SpeechSynthesisUtterance(`${item.title}. ${item.text}`);
+        utt.lang = 'ru-RU';
+        utt.rate = 1.02;
+        utt.pitch = 1.0;
+        const voices = window.speechSynthesis.getVoices ? window.speechSynthesis.getVoices() : [];
+        const ruVoice = voices.find(v => /ru/i.test(v.lang) && /google|microsoft|irina|pavel|dmitry|svetlana/i.test(v.name)) || voices.find(v => /ru/i.test(v.lang));
+        if (ruVoice) utt.voice = ruVoice;
+        utt.onend = () => {
+          if (!_lpVoiceState.playing) return;
+          if (_lpVoiceState.step < _lpVoiceState.steps.length - 1) {
+            setTimeout(() => {
+              if (_lpVoiceState.playing) playLpStepVoice(_lpVoiceState.step + 1);
+            }, 350);
+          } else {
+            _lpVoiceState.playing = false;
+            if (window.AMKTheme && window.AMKTheme.playSfx) window.AMKTheme.playSfx('success');
+            updateLpBriefingUi();
+          }
+        };
+        utt.onerror = () => {
+          _lpVoiceState.playing = false;
+          updateLpBriefingUi();
+        };
+        window.speechSynthesis.speak(utt);
+      } catch (e) {
+        _lpVoiceState.playing = false;
+        updateLpBriefingUi();
+      }
+    }
+
+    function toggleLpVoicePlay() {
+      if (_lpVoiceState.playing) {
+        stopLpNarration();
+      } else {
+        playLpStepVoice(_lpVoiceState.step);
+      }
+    }
+
+    function selectLpVoiceStep(idx) {
+      const wasPlaying = _lpVoiceState.playing;
+      _lpVoiceState.step = idx;
+      if (wasPlaying) playLpStepVoice(idx);
+      else {
+        if (window.AMKTheme && window.AMKTheme.playSfx) window.AMKTheme.playSfx('click');
+        updateLpBriefingUi();
+      }
+    }
+
+    function updateLpBriefingUi() {
+      const root = document.getElementById(_lpVoiceState.mountId);
+      if (!root || !_lpVoiceState.steps.length) return;
+      const item = _lpVoiceState.steps[_lpVoiceState.step];
+      const badge = root.querySelector('[data-brief-badge]');
+      const title = root.querySelector('[data-brief-title]');
+      const text = root.querySelector('[data-brief-text]');
+      const hl = root.querySelector('[data-brief-hl]');
+      const icon = root.querySelector('[data-brief-icon]');
+      const playBtn = root.querySelector('[data-brief-play]');
+      const eq = root.querySelector('[data-brief-eq]');
+
+      if (badge) { badge.textContent = item.badge; badge.style.color = item.color; badge.style.borderColor = item.color; }
+      if (title) title.textContent = item.title;
+      if (text) text.textContent = item.text;
+      if (hl) hl.textContent = item.highlight;
+      if (icon) { icon.textContent = item.visualIcon; icon.style.color = item.color; }
+      if (playBtn) {
+        playBtn.innerHTML = _lpVoiceState.playing
+          ? '<span class="material-symbols-outlined text-[18px]">stop_circle</span><span>Остановить озвучку</span>'
+          : '<span class="material-symbols-outlined text-[18px]">volume_up</span><span>Слушать объяснение с голосом</span>';
+      }
+      if (eq) eq.style.opacity = _lpVoiceState.playing ? '1' : '0.25';
+
+      root.querySelectorAll('[data-brief-step]').forEach((b, i) => {
+        const active = i === _lpVoiceState.step;
+        b.style.borderColor = active ? item.color : 'rgba(255,255,255,0.12)';
+        b.style.background = active ? 'rgba(56,189,248,0.14)' : 'rgba(255,255,255,0.04)';
+        b.style.color = active ? '#ffffff' : '#94a3b8';
+      });
+    }
+
+    function buildLpVideoHtml(spec, num, mountId) {
+      _lpVoiceState.steps = buildNarratedStepsForLesson(spec, num);
+      _lpVoiceState.step = 0;
+      _lpVoiceState.playing = false;
+      _lpVoiceState.mountId = mountId || 'lp-video-overview-mount';
+      const first = _lpVoiceState.steps[0];
       return `
-        <video id="lp-overview-video" class="w-full aspect-video bg-slate-950" controls preload="metadata" poster="${poster}" src="${mp4}">
-          <source src="${mp4}" type="video/mp4" />
-          <track kind="subtitles" srclang="ru" label="Русский" src="${vtt}" default />
-        </video>
+        <div class="p-5 sm:p-6 bg-gradient-to-br from-[#080d1c] via-[#0d152a] to-[#081220] text-slate-100 space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <span data-brief-badge class="px-3 py-1 rounded-full text-[11px] font-extrabold font-mono uppercase tracking-wider border" style="color:${first.color};border-color:${first.color};background:rgba(255,255,255,0.04);">${escapeHtml(first.badge)}</span>
+            <div class="flex items-center gap-2">
+              <div data-brief-eq class="flex items-end gap-1 h-4 transition-opacity" style="opacity:0.25;" aria-hidden="true">
+                <span class="w-1 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
+                <span class="w-1 h-4 bg-indigo-400 rounded-full animate-pulse"></span>
+                <span class="w-1 h-3 bg-emerald-400 rounded-full animate-pulse"></span>
+                <span class="w-1 h-4 bg-cyan-300 rounded-full animate-pulse"></span>
+              </div>
+              <button type="button" data-brief-play onclick="toggleLpVoicePlay()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[18px]">volume_up</span>
+                <span>Слушать объяснение с голосом</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center p-4 sm:p-5 rounded-2xl bg-black/35 border border-white/10">
+            <div class="flex flex-col items-center justify-center text-center p-4 rounded-xl bg-white/5 border border-white/10 space-y-2">
+              <span data-brief-icon class="material-symbols-outlined text-[46px]" style="color:${first.color};">${first.visualIcon}</span>
+              <span data-brief-hl class="text-[11px] font-mono font-bold text-cyan-300">${escapeHtml(first.highlight)}</span>
+            </div>
+            <div class="md:col-span-2 space-y-2">
+              <h3 data-brief-title class="text-lg sm:text-xl font-extrabold text-white">${escapeHtml(first.title)}</h3>
+              <p data-brief-text class="text-xs sm:text-sm text-slate-200 leading-relaxed">${escapeHtml(first.text)}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            ${_lpVoiceState.steps.map((s, idx) => `
+              <button type="button" data-brief-step="${idx}" onclick="selectLpVoiceStep(${idx})" class="p-3 rounded-xl text-left border transition-all text-xs font-bold" style="border-color:${idx === 0 ? first.color : 'rgba(255,255,255,0.12)'};background:${idx === 0 ? 'rgba(56,189,248,0.14)' : 'rgba(255,255,255,0.04)'};color:${idx === 0 ? '#ffffff' : '#94a3b8'};">
+                <div class="text-[10px] font-mono opacity-80">Шаг ${idx + 1} из 3</div>
+                <div class="truncate mt-0.5">${escapeHtml(s.title)}</div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
       `;
     }
 
@@ -1168,22 +1389,18 @@
       if (!panel || !mount) return;
       const { spec, num } = getLpVideoSpecAndNum();
       panel.classList.remove('hidden');
-      if (!mount.querySelector('video')) {
-        mount.innerHTML = buildLpVideoHtml(spec, num);
-      }
+      mount.innerHTML = buildLpVideoHtml(spec, num, 'lp-video-overview-mount');
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function closeLpVideoOverview() {
+      stopLpNarration();
       const panel = document.getElementById('lp-video-overview-panel');
-      const mount = document.getElementById('lp-video-overview-mount');
-      if (mount) {
-        const v = mount.querySelector('video');
-        if (v && typeof v.pause === 'function') v.pause();
-      }
       if (panel) panel.classList.add('hidden');
     }
 
     function switchLpTheoryView(view) {
+      if (view !== 'video') stopLpNarration();
       const gTab = document.getElementById('lp-tab-game');
       const vTab = document.getElementById('lp-tab-video');
       const tTab = document.getElementById('lp-tab-text');
@@ -1203,9 +1420,9 @@
 
       if (view === 'video') {
         const vMount = document.getElementById('lp-theory-video-mount');
-        if (vMount && !vMount.querySelector('video')) {
+        if (vMount) {
           const { spec, num } = getLpVideoSpecAndNum();
-          vMount.innerHTML = buildLpVideoHtml(spec, num);
+          vMount.innerHTML = buildLpVideoHtml(spec, num, 'lp-theory-video-mount');
         }
       }
     }
@@ -1489,26 +1706,23 @@
         </li>
       `).join('');
 
-      const fallbackStarter = b.starter_code || (catLesson && catLesson.starter_code) || `// Практическое решение по теме: ${cleanTitle}\n`;
       const savedState = savedProgress[b.id]?.state;
-      let initialCode = (savedState && savedState.code !== undefined && savedState.code !== null && savedState.code.trim() !== '')
+      // Clean empty input: never prefill ready answers so student writes independently
+      const initialCode = (savedState && typeof savedState.code === 'string' && savedState.code.trim() !== '')
         ? savedState.code
-        : fallbackStarter;
-      if (!initialCode.trim() && fallbackStarter) {
-        initialCode = fallbackStarter;
-      }
+        : '';
 
       const isCompleted = savedProgress[b.id]?.completed;
       const statusMsg = isCompleted
-        ? '✓ Ваше решение сохранено в учебном профиле'
-        : 'Решение будет прикреплено к вашему учебному профилю';
+        ? '✓ Решение проверено ИИ и сохранено в зачётке'
+        : 'Напишите самостоятельное решение — его проверит ИИ-экзаменатор (учитывается содержание и время)';
       const statusCls = isCompleted ? 'text-xs text-emerald-400 font-bold' : 'text-xs text-slate-400';
 
       return `
         <div class="space-y-6 animate-fade-in">
           <div>
             <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              Прикладной блок
+              Самостоятельная практика · Проверка Gemini AI
             </span>
             <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-3">${escapeHtml(b.title || `Практическое задание: ${cleanTitle}`)}</h2>
           </div>
@@ -1530,22 +1744,22 @@
             <div>
               <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-emerald-400 text-[16px]">fact_check</span>
-                <span>Критерии выполнения (${rawGuidelines.length})</span>
+                <span>Критерии оценивания (${rawGuidelines.length})</span>
               </h4>
               <ul id="lp-practical-guidelines-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">${guidelines}</ul>
             </div>
 
             <div>
               <div class="flex items-center justify-between mb-2">
-                <label class="block text-xs font-bold text-slate-300">Инженерный рабочий терминал / код решения</label>
+                <label for="practical-code-input" class="block text-xs font-bold text-slate-300">Поле самостоятельного решения (без шаблонов и подсказок)</label>
                 <div class="flex items-center gap-1.5">
                   <button type="button" onclick="copyPracticalCode()" class="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-semibold border border-white/10 transition-colors flex items-center gap-1">
                     <span class="material-symbols-outlined text-[13px]">content_copy</span>
                     <span>Копировать</span>
                   </button>
                   <button type="button" onclick="resetPracticalCode()" class="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-semibold border border-white/10 transition-colors flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[13px]">restart_alt</span>
-                    <span>Шаблон</span>
+                    <span class="material-symbols-outlined text-[13px]">delete_sweep</span>
+                    <span>Очистить</span>
                   </button>
                 </div>
               </div>
@@ -1557,19 +1771,21 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
                     <span class="text-[11px] font-mono text-slate-400 ml-2">solution.src</span>
                   </div>
-                  <span class="text-[10px] font-mono uppercase text-indigo-400 font-bold">Interactive Sandbox</span>
+                  <span class="text-[10px] font-mono uppercase text-cyan-400 font-bold">Самостоятельный ввод</span>
                 </div>
-                <textarea id="practical-code-input" rows="6" placeholder="Вставьте ваш код или текстовое решение..." class="w-full px-4 py-3 bg-dark-950 font-mono text-xs text-emerald-300 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-emerald-500/50 border-0 transition-all leading-relaxed">${escapeHtml(initialCode)}</textarea>
+                <textarea id="practical-code-input" rows="7" placeholder="Напишите ваше самостоятельное решение, расчёты, последовательность шагов или код с нуля..." class="w-full px-4 py-3 bg-dark-950 font-mono text-xs text-emerald-300 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/60 border-0 transition-all leading-relaxed">${escapeHtml(initialCode)}</textarea>
               </div>
             </div>
 
-            <div class="flex items-center justify-between pt-2">
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
               <span id="practice-status" class="${statusCls}">${statusMsg}</span>
-              <button type="button" onclick="savePracticeSolution()" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-glow-emerald transition-all flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[16px]">save</span>
-                <span>Зафиксировать решение</span>
+              <button type="button" id="lp-ai-grade-btn" onclick="savePracticeSolution()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-cyan-600 to-emerald-600 hover:opacity-95 text-white font-bold text-xs shadow-glow-indigo transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[17px]">psychology</span>
+                <span>Отправить на проверку ИИ</span>
               </button>
             </div>
+
+            <div id="lp-ai-verdict-box" class="hidden"></div>
           </div>
         </div>
       `;
@@ -1734,16 +1950,127 @@
       }
     }
 
+    function renderAiVerdictCard(ev) {
+      const g5 = Number(ev.grade_5 || 4);
+      const s100 = Number(ev.score_100 || 80);
+      const ok = Boolean(ev.passed);
+      const tone = g5 >= 5 ? '#34d399' : (g5 === 4 ? '#38bdf8' : (g5 === 3 ? '#fbbf24' : '#fb7185'));
+      const strengths = (ev.strengths || []).map(x => `<li class="flex items-start gap-1.5 text-emerald-300"><span>✓</span><span>${escapeHtml(x)}</span></li>`).join('');
+      const improvements = (ev.improvements || []).map(x => `<li class="flex items-start gap-1.5 text-amber-300"><span>→</span><span>${escapeHtml(x)}</span></li>`).join('');
+      return `
+        <div class="p-5 rounded-2xl bg-dark-950/90 border space-y-4 shadow-xl" style="border-color:${tone};">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-14 h-14 rounded-2xl flex flex-col items-center justify-center font-mono font-black border" style="background:rgba(255,255,255,0.04);border-color:${tone};color:${tone};">
+                <span class="text-2xl leading-none">${g5}</span>
+                <span class="text-[9px] opacity-80">${s100}%</span>
+              </div>
+              <div>
+                <div class="text-[10px] font-mono uppercase tracking-wider text-cyan-300 font-bold">Вердикт ИИ-экзаменатора · ${escapeHtml(ev.provider || 'Gemini AI')}</div>
+                <h4 class="text-base font-extrabold text-white mt-0.5">${escapeHtml(ev.verdict_title || (ok ? 'Задание зачтено' : 'Нужна доработка'))}</h4>
+              </div>
+            </div>
+            <span class="px-3 py-1 rounded-full text-xs font-extrabold font-mono" style="background:rgba(255,255,255,0.06);color:${tone};border:1px solid ${tone};">${ok ? 'ЗАЧТЕНО В ЗАЧЁТКУ' : 'НА ДОРАБОТКУ'}</span>
+          </div>
+          <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-cyan-200 flex items-start gap-2">
+            <span class="material-symbols-outlined text-[18px] text-cyan-400 shrink-0">schedule</span>
+            <span>${escapeHtml(ev.time_analysis || '')}</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">${escapeHtml(ev.feedback || '')}</p>
+          ${(strengths || improvements) ? `
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
+              ${strengths ? `<ul class="space-y-1.5 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20">${strengths}</ul>` : ''}
+              ${improvements ? `<ul class="space-y-1.5 p-3 rounded-xl bg-amber-500/5 border border-amber-500/20">${improvements}</ul>` : ''}
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
     async function savePracticeSolution() {
-      const val = document.getElementById('practical-code-input').value;
+      const inputEl = document.getElementById('practical-code-input');
+      const val = (inputEl && inputEl.value) ? inputEl.value : '';
       if (!val.trim()) {
-        alert('Введите ваше решение или код перед сохранением.');
+        alert('Напишите ваше самостоятельное решение перед проверкой ИИ.');
         return;
       }
-      await syncBlockState({ code: val }, true);
       const st = document.getElementById('practice-status');
-      st.textContent = '✓ Решение успешно зафиксировано!';
-      st.className = 'text-xs text-emerald-400 font-bold';
+      const btn = document.getElementById('lp-ai-grade-btn');
+      const verdictBox = document.getElementById('lp-ai-verdict-box');
+      if (btn) btn.disabled = true;
+      if (st) {
+        st.textContent = '🤖 Gemini AI проверяет ваше решение, критерии и время работы...';
+        st.className = 'text-xs text-cyan-300 font-bold animate-pulse';
+      }
+
+      const b = currentLesson && currentLesson.blocks ? currentLesson.blocks[currentBlockIdx] : {};
+      const { spec, num } = getLpVideoSpecAndNum();
+      const catLesson = getCatalogLessonFor(spec, num);
+      const cleanTitle = (currentLesson?.title || (catLesson && catLesson.title) || `Урок ${num}`).replace(/^Урок\s*\d+\.\s*/i, '');
+      const userObj = (typeof window.getActiveUser === 'function') ? window.getActiveUser() : null;
+      const gameState = savedProgress['b3_theory']?.state || {};
+      const labState = savedProgress['b4_interactive']?.state || {};
+      const interactiveDone = Boolean(gameState.game_completed || labState.lab_mode || labState.sequence_solved || labState.starterPassed);
+      const interactiveScore = Number(gameState.score || 0);
+
+      let evaluation = null;
+      try {
+        const res = await fetch(`${lpApiBase()}/api/ai/evaluate-lesson`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            specialty: spec,
+            lesson_num: num,
+            lesson_title: cleanTitle,
+            task_prompt: b.task_description || b.prompt || '',
+            criteria: b.guidelines || b.criteria || [],
+            solution_text: val,
+            elapsed_seconds: lpElapsedSeconds,
+            interactive_score: interactiveScore,
+            interactive_done: interactiveDone,
+            user_id: userObj ? userObj.id : undefined
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (data && data.evaluation) evaluation = data.evaluation;
+      } catch (e) {}
+
+      if (!evaluation) {
+        const words = val.trim().split(/\s+/).length;
+        const g5 = words >= 20 ? 5 : (words >= 10 ? 4 : 3);
+        const s100 = g5 === 5 ? 92 : (g5 === 4 ? 80 : 65);
+        const mins = Math.floor(lpElapsedSeconds / 60);
+        const secs = lpElapsedSeconds % 60;
+        evaluation = {
+          grade_5: g5,
+          score_100: s100,
+          passed: g5 >= 3,
+          verdict_title: g5 >= 4 ? 'Хорошее самостоятельное решение' : 'Зачтено, можно дополнить',
+          time_analysis: `Затрачено времени: ${mins} мин ${secs} сек.`,
+          feedback: 'Локальная проверка выполнена. Ответ принят и записан в зачётку практикума.',
+          strengths: [`Написано самостоятельно (${words} слов)`],
+          improvements: g5 < 5 ? ['Добавьте больше технических деталей по критериям ТЗ'] : [],
+          provider: 'AMK AI Offline'
+        };
+      }
+
+      lpLastAiEvaluation = evaluation;
+      savePracticumGradeRecord(spec, num, cleanTitle, evaluation.grade_5, evaluation.score_100, lpElapsedSeconds, evaluation.feedback);
+      await syncBlockState({ code: val, ai_evaluation: evaluation, elapsed_seconds: lpElapsedSeconds }, Boolean(evaluation.passed));
+
+      if (verdictBox) {
+        verdictBox.classList.remove('hidden');
+        verdictBox.innerHTML = renderAiVerdictCard(evaluation);
+      }
+      if (st) {
+        st.textContent = `✓ ИИ выставил оценку ${evaluation.grade_5}/5 (${evaluation.score_100}%) и записал в калькулятор успеваемости!`;
+        st.className = 'text-xs text-emerald-400 font-bold';
+      }
+      if (window.AMKTheme && window.AMKTheme.playSfx) {
+        window.AMKTheme.playSfx(evaluation.passed ? 'success' : 'error');
+      }
+      if (btn) btn.disabled = false;
     }
 
     function copyPracticalCode() {
@@ -1752,7 +2079,7 @@
         navigator.clipboard.writeText(el.value).then(() => {
           const st = document.getElementById('practice-status');
           if (st) {
-            st.textContent = '✓ Код скопирован в буфер обмена!';
+            st.textContent = '✓ Решение скопировано в буфер обмена!';
             st.className = 'text-xs text-cyan-400 font-bold';
           }
         });
@@ -1760,11 +2087,9 @@
     }
 
     function resetPracticalCode() {
-      if (!currentLesson) return;
-      const b = currentLesson.blocks[currentBlockIdx];
       const el = document.getElementById('practical-code-input');
-      if (b && el && confirm('Сбросить решение к исходному шаблону?')) {
-        el.value = b.starter_code || '';
+      if (el && confirm('Очистить поле решения?')) {
+        el.value = '';
       }
     }
 
@@ -1786,11 +2111,21 @@
         }
       });
 
+      const pct = questions.length ? Math.round((correct / questions.length) * 100) : 100;
+      const g5 = pct >= 88 ? 5 : (pct >= 70 ? 4 : (pct >= 50 ? 3 : 2));
+      const { spec, num } = getLpVideoSpecAndNum();
+      const catLesson = getCatalogLessonFor(spec, num);
+      const cleanTitle = (currentLesson?.title || (catLesson && catLesson.title) || `Урок ${num}`).replace(/^Урок\s*\d+\.\s*/i, '');
+      if (!lpLastAiEvaluation) {
+        savePracticumGradeRecord(spec, num, cleanTitle, g5, pct, lpElapsedSeconds, `Тест пройден: ${correct}/${questions.length}`);
+      }
+
       const box = document.getElementById('quiz-eval-box');
       box.classList.remove('hidden');
       box.className = 'p-4 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-200 text-xs';
-      box.innerHTML = `<strong>Результат: ${correct} из ${questions.length} верно!</strong><p class="mt-1">Итоговый тест принят. Нажмите «Далее» для перехода к результатам урока.</p>`;
-      await syncBlockState({ score: correct, total: questions.length, answers: answers }, true);
+      box.innerHTML = `<strong>Результат: ${correct} из ${questions.length} верно (Оценка: ${g5}/5)!</strong><p class="mt-1">Оценка сохранена в калькулятор среднего балла практикума. Нажмите «Далее» для завершения урока.</p>`;
+      if (window.AMKTheme && window.AMKTheme.playSfx) window.AMKTheme.playSfx(g5 >= 3 ? 'success' : 'error');
+      await syncBlockState({ score: correct, total: questions.length, answers: answers, grade_5: g5 }, true);
     }
 
     async function finalizeLesson() {

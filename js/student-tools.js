@@ -92,10 +92,27 @@
   }
 
   // =====================================================================
-  // 2. GPA CALCULATOR
+  // 2. PRACTICUM GRADEBOOK & GPA CALCULATOR (AUTO-SYNCED WITH PASSED TESTS)
   // =====================================================================
-  const GPA_KEY = 'amk.gpa.v1';
+  const PRACTICUM_GRADES_KEY = 'amk_practicum_grades_v1';
+  const GPA_SIM_KEY = 'amk.gpa.sim.v1';
   const GRADE_TO_4 = { 5: 4.0, 4: 3.0, 3: 2.0, 2: 0.0 };
+  const SPEC_SHORT = {
+    it: 'IT / Web',
+    graphic_design: 'Графдизайн',
+    autoelectric: 'Автоэлектрика',
+    hvac: 'HVAC',
+    automechanic: 'Автомеханика'
+  };
+
+  function scoreToGrade5(score) {
+    const s = Number(score || 0);
+    if (s <= 5 && s >= 2) return Math.round(s);
+    if (s >= 88) return 5;
+    if (s >= 70) return 4;
+    if (s >= 50) return 3;
+    return 2;
+  }
 
   function initGpa(root) {
     const rowsEl = root.querySelector('[data-gpa-rows]');
@@ -104,44 +121,116 @@
     const outCredits = root.querySelector('[data-gpa-credits]');
     const verdict = root.querySelector('[data-gpa-verdict]');
     const meter = root.querySelector('[data-gpa-meter]');
-    let rows = store.get(GPA_KEY, null) || [
-      { name: 'Модуль 1. Основы специальности', credits: 4, grade: 5 },
-      { name: 'Модуль 2. Инструменты и приборы', credits: 3, grade: 4 },
-      { name: 'Модуль 3. Практика в мастерской', credits: 5, grade: 4 },
-    ];
+
+    function loadRealGrades() {
+      const stored = store.get(PRACTICUM_GRADES_KEY, []);
+      if (Array.isArray(stored) && stored.length) {
+        return stored.map((g) => ({
+          id: g.id || `${g.specialty || 'it'}:${g.lesson_num || 1}`,
+          name: `Урок ${g.lesson_num || 1}. ${g.title || 'Практический тест'}`,
+          spec: SPEC_SHORT[g.specialty] || g.specialty || 'Практикум',
+          grade: scoreToGrade5(g.grade_5 || g.score_100),
+          score100: Number(g.score_100 || 0),
+          source: 'real'
+        }));
+      }
+      return [];
+    }
+
+    let rows = loadRealGrades();
+    const simSaved = store.get(GPA_SIM_KEY, []);
+    if (!rows.length && Array.isArray(simSaved) && simSaved.length) {
+      rows = simSaved;
+    }
+
+    // Best-effort sync real graded submissions from backend API
+    (async function syncFromBackend() {
+      try {
+        const base = (window.location && window.location.hostname && window.location.hostname.endsWith('github.io'))
+          ? 'https://amk-skillhub.onrender.com'
+          : '';
+        const res = await fetch(base + '/api/tasks?specialty=it', { credentials: 'include' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const tasks = Array.isArray(data.tasks) ? data.tasks : [];
+        const graded = tasks.filter(t => t && (t.status_code === 'graded' || Number(t.score || 0) > 0));
+        if (graded.length) {
+          const existingIds = new Set(rows.map(r => r.id));
+          graded.forEach((t) => {
+            const id = `it:${t.task_number}`;
+            if (!existingIds.has(id)) {
+              rows.push({
+                id,
+                name: `Урок ${t.task_number}. ${String(t.title || '').replace(/^Урок\s*\d+\.\s*/i, '')}`,
+                spec: 'Практикум',
+                grade: scoreToGrade5(t.score),
+                score100: Number(t.score || 0),
+                source: 'real'
+              });
+            }
+          });
+          draw();
+        }
+      } catch (e) {}
+    })();
+
+    function gradeColor(g) {
+      if (g >= 5) return '#34d399';
+      if (g === 4) return '#38bdf8';
+      if (g === 3) return '#fbbf24';
+      return '#fb7185';
+    }
 
     function draw() {
+      if (!rows.length) {
+        rowsEl.innerHTML = `
+          <div style="padding:14px;border-radius:12px;background:var(--bg);border:1px dashed var(--line);font-size:0.84rem;color:var(--muted);line-height:1.5;">
+            Вы ещё не сдали уроки в практикуме. Как только пройдёте тест или проверку ИИ в любом уроке, оценки появятся здесь автоматически в формате <strong>«Урок 1 · Тема — Оценка 5»</strong>.<br>
+            <a href="tasks.html" style="color:var(--accent);font-weight:700;text-decoration:underline;display:inline-block;margin-top:6px;">Открыть практикум →</a>
+          </div>`;
+        calc();
+        return;
+      }
+
       rowsEl.innerHTML = rows.map((r, i) => `
-        <div class="gpa-row" data-gpa-row="${i}">
-          <input class="tool-input" type="text" value="${esc(r.name)}" data-gpa-field="name" aria-label="Название модуля ${i + 1}" placeholder="Модуль / предмет">
-          <input class="tool-input tool-input--num" type="number" min="1" max="30" step="1" value="${r.credits}" data-gpa-field="credits" aria-label="Кредиты модуля ${i + 1}">
-          <select class="tool-input tool-input--num" data-gpa-field="grade" aria-label="Оценка модуля ${i + 1}">
+        <div class="gpa-row" data-gpa-row="${i}" style="grid-template-columns:minmax(0,1fr) auto 64px 32px;">
+          <div style="min-width:0;display:flex;flex-direction:column;gap:2px;">
+            <input class="tool-input" type="text" value="${esc(r.name)}" data-gpa-field="name" aria-label="Урок ${i + 1}" placeholder="Урок и тема" style="padding:7px 10px;font-size:0.84rem;font-weight:600;">
+          </div>
+          <span style="font-size:10px;font-weight:800;padding:3px 7px;border-radius:999px;background:var(--bg-elev);color:${r.source === 'real' ? '#34d399' : 'var(--muted)'};white-space:nowrap;">${r.source === 'real' ? '✓ Практикум' : 'Прогноз'}</span>
+          <select class="tool-input tool-input--num" data-gpa-field="grade" aria-label="Оценка за урок ${i + 1}" style="font-weight:900;color:${gradeColor(Number(r.grade))};">
             ${[5, 4, 3, 2].map((g) => `<option value="${g}"${g === Number(r.grade) ? ' selected' : ''}>${g}</option>`).join('')}
           </select>
-          <button type="button" class="tool-icon-btn" data-gpa-del="${i}" aria-label="Удалить модуль ${i + 1}">✕</button>
+          <button type="button" class="tool-icon-btn" data-gpa-del="${i}" aria-label="Удалить строку ${i + 1}">✕</button>
         </div>`).join('');
       calc();
     }
 
     function calc() {
-      let sumC = 0, sum5 = 0, sum4 = 0;
+      let count = rows.length;
+      let sum5 = 0, sum4 = 0;
       rows.forEach((r) => {
-        const c = Math.max(0, Number(r.credits) || 0);
-        const g = Number(r.grade) || 0;
-        sumC += c;
-        sum5 += c * g;
-        sum4 += c * (GRADE_TO_4[g] ?? 0);
+        const g = Math.max(2, Math.min(5, Number(r.grade) || 4));
+        sum5 += g;
+        sum4 += (GRADE_TO_4[g] ?? 0);
       });
-      const g5 = sumC ? sum5 / sumC : 0;
-      const g4 = sumC ? sum4 / sumC : 0;
-      out5.textContent = g5.toFixed(2);
-      out4.textContent = g4.toFixed(2);
-      outCredits.textContent = String(sumC);
-      meter.style.width = Math.min(100, (g4 / 4) * 100).toFixed(1) + '%';
-      const level = !sumC ? '' : g4 >= 3.67 ? 'Отлично — уровень повышенной стипендии' : g4 >= 2.67 ? 'Хорошо — стабильный результат' : g4 >= 2.0 ? 'Удовлетворительно — есть что подтянуть' : 'Риск задолженности — нужен план пересдачи';
+      const g5 = count ? sum5 / count : 0;
+      const g4 = count ? sum4 / count : 0;
+      out5.textContent = count ? g5.toFixed(2) : '—';
+      out4.textContent = count ? g4.toFixed(2) : '—';
+      outCredits.textContent = String(count);
+      meter.style.width = count ? Math.min(100, (g5 / 5) * 100).toFixed(1) + '%' : '0%';
+      const level = !count
+        ? 'Сдайте первый урок в практикуме — средний балл рассчитается автоматически'
+        : g5 >= 4.6 ? 'Отлично — красный уровень, повышенная стипендия'
+        : g5 >= 3.8 ? 'Хорошо — уверенное освоение практикума'
+        : g5 >= 3.0 ? 'Удовлетворительно — подтяните оценки по сложным темам'
+        : 'Нужно пересдать практические тесты для зачёта';
       verdict.textContent = level;
-      root.dataset.gpaLevel = !sumC ? 'none' : g4 >= 3.67 ? 'high' : g4 >= 2.67 ? 'good' : g4 >= 2.0 ? 'mid' : 'low';
-      store.set(GPA_KEY, rows);
+      root.dataset.gpaLevel = !count ? 'none' : g5 >= 4.6 ? 'high' : g5 >= 3.8 ? 'good' : g5 >= 3.0 ? 'mid' : 'low';
+      if (rows.every(r => r.source !== 'real')) {
+        store.set(GPA_SIM_KEY, rows);
+      }
     }
 
     rowsEl.addEventListener('input', (e) => {
@@ -154,8 +243,9 @@
     });
     rowsEl.addEventListener('change', (e) => {
       if (e.target.dataset.gpaField === 'grade') {
-        rows[Number(e.target.closest('[data-gpa-row]').dataset.gpaRow)].grade = Number(e.target.value);
-        calc();
+        const idx = Number(e.target.closest('[data-gpa-row]').dataset.gpaRow);
+        rows[idx].grade = Number(e.target.value);
+        draw();
       }
     });
     rowsEl.addEventListener('click', (e) => {
@@ -165,13 +255,14 @@
       draw();
     });
     root.querySelector('[data-gpa-add]').addEventListener('click', () => {
-      rows.push({ name: `Модуль ${rows.length + 1}`, credits: 3, grade: 5 });
+      rows.push({ id: `sim:${Date.now()}`, name: `Урок ${rows.length + 1}. Прогноз по теме`, spec: 'Прогноз', grade: 5, source: 'sim' });
       draw();
       const last = rowsEl.querySelector('.gpa-row:last-child input');
       if (last) last.focus();
     });
     root.querySelector('[data-gpa-reset]').addEventListener('click', () => {
-      rows = [];
+      rows = loadRealGrades();
+      if (!rows.length) store.set(GPA_SIM_KEY, []);
       draw();
     });
     draw();

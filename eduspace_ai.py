@@ -352,3 +352,144 @@ def review_submission_ai(submission_data, task_data, user_api_key="", provider="
         f"Провайдер LLM не вернул корректную оценку работы ({type(last_error).__name__ if last_error else 'EmptyOrInvalidJSON'})."
     )
 
+
+
+def evaluate_student_lesson_submission(
+    lesson_title,
+    specialty="it",
+    task_prompt="",
+    criteria=None,
+    solution_text="",
+    elapsed_seconds=0,
+    interactive_score=0,
+    interactive_done=False,
+    user_api_key="",
+    provider=""
+):
+    """
+    Comprehensive AI Examiner (Gemini / OpenAI) for end-of-lesson grading.
+    Evaluates:
+      1. Written student solution against lesson criteria (substance, accuracy, completeness)
+      2. Time spent on lesson (honesty, pacing, anti-rush detection)
+      3. Interactive lab performance
+    Returns structured dict with grade_5 (2..5), score_100 (0..100), time_analysis, feedback, etc.
+    """
+    criteria = criteria or []
+    clean_solution = (solution_text or "").strip()
+    elapsed = max(0, int(elapsed_seconds or 0))
+    mins = elapsed // 60
+    secs = elapsed % 60
+    time_label = f"{mins} мин {secs} сек" if mins > 0 else f"{secs} сек"
+
+    # Quick empty/too-short check
+    if len(clean_solution) < 12:
+        return {
+            "grade_5": 2,
+            "score_100": 25,
+            "passed": False,
+            "verdict_title": "Требуется развёрнутое самостоятельное решение",
+            "time_analysis": f"Затрачено времени: {time_label}. Ответ слишком короткий для объективной оценки.",
+            "feedback": "Напишите полноценное самостоятельное решение по шагам, учитывая все критерии задания, и отправьте на повторную проверку ИИ.",
+            "strengths": ["Интерактивная часть пройдена" if interactive_done else "Попытка сдачи зафиксирована"],
+            "improvements": ["Раскройте каждый пункт технического задания своими словами", "Укажите конкретные параметры, единицы измерения или код"],
+            "provider": "AMK AI Guard",
+            "elapsed_seconds": elapsed,
+        }
+
+    gemini_key, openai_key = resolve_llm_keys(user_api_key=user_api_key, provider=provider)
+    criteria_text = "\n".join([f"- {c}" for c in criteria]) if criteria else "- Техническая точность и полнота ответа"
+
+    system_prompt = (
+        "Ты строгий, но справедливый ИИ-экзаменатор технического колледжа AMK SkillHub. "
+        "Твоя задача — оценить самостоятельную работу студента в конце урока по трём факторам: "
+        "1) точность и полнота написанного решения по критериям ТЗ; "
+        "2) время выполнения (если меньше 20 секунд при длинном тексте — предупреди о возможном копипасте и снизь балл; "
+        "если от 1 до 20 минут — похвали за вдумчивый темп); "
+        "3) результаты интерактивной лаборатории. "
+        "Верни ТОЛЬКО валидный JSON без markdown-обёрток со следующими ключами: "
+        '{"grade_5": 5, "score_100": 92, "passed": true, "verdict_title": "...", '
+        '"time_analysis": "...", "feedback": "...", "strengths": ["..."], "improvements": ["..."]}. '
+        "grade_5 — целое число от 2 до 5. passed — true если grade_5 >= 3. Язык ответа: русский."
+    )
+    user_prompt = (
+        f"Специальность: {specialty}\n"
+        f"Тема урока: {lesson_title}\n"
+        f"Задание: {task_prompt}\n"
+        f"Критерии выполнения:\n{criteria_text}\n"
+        f"Интерактивный тренажёр: {'пройден' if interactive_done else 'не завершён'} (очки: {interactive_score})\n"
+        f"Затраченное время на урок: {time_label} ({elapsed} сек)\n"
+        f"Решение студента:\n{clean_solution[:2500]}"
+    )
+
+    raw_reply = None
+    used_provider = "fallback"
+    try:
+        if gemini_key:
+            raw_reply = _call_gemini_api(gemini_key, system_prompt, user_prompt)
+            used_provider = "Gemini AI"
+        elif openai_key:
+            raw_reply = _call_openai_api(openai_key, system_prompt, user_prompt)
+            used_provider = "OpenAI"
+    except Exception:
+        raw_reply = None
+
+    if raw_reply:
+        try:
+            parsed = json.loads(_strip_json_fences(raw_reply))
+            g5 = int(parsed.get("grade_5", 4))
+            g5 = max(2, min(5, g5))
+            s100 = int(parsed.get("score_100", g5 * 20 - 5))
+            s100 = max(0, min(100, s100))
+            return {
+                "grade_5": g5,
+                "score_100": s100,
+                "passed": bool(parsed.get("passed", g5 >= 3)),
+                "verdict_title": str(parsed.get("verdict_title") or ("Отличная работа!" if g5 == 5 else "Решение проверено ИИ")),
+                "time_analysis": str(parsed.get("time_analysis") or f"Затрачено времени: {time_label}."),
+                "feedback": str(parsed.get("feedback") or "Работа оценена на основании критериев курса."),
+                "strengths": list(parsed.get("strengths") or [])[:4],
+                "improvements": list(parsed.get("improvements") or [])[:4],
+                "provider": used_provider,
+                "elapsed_seconds": elapsed,
+            }
+        except Exception:
+            pass
+
+    # Deterministic smart rubric fallback if API is unreachable
+    words = len(re.findall(r"[A-Za-zА-Яа-яЁё0-9]+", clean_solution))
+    matched = 0
+    low = clean_solution.lower()
+    for c in criteria:
+        tokens = [t for t in re.findall(r"[a-zа-яё0-9]{3,}", str(c).lower()) if t not in ("для", "или", "при", "что", "как", "без", "все")]
+        if any(t in low for t in tokens[:6]):
+            matched += 1
+    ratio = matched / max(1, len(criteria)) if criteria else min(1.0, words / 25.0)
+    score = int(45 + ratio * 38 + (12 if interactive_done else 0) + (5 if words >= 18 else 0))
+    if elapsed < 15 and words > 25:
+        score = max(55, score - 15)
+        t_note = f"Время: {time_label} — слишком быстро для объёмного текста, зафиксировано подозрение на копипаст."
+    elif elapsed < 30:
+        t_note = f"Время: {time_label} — очень быстрый темп, убедитесь, что внимательно проверили все детали."
+    else:
+        t_note = f"Время: {time_label} — спокойный, вдумчивый темп выполнения задания."
+    score = max(30, min(98, score))
+    g5 = 5 if score >= 88 else (4 if score >= 74 else (3 if score >= 58 else 2))
+    return {
+        "grade_5": g5,
+        "score_100": score,
+        "passed": g5 >= 3,
+        "verdict_title": "Отличное выполнение!" if g5 == 5 else ("Хороший результат" if g5 == 4 else ("Удовлетворительно" if g5 == 3 else "Нужна доработка")),
+        "time_analysis": t_note,
+        "feedback": (
+            f"Проверено соответствие критериям ({matched} из {max(1, len(criteria))}), объём ответа ({words} слов) "
+            f"и статус интерактивной лаборатории. "
+            + ("Решение грамотное и структурированное." if g5 >= 4 else "Добавьте больше технических деталей и конкретных значений по ТЗ.")
+        ),
+        "strengths": [
+            f"Самостоятельно написано {words} слов по теме урока",
+            "Интерактивный тренажёр успешно пройден" if interactive_done else "Показана базовая логика решения",
+        ],
+        "improvements": [] if g5 == 5 else ["Проверьте все критерии ТЗ и раскройте пропущенные параметры"],
+        "provider": "AMK AI Rubric",
+        "elapsed_seconds": elapsed,
+    }

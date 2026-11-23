@@ -264,6 +264,38 @@ window.TopicGameEngine = (function () {
       .tge-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
       .tge-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
       .tge-grid-probe { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 14px; }
+      .tge-live-split { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.15fr); gap: 14px; align-items: stretch; }
+      .tge-live-pane {
+        padding: 14px;
+        border-radius: 16px;
+        background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.14), rgba(2, 6, 23, 0.92) 72%);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 14px 32px -18px rgba(56, 189, 248, 0.45);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 10px;
+        min-width: 0;
+      }
+      .tge-live-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+        color: #67e8f9; font-family: 'JetBrains Mono', ui-monospace, monospace;
+      }
+      .tge-live-dot { width: 7px; height: 7px; border-radius: 50%; background: #34d399; box-shadow: 0 0 10px #34d399; animation: tgePulse 1.4s infinite; }
+      @keyframes tgeDashFlow { to { stroke-dashoffset: -36; } }
+      @keyframes tgeSlowSpin { to { transform: rotate(360deg); } }
+      .tge-flow-line { stroke-dasharray: 8 6; animation: tgeDashFlow 1.2s linear infinite; }
+      .tge-spin { transform-origin: center; animation: tgeSlowSpin 8s linear infinite; }
+      .tge-checker {
+        background-image: linear-gradient(45deg, rgba(148,163,184,0.22) 25%, transparent 25%),
+                          linear-gradient(-45deg, rgba(148,163,184,0.22) 25%, transparent 25%),
+                          linear-gradient(45deg, transparent 75%, rgba(148,163,184,0.22) 75%),
+                          linear-gradient(-45deg, transparent 75%, rgba(148,163,184,0.22) 75%);
+        background-size: 14px 14px;
+        background-position: 0 0, 0 7px, 7px -7px, -7px 0;
+      }
+      @media (max-width: 820px) { .tge-live-split { grid-template-columns: 1fr; } }
       .tge-card-dark {
         padding: 14px;
         border-radius: 14px;
@@ -836,16 +868,54 @@ window.TopicGameEngine = (function () {
       `;
     } else if (mech === 'bench_tuner') {
       stageHtml = renderBenchTuner(inst, r, rSt);
-    } else if (mech === 'defect_inspector') {
-      stageHtml = renderDefectInspector(inst, r, rSt);
-    } else if (mech === 'code_or_formula_builder') {
-      stageHtml = renderBuilder(inst, r, rSt);
-    } else if (mech === 'probe_diagnostic') {
-      stageHtml = renderProbeDiagnostic(inst, r, rSt);
-    } else if (mech === 'workshop_quest') {
-      stageHtml = renderWorkshopQuest(inst, r, rSt);
-    } else if (mech === 'triage_radar') {
-      stageHtml = renderTriageRadar(inst, r, rSt);
+    } else {
+      let innerStage = '';
+      if (mech === 'defect_inspector') innerStage = renderDefectInspector(inst, r, rSt);
+      else if (mech === 'code_or_formula_builder') innerStage = renderBuilder(inst, r, rSt);
+      else if (mech === 'probe_diagnostic') innerStage = renderProbeDiagnostic(inst, r, rSt);
+      else if (mech === 'workshop_quest') innerStage = renderWorkshopQuest(inst, r, rSt);
+      else if (mech === 'triage_radar') innerStage = renderTriageRadar(inst, r, rSt);
+
+      const specName = inst.spec || 'it';
+      const solvedPct = rSt.solved ? 100 : Math.min(88, 28 + inst.roundIdx * 24 + (rSt.probed ? rSt.probed.length * 18 : 0) + (rSt.slots ? rSt.slots.filter(Boolean).length * 20 : 0) + (rSt.triedBad ? rSt.triedBad.length * 14 : 0));
+      const statusCol = rSt.solved ? '#34d399' : (inst.lives <= 1 ? '#fb7185' : '#38bdf8');
+      const liveMonitor = `
+        <div class="tge-live-pane">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
+            <span class="tge-live-badge"><span class="tge-live-dot" style="background:${statusCol};box-shadow:0 0 10px ${statusCol};"></span>ЖИВОЙ СТЕНД · ${esc(specName.toUpperCase())}</span>
+            <span style="font-family:monospace;font-size:10px;font-weight:800;color:${statusCol};">${rSt.solved ? 'ЭТАЛОН ✓' : 'АКТИВЕН'}</span>
+          </div>
+          <svg viewBox="0 0 280 132" style="width:100%;height:132px;background:#060b16;border-radius:12px;border:1px solid rgba(56,189,248,0.22);">
+            <path d="M0 33 H280 M0 66 H280 M0 99 H280 M70 0 V132 M140 0 V132 M210 0 V132" stroke="rgba(56,189,248,0.1)" stroke-width="1"/>
+            <g transform="translate(74,66)">
+              <circle r="38" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8"/>
+              <circle r="38" fill="none" stroke="${statusCol}" stroke-width="8" stroke-dasharray="${Math.round(solvedPct * 2.38)} 240" transform="rotate(-90)" style="transition:stroke-dasharray 300ms ease;"/>
+              <circle r="22" fill="none" stroke="#818cf8" stroke-width="2" stroke-dasharray="6 5" class="tge-spin"/>
+              <text y="5" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="900" font-family="monospace">${solvedPct}%</text>
+            </g>
+            <g transform="translate(132,26)">
+              <text x="0" y="10" fill="#94a3b8" font-size="9" font-family="monospace">ДИАГНОСТИКА УЗЛА</text>
+              <rect x="0" y="18" width="130" height="8" rx="4" fill="#1e293b"/>
+              <rect x="0" y="18" width="${Math.round(solvedPct * 1.3)}" height="8" rx="4" fill="${statusCol}"/>
+              <text x="0" y="44" fill="#94a3b8" font-size="9" font-family="monospace">ТОЧНОСТЬ СМЕНЫ</text>
+              <rect x="0" y="52" width="130" height="8" rx="4" fill="#1e293b"/>
+              <rect x="0" y="52" width="${Math.max(24, Math.round((inst.lives / 3) * 130))}" height="8" rx="4" fill="#34d399"/>
+              <path d="M 0 82 Q 22 66 44 82 T 88 82 T 130 82" fill="none" stroke="${statusCol}" stroke-width="2.5" class="tge-flow-line"/>
+            </g>
+          </svg>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;">
+            <div style="padding:7px 9px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+              <div style="font-size:9px;color:#94a3b8;">КОМБО / ОЧКИ</div>
+              <div style="font-family:monospace;font-weight:900;color:#fcd34d;">x${inst.combo} · ${inst.score} PTS</div>
+            </div>
+            <div style="padding:7px 9px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+              <div style="font-size:9px;color:#94a3b8;">СТАТУС РАУНДА</div>
+              <div style="font-family:monospace;font-weight:900;color:${statusCol};">${rSt.solved ? 'ВЫПОЛНЕНО' : 'В РАБОТЕ'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      stageHtml = `<div class="tge-live-split"><div style="display:flex;flex-direction:column;gap:12px;min-width:0;">${innerStage}</div><div>${liveMonitor}</div></div>`;
     }
 
     const fb = rSt.feedback;
@@ -914,10 +984,11 @@ window.TopicGameEngine = (function () {
   }
 
   // =========================================================================
-  // MECHANIC 1: BENCH TUNER
+  // MECHANIC 1: BENCH TUNER + LIVE INTERACTIVE VISUAL STAGE (ALL 5 COURSES)
   // =========================================================================
-  function renderBenchPreview(r, vals) {
+  function renderBenchPreview(r, vals, inst) {
     const type = r.previewType || 'generic';
+    const spec = (inst && inst.spec) || 'it';
 
     if (type === 'banner_export') {
       const ppi = Number(vals.ppi || 72);
@@ -925,18 +996,40 @@ window.TopicGameEngine = (function () {
       const w = Number(vals.width || 1200);
       const estKb = Math.round((w / 1200) * Math.pow(ppi / 72, 2) * (fmt === 'BMP' ? 2100 : (fmt === 'WebP' ? 145 : (fmt === 'PNG' ? 230 : 280))));
       const isHeavy = estKb > 350;
+      const hasAlpha = fmt.includes('PNG') || fmt === 'WebP';
+      const scalePct = Math.max(42, Math.min(100, Math.round((w / 2000) * 100)));
+      const loadSec = Math.max(0.08, (estKb / 720)).toFixed(2);
+      const speedPct = Math.max(8, Math.min(100, Math.round(100 - Math.min(92, (estKb / 3500) * 100))));
+      const accent = isHeavy ? '#fb7185' : '#34d399';
       return `
-        <div class="tge-card-dark" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">
-          <div style="display:flex;align-items:center;gap:12px;min-width:0;">
-            <div style="width:58px;height:44px;border-radius:10px;background:linear-gradient(135deg,#4f46e5,#06b6d4);display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:11px;font-weight:900;color:#fff;flex-shrink:0;">${w}px</div>
-            <div style="min-width:0;">
-              <div style="font-weight:700;font-size:13px;color:#fff;overflow-wrap:anywhere;">banner-hero.${fmt.toLowerCase().replace(/[^a-z0-9]/g, '')}</div>
-              <div style="font-size:11px;color:#94a3b8;">Плотность: <strong style="color:#67e8f9;font-family:monospace;">${ppi} ppi</strong> • Альфа: ${fmt.includes('PNG') || fmt === 'WebP' ? 'Да' : 'Нет'}</div>
+        <div class="tge-live-pane">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span class="tge-live-badge"><span class="tge-live-dot"></span>LIVE PREVIEW · PHOTOSHOP EXPORT</span>
+            <span style="font-family:monospace;font-size:11px;font-weight:800;color:${accent};">${estKb > 1000 ? (estKb / 1024).toFixed(1) + ' MB' : estKb + ' KB'}</span>
+          </div>
+
+          <div style="border-radius:12px;border:1px solid rgba(255,255,255,0.14);background:#090d1a;overflow:hidden;">
+            <div style="padding:6px 10px;background:rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;font-family:monospace;font-size:10px;color:#94a3b8;">
+              <span>● ● ●  banner-hero.${esc(fmt.toLowerCase().replace(/[^a-z0-9]/g, ''))}</span>
+              <span style="color:#67e8f9;">${w} × ${Math.round(w / 2)} px · ${ppi} ppi</span>
+            </div>
+            <div class="${hasAlpha ? 'tge-checker' : ''}" style="padding:14px;display:flex;align-items:center;justify-content:center;min-height:112px;background-color:${hasAlpha ? '#0f172a' : '#ffffff'};transition:all 220ms ease;">
+              <div style="width:${scalePct}%;height:74px;border-radius:${hasAlpha ? '14px' : '4px'};background:linear-gradient(135deg,#4f46e5 0%,#06b6d4 60%,#34d399 100%);border:2px solid ${accent};display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 26px -10px ${accent};transition:all 220ms cubic-bezier(0.22,1,0.36,1);position:relative;overflow:hidden;">
+                <span style="font-weight:900;font-size:12px;letter-spacing:0.06em;">AMK HERO BANNER</span>
+                <span style="font-family:monospace;font-size:10px;opacity:0.9;">${w}px · ${esc(fmt)} · ${ppi} ppi</span>
+                ${ppi >= 300 ? '<span style="position:absolute;top:4px;right:6px;background:rgba(244,63,94,0.9);padding:1px 5px;border-radius:4px;font-size:9px;font-weight:800;">PRINT OVERLOAD</span>' : ''}
+              </div>
             </div>
           </div>
-          <div style="text-align:right;">
-            <div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:700;">Вес файла</div>
-            <div style="font-size:18px;font-weight:900;font-family:monospace;color:${isHeavy ? '#fb7185' : '#34d399'};">${estKb > 1000 ? (estKb / 1024).toFixed(1) + ' MB' : estKb + ' KB'}</div>
+
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#cbd5e1;">
+              <span>Скорость загрузки (4G/LTE): <strong style="color:${accent};font-family:monospace;">${loadSec} сек</strong></span>
+              <span>Альфа: <strong style="color:${hasAlpha ? '#34d399' : '#fbbf24'};">${hasAlpha ? 'Прозрачный' : 'Заливка'}</strong></span>
+            </div>
+            <div style="height:7px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;">
+              <div style="width:${speedPct}%;height:100%;background:${accent};transition:width 240ms ease;box-shadow:0 0 12px ${accent};"></div>
+            </div>
           </div>
         </div>
       `;
@@ -948,14 +1041,18 @@ window.TopicGameEngine = (function () {
       const align = vals.align || 'stretch';
       const gap = Number(vals.gap !== undefined ? vals.gap : 8);
       return `
-        <div class="tge-card-dark" style="display:flex;flex-direction:column;gap:10px;border-color:rgba(99,102,241,0.34);">
-          <div style="font-family:monospace;font-size:11px;color:#67e8f9;background:rgba(0,0,0,0.45);padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);overflow-x:auto;">
+        <div class="tge-live-pane">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span class="tge-live-badge"><span class="tge-live-dot"></span>LIVE VIEWPORT · CSS ENGINE</span>
+            <span style="font-family:monospace;font-size:10px;color:#818cf8;">gap: ${gap}px</span>
+          </div>
+          <div style="font-family:monospace;font-size:11px;color:#67e8f9;background:rgba(0,0,0,0.45);padding:8px 10px;border-radius:8px;border:1px solid rgba(56,189,248,0.22);overflow-x:auto;">
             header { display: ${esc(disp)}; justify-content: ${esc(just)}; align-items: ${esc(align)}; gap: ${gap}px; }
           </div>
-          <div style="min-height:68px;padding:10px;border-radius:10px;background:#0f172a;border:1px dashed rgba(129,140,248,0.5);display:${esc(disp)};justify-content:${esc(just)};align-items:${esc(align)};gap:${gap}px;">
-            <div style="padding:6px 10px;border-radius:7px;background:#4f46e5;color:#fff;font-weight:800;font-size:11px;">LOGO</div>
-            <div style="padding:6px 10px;border-radius:7px;background:#334155;color:#e2e8f0;font-weight:700;font-size:11px;">Курсы</div>
-            <div style="padding:6px 10px;border-radius:7px;background:#059669;color:#fff;font-weight:700;font-size:11px;">Войти</div>
+          <div style="min-height:96px;padding:12px;border-radius:12px;background:#070c18;border:1px dashed rgba(56,189,248,0.55);display:${esc(disp)};justify-content:${esc(just)};align-items:${esc(align)};gap:${gap}px;transition:all 200ms ease;">
+            <div style="padding:8px 12px;border-radius:8px;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;font-weight:800;font-size:11px;">LOGO</div>
+            <div style="padding:8px 12px;border-radius:8px;background:#1e293b;border:1px solid rgba(255,255,255,0.15);color:#e2e8f0;font-weight:700;font-size:11px;">Курсы</div>
+            <div style="padding:8px 12px;border-radius:8px;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-weight:700;font-size:11px;">Войти</div>
           </div>
         </div>
       `;
@@ -967,36 +1064,136 @@ window.TopicGameEngine = (function () {
       const curr = power / 12;
       const drop = (curr * 2 * 0.0175 * 4) / Math.max(0.25, sec);
       const overheat = sec < (curr / 10);
+      const strokeW = Math.max(2.5, Math.min(11, sec * 3.2));
+      const wireCol = overheat ? '#fb7185' : (drop > 0.5 ? '#fbbf24' : '#34d399');
+      const flowSpeed = Math.max(0.35, 2.2 - curr / 25).toFixed(2);
       return `
-        <div class="tge-grid-3">
-          <div class="tge-card-dark" style="text-align:center;">
-            <div style="font-size:10px;color:#94a3b8;">Ток (I = P/U)</div>
-            <div style="font-size:18px;font-weight:900;font-family:monospace;color:#fcd34d;margin-top:4px;">${curr.toFixed(1)} A</div>
+        <div class="tge-live-pane">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span class="tge-live-badge"><span class="tge-live-dot"></span>LIVE CIRCUIT · 12V AUTO BENCH</span>
+            <span style="font-family:monospace;font-size:11px;font-weight:900;color:${wireCol};">${overheat ? '🔥 ПЕРЕГРЕВ ЖИЛЫ!' : '✓ ЦЕПЬ В НОРМЕ'}</span>
           </div>
-          <div class="tge-card-dark" style="text-align:center;">
-            <div style="font-size:10px;color:#94a3b8;">Падение dU на 4м</div>
-            <div style="font-size:18px;font-weight:900;font-family:monospace;color:${drop > 0.5 ? '#fb7185' : '#34d399'};margin-top:4px;">${drop.toFixed(2)} V</div>
-          </div>
-          <div class="tge-card-dark" style="text-align:center;">
-            <div style="font-size:10px;color:#94a3b8;">Жила ${sec} мм²</div>
-            <div style="font-size:12px;font-weight:900;color:${overheat ? '#fb7185' : '#34d399'};margin-top:7px;">${overheat ? 'ПЕРЕГРЕВ!' : 'НОРМА'}</div>
+          <svg viewBox="0 0 320 118" style="width:100%;height:112px;background:#070c18;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
+            <rect x="14" y="34" width="54" height="48" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+            <text x="41" y="55" text-anchor="middle" fill="#38bdf8" font-size="11" font-weight="800" font-family="monospace">12.6V</text>
+            <text x="41" y="70" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="monospace">АКБ</text>
+            <path d="M 68 48 L 246 48" fill="none" stroke="${wireCol}" stroke-width="${strokeW}" stroke-linecap="round" opacity="0.35"/>
+            <path d="M 68 48 L 246 48" fill="none" stroke="${wireCol}" stroke-width="${Math.max(2, strokeW * 0.65)}" class="tge-flow-line" style="animation-duration:${flowSpeed}s;"/>
+            <path d="M 246 72 L 68 72" fill="none" stroke="#64748b" stroke-width="2.5" class="tge-flow-line" style="animation-duration:${flowSpeed}s;"/>
+            <text x="157" y="36" text-anchor="middle" fill="${wireCol}" font-size="10" font-weight="800" font-family="monospace">Жила ${sec} мм² · I = ${curr.toFixed(1)} A</text>
+            <circle cx="272" cy="60" r="24" fill="${overheat ? 'rgba(251,113,133,0.22)' : 'rgba(52,211,153,0.2)'}" stroke="${wireCol}" stroke-width="2"/>
+            <text x="272" y="57" text-anchor="middle" fill="#fff" font-size="10" font-weight="900" font-family="monospace">${power}W</text>
+            <text x="272" y="70" text-anchor="middle" fill="${wireCol}" font-size="8" font-family="monospace">-${drop.toFixed(2)}V</text>
+          </svg>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;">
+            <div style="padding:6px;border-radius:8px;background:rgba(255,255,255,0.04);"><div style="font-size:9px;color:#94a3b8;">ТОК</div><div style="font-family:monospace;font-weight:900;color:#fcd34d;font-size:13px;">${curr.toFixed(1)} A</div></div>
+            <div style="padding:6px;border-radius:8px;background:rgba(255,255,255,0.04);"><div style="font-size:9px;color:#94a3b8;">ПАДЕНИЕ ΔU</div><div style="font-family:monospace;font-weight:900;color:${drop > 0.5 ? '#fb7185' : '#34d399'};font-size:13px;">${drop.toFixed(2)} V</div></div>
+            <div style="padding:6px;border-radius:8px;background:rgba(255,255,255,0.04);"><div style="font-size:9px;color:#94a3b8;">СЕЧЕНИЕ</div><div style="font-family:monospace;font-weight:900;color:#67e8f9;font-size:13px;">${sec} мм²</div></div>
           </div>
         </div>
       `;
     }
 
+    // Universal Specialty-Aware Live Visual Canvas for ALL remaining lessons across all 5 courses!
+    const ctrls = r.controls || [];
+    const numCtrls = ctrls.filter(c => c.kind !== 'pills');
+    const primary = numCtrls[0] || ctrls[0];
+    let normPct = 55;
+    if (primary && primary.max !== undefined && primary.min !== undefined) {
+      const v = Number(vals[primary.id]);
+      normPct = Math.max(5, Math.min(100, Math.round(((v - Number(primary.min)) / Math.max(1e-4, Number(primary.max) - Number(primary.min))) * 100)));
+    } else if (primary && primary.options) {
+      const idx = primary.options.map(String).indexOf(String(vals[primary.id]));
+      normPct = Math.round(((Math.max(0, idx) + 1) / Math.max(1, primary.options.length)) * 100);
+    }
+    const needleAngle = -90 + (normPct / 100) * 180;
     const keys = Object.keys(vals);
+    const chipsHtml = keys.map(k => {
+      const c = ctrls.find(x => x.id === k);
+      return `<div style="padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(56,189,248,0.18);display:flex;justify-content:space-between;gap:6px;font-size:11px;"><span style="color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(c ? c.label : k)}</span><strong style="font-family:monospace;color:#67e8f9;">${esc(vals[k])}${esc(c && c.unit ? c.unit : '')}</strong></div>`;
+    }).join('');
+
+    let liveSvg = '';
+    if (spec === 'automechanic') {
+      const gearSpeed = Math.max(1.2, 7 - (normPct / 18)).toFixed(1);
+      liveSvg = `
+        <svg viewBox="0 0 320 120" style="width:100%;height:118px;background:#070c18;border-radius:12px;border:1px solid rgba(56,189,248,0.2);">
+          <g transform="translate(86,62)">
+            <circle r="38" fill="none" stroke="#334155" stroke-width="10" stroke-dasharray="10 6" class="tge-spin" style="animation-duration:${gearSpeed}s;"/>
+            <circle r="24" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5"/>
+            <circle r="8" fill="#38bdf8"/>
+          </g>
+          <g transform="translate(226,84)">
+            <path d="M -52 0 A 52 52 0 0 1 52 0" fill="none" stroke="#1e293b" stroke-width="11" stroke-linecap="round"/>
+            <path d="M -52 0 A 52 52 0 0 1 52 0" fill="none" stroke="url(#amkGaugeG)" stroke-width="11" stroke-linecap="round" stroke-dasharray="${Math.round(normPct * 1.63)} 200"/>
+            <g transform="rotate(${needleAngle})">
+              <line x1="0" y1="0" x2="0" y2="-42" stroke="#f8fafc" stroke-width="3" stroke-linecap="round"/>
+            </g>
+            <circle r="6" fill="#38bdf8"/>
+            <text y="22" text-anchor="middle" fill="#67e8f9" font-size="11" font-weight="900" font-family="monospace">${primary ? esc(vals[primary.id]) + esc(primary.unit || '') : normPct + '%'}</text>
+          </g>
+          <defs><linearGradient id="amkGaugeG"><stop offset="0%" stop-color="#38bdf8"/><stop offset="65%" stop-color="#34d399"/><stop offset="100%" stop-color="#fb7185"/></linearGradient></defs>
+        </svg>`;
+    } else if (spec === 'autoelectric') {
+      const freq = 0.04 + (normPct / 100) * 0.12;
+      const amp = 18 + (normPct / 100) * 24;
+      let pts = '';
+      for (let x = 14; x <= 306; x += 6) {
+        const y = 60 + Math.sin(x * freq) * amp;
+        pts += `${x},${y.toFixed(1)} `;
+      }
+      liveSvg = `
+        <svg viewBox="0 0 320 120" style="width:100%;height:118px;background:#050a14;border-radius:12px;border:1px solid rgba(52,211,153,0.28);">
+          <path d="M0 30 H320 M0 60 H320 M0 90 H320 M80 0 V120 M160 0 V120 M240 0 V120" stroke="rgba(52,211,153,0.12)" stroke-width="1"/>
+          <polyline points="${pts}" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="14" y="20" fill="#34d399" font-size="10" font-weight="800" font-family="monospace">OSCILLOSCOPE LIVE · ${primary ? esc(vals[primary.id]) + esc(primary.unit || '') : normPct + '%'}</text>
+        </svg>`;
+    } else if (spec === 'hvac') {
+      const flowSpeed = Math.max(0.4, 2.2 - normPct / 60).toFixed(2);
+      liveSvg = `
+        <svg viewBox="0 0 320 120" style="width:100%;height:118px;background:#070c18;border-radius:12px;border:1px solid rgba(56,189,248,0.28);">
+          <rect x="18" y="24" width="76" height="72" rx="10" fill="rgba(56,189,248,0.14)" stroke="#38bdf8" stroke-width="2"/>
+          <text x="56" y="56" text-anchor="middle" fill="#67e8f9" font-size="10" font-weight="800" font-family="monospace">ИСПАРИТЕЛЬ</text>
+          <text x="56" y="72" text-anchor="middle" fill="#38bdf8" font-size="11" font-weight="900" font-family="monospace">COLD</text>
+          <rect x="226" y="24" width="76" height="72" rx="10" fill="rgba(251,113,133,0.14)" stroke="#fb7185" stroke-width="2"/>
+          <text x="264" y="56" text-anchor="middle" fill="#fda4af" font-size="10" font-weight="800" font-family="monospace">КОНДЕНСАТОР</text>
+          <text x="264" y="72" text-anchor="middle" fill="#fb7185" font-size="11" font-weight="900" font-family="monospace">HOT</text>
+          <path d="M 94 40 L 226 40" stroke="#fb7185" stroke-width="4" class="tge-flow-line" style="animation-duration:${flowSpeed}s;"/>
+          <path d="M 226 80 L 94 80" stroke="#38bdf8" stroke-width="4" class="tge-flow-line" style="animation-duration:${flowSpeed}s;"/>
+          <circle cx="160" cy="60" r="22" fill="#0f172a" stroke="#c084fc" stroke-width="2.5"/>
+          <text x="160" y="64" text-anchor="middle" fill="#e9d5ff" font-size="10" font-weight="900" font-family="monospace">${normPct}%</text>
+        </svg>`;
+    } else if (spec === 'graphic_design') {
+      const bleed = Math.max(4, Math.min(18, Math.round(normPct * 0.18)));
+      liveSvg = `
+        <svg viewBox="0 0 320 120" style="width:100%;height:118px;background:#070c18;border-radius:12px;border:1px solid rgba(192,132,252,0.28);">
+          <rect x="${50 - bleed}" y="${22 - bleed / 2}" width="${220 + bleed * 2}" height="${76 + bleed}" rx="4" fill="rgba(244,63,94,0.12)" stroke="#fb7185" stroke-dasharray="4 3" stroke-width="1.5"/>
+          <rect x="50" y="22" width="220" height="76" rx="4" fill="url(#amkArtG)" stroke="#f8fafc" stroke-width="1.5"/>
+          <text x="160" y="56" text-anchor="middle" fill="#fff" font-size="12" font-weight="900">PREPRESS LAYOUT</text>
+          <text x="160" y="74" text-anchor="middle" fill="#e2e8f0" font-size="10" font-family="monospace">${primary ? esc(vals[primary.id]) + esc(primary.unit || '') : 'CMYK · 300 DPI'}</text>
+          <defs><linearGradient id="amkArtG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4f46e5"/><stop offset="50%" stop-color="#ec4899"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs>
+        </svg>`;
+    } else {
+      liveSvg = `
+        <svg viewBox="0 0 320 120" style="width:100%;height:118px;background:#070c18;border-radius:12px;border:1px solid rgba(56,189,248,0.25);">
+          <rect x="18" y="14" width="284" height="92" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+          <rect x="28" y="24" width="${Math.max(40, Math.round(normPct * 2.5))}" height="16" rx="5" fill="#38bdf8"/>
+          <rect x="28" y="48" width="${Math.max(60, Math.round((100 - normPct * 0.4) * 2.4))}" height="14" rx="5" fill="#818cf8" opacity="0.85"/>
+          <rect x="28" y="70" width="${Math.max(50, Math.round(normPct * 2.2))}" height="18" rx="6" fill="#34d399" opacity="0.85"/>
+          <text x="290" y="96" text-anchor="end" fill="#67e8f9" font-size="10" font-weight="800" font-family="monospace">LIVE UI · ${normPct}%</text>
+        </svg>`;
+    }
+
     return `
-      <div class="tge-card-dark" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:9px;">
-        ${keys.map(k => {
-          const ctrl = (r.controls || []).find(c => c.id === k);
-          return `
-            <div style="padding:9px 11px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;">
-              <span style="font-size:11px;color:#94a3b8;font-weight:600;overflow-wrap:anywhere;">${esc(ctrl ? ctrl.label : k)}</span>
-              <span style="font-size:13px;font-weight:900;font-family:monospace;color:#67e8f9;flex-shrink:0;">${esc(vals[k])}${esc(ctrl && ctrl.unit ? ctrl.unit : '')}</span>
-            </div>
-          `;
-        }).join('')}
+      <div class="tge-live-pane">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <span class="tge-live-badge"><span class="tge-live-dot"></span>ЖИВОЙ СТЕНД · ${esc(spec.toUpperCase())}</span>
+          <span style="font-family:monospace;font-size:10px;color:#34d399;">REAL-TIME</span>
+        </div>
+        ${liveSvg}
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;">
+          ${chipsHtml}
+        </div>
       </div>
     `;
   }
@@ -1030,16 +1227,20 @@ window.TopicGameEngine = (function () {
 
     return `
       <div class="tge-prompt tge-prompt-indigo">${esc(r.prompt)}</div>
-      <div id="tge-bench-preview">${renderBenchPreview(r, rSt.vals)}</div>
-      <div class="tge-grid-2">${controlsHtml}</div>
-      ${!rSt.solved ? `
-        <div style="display:flex;justify-content:flex-end;">
-          <button type="button" id="tge-bench-submit" onclick="TopicGameEngine.checkBench('${escAttr(inst.id)}')" class="tge-btn-primary">
-            ${svgIcon('check', 16)}
-            <span>Применить настройку</span>
-          </button>
+      <div class="tge-live-split">
+        <div style="display:flex;flex-direction:column;gap:10px;min-width:0;">
+          ${controlsHtml}
+          ${!rSt.solved ? `
+            <div style="display:flex;justify-content:flex-start;padding-top:4px;">
+              <button type="button" id="tge-bench-submit" onclick="TopicGameEngine.checkBench('${escAttr(inst.id)}')" class="tge-btn-primary" style="width:100%;">
+                ${svgIcon('check', 16)}
+                <span>Применить настройку</span>
+              </button>
+            </div>
+          ` : ''}
         </div>
-      ` : ''}
+        <div id="tge-bench-preview">${renderBenchPreview(r, rSt.vals, inst)}</div>
+      </div>
     `;
   }
 
@@ -1447,7 +1648,7 @@ window.TopicGameEngine = (function () {
       const lbl = document.getElementById(`tge-range-lbl-${ctrlId}`);
       if (lbl) lbl.textContent = val + (ctrl && ctrl.unit ? ctrl.unit : '');
       const prev = document.getElementById('tge-bench-preview');
-      if (prev) prev.innerHTML = renderBenchPreview(r, inst.roundState.vals);
+      if (prev) prev.innerHTML = renderBenchPreview(r, inst.roundState.vals, inst);
     },
 
     checkBench: function (id) {

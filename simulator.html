@@ -6,13 +6,13 @@
   <!-- Open Graph / WhatsApp / Telegram Social Preview -->
   <meta property="og:type" content="website"/>
   <meta property="og:url" content="https://amk-skillhub.onrender.com/"/>
-  <meta property="og:title" content="EDU SPACE — Цифровая образовательная среда АМК"/>
+  <meta property="og:title" content="AMK SkillHub — Цифровая образовательная среда АМК"/>
   <meta property="og:description" content="Инновационная цифровая платформа Алматинского многопрофильного колледжа. 5 специальностей ТиПО, интерактивные тренажеры и реестр аккредитации."/>
   <meta property="og:image" content="https://amk-skillhub.onrender.com/assets/eduspace-logo.svg"/>
   <meta name="theme-color" content="#f1f5f9"/>
   <meta name="twitter:card" content="summary_large_image"/>
 
-  <title>Интерактивный урок и тренажёр — EDU SPACE | Цифровая образовательная платформа АМК</title>
+  <title>Интерактивный урок и тренажёр — AMK SkillHub | Цифровая образовательная платформа АМК</title>
   <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg"/>
 
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
@@ -88,12 +88,12 @@
       <a href="index.html" class="flex items-center gap-3 px-2 mb-5 group">
         <div class="relative w-9 h-9 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-glow-indigo transition-transform group-hover:scale-105">
           <div class="w-full h-full bg-dark-900 rounded-[14px] flex items-center justify-center">
-            <img alt="EDU SPACE Logo" width="22" height="22" class="h-5 w-5 object-contain" src="assets/eduspace-logo.svg"/>
+            <img alt="AMK SkillHub Logo" width="22" height="22" class="h-5 w-5 object-contain" src="assets/eduspace-logo.svg"/>
           </div>
         </div>
         <div class="flex flex-col">
           <span class="font-extrabold text-base text-white tracking-tight flex items-center gap-1.5">
-            EDU SPACE <span class="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">АМК</span>
+            AMK SkillHub <span class="text-[9px] uppercase font-bold tracking-widest px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">АМК</span>
           </span>
           <span class="text-[10px] font-semibold text-indigo-400 tracking-wider uppercase">Тренажёр урока</span>
         </div>
@@ -123,7 +123,7 @@
 
     <div class="p-4 border-t border-white/10 space-y-2 bg-dark-950/60">
       <div class="flex items-center justify-between text-xs">
-        <a href="student.html" class="font-bold text-slate-400 hover:text-white flex items-center gap-1 transition-colors">
+        <a href="tasks.html" class="font-bold text-slate-400 hover:text-white flex items-center gap-1 transition-colors">
           <span class="material-symbols-outlined text-[16px]">dashboard</span>
           <span>Мой кабинет</span>
         </a>
@@ -164,8 +164,8 @@
           <span class="material-symbols-outlined text-[16px] text-indigo-400">save</span>
           <span class="hidden sm:inline">Сохранить черновик</span>
         </button>
-        <button type="button" onclick="openMessengerModal()" class="p-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-colors" title="Вопрос куратору">
-          <span class="material-symbols-outlined text-[20px]">chat</span>
+        <button type="button" onclick="openAiTutorModal()" class="p-2 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white transition-colors" title="AI Тьютор (Gemini)">
+          <span class="material-symbols-outlined text-[20px]">smart_toy</span>
         </button>
         <a href="profile.html" class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 text-white font-bold flex items-center justify-center text-xs shadow-glow-indigo" data-user-initials>
           СТ
@@ -870,7 +870,7 @@
 
       term.innerHTML = `
         <div class="text-slate-400 border-b border-white/10 pb-1.5 mb-1.5 flex justify-between">
-          <span>EDU SPACE Test Runner • Модуль №${activeTaskNumber}</span>
+          <span>AMK SkillHub Test Runner • Модуль №${activeTaskNumber}</span>
           <span class="font-bold ${report.passed ? 'text-emerald-400' : 'text-amber-400'}">Пройдено: ${report.passedCount}/${report.totalCount} (${report.score}/100 баллов)</span>
         </div>
         ${linesHtml}
@@ -1501,7 +1501,7 @@
         </div>
         <div>
           <div class="text-sm font-extrabold text-white flex items-center gap-2">
-            <span>AI-Куратор EDU SPACE</span>
+            <span>AI-Куратор AMK SkillHub</span>
             <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold border border-indigo-500/30">AI Pro</span>
           </div>
           <div class="text-[11px] text-slate-400" id="ai-quota-label">Бесплатный доступ: 3 подсказки в день</div>

@@ -1,5 +1,5 @@
 /**
- * EDU SPACE i18n Engine (ru <-> kk, ready for kk-Latn)
+ * AMK SkillHub i18n Engine (ru <-> kk, ready for kk-Latn)
  * Lightweight, zero-dependency internationalization & Kazakh localization module.
  */
 (function () {
@@ -24,8 +24,8 @@
     "languageName": "Русский",
     "shortCode": "РУС",
     "script": "Cyrl",
-    "pageTitle": "Программа курса и модули — EDU SPACE | АМК",
-    "pageDescription": "Программа курса и модули — EDU SPACE | Цифровая образовательная платформа АМК"
+    "pageTitle": "Программа курса и модули — AMK SkillHub",
+    "pageDescription": "Программа курса и модули — AMK SkillHub — Цифровая образовательная платформа"
   },
   "a11y": {
     "skipToContent": "К содержимому",
@@ -46,8 +46,8 @@
     "closeModal": "Закрыть окно"
   },
   "brand": {
-    "homeTitle": "На главную EDU SPACE",
-    "cabinetSubtitle": "Кабинет АМК"
+    "homeTitle": "На главную AMK SkillHub",
+    "cabinetSubtitle": "Платформа колледжа"
   },
   "lang": {
     "switcherLabel": "Язык интерфейса",
@@ -76,9 +76,9 @@
     "gradesTooltip": "Оценки и зачётка",
     "deadlines": "Дедлайны",
     "deadlinesTooltip": "Календарь дедлайнов",
-    "curatorChat": "Чат с куратором",
-    "curatorChatTooltip": "Чат с куратором",
-    "curatorOnlineTitle": "Куратор онлайн",
+    "curatorChat": "AI Тьютор",
+    "curatorChatTooltip": "AI Тьютор",
+    "curatorOnlineTitle": "AI Тьютор онлайн",
     "notifications": "Уведомления",
     "notificationsTooltip": "Уведомления",
     "profileAndCert": "Профиль и сертификат",
@@ -223,7 +223,7 @@
       "colCourse": "Курс",
       "colScore": "Балл",
       "colStatus": "Статус",
-      "colComment": "Комментарий куратора",
+      "colComment": "Рецензия AI",
       "emptyRow": "У вас пока нет сданных работ. Откройте Урок №1, пройдите автопроверку и отправьте первое решение!",
       "downloadCsv": "Скачать выписку CSV"
     },
@@ -239,9 +239,9 @@
       "openLessonBtn": "Открыть урок"
     },
     "chat": {
-      "title": "💬 Чат с куратором курса",
+      "title": "💬 AI Тьютор курса",
       "loading": "Загружаем сообщения…",
-      "guestStatus": "Чат с куратором курса (Ознакомительный режим)",
+      "guestStatus": "AI Тьютор курса (Ознакомительный режим)",
       "curatorRole": "Куратор курса · {curator}",
       "welcomeMessage": "Здравствуйте! Добро пожаловать на курс «{course}». Здесь вы можете задать вопрос по текущему уроку, разбору ошибок или срокам сдачи.",
       "inputPlaceholder": "Напишите сообщение куратору...",
@@ -286,8 +286,8 @@
     "languageName": "Қазақша",
     "shortCode": "ҚАЗ",
     "script": "Cyrl",
-    "pageTitle": "Курс бағдарламасы мен модульдер — EDU SPACE | АМК",
-    "pageDescription": "Курс бағдарламасы мен модульдер — EDU SPACE | АМК цифрлық білім беру платформасы"
+    "pageTitle": "Курс бағдарламасы мен модульдер — AMK SkillHub",
+    "pageDescription": "Курс бағдарламасы мен модульдер — AMK SkillHub цифрлық білім беру платформасы"
   },
   "a11y": {
     "skipToContent": "Негізгі мазмұнға өту",
@@ -308,7 +308,7 @@
     "closeModal": "Терезені жабу"
   },
   "brand": {
-    "homeTitle": "EDU SPACE басты бетіне өту",
+    "homeTitle": "AMK SkillHub басты бетіне өту",
     "cabinetSubtitle": "АМК кабинеті"
   },
   "lang": {
@@ -338,9 +338,9 @@
     "gradesTooltip": "Бағалар мен сынақ кітапшасы",
     "deadlines": "Тапсыру мерзімі",
     "deadlinesTooltip": "Мерзімдер күнтізбесі",
-    "curatorChat": "Куратормен чат",
-    "curatorChatTooltip": "Куратормен чат",
-    "curatorOnlineTitle": "Куратор желіде",
+    "curatorChat": "AI Тьютор",
+    "curatorChatTooltip": "AI Тьютор",
+    "curatorOnlineTitle": "AI Тьютор желіде",
     "notifications": "Хабарландырулар",
     "notificationsTooltip": "Хабарландырулар",
     "profileAndCert": "Профиль және сертификат",
@@ -501,9 +501,9 @@
       "openLessonBtn": "Сабақты ашу"
     },
     "chat": {
-      "title": "💬 Куратормен чат",
+      "title": "💬 AI Тьютор",
       "loading": "Хабарламалар жүктелуде…",
-      "guestStatus": "Куратормен чат (Танысу режимі)",
+      "guestStatus": "AI Тьютор (Танысу режимі)",
       "curatorRole": "Курс кураторы · {curator}",
       "welcomeMessage": "Сәлеметсіз бе! «{course}» курсына қош келдіңіз. Осы чатта ағымдағы сабақ, қатемен жұмыс немесе тапсыру мерзімі бойынша сұрақ қоя аласыз.",
       "inputPlaceholder": "Кураторға хабарлама жазыңыз...",

@@ -50,75 +50,209 @@
   unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 
-/* ==================== 3 ВИЗУАЛЬНЫЕ ТЕМЫ ==================== */
+/* ==================== 3 ВИЗУАЛЬНЫЕ ТЕМЫ (UNIFIED MASTER ENGINE) ==================== */
 :root,
-:root[data-theme="light"] {
-  color-scheme: light;
-  --bg: #F2EFE9;
-  --bg-elev: #E6E1D8;
-  --surface: #FAF8F5;
-  --surface-solid: #FFFFFF;
-  --surface-hover: #FFFFFF;
-  --ink: #25262B;
-  --ink-soft: #32343A;
-  --muted: #5A5D66;
-  --line: rgba(37, 38, 43, 0.14);
-  --line-strong: rgba(37, 99, 235, 0.45);
-  --primary: #2563EB;
-  --primary-deep: #1D4ED8;
-  --accent: #2563EB;
-  --accent-ink: #FFFFFF;
-  --glow: none;
+:root[data-theme="neon"] {
+  color-scheme: dark;
+  --bg: #070B14;
+  --bg-elev: #0D1322;
+  --surface: rgba(15, 23, 42, 0.84);
+  --surface-solid: #0F172A;
+  --surface-hover: #17223B;
+  --ink: #F1F5F9;
+  --ink-soft: #CBD5E1;
+  --muted: #94A3B8;
+  --line: rgba(56, 189, 248, 0.22);
+  --line-strong: rgba(56, 189, 248, 0.65);
+  --primary: #38BDF8;
+  --primary-deep: #0284C7;
+  --accent: #38BDF8;
+  --accent-2: #818CF8;
+  --accent-3: #34D399;
+  --accent-ink: #04101B;
+  --glow: 0 0 26px rgba(56, 189, 248, 0.34);
   --font-display: 'Bebas Neue', 'Inter', system-ui, sans-serif;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Full cross-page variable sync (tasks.html, workshop.css, style.css) */
+  --bg-canvas: #070B14;
+  --bg-deep: #070B14;
+  --bg-page: #070B14;
+  --bg-surface: #0F172A;
+  --bg-elevated: #141E33;
+  --bg-card: #0F172A;
+  --bg-card-hover: #17223B;
+  --bg-glass: rgba(10, 15, 29, 0.86);
+  --workshop-bg: #070B14;
+  --workshop-surface: #0F172A;
+  --workshop-shell: #0B1120;
+  --workshop-line: rgba(56, 189, 248, 0.22);
+  --workshop-text: #F1F5F9;
+  --workshop-muted: #94A3B8;
+  --workshop-accent: #38BDF8;
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-muted: #94A3B8;
+  --border-subtle: rgba(148, 163, 184, 0.14);
+  --border-default: rgba(56, 189, 248, 0.24);
+  --border-strong: rgba(56, 189, 248, 0.6);
+  --accent-primary: #38BDF8;
+  --accent-primary-hover: #7DD3FC;
+  --accent-primary-ink: #04101B;
+  --accent-secondary: #818CF8;
+  --status-avail-bg: rgba(16, 185, 129, 0.14);
+  --status-avail-text: #34D399;
+  --status-avail-border: rgba(52, 211, 153, 0.36);
+  --status-prog-bg: rgba(245, 158, 11, 0.15);
+  --status-prog-text: #FBBF24;
+  --status-prog-border: rgba(251, 191, 36, 0.36);
+  --status-lock-bg: rgba(148, 163, 184, 0.12);
+  --status-lock-text: #94A3B8;
+  --status-lock-border: rgba(148, 163, 184, 0.22);
 }
 
 :root[data-theme="graphite"] {
   color-scheme: dark;
-  --bg: #25262B;
-  --bg-elev: #2E3037;
-  --surface: #2F3138;
-  --surface-solid: #32343C;
-  --surface-hover: #383B44;
-  --ink: #F2EFE9;
-  --ink-soft: #E5E1D8;
-  --muted: #B4B7C0;
-  --line: rgba(242, 239, 233, 0.14);
-  --line-strong: rgba(198, 255, 61, 0.5);
+  --bg: #181A20;
+  --bg-elev: #20232B;
+  --surface: rgba(34, 37, 46, 0.9);
+  --surface-solid: #22252E;
+  --surface-hover: #2B2F3A;
+  --ink: #F4F4F5;
+  --ink-soft: #E4E4E7;
+  --muted: #A1A1AA;
+  --line: rgba(244, 244, 245, 0.14);
+  --line-strong: rgba(198, 255, 61, 0.55);
   --primary: #C6FF3D;
   --primary-deep: #AEE624;
   --accent: #C6FF3D;
-  --accent-ink: #18191D;
-  --glow: 0 0 24px rgba(198, 255, 61, 0.16);
+  --accent-2: #60A5FA;
+  --accent-3: #34D399;
+  --accent-ink: #121417;
+  --glow: 0 0 24px rgba(198, 255, 61, 0.22);
+
+  --bg-canvas: #181A20;
+  --bg-deep: #181A20;
+  --bg-page: #181A20;
+  --bg-surface: #22252E;
+  --bg-elevated: #282C36;
+  --bg-card: #22252E;
+  --bg-card-hover: #2B2F3A;
+  --bg-glass: rgba(24, 26, 32, 0.9);
+  --workshop-bg: #181A20;
+  --workshop-surface: #22252E;
+  --workshop-shell: #1D2028;
+  --workshop-line: rgba(244, 244, 245, 0.14);
+  --workshop-text: #F4F4F5;
+  --workshop-muted: #A1A1AA;
+  --workshop-accent: #C6FF3D;
+  --text-primary: #F4F4F5;
+  --text-secondary: #D4D4D8;
+  --text-muted: #A1A1AA;
+  --border-subtle: rgba(244, 244, 245, 0.1);
+  --border-default: rgba(244, 244, 245, 0.16);
+  --border-strong: rgba(198, 255, 61, 0.55);
+  --accent-primary: #C6FF3D;
+  --accent-primary-hover: #D9FF73;
+  --accent-primary-ink: #121417;
+  --accent-secondary: #60A5FA;
+  --status-avail-bg: rgba(16, 185, 129, 0.14);
+  --status-avail-text: #34D399;
+  --status-avail-border: rgba(52, 211, 153, 0.34);
+  --status-prog-bg: rgba(245, 158, 11, 0.15);
+  --status-prog-text: #FBBF24;
+  --status-prog-border: rgba(251, 191, 36, 0.34);
+  --status-lock-bg: rgba(161, 161, 170, 0.12);
+  --status-lock-text: #A1A1AA;
+  --status-lock-border: rgba(161, 161, 170, 0.2);
 }
 
-:root[data-theme="neon"] {
-  color-scheme: dark;
-  --bg: #0B0C10;
-  --bg-elev: #12141C;
-  --surface: #131620;
-  --surface-solid: #161925;
-  --surface-hover: #1C2030;
-  --ink: #E8FFF6;
-  --ink-soft: #C5F5E3;
-  --muted: #93B5AA;
-  --line: rgba(57, 255, 136, 0.22);
-  --line-strong: rgba(57, 255, 136, 0.65);
-  --primary: #39FF88;
-  --primary-deep: #1FE06F;
-  --accent: #39FF88;
-  --accent-ink: #07130C;
-  --glow: 0 0 22px rgba(57, 255, 136, 0.28);
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #EEF2FF;
+  --bg-elev: #E2E8F8;
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-solid: #FFFFFF;
+  --surface-hover: #F8FAFF;
+  --ink: #0F172A;
+  --ink-soft: #1E293B;
+  --muted: #475569;
+  --line: rgba(37, 99, 235, 0.16);
+  --line-strong: rgba(37, 99, 235, 0.5);
+  --primary: #2563EB;
+  --primary-deep: #1D4ED8;
+  --accent: #2563EB;
+  --accent-2: #7C3AED;
+  --accent-3: #059669;
+  --accent-ink: #FFFFFF;
+  --glow: 0 8px 26px rgba(37, 99, 235, 0.22);
+
+  --bg-canvas: #EEF2FF;
+  --bg-deep: #EEF2FF;
+  --bg-page: #EEF2FF;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F8FAFC;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F1F5FF;
+  --bg-glass: rgba(255, 255, 255, 0.9);
+  --workshop-bg: #EEF2FF;
+  --workshop-surface: #FFFFFF;
+  --workshop-shell: #FFFFFF;
+  --workshop-line: rgba(37, 99, 235, 0.16);
+  --workshop-text: #0F172A;
+  --workshop-muted: #475569;
+  --workshop-accent: #2563EB;
+  --text-primary: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #475569;
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-default: rgba(37, 99, 235, 0.18);
+  --border-strong: rgba(37, 99, 235, 0.5);
+  --accent-primary: #2563EB;
+  --accent-primary-hover: #1D4ED8;
+  --accent-primary-ink: #FFFFFF;
+  --accent-secondary: #7C3AED;
+  --status-avail-bg: #ECFDF5;
+  --status-avail-text: #047857;
+  --status-avail-border: rgba(5, 150, 105, 0.32);
+  --status-prog-bg: #FFFBEB;
+  --status-prog-text: #B45309;
+  --status-prog-border: rgba(217, 119, 6, 0.32);
+  --status-lock-bg: #F1F5F9;
+  --status-lock-text: #475569;
+  --status-lock-border: rgba(15, 23, 42, 0.14);
 }
 
 html, body {
   background-color: var(--bg) !important;
-  background-image: none !important;
   color: var(--ink) !important;
   font-family: var(--font-sans) !important;
 }
 
-/* Убираем декоративный шум (плавающие круги из academy.css) */
+/* Атмосферный High-Tech Aurora Glow фон */
+:root[data-theme="neon"] body {
+  background-image:
+    radial-gradient(ellipse 68% 48% at 12% 0%, rgba(56, 189, 248, 0.16), transparent 62%),
+    radial-gradient(ellipse 60% 45% at 88% 8%, rgba(129, 140, 248, 0.17), transparent 58%),
+    radial-gradient(ellipse 55% 42% at 65% 95%, rgba(52, 211, 153, 0.11), transparent 60%),
+    linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px) !important;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 44px 44px, 44px 44px !important;
+  background-attachment: fixed !important;
+}
+:root[data-theme="graphite"] body {
+  background-image:
+    radial-gradient(ellipse 70% 45% at 15% 0%, rgba(198, 255, 61, 0.08), transparent 60%),
+    radial-gradient(ellipse 60% 45% at 88% 10%, rgba(96, 165, 250, 0.09), transparent 58%) !important;
+  background-attachment: fixed !important;
+}
+:root[data-theme="light"] body {
+  background-image:
+    radial-gradient(ellipse 65% 45% at 12% 0%, rgba(37, 99, 235, 0.11), transparent 60%),
+    radial-gradient(ellipse 60% 45% at 88% 8%, rgba(124, 58, 237, 0.1), transparent 58%) !important;
+  background-attachment: fixed !important;
+}
+
 body::before,
 body::after {
   display: none !important;
@@ -126,9 +260,10 @@ body::after {
 
 /* Адаптация ключевых поверхностей под активную тему */
 .topbar {
-  background: var(--surface) !important;
+  background: var(--bg-glass) !important;
   border-bottom: 1px solid var(--line) !important;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
 }
 .topbar .brand,
 .topbar nav a {
@@ -916,3 +1051,206 @@ header .max-w-7xl.h-20 {
 }
 .compact-extra[open] > summary::after { content: 'Свернуть ▴'; }
 .compact-extra[open] > summary { margin-bottom: 14px; }
+
+
+/* ==================== FULL-SHELL THEME SYNC & CYBER-GLASS POLISH ==================== */
+.theme-sfx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: 2px;
+  transition: all 140ms ease;
+}
+.theme-sfx-btn:hover {
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+}
+
+/* 100% Theme Sync for Sidebar, Top Header, Mobile Nav & Shell Cards (tasks.html, profile.html, simulator.html) */
+:root[data-theme="neon"] .app-sidebar,
+:root[data-theme="graphite"] .app-sidebar {
+  background: linear-gradient(180deg, var(--workshop-shell) 0%, var(--bg) 100%) !important;
+  border-right: 1px solid var(--line) !important;
+  color: var(--ink) !important;
+}
+:root[data-theme="neon"] .top-header,
+:root[data-theme="graphite"] .top-header,
+:root[data-theme="neon"] header,
+:root[data-theme="graphite"] header,
+:root[data-theme="neon"] .mobile-bottom-nav,
+:root[data-theme="graphite"] .mobile-bottom-nav {
+  background: var(--bg-glass) !important;
+  border-color: var(--line) !important;
+  color: var(--ink) !important;
+  backdrop-filter: blur(18px) !important;
+  -webkit-backdrop-filter: blur(18px) !important;
+}
+:root[data-theme="neon"] .app-sidebar .brand-link,
+:root[data-theme="graphite"] .app-sidebar .brand-link,
+:root[data-theme="neon"] .app-sidebar .nav-item,
+:root[data-theme="graphite"] .app-sidebar .nav-item,
+:root[data-theme="neon"] .top-header a,
+:root[data-theme="graphite"] .top-header a,
+:root[data-theme="neon"] .breadcrumbs,
+:root[data-theme="graphite"] .breadcrumbs {
+  color: var(--ink-soft) !important;
+}
+:root[data-theme="neon"] .app-sidebar .nav-item:hover,
+:root[data-theme="graphite"] .app-sidebar .nav-item:hover,
+:root[data-theme="neon"] .app-sidebar .nav-item.is-active,
+:root[data-theme="graphite"] .app-sidebar .nav-item.is-active {
+  background: rgba(56, 189, 248, 0.14) !important;
+  color: var(--accent) !important;
+  border-color: var(--line-strong) !important;
+}
+:root[data-theme="neon"] .app-sidebar .brand-mark,
+:root[data-theme="graphite"] .app-sidebar .brand-mark {
+  background: var(--bg-elev) !important;
+  border: 1px solid var(--line) !important;
+}
+:root[data-theme="neon"] .collapse-btn,
+:root[data-theme="graphite"] .collapse-btn,
+:root[data-theme="neon"] .lang-switcher,
+:root[data-theme="graphite"] .lang-switcher {
+  background: var(--bg-elev) !important;
+  border: 1px solid var(--line) !important;
+  color: var(--ink) !important;
+}
+:root[data-theme="neon"] .continue-banner,
+:root[data-theme="graphite"] .continue-banner,
+:root[data-theme="neon"] .timeline-card,
+:root[data-theme="graphite"] .timeline-card,
+:root[data-theme="neon"] .segmented-control,
+:root[data-theme="graphite"] .segmented-control,
+:root[data-theme="neon"] .search-input,
+:root[data-theme="graphite"] .search-input,
+:root[data-theme="neon"] .course-dropdown-menu,
+:root[data-theme="graphite"] .course-dropdown-menu {
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  color: var(--ink) !important;
+  backdrop-filter: blur(16px);
+}
+:root[data-theme="neon"] .course-header-card,
+:root[data-theme="graphite"] .course-header-card {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.94) 0%, rgba(30, 27, 75, 0.9) 55%, rgba(12, 74, 110, 0.85) 100%) !important;
+  border: 1px solid var(--line-strong) !important;
+  box-shadow: 0 20px 50px -20px rgba(56, 189, 248, 0.35) !important;
+}
+:root[data-theme="neon"] .course-header-card *,
+:root[data-theme="graphite"] .course-header-card * {
+  color: #F8FAFC;
+}
+:root[data-theme="neon"] .progress-panel,
+:root[data-theme="graphite"] .progress-panel {
+  background: rgba(7, 11, 20, 0.65) !important;
+  border: 1px solid var(--line) !important;
+}
+
+/* Fix bg-dark cards in dark themes (override workshop.css white leak) */
+:root[data-theme="neon"] .bg-dark-900,
+:root[data-theme="neon"] .bg-dark-950,
+:root[data-theme="neon"] .bg-dark-850,
+:root[data-theme="graphite"] .bg-dark-900,
+:root[data-theme="graphite"] .bg-dark-950,
+:root[data-theme="graphite"] .bg-dark-850 {
+  background-color: var(--surface-solid) !important;
+  color: var(--ink) !important;
+}
+:root[data-theme="neon"] .text-white,
+:root[data-theme="graphite"] .text-white {
+  color: #F8FAFC !important;
+}
+:root[data-theme="neon"] .text-slate-300,
+:root[data-theme="neon"] .text-slate-400,
+:root[data-theme="graphite"] .text-slate-300,
+:root[data-theme="graphite"] .text-slate-400 {
+  color: var(--muted) !important;
+}
+
+/* Seamless Glassmorphic AI Tutor Integration (Point 15 - zero jarring white boxes/borders!) */
+#ai-tutor-drawer {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.62) 0%, rgba(7, 11, 20, 0.72) 100%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.16) !important;
+  box-shadow: 0 12px 36px -14px rgba(0, 0, 0, 0.55) !important;
+  backdrop-filter: blur(22px) !important;
+  -webkit-backdrop-filter: blur(22px) !important;
+  border-radius: 24px !important;
+}
+:root[data-theme="light"] #ai-tutor-drawer {
+  background: rgba(255, 255, 255, 0.68) !important;
+  border: 1px solid rgba(37, 99, 235, 0.14) !important;
+  box-shadow: 0 10px 30px -12px rgba(37, 99, 235, 0.14) !important;
+}
+#ai-tutor-drawer > div {
+  background: transparent !important;
+  border-color: var(--border-subtle) !important;
+}
+#ai-tutor-messages {
+  background: transparent !important;
+}
+#ai-tutor-input {
+  background: rgba(15, 23, 42, 0.55) !important;
+  border: 1px solid var(--line) !important;
+  color: var(--ink) !important;
+}
+:root[data-theme="light"] #ai-tutor-input {
+  background: rgba(255, 255, 255, 0.85) !important;
+  color: #0F172A !important;
+}
+
+/* Interactive Cursor Spotlight & Cyber HUD Depth on Cards (Point 22) */
+.card, .card-link, .tool-card, .timeline-card, .cyber-card, .pr-info, .continue-banner {
+  position: relative;
+  overflow: hidden;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), border-color 180ms ease, box-shadow 220ms ease !important;
+}
+.card::after, .tool-card::after, .timeline-card::after, .cyber-card::after, .pr-info::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(56, 189, 248, 0.13), transparent 60%);
+}
+:root[data-theme="graphite"] .card::after,
+:root[data-theme="graphite"] .tool-card::after,
+:root[data-theme="graphite"] .timeline-card::after,
+:root[data-theme="graphite"] .cyber-card::after {
+  background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(198, 255, 61, 0.11), transparent 60%);
+}
+.card:hover::after, .tool-card:hover::after, .timeline-card:hover::after, .cyber-card:hover::after, .pr-info:hover::after {
+  opacity: 1;
+}
+.card:hover, .tool-card:hover, .timeline-card:hover, .cyber-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--line-strong) !important;
+  box-shadow: var(--glow), 0 18px 40px -18px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Animated Glowing Progress Fill */
+.progress-fill, .gpa-meter-fill {
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--glow);
+}
+.progress-fill::after, .gpa-meter-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: translateX(-100%);
+  animation: amkShimmer 2.4s infinite;
+}
+@keyframes amkShimmer {
+  100% { transform: translateX(100%); }
+}

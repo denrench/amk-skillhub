@@ -1172,9 +1172,121 @@
     openModal(tr('modal.notifications.title', '🔔 Центр уведомлений'), `<div class="space-y-2.5">${listHtml}</div>`);
   }
 
+  async function openAiTutorModal() {
+    const user = getActiveUser();
+    const spec = window.currentSpec || (user && user.specialty_slug) || 'it';
+    const course = getCourseBySlug(spec);
+    const locTitle = tr(`course.catalog.${spec}.title`, course.title);
+    openModal('🤖 AI Тьютор AMK SkillHub', `
+      <div class="flex flex-col h-[420px] border border-white/10 rounded-2xl bg-dark-950/75 overflow-hidden">
+        <div class="px-4 py-2.5 border-b border-white/10 flex items-center justify-between gap-2 bg-indigo-950/30">
+          <div class="flex items-center gap-2 text-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="font-bold text-slate-100">Gemini AI Наставник</span>
+            <span class="text-slate-400">· ${escapeHtml(locTitle)}</span>
+          </div>
+          <span id="edu-ai-modal-status" class="text-[11px] text-emerald-300 font-semibold">Онлайн</span>
+        </div>
+        <div id="edu-ai-chat-box" class="flex-1 p-4 overflow-y-auto space-y-3 text-sm" role="log" aria-label="Диалог с AI Тьютором">
+          <article class="rounded-2xl border border-indigo-500/30 bg-indigo-950/40 p-3.5 max-w-[90%]">
+            <div class="text-[11px] font-bold text-cyan-300 mb-1">AI Тьютор · AMK SkillHub</div>
+            <p class="text-slate-100 leading-relaxed m-0">Привет! Я твой персональный ИИ-наставник по курсу <strong>${escapeHtml(locTitle)}</strong>. Спрашивай про теорию, разбор формул, ошибки в коде или устройстве узлов — помогу разобраться, но не дам готовый спойлер, чтобы ты научился сам.</p>
+          </article>
+        </div>
+        <div class="px-3 py-2 border-t border-white/10 flex flex-wrap gap-1.5 bg-dark-950/60">
+          <button type="button" data-ai-quick="Объясни ключевую тему этого курса простыми словами" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 text-[11px] font-semibold text-slate-200 transition-colors">💡 Объясни базу</button>
+          <button type="button" data-ai-quick="Какие самые частые ошибки совершают новички по этой специальности?" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 text-[11px] font-semibold text-slate-200 transition-colors">⚠️ Частые ошибки</button>
+          <button type="button" data-ai-quick="Дай наводящий план, как самостоятельно решить практическое задание" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/15 border border-white/10 text-[11px] font-semibold text-slate-200 transition-colors">🧭 Алгоритм решения</button>
+        </div>
+        <form id="edu-ai-chat-form" class="p-2.5 bg-dark-900/90 border-t border-white/10 flex gap-2">
+          <input type="text" id="edu-ai-chat-input" aria-label="Вопрос AI Тьютору" placeholder="Задайте вопрос по курсу или практике..." maxlength="1000" class="min-w-0 flex-1 px-3.5 py-2.5 border border-white/15 bg-dark-850 text-white rounded-xl text-sm focus:outline-none focus:border-cyan-400" required>
+          <button type="submit" id="edu-ai-chat-send" class="academy-action px-4">Спросить</button>
+        </form>
+      </div>
+    `);
+
+    const box = document.getElementById('edu-ai-chat-box');
+    const form = document.getElementById('edu-ai-chat-form');
+    const input = document.getElementById('edu-ai-chat-input');
+    const sendBtn = document.getElementById('edu-ai-chat-send');
+    const statusEl = document.getElementById('edu-ai-modal-status');
+    if (!box || !form || !input) return;
+
+    function appendBubble(role, text) {
+      const item = document.createElement('article');
+      if (role === 'user') {
+        item.className = 'rounded-2xl border border-indigo-400/30 bg-indigo-600/80 text-white p-3 max-w-[85%] ml-auto';
+      } else {
+        item.className = 'rounded-2xl border border-white/10 bg-dark-900/90 text-slate-100 p-3.5 max-w-[90%]';
+      }
+      const label = document.createElement('div');
+      label.className = role === 'user' ? 'text-[10px] font-bold text-indigo-100 mb-1' : 'text-[11px] font-bold text-cyan-300 mb-1';
+      label.textContent = role === 'user' ? 'Вы' : 'AI Тьютор · Gemini';
+      const p = document.createElement('p');
+      p.className = 'text-xs sm:text-sm whitespace-pre-wrap break-words leading-relaxed m-0';
+      p.textContent = text;
+      item.append(label, p);
+      box.appendChild(item);
+      box.scrollTop = box.scrollHeight;
+      return item;
+    }
+
+    async function askAi(question) {
+      if (!question || (sendBtn && sendBtn.disabled)) return;
+      appendBubble('user', question);
+      input.value = '';
+      if (sendBtn) sendBtn.disabled = true;
+      if (statusEl) statusEl.textContent = 'Думает...';
+      const thinking = appendBubble('ai', 'Анализирую вопрос и контекст курса...');
+
+      try {
+        const base = typeof apiBase === 'function' ? apiBase() : '';
+        const res = await fetch(base + '/api/ai/tutor', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question,
+            specialty: spec,
+            lesson_id: 1,
+            course_title: locTitle,
+            user_id: user ? user.id : undefined,
+            user_email: user ? user.email : undefined,
+            block_context: `Курс: ${locTitle} (${spec}). Режим наставника AMK SkillHub.`
+          })
+        });
+        const data = await res.json().catch(() => ({}));
+        thinking.remove();
+        const reply = data.answer || data.reply || data.message || data.error || 'Не удалось получить ответ от AI. Попробуйте уточнить вопрос.';
+        appendBubble('ai', reply);
+        if (statusEl) statusEl.textContent = data.provider ? `Онлайн (${data.provider})` : 'Онлайн';
+      } catch (err) {
+        thinking.remove();
+        appendBubble('ai', 'Не удалось связаться с сервером AI. Проверьте подключение и попробуйте ещё раз.');
+        if (statusEl) statusEl.textContent = 'Офлайн';
+      } finally {
+        if (sendBtn) sendBtn.disabled = false;
+        input.focus();
+      }
+    }
+
+    document.querySelectorAll('[data-ai-quick]').forEach(btn => {
+      btn.addEventListener('click', () => askAi(btn.getAttribute('data-ai-quick')));
+    });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      askAi(input.value.trim());
+    });
+    setTimeout(() => input.focus(), 60);
+  }
+
   async function openMessengerModal(recipient) {
     const peerId = Number.isInteger(recipient) && recipient > 0 ? recipient : null;
-    openModal(peerId ? 'Личный диалог' : tr('modal.chat.title', 'Обсуждение курса'), `
+    if (!peerId) {
+      return openAiTutorModal();
+    }
+    openModal('Личный диалог', `
       <div class="flex flex-col h-80 border border-white/10 rounded-2xl bg-dark-950/60">
         <p id="edu-chat-status" class="px-4 pt-3 text-sm text-slate-300" role="status">${escapeHtml(tr('modal.chat.loading', 'Загружаем сообщения…'))}</p>
         <div id="edu-chat-box" class="flex-1 p-4 overflow-y-auto space-y-3" role="log" aria-label="Сообщения чата"></div>
@@ -1918,6 +2030,7 @@
   window.openCalendarModal = openCalendarModal;
   window.openNotificationsModal = openNotificationsModal;
   window.openMessengerModal = openMessengerModal;
+  window.openAiTutorModal = openAiTutorModal;
   window.openSettingsModal = openSettingsModal;
   window.openLeaderboardModal = openLeaderboardModal;
   window.openDailyQuestsModal = openDailyQuestsModal;
@@ -1928,6 +2041,7 @@
   window.sharePortfolio = sharePortfolio;
   window.getCourseBySlug = getCourseBySlug;
   window.getCoursesList = getCoursesList;
+  window.getUserStudyDay = getUserStudyDay;
 })();
 
   // ==========================================
@@ -2160,37 +2274,38 @@
   function openInteractiveRoadmapModal() {
     const trRm = (k, fb, p) => (window.I18n && window.I18n.t) ? window.I18n.t(k, p) : fb;
     const escRm = (window.EduSpace && window.EduSpace.escapeHtml) ? window.EduSpace.escapeHtml : (s => String(s || ''));
-    const user = getActiveUser();
+    const user = (typeof getActiveUser === 'function') ? getActiveUser() : null;
     const spec = window.currentSpec || (user && user.specialty_slug) || 'it';
     const course = (window.EduSpace && window.EduSpace.getCourseBySlug)
       ? window.EduSpace.getCourseBySlug(spec)
       : { slug: spec, short_title: 'Курс', title: 'Курс' };
-    const locCourseShort = trRm(`course.catalog.${spec}.shortTitle`, course.short_title);
+    const locCourseShort = trRm(`course.catalog.${spec}.shortTitle`, course.short_title || 'Курс');
     const tasks = (window._cachedTasks && window._cachedTasks[course.slug]) || [];
     const catalogLessons = (window.EDU_LESSONS && window.EDU_LESSONS[course.slug]) || [];
-    const curDay = getUserStudyDay(user);
+    const curDay = (typeof window.getUserStudyDay === 'function') ? window.getUserStudyDay(user) : 20;
     const nodesHtml = Array.from({ length: 20 }, (_, i) => i + 1).map(num => {
       const isPro = num > 3;
-      const t = tasks.find(x => x.task_number === num);
+      const t = tasks.find(x => Number(x.task_number) === num);
       const isLocked = t ? Boolean(t.is_locked) : (num > curDay);
       const catLesson = catalogLessons.find(x => Number(x.num) === num) || catalogLessons[num - 1];
-      const rawTitle = (t && t.title) || (catLesson && catLesson.title) || ('Модуль #' + num);
+      const rawTitle = (t && t.title) || (catLesson && catLesson.title) || ('Урок #' + num);
       const locLesson = window.I18n ? window.I18n.localizeLessonContent(course.slug, num, { title: rawTitle, description: '' }) : { title: rawTitle };
       const title = locLesson.title;
-      const isDone = t && t.status_code === 'graded';
-      const border = isDone ? 'border-emerald-500/50 bg-emerald-950/20' : (isLocked ? 'border-white/10 bg-dark-950/40 opacity-75' : (isPro ? 'border-amber-500/40 bg-amber-950/20' : 'border-indigo-500/40 bg-indigo-950/20'));
-      const iconColor = isDone ? 'text-emerald-400' : (isLocked ? 'text-slate-500' : (isPro ? 'text-amber-400' : 'text-indigo-400'));
+      const isDone = t && (t.status_code === 'graded' || Number(t.score || 0) >= 50);
+      const gradeBadge = (t && t.score) ? ` · ${t.score}%` : '';
+      const border = isDone ? 'border-emerald-500/50 bg-emerald-950/30' : (isLocked ? 'border-white/10 bg-dark-950/50 opacity-75' : (isPro ? 'border-cyan-500/40 bg-cyan-950/20' : 'border-indigo-500/40 bg-indigo-950/25'));
+      const iconColor = isDone ? 'text-emerald-400' : (isLocked ? 'text-slate-500' : (isPro ? 'text-cyan-400' : 'text-indigo-400'));
       const subLabel = isDone
-        ? trRm('modal.roadmap.moduleCompleted', '✓ Модуль зачтён')
-        : (isLocked ? `День ${num}` : (isPro ? trRm('modal.roadmap.modulePro', 'Профильный модуль · Сертификат') : trRm('modal.roadmap.moduleBase', 'Базовый модуль')));
+        ? (trRm('modal.roadmap.moduleCompleted', '✓ Модуль зачтён') + gradeBadge)
+        : (isLocked ? `День ${num}` : (isPro ? trRm('modal.roadmap.modulePro', 'Профильный урок · Практикум') : trRm('modal.roadmap.moduleBase', 'Базовый урок')));
       const actionHtml = isLocked
         ? `<span class="px-3 py-1.5 rounded-xl bg-white/5 text-slate-400 text-xs font-bold shrink-0 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">lock</span><span>День ${num}</span></span>`
-        : `<a href="simulator.html?specialty=${encodeURIComponent(course.slug)}&task=${num}" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all shrink-0">${escRm(trRm('lesson.action.open', 'Открыть'))}</a>`;
+        : `<a href="lesson_player.html?specialty=${encodeURIComponent(course.slug)}&lesson=${num}" class="px-3 py-1.5 rounded-xl bg-indigo-600/80 hover:bg-indigo-500 text-white text-xs font-bold transition-all shrink-0">${escRm(trRm('lesson.action.open', 'Открыть'))}</a>`;
 
       return `
         <div class="p-3.5 rounded-2xl border ${border} flex items-center justify-between gap-3 hover:scale-[1.01] transition-transform">
           <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center ${iconColor} font-bold font-mono text-xs">
+            <div class="w-9 h-9 rounded-xl bg-white/5 flex items-center justify-center ${iconColor} font-bold font-mono text-xs shrink-0">
               ${num}
             </div>
             <div>
@@ -2202,15 +2317,17 @@
         </div>
       `;
     }).join('');
-    openModal(trRm('modal.roadmap.title', '🚀 Интерактивный роадмап курса: ' + locCourseShort, { course: locCourseShort }), `
+    openModal(trRm('modal.roadmap.title', '🚀 Дорожная карта курса: ' + locCourseShort, { course: locCourseShort }), `
       <div class="space-y-4 text-xs">
-        <p class="text-slate-300">${escRm(trRm('modal.roadmap.subtitle', 'Персональная траектория освоения профессии от базовой теории до дипломного проекта с поддержкой 3D-моделей и лабораторных симуляторов.'))}</p>
+        <p class="text-slate-300">${escRm(trRm('modal.roadmap.subtitle', 'Персональная траектория из 20 интерактивных уроков AMK SkillHub с лабораторными симуляторами и проверкой решений через Gemini AI.'))}</p>
         <div class="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1">
           ${nodesHtml}
         </div>
       </div>
     `);
   }
+  window.openInteractiveRoadmapModal = openInteractiveRoadmapModal;
+  window.openCommandPaletteModal = openCommandPaletteModal;
 
 
   // ==========================================

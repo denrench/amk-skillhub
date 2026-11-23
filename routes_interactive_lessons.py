@@ -1048,6 +1048,105 @@ def ai_review_submission():
         }), 503
     return jsonify({"ok": True, "success": True, "review": review})
 
+
+@interactive_lessons_bp.route('/api/ai/evaluate-lesson', methods=['POST'])
+def ai_evaluate_student_lesson():
+    """
+    Comprehensive end-of-lesson AI Proctor & Examiner endpoint.
+    Evaluates written solution, interactive lab performance, and elapsed time via Gemini AI,
+    returns a 5-point grade + percentage + detailed review, and stores the grade in DB.
+    """
+    from eduspace_ai import evaluate_student_lesson_submission
+
+    data = request.get_json() or {}
+    lesson_title = (data.get('lesson_title') or 'Практический урок').strip()
+    raw_spec = (data.get('specialty') or data.get('course_slug') or 'it').strip().lower()
+    specialty = SPECIALTY_ALIASES.get(raw_spec, raw_spec)
+    lesson_num = 1
+    try:
+        m = re.search(r'\d+', str(data.get('lesson_num') or data.get('lesson_id') or 1))
+        if m:
+            lesson_num = max(1, min(20, int(m.group(0))))
+    except Exception:
+        lesson_num = 1
+
+    task_prompt = (data.get('task_prompt') or '').strip()
+    criteria = data.get('criteria') if isinstance(data.get('criteria'), list) else []
+    solution_text = (data.get('solution_text') or '').strip()
+    elapsed_seconds = int(data.get('elapsed_seconds') or 0)
+    interactive_score = int(data.get('interactive_score') or 0)
+    interactive_done = bool(data.get('interactive_done', False))
+    user_api_key = (data.get('user_api_key') or '').strip()
+    provider = (data.get('provider') or '').strip().lower()
+
+    result = evaluate_student_lesson_submission(
+        lesson_title=lesson_title,
+        specialty=specialty,
+        task_prompt=task_prompt,
+        criteria=criteria,
+        solution_text=solution_text,
+        elapsed_seconds=elapsed_seconds,
+        interactive_score=interactive_score,
+        interactive_done=interactive_done,
+        user_api_key=user_api_key,
+        provider=provider,
+    )
+
+    # Best-effort persist to database for logged-in student
+    user = _get_current_user()
+    if not user and data.get('user_id'):
+        try:
+            conn = _get_db()
+            c = conn.cursor()
+            c.execute("SELECT id, email, full_name, role FROM users WHERE id = ?", (int(data.get('user_id')),))
+            row = c.fetchone()
+            if row:
+                user = dict(row)
+        except Exception:
+            pass
+
+    if user and user.get('id'):
+        try:
+            conn = _get_db()
+            c = conn.cursor()
+            c.execute(
+                "SELECT id FROM tasks WHERE specialty_slug = ? AND task_number = ? LIMIT 1",
+                (specialty, lesson_num)
+            )
+            t_row = c.fetchone()
+            if t_row:
+                task_id = t_row['id']
+                now_iso = datetime.now(timezone.utc).isoformat()
+                ai_comment = f"[AI {result['grade_5']}/5 · {result['provider']}] {result['time_analysis']} {result['feedback']}"
+                c.execute(
+                    "SELECT id FROM task_submissions WHERE user_id = ? AND task_id = ? LIMIT 1",
+                    (user['id'], task_id)
+                )
+                sub = c.fetchone()
+                status_val = 'graded' if result['passed'] else 'needs_revision'
+                if sub:
+                    c.execute(
+                        "UPDATE task_submissions SET submitted_code = ?, status = ?, score = ?, teacher_comment = ?, submitted_at = ?, reviewed_at = ? WHERE id = ?",
+                        (solution_text[:4000], status_val, int(result['score_100']), ai_comment[:1000], now_iso, now_iso, sub['id'])
+                    )
+                else:
+                    c.execute(
+                        "INSERT INTO task_submissions (user_id, task_id, submitted_code, status, score, teacher_comment, submitted_at, reviewed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                        (user['id'], task_id, solution_text[:4000], status_val, int(result['score_100']), ai_comment[:1000], now_iso, now_iso)
+                    )
+                conn.commit()
+        except Exception:
+            pass
+
+    return jsonify({
+        "ok": True,
+        "success": True,
+        "specialty": specialty,
+        "lesson_num": lesson_num,
+        "lesson_title": lesson_title,
+        "evaluation": result
+    })
+
 # ==========================================
 # 5. LESSON PLAYER PAGE ROUTE
 # ==========================================

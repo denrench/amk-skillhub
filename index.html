@@ -140,20 +140,20 @@
         <div class="tools-row-2">
           <article class="tool-card" data-tool="gpa">
             <div class="tool-card-head">
-              <h3>2. Калькулятор GPA</h3>
-              <span class="tool-count">Шкала 5.0 и 4.0 · localStorage</span>
+              <h3>2. Калькулятор оценок практикума</h3>
+              <span class="tool-count">Авторасчёт по пройденным урокам</span>
             </div>
             <div class="gpa-summary">
-              <div class="gpa-stat"><span>Средний балл (5.0)</span><strong data-gpa-5>0.00</strong></div>
-              <div class="gpa-stat"><span>GPA (4.0)</span><strong data-gpa-4>0.00</strong></div>
-              <div class="gpa-stat"><span>Кредитов</span><strong data-gpa-credits>0</strong></div>
+              <div class="gpa-stat"><span>Средний балл (5.0)</span><strong data-gpa-5>—</strong></div>
+              <div class="gpa-stat"><span>GPA (4.0)</span><strong data-gpa-4>—</strong></div>
+              <div class="gpa-stat"><span>Уроков сдано</span><strong data-gpa-credits>0</strong></div>
             </div>
             <div class="gpa-meter-track"><div class="gpa-meter-fill" data-gpa-meter style="width:0%;"></div></div>
             <p class="gpa-verdict" data-gpa-verdict></p>
             <div class="gpa-rows" data-gpa-rows></div>
             <div class="tool-actions">
-              <button type="button" class="tool-btn tool-btn--primary" data-gpa-add>+ Добавить модуль</button>
-              <button type="button" class="tool-btn" data-gpa-reset>Очистить</button>
+              <button type="button" class="tool-btn tool-btn--primary" data-gpa-add>+ Прогноз урока</button>
+              <button type="button" class="tool-btn" data-gpa-reset>Синхронизировать</button>
             </div>
           </article>
 
@@ -203,7 +203,7 @@
         </div>
         <div class="actions">
           <a class="button primary" href="learn.html">Открыть учебник</a>
-          <a class="button" href="student.html">Личный кабинет</a>
+          <a class="button" href="tasks.html">Личный кабинет</a>
         </div>
       </div>
     </section>
@@ -222,13 +222,13 @@
         <h3>Обучение</h3>
         <a href="learn.html">Учебник</a>
         <a href="tasks.html">Практикум</a>
-        <a href="student.html">Мой кабинет</a>
+        <a href="tasks.html">Мой кабинет</a>
       </div>
       <div class="footer-col">
         <h3>Платформа</h3>
         <a href="features.html">Возможности</a>
-        <a href="tools.html">Инструменты</a>
-        <a href="career.html">Карьера</a>
+        <a href="tools.html">Инструменты и шпаргалки</a>
+        <a href="profile.html">Профиль и сертификат</a>
       </div>
       <div class="footer-col">
         <h3>Колледж</h3>
@@ -247,104 +247,93 @@
         window.PhotorealShowcase.mount(prEl, [
           {
             course: 'Автомеханика',
-            short: 'Колесо и диск',
-            title: 'Колёсный диск и покрышка в сборе',
-            text: 'Реальный скан обода и шины с PBR-текстурами металла, коррозии и износа протектора. Базовый объект для изучения шиномонтажа, балансировки и углов УУК.',
+            short: 'Спорт-диск в автосервисе',
+            title: 'Кованый литой диск и тормозной узел в автомастерской',
+            text: 'Новый 10-спицевый кованый легкосплавный диск с перфорированным тормозным ротором и суппортом Brembo на подиуме в интерьере современной автомастерской с подъёмником и инструментальным шкафом.',
             facts: [
-              'Момент затяжки болтов: 100–120 Н·м крест-накрест',
-              'Проверка геометрии обода, биения и износа протектора',
-              'PBR-материалы: Diffuse, Normal, Roughness, Metalness',
+              'Момент затяжки колёсных болтов: 110–120 Н·м крест-накрест',
+              'Динамическое вращение узла, вентилируемый ротор и 6-поршневой суппорт',
+              'Атмосферное освещение автосервиса, PBR-металл и рефлексия пола',
             ],
-            source: 'Poly Haven: Rusted Wheel Rim & Old Tyre',
-            sourceUrl: 'https://polyhaven.com/a/rusted_wheel_rim_01',
+            source: 'AMK SkillHub 3D Studio · PBR Workshop Scene',
+            sourceUrl: 'tasks.html?specialty=automechanic',
             cta: 'Открыть курс Автомеханики',
-            href: 'learn.html?course=automechanic',
-            size: 1.85,
-            envIntensity: 1.15,
-            parts: [
-              { url: 'assets/photoreal/old_tyre/old_tyre_1k.gltf', size: 1.85 },
-              { url: 'assets/photoreal/rusted_wheel_rim_01/rusted_wheel_rim_01_1k.gltf', size: 1.15, offset: [0, 0.35, 0] },
-            ],
-          },
-          {
-            course: 'Автоэлектрика',
-            short: 'Мультиметр',
-            title: 'Аналого-цифровой мультиметр диагноста',
-            text: 'Фотореалистичный измерительный прибор с текстурами корпуса, шкалы, переключателя диапазонов и щупов.',
-            facts: [
-              'АКБ в покое: 12.6–12.7 В, падение под нагрузкой <= 0.5 В',
-              'Сопротивление терминаторов CAN-Bus: 60 Ом (120 || 120)',
-              'Режимы: DC V, сопротивление Ω, прозвонка и ток 10A',
-            ],
-            source: 'Poly Haven: Retro Multimeter',
-            sourceUrl: 'https://polyhaven.com/a/retro_multimeter',
-            cta: 'Открыть курс Автоэлектрики',
-            href: 'learn.html?course=autoelectric',
-            size: 1.8,
-            envIntensity: 1.1,
-            parts: [
-              { url: 'assets/photoreal/retro_multimeter/retro_multimeter_1k.gltf', size: 1.8, rotation: [-0.2, 0.25, 0] },
-            ],
-          },
-          {
-            course: 'Холодильное (HVAC)',
-            short: 'Наружный блок',
-            title: 'Наружный блок сплит-системы (конденсатор)',
-            text: 'Детализированный скан наружного блока с защитной решёткой вентилятора, корпусом и кронштейнами.',
-            facts: [
-              'Опрессовка азотом и вакуум < 500 микрон перед пуском',
-              'Перегрев Superheat 4–8 K · Переохлаждение Subcooling 3–6 K',
-              'Контроль перепада температур ΔT на теплообменнике 8–12 °C',
-            ],
-            source: 'Poly Haven: Exterior Aircon Unit',
-            sourceUrl: 'https://polyhaven.com/a/exterior_aircon_unit',
-            cta: 'Открыть курс HVAC',
-            href: 'learn.html?course=hvac',
-            size: 2.0,
-            envIntensity: 1.1,
-            parts: [
-              { url: 'assets/photoreal/exterior_aircon_unit/exterior_aircon_unit_1k.gltf', size: 2.0 },
-            ],
-          },
-          {
-            course: 'Графический дизайн',
-            short: 'Краски и мокап',
-            title: 'Аэрозольные баллончики и матовая упаковка',
-            text: 'Образец материалов для предметной визуализации: этикетка, металл сопла и блики цилиндрической упаковки.',
-            facts: [
-              'Вылеты под обрез Bleed 3 мм и суммарная краска TIL <= 300%',
-              'Профили RGB (экран) и CMYK FOGRA39 (300 dpi печать)',
-              '3-точечный свет в студии: Key, Fill и Rim Light',
-            ],
-            source: 'Poly Haven: Spray Paint Bottles',
-            sourceUrl: 'https://polyhaven.com/a/spray_paint_bottles',
-            cta: 'Открыть курс Графдизайна',
-            href: 'learn.html?course=graphic_design',
-            size: 1.5,
-            envIntensity: 1.15,
-            parts: [
-              { url: 'assets/photoreal/spray_paint_bottles/spray_paint_bottles_1k.gltf', size: 1.5 },
-            ],
+            href: 'tasks.html?specialty=automechanic',
+            size: 2.35,
+            envIntensity: 1.25,
+            sceneType: 'sport_wheel_garage',
           },
           {
             course: 'Веб-дизайн (IT)',
-            short: 'Ноутбук верстальщика',
-            title: 'Рабочая станция веб-разработчика',
-            text: 'Фотореалистичная модель ноутбука с текстурой клавиатуры, матового пластика корпуса и антибликового экрана.',
+            short: 'Игровой ПК и ноутбук',
+            title: 'Геймерская рабочая станция за RGB-столом',
+            text: 'Мощный игровой ноутбук с RGB-клавиатурой, ультраширокий монитор и прозрачный системный блок с вращающимися неоновыми вентиляторами в кибер-комнате с подсветкой.',
             facts: [
-              'Адаптивные сетки CSS Grid, Flexbox и кратность отступов 8px',
-              'Контраст интерфейса по стандарту WCAG 2.1 (от 4.5:1)',
-              'Оптимизация WebGL, анимаций 60 FPS и сборки в Git',
+              'Живая RGB-подсветка системного блока, стола и неоновых панелей стены',
+              'Адаптивные сетки CSS Grid, Flexbox, Figma и чистый код 60 FPS',
+              'Высококонтрастные интерфейсы по стандарту WCAG 2.1 и оптимизация WebP',
             ],
-            source: 'Poly Haven: Classic Laptop',
-            sourceUrl: 'https://polyhaven.com/a/classic_laptop',
+            source: 'AMK SkillHub 3D Studio · Cyber Gaming Room',
+            sourceUrl: 'tasks.html?specialty=it',
             cta: 'Открыть курс IT / Веб-дизайна',
-            href: 'learn.html?course=it',
-            size: 1.95,
-            envIntensity: 1.05,
-            parts: [
-              { url: 'assets/photoreal/classic_laptop/classic_laptop_1k.gltf', size: 1.95 },
+            href: 'tasks.html?specialty=it',
+            size: 2.35,
+            envIntensity: 1.2,
+            sceneType: 'gaming_room_rig',
+          },
+          {
+            course: 'Автоэлектрика',
+            short: 'Осциллограф и стенд',
+            title: 'Диагностический стенд CAN-Bus и осциллограф',
+            text: 'Цифровой автомобильный осциллограф с живой осциллограммой CAN-шины и профессиональный мультиметр на антистатическом ESD-верстаке.',
+            facts: [
+              'АКБ в покое: 12.6–12.7 В, генератор под нагрузкой 13.8–14.4 В',
+              'Сопротивление терминаторов шины CAN-Bus: 60 Ом (120 || 120)',
+              'Диагностика сигналов ДПКВ, ШИМ-регуляторов и датчиков ЭБУ',
             ],
+            source: 'AMK SkillHub 3D Studio · ESD Diagnostics Lab',
+            sourceUrl: 'tasks.html?specialty=autoelectric',
+            cta: 'Открыть курс Автоэлектрики',
+            href: 'tasks.html?specialty=autoelectric',
+            size: 2.25,
+            envIntensity: 1.2,
+            sceneType: 'autoelectric_lab',
+          },
+          {
+            course: 'Холодильное (HVAC)',
+            short: 'Инверторный блок HVAC',
+            title: 'Инверторный наружный блок с манометрами',
+            text: 'Современный инверторный конденсаторный блок с вращающейся крыльчаткой, медной магистралью и манометрическим коллектором LP/HP на технической кровле.',
+            facts: [
+              'Опрессовка азотом и глубокий вакуум < 500 микрон перед заправкой',
+              'Перегрев Superheat 4–8 K · Переохлаждение Subcooling 3–6 K',
+              'Контроль давления фреонов R410A, R32, R134a и перепада ΔT',
+            ],
+            source: 'AMK SkillHub 3D Studio · HVAC Technical Deck',
+            sourceUrl: 'tasks.html?specialty=hvac',
+            cta: 'Открыть курс HVAC',
+            href: 'tasks.html?specialty=hvac',
+            size: 2.25,
+            envIntensity: 1.15,
+            sceneType: 'hvac_rooftop',
+          },
+          {
+            course: 'Графический дизайн',
+            short: 'Арт-студия и планшет',
+            title: 'Графический планшет и студия предпечатной подготовки',
+            text: 'Профессиональный интерактивный перьевой дисплей, веер эталонных цветов Pantone/CMYK и студийный стол дизайнера для работы с полиграфией и брендингом.',
+            facts: [
+              'Вылеты под обрез Bleed 3–5 мм и контроль суммарной краски TIL <= 300%',
+              'Цветовые пространства RGB (экран) и CMYK FOGRA39 (300 dpi печать)',
+              'Модульные сетки, типографика и векторная подготовка в Illustrator',
+            ],
+            source: 'AMK SkillHub 3D Studio · Creative Art Studio',
+            sourceUrl: 'tasks.html?specialty=graphic_design',
+            cta: 'Открыть курс Графдизайна',
+            href: 'tasks.html?specialty=graphic_design',
+            size: 2.25,
+            envIntensity: 1.2,
+            sceneType: 'design_studio',
           },
         ]);
       }

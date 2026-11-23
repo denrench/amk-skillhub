@@ -114,59 +114,13 @@
     } catch {}
   }
 
-  function mountCourseInteractiveHub(containerEl, activeSpec, defaultLessonNum = 1) {
-    if (!containerEl) return;
+  function mountCourseInteractiveHub(containerEl) {
+    if (containerEl) {
+      containerEl.innerHTML = '';
+      containerEl.hidden = true;
+    }
     disposeActiveModel?.();
     disposeActiveModel = null;
-
-    containerEl.innerHTML = `
-      <div style="margin:1.1rem 0 1.4rem;padding:1.1rem;border-radius:18px;background:#0f172a;color:#f8fafc;border:1px solid rgba(56,189,248,0.28);box-shadow:0 16px 36px rgba(15,23,42,0.18);">
-        <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;">
-          <div>
-            <span style="font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:#38bdf8;">Цифровой двойник и интерактив направления · ${course[0]}</span>
-            <h3 style="margin:3px 0 0;font-size:1.15rem;color:#ffffff;">Интерактивный 3D-стенд и тренажёр по теме курса</h3>
-          </div>
-          <div style="display:flex;flex-wrap:wrap;gap:6px;" role="group" aria-label="Режим стенда курса">
-            <button type="button" id="acad-hub-tab-3d" class="button primary" style="min-height:34px;padding:0.3rem 0.85rem;font-size:0.8rem;">🧊 3D-модели профессии (5 узлов)</button>
-            <button type="button" id="acad-hub-tab-lab" class="button" style="min-height:34px;padding:0.3rem 0.85rem;font-size:0.8rem;background:rgba(255,255,255,0.08);color:#e2e8f0;border-color:rgba(255,255,255,0.18);">🔬 Интерактивный тренажёр курса</button>
-          </div>
-        </div>
-        <div id="acad-hub-3d-stage"></div>
-        <div id="acad-hub-lab-stage" hidden></div>
-      </div>
-    `;
-
-    const stage3d = containerEl.querySelector('#acad-hub-3d-stage');
-    const stageLab = containerEl.querySelector('#acad-hub-lab-stage');
-    const btn3d = containerEl.querySelector('#acad-hub-tab-3d');
-    const btnLab = containerEl.querySelector('#acad-hub-tab-lab');
-
-    if (window.WorkshopModels && stage3d) {
-      const def = window.WorkshopModels.forLesson({ course_slug: activeSpec, order_num: defaultLessonNum }) || window.WorkshopModels.forCourse(activeSpec, 0);
-      disposeActiveModel = window.WorkshopModels.show(stage3d, def, { courseSlug: activeSpec, allowModelSwitch: true });
-    }
-
-    if (window.LessonInteractives && stageLab) {
-      window.LessonInteractives.renderTopicLab(
-        stageLab,
-        { course_slug: activeSpec, order_num: defaultLessonNum, title: course[0] },
-        {},
-        () => {}
-      );
-    }
-
-    btn3d?.addEventListener('click', () => {
-      stage3d.hidden = false;
-      stageLab.hidden = true;
-      btn3d.className = 'button primary';
-      btnLab.className = 'button';
-    });
-    btnLab?.addEventListener('click', () => {
-      stage3d.hidden = true;
-      stageLab.hidden = false;
-      btnLab.className = 'button primary';
-      btn3d.className = 'button';
-    });
   }
 
   function catalog() {
@@ -209,109 +163,110 @@
   }
 
   function renderLesson() {
-    const [title, concept, example, question, correct, incorrect, explanation] = lesson;
+    const [title, concept, example] = lesson;
     const key = `${slug}:${requested}`;
-    const choices = requested % 2 ? [incorrect, correct] : [correct, incorrect];
-    const hasModel = true;
     const next = requested < data[slug].length ? href(slug, requested + 1) : href(slug);
-    const gameStoreKey = `eduspace_academy_game_${slug}_${requested}`;
-    let savedGameState = {};
-    try {
-      savedGameState = JSON.parse(localStorage.getItem(gameStoreKey) || '{}') || {};
-    } catch {}
-    const gameDone = Boolean(savedGameState && (savedGameState.game_completed || savedGameState.gameCompleted));
+    const catList = (window.EDU_LESSONS && window.EDU_LESSONS[slug]) || [];
+    const catItem = catList.find(x => Number(x.num) === requested) || catList[requested - 1] || null;
+    const toolsText = (catItem && catItem.tools) || 'Профильные стандарты специальности';
+    const rawTheoryHtml = (catItem && catItem.theory) ? String(catItem.theory) : '';
+    const theoryPlain = rawTheoryHtml.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     const safety = ['autoelectric', 'automechanic', 'hvac'].includes(slug)
-      ? '<p class="muted">Учебный пример для разбора. Действия на оборудовании выполняют по инструкции производителя под руководством преподавателя.</p>'
+      ? '<p class="muted" style="margin-top:0.75rem;">⚠️ Техника безопасности: любые работы с реальным оборудованием выполняются по регламенту производителя под контролем мастера производственного обучения.</p>'
       : '';
-    document.title = `${title} · AMK SkillHub`;
+    let passed = completed.includes(key);
+    document.title = `${title} · Учебник AMK SkillHub`;
     root.innerHTML = `
       <div class="lesson-head"><div class="container stack">
-        <a href="${href(slug)}">← Все уроки курса</a>
-        <p class="eyebrow">${course[0]} / Урок ${String(requested).padStart(2, '0')} из ${data[slug].length}</p>
+        <a href="${href(slug)}">← Все главы учебника курса</a>
+        <p class="eyebrow">${course[0]} / Глава ${String(requested).padStart(2, '0')} из ${data[slug].length} · Теоретический справочник</p>
         <h1>${title}</h1>
-        <div class="lesson-progress-chips" aria-label="Этапы урока">
-          <span class="lesson-step-chip" id="chip-game-step" data-done="${gameDone ? 'true' : 'false'}">01 · Интерактивная игра-тема</span>
-          <span class="lesson-step-chip" data-done="true">02 · Объяснение и пример</span>
-          <span class="lesson-step-chip" data-done="true">03 · 3D-модель и тренажёр</span>
-          <span class="lesson-step-chip" id="chip-quiz-step" data-done="false">04 · Проверка знаний</span>
+        <div class="lesson-progress-chips" aria-label="Разделы главы">
+          <span class="lesson-step-chip" data-done="true">01 · Суть и теория</span>
+          <span class="lesson-step-chip" data-done="true">02 · Разбор на практике</span>
+          <span class="lesson-step-chip" id="chip-quiz-step" data-done="${passed ? 'true' : 'false'}">03 · Готовность к практикуму</span>
+          <button type="button" class="button" id="lesson-voice-btn" style="min-height:32px;padding:0.2rem 0.75rem;font-size:0.78rem;">🔊 Прослушать главу</button>
           <button type="button" class="button lesson-bookmark-btn" id="lesson-bookmark-btn" aria-pressed="${bookmarks.includes(key) ? 'true' : 'false'}" style="min-height:32px;padding:0.2rem 0.7rem;font-size:0.78rem;">${bookmarks.includes(key) ? '★ В закладках' : '☆ В закладки'}</button>
         </div>
       </div></div>
       <div class="container lesson-layout">
-        <nav class="catalog-menu lesson-nav" aria-label="Разделы урока">
-          <a href="#visual">0. Игра по теме</a><a href="#explanation">1. Объяснение</a><a href="#example">2. Пример</a><a href="#model">3. 3D-модель и тренажёр</a><a href="#exercise">4. Задание</a>
+        <nav class="catalog-menu lesson-nav" aria-label="Разделы главы">
+          <a href="#explanation">1. Теоретическая основа</a>
+          <a href="#example">2. Применение в работе</a>
+          <a href="#deep-dive">3. Технологические нюансы</a>
+          <a href="#practice-cta">4. Переход в практикум</a>
         </nav>
         <article>
-          <section id="visual" class="lesson-visual-card">
-            <div class="lesson-visual-head">
-              <span class="eyebrow">01 · Интерактивное освоение темы</span>
-              <span class="lesson-visual-meta">3 УНИКАЛЬНЫХ РАУНДА · СИТУАЦИЯ → МЕХАНИКА → ПРАВИЛО</span>
-            </div>
-            <div id="academy-topic-game-mount"></div>
-            <div class="actions">
-              <a class="button primary" href="lesson_player.html?catalog=1&amp;specialty=${slug}&amp;task=${requested}">Открыть полный 8-этапный урок →</a>
-            </div>
+          <section id="explanation" class="card">
+            <p class="eyebrow">01 / Теоретическая основа</p>
+            <h2>Как это устроено</h2>
+            <p data-concept style="font-size:1.02rem;line-height:1.7;"></p>
+            <p class="muted" style="margin-top:0.75rem;font-size:0.86rem;">Ключевые инструменты направления: <strong>${toolsText}</strong></p>
           </section>
-          <section id="explanation" class="card"><p class="eyebrow">01 / Разберитесь</p><h2>Главная идея</h2><p data-concept></p></section>
-          <section id="example" class="card example"><p class="eyebrow">02 / Посмотрите решение</p><h2>Разбор примера</h2><p data-example></p>${safety}</section>
-          ${hasModel ? `<section id="model" class="card">
-            <p class="eyebrow">03 / Интерактивный 3D-стенд и симулятор профессии</p>
-            <h2>3D-модель узла и практический тренажёр по теме</h2>
-            <p class="muted">Вращайте 3D-модель, включайте взрыв-схему, меняйте рабочие параметры на слайдере телеметрии и отработайте навык в тренажёре.</p>
-            <div id="academy-lesson-3d-hub"></div>
-            <div class="actions" style="margin-top:0.75rem;">
-              <a class="button" href="lesson_player.html?catalog=1&amp;specialty=${slug}&amp;task=${requested}&amp;view=model">Открыть на весь экран в 8-этапном плеере →</a>
+
+          <section id="example" class="card example">
+            <p class="eyebrow">02 / Применение в реальной работе</p>
+            <h2>Инженерный контекст и разбор ситуации</h2>
+            <p data-example style="line-height:1.7;"></p>
+            ${safety}
+          </section>
+
+          <section id="deep-dive" class="card">
+            <p class="eyebrow">03 / Углублённая теория</p>
+            <h2>На что обращает внимание специалист</h2>
+            <div style="line-height:1.7;" data-deep-theory></div>
+            <p class="muted" style="margin-top:0.9rem;font-size:0.84rem;">💡 В учебнике даётся фундаментальное понимание темы без готовых ответов на контрольные задания — проверьте свои знания самостоятельно в интерактивном практикуме!</p>
+          </section>
+
+          <section id="practice-cta" class="card">
+            <p class="eyebrow">04 / Закрепление и оценка ИИ</p>
+            <h2>Готовы применить знания на живом стенде?</h2>
+            <p class="muted">Откройте интерактивный урок с живым симулятором, напишите самостоятельное решение и получите оценку с подробным разбором от Gemini AI.</p>
+            <div class="actions" style="margin-top:0.85rem;display:flex;flex-wrap:wrap;gap:10px;">
+              <a class="button primary" href="lesson_player.html?catalog=1&amp;specialty=${slug}&amp;task=${requested}">Открыть интерактивный урок и практикум →</a>
+              <button type="button" class="button" id="mark-chapter-read-btn">${passed ? '✓ Глава изучена' : 'Отметить главу изученной'}</button>
+              <a class="button" href="${next}">${requested < data[slug].length ? 'Следующая глава →' : 'К оглавлению курса'}</a>
             </div>
-          </section>` : ''}
-          <section id="exercise" class="card"><p class="eyebrow">04 / Примените знания</p><h2>Проверьте себя</h2><p data-question></p>
-            <div class="stack" data-choices></div>
-            <p class="answer-result" role="status" hidden></p>
-            <p data-sync class="muted" role="status"></p>
-            <div class="actions" data-next hidden><a class="button dark" href="${next}">${requested < data[slug].length ? 'Следующий урок →' : 'Вернуться к программе'}</a></div>
+            <p data-sync class="muted" role="status" style="margin-top:0.5rem;"></p>
           </section>
           ${course[2] ? `<p class="muted"><a href="${course[2]}">Справочный материал по направлению</a></p>` : ''}
         </article>
       </div>`;
-    mountCourseInteractiveHub(document.getElementById('academy-lesson-3d-hub'), slug, requested);
-    const gameChip = root.querySelector('#chip-game-step');
-    if (window.TopicGameEngine && document.getElementById('academy-topic-game-mount')) {
-      window.TopicGameEngine.mount({
-        containerId: 'academy-topic-game-mount',
-        spec: slug,
-        taskNum: requested,
-        title: title,
-        summary: concept,
-        chunks: [
-          { heading: 'Главная идея', text: concept, callout: { text: explanation } },
-          { heading: 'Разбор примера', text: example, callout: { text: correct } }
-        ],
-        savedState: savedGameState,
-        alreadyCompleted: gameDone,
-        onComplete: (res) => {
-          try {
-            localStorage.setItem(gameStoreKey, JSON.stringify(res || { game_completed: true }));
-          } catch {}
-          if (gameChip) gameChip.dataset.done = 'true';
-          if (window.PrismFX) {
-            window.PrismFX.play('good');
-            const mountEl = document.getElementById('academy-topic-game-mount');
-            if (mountEl) {
-              const r = mountEl.getBoundingClientRect();
-              window.PrismFX.burst(r.left + r.width * 0.5, r.top + 80, 24, true);
-              window.PrismFX.spawnFloat(r.left + r.width * 0.5, r.top + 60, '+25 XP ✓', true);
-            }
-          }
-        }
-      });
-    }
+
     root.querySelector('[data-concept]').textContent = concept;
     root.querySelector('[data-example]').textContent = example;
-    root.querySelector('[data-question]').textContent = question;
-    const options = root.querySelector('[data-choices]');
-    const result = root.querySelector('.answer-result');
-    const nextAction = root.querySelector('[data-next]');
-    let passed = completed.includes(key);
-    const quizChip = root.querySelector('#chip-quiz-step');
+    const deepEl = root.querySelector('[data-deep-theory]');
+    if (deepEl) {
+      if (rawTheoryHtml) {
+        deepEl.innerHTML = rawTheoryHtml;
+      } else {
+        deepEl.textContent = 'Понимание базовых физических и программных закономерностей позволяет находить причины ошибок системно, не прибегая к методу проб и ошибок.';
+      }
+    }
+
+    let speaking = false;
+    const voiceBtn = root.querySelector('#lesson-voice-btn');
+    if (voiceBtn) {
+      voiceBtn.addEventListener('click', () => {
+        if (!window.speechSynthesis) return;
+        if (speaking) {
+          window.speechSynthesis.cancel();
+          speaking = false;
+          voiceBtn.textContent = '🔊 Прослушать главу';
+          return;
+        }
+        window.speechSynthesis.cancel();
+        const textToRead = `${title}. ${concept} ${example} ${theoryPlain.slice(0, 500)}`;
+        const utt = new SpeechSynthesisUtterance(textToRead);
+        utt.lang = 'ru-RU';
+        utt.rate = 1.02;
+        utt.onend = () => { speaking = false; voiceBtn.textContent = '🔊 Прослушать главу'; };
+        speaking = true;
+        voiceBtn.textContent = '⏹ Остановить озвучку';
+        window.speechSynthesis.speak(utt);
+      });
+    }
+
     const markBtn = root.querySelector('#lesson-bookmark-btn');
     if (markBtn) {
       markBtn.addEventListener('click', () => {
@@ -322,49 +277,26 @@
         markBtn.setAttribute('aria-pressed', String(on));
         markBtn.textContent = on ? '★ В закладках' : '☆ В закладки';
         try { localStorage.setItem(markKey, JSON.stringify(bookmarks)); } catch {}
-        if (on && window.PrismFX) window.PrismFX.play('good');
       });
     }
-    if (passed) {
-      nextAction.hidden = false;
-      if (quizChip) quizChip.dataset.done = 'true';
-    }
 
-    for (const [idx, choice] of choices.entries()) {
-      const button = document.createElement('button');
-      button.className = 'button answer reveal-item';
-      button.style.setProperty('--reveal-delay', `${idx * 60}ms`);
-      button.type = 'button';
-      button.textContent = choice;
-      button.setAttribute('aria-pressed', 'false');
-      button.addEventListener('click', () => {
-        for (const option of options.children) option.setAttribute('aria-pressed', String(option === button));
-        const right = choice === correct;
-        result.hidden = false;
-        result.dataset.correct = String(right);
-        result.textContent = right ? `Верно. ${explanation}` : 'Попробуйте ещё раз. Сравните варианты с разобранным примером выше.';
-        if (right) {
+    const readBtn = root.querySelector('#mark-chapter-read-btn');
+    const quizChip = root.querySelector('#chip-quiz-step');
+    if (readBtn) {
+      readBtn.addEventListener('click', () => {
+        if (!passed) {
+          passed = true;
+          completed.push(key);
+          try {
+            localStorage.setItem(storeKey, JSON.stringify(completed));
+          } catch {}
           if (quizChip) quizChip.dataset.done = 'true';
-          if (window.PrismFX) {
-            const rect = button.getBoundingClientRect();
-            const cx = rect.left + rect.width * 0.5;
-            const cy = rect.top + rect.height * 0.5;
-            window.PrismFX.burst(cx, cy, 24, true);
-            window.PrismFX.spawnFloat(cx, rect.top - 8, '+25 XP ✓', true);
-          }
-          if (!passed) {
-            passed = true;
-            completed.push(key);
-            try {
-              localStorage.setItem(storeKey, JSON.stringify(completed));
-              root.querySelector('[data-sync]').textContent = 'Прогресс сохранён в этом браузере.';
-            } catch {}
-            nextAction.hidden = false;
-          }
+          readBtn.textContent = '✓ Глава изучена';
+          const syncEl = root.querySelector('[data-sync]');
+          if (syncEl) syncEl.textContent = 'Прогресс чтения учебника сохранён.';
           saveAccountProgress();
         }
       });
-      options.append(button);
     }
   }
 

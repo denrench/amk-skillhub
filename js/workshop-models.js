@@ -1197,5 +1197,13 @@ window.WorkshopModels = (() => {
     return models[key];
   }
 
-  return { forLesson, forCourse, show, models, resolveModelKey, COURSE_MODEL_KEYS };
+  function showDisabled(target) {
+    if (target) {
+      target.innerHTML = '';
+      target.style.display = 'none';
+    }
+    return () => {};
+  }
+
+  return { forLesson, forCourse, show: showDisabled, models, resolveModelKey, COURSE_MODEL_KEYS };
 })();

@@ -278,34 +278,55 @@ window.LessonInteractives = (() => {
           ? (fmt === 'svg' ? 2 : Math.round(qual * 1.9 + 40))
           : Math.round((ppi === 300 ? 18 : 1.8) * (fmt === 'png' ? 210 : fmt === 'jpg' ? qual * 1.4 : qual * 0.72));
         const ok = isSvg ? fmt === 'svg' : (ppi === 72 && fmt === 'webp' && kb <= 150);
+        const hasAlpha = fmt !== 'jpg';
+        const loadSec = Math.max(0.06, kb / 650).toFixed(2);
+        const speedPct = Math.max(10, Math.min(100, Math.round(100 - Math.min(90, (kb / 2600) * 100))));
+        const blurPx = (!isSvg && fmt === 'jpg' && qual < 60) ? ((60 - qual) * 0.08).toFixed(1) : '0';
+        const accent = ok ? '#34d399' : '#fb7185';
         ws.innerHTML = `
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;align-items:center;">
-            <div style="space-y:12px;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;align-items:stretch;">
+            <div style="display:flex;flex-direction:column;gap:14px;justify-content:center;">
               <div>
                 <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:6px;">Формат экспорта</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                   ${(isSvg ? [['png', 'Растр PNG'], ['svg', 'Вектор SVG']] : [['png', 'PNG-24'], ['jpg', 'JPG'], ['webp', 'WebP']]).map(([id, lbl]) => `
-                    <button type="button" data-fmt="${id}" style="padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;border:1px solid ${fmt === id ? '#818cf8' : 'rgba(255,255,255,0.14)'};background:${fmt === id ? '#4f46e5' : 'rgba(255,255,255,0.06)'};color:#fff;cursor:pointer;">${lbl}</button>
+                    <button type="button" data-fmt="${id}" style="padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;border:1px solid ${fmt === id ? '#38bdf8' : 'rgba(255,255,255,0.14)'};background:${fmt === id ? '#4f46e5' : 'rgba(255,255,255,0.06)'};color:#fff;cursor:pointer;">${lbl}</button>
                   `).join('')}
                 </div>
               </div>
               ${isSvg ? '' : `
               <div>
                 <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:6px;">Плотность пикселей (PPI)</div>
-                <div style="display:flex;gap:8px;">
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
                   <button type="button" data-ppi="300" style="padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;border:1px solid ${ppi === 300 ? '#f87171' : 'rgba(255,255,255,0.14)'};background:${ppi === 300 ? 'rgba(239,68,68,0.25)' : 'rgba(255,255,255,0.06)'};color:#fff;cursor:pointer;">300 ppi (Печать)</button>
                   <button type="button" data-ppi="72" style="padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;border:1px solid ${ppi === 72 ? '#34d399' : 'rgba(255,255,255,0.14)'};background:${ppi === 72 ? 'rgba(16,185,129,0.25)' : 'rgba(255,255,255,0.06)'};color:#fff;cursor:pointer;">72 ppi (Экран)</button>
                 </div>
               </div>
               <div>
                 <label style="font-size:11px;font-weight:700;color:#94a3b8;display:block;margin-bottom:4px;">Качество сжатия: <strong style="color:#38bdf8">${qual}%</strong></label>
-                <input id="lab-qual" type="range" min="40" max="100" value="${qual}" style="width:100%;accent-color:#6366f1;cursor:pointer;">
+                <input id="lab-qual" type="range" min="40" max="100" value="${qual}" style="width:100%;accent-color:#38bdf8;cursor:pointer;">
               </div>`}
             </div>
-            <div style="padding:20px;border-radius:18px;background:#0f172a;border:1px solid ${ok ? 'rgba(16,185,129,0.5)' : 'rgba(245,158,11,0.4)'};text-align:center;">
-              <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;font-weight:700;">Итоговый вес файла</div>
-              <div style="font-size:36px;font-weight:900;font-family:monospace;color:${ok ? '#34d399' : '#f87171'};margin:8px 0;">${kb >= 1024 ? (kb / 1024).toFixed(1) + ' MB' : kb + ' KB'}</div>
-              <div style="font-size:12px;color:#cbd5e1;">${ok ? '✓ Идеально для быстрой загрузки веба!' : isSvg ? 'При зуме 400% растр даёт лесенку пикселей' : 'Для веба нужен 72 ppi и формат WebP ≤ 150 КБ'}</div>
+            <div style="padding:16px;border-radius:18px;background:radial-gradient(circle at 50% 0%, rgba(56,189,248,0.12), #090e1a 75%);border:1px solid ${ok ? 'rgba(52,211,153,0.55)' : 'rgba(56,189,248,0.3)'};display:flex;flex-direction:column;gap:12px;justify-content:space-between;">
+              <div style="display:flex;align-items:center;justify-content:space-between;font-family:monospace;font-size:10px;color:#67e8f9;">
+                <span>LIVE PREVIEW · ${fmt.toUpperCase()}</span>
+                <span style="color:${accent};font-weight:800;">${kb >= 1024 ? (kb / 1024).toFixed(1) + ' MB' : kb + ' KB'}</span>
+              </div>
+              <div style="border-radius:12px;padding:14px;min-height:94px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.12);background-color:${hasAlpha ? '#0f172a' : '#f8fafc'};background-image:${hasAlpha ? 'linear-gradient(45deg,rgba(148,163,184,0.2) 25%,transparent 25%),linear-gradient(-45deg,rgba(148,163,184,0.2) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,rgba(148,163,184,0.2) 75%),linear-gradient(-45deg,transparent 75%,rgba(148,163,184,0.2) 75%)' : 'none'};background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;">
+                <div style="padding:12px 18px;border-radius:${hasAlpha ? '14px' : '4px'};background:linear-gradient(135deg,#4f46e5,#06b6d4);color:#fff;font-weight:900;font-size:13px;letter-spacing:0.04em;filter:blur(${blurPx}px);transform:scale(${isSvg && fmt === 'svg' ? '1.05' : '1'});transition:all 200ms ease;box-shadow:0 10px 24px -10px ${accent};text-align:center;">
+                  ${isSvg ? (fmt === 'svg' ? '✦ VECTOR SVG 400%' : '▦ RASTER PIXELS') : 'AMK WEB BANNER'}
+                  <div style="font-family:monospace;font-size:10px;font-weight:700;opacity:0.9;margin-top:2px;">${isSvg ? fmt.toUpperCase() : `${ppi} ppi · Q${qual}% · ${hasAlpha ? 'Alpha' : 'No Alpha'}`}</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:#cbd5e1;gap:8px;flex-wrap:wrap;">
+                  <span>Загрузка 4G: <strong style="color:${accent};font-family:monospace;">${loadSec} с</strong></span>
+                  <span style="color:${ok ? '#34d399' : '#fbbf24'};font-weight:700;">${ok ? '✓ Эталон для веба' : (isSvg ? 'Сравните чёткость SVG' : 'Цель: 72 ppi · WebP ≤ 150 КБ')}</span>
+                </div>
+                <div style="height:7px;border-radius:999px;background:rgba(255,255,255,0.1);overflow:hidden;">
+                  <div style="width:${speedPct}%;height:100%;background:${accent};transition:width 220ms ease;"></div>
+                </div>
+              </div>
             </div>
           </div>
         `;
