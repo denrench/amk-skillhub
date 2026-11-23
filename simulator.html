@@ -63,6 +63,7 @@
   <script src="js/workshop-models.js"></script>
   <script src="js/eduspace-3d-engine.js"></script>
   <script src="js/lesson-interactives.js"></script>
+  <script src="js/anti-cheat.js"></script>
   <link rel="stylesheet" href="css/workshop.css">
   <script src="js/prism-fx.js" defer></script>
   <script src="js/theme.js"></script>
@@ -467,7 +468,12 @@
                 <span class="ml-2 text-xs font-bold text-slate-300">Рабочая область решения</span>
                 <span id="editor-file-label" class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[11px] font-mono border border-indigo-500/30 font-bold">solution.js</span>
               </div>
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2.5">
+                <button type="button" data-amk-integrity-badge onclick="window.AMKAntiCheat && window.AMKAntiCheat.openProctorLogModal()" class="flex items-center gap-1 px-2.5 py-1 rounded-lg border font-mono font-bold text-[11px] cursor-pointer" style="color:#34d399;background:rgba(16,185,129,0.14);border-color:rgba(16,185,129,0.38);" title="AMK Контроль честности">
+                  <span data-amk-integrity-icon class="material-symbols-outlined text-[14px]">verified_user</span>
+                  <span>Честность:</span>
+                  <span data-amk-integrity-score>100%</span>
+                </button>
                 <button type="button" onclick="formatEditorCode()" class="px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[11px] font-bold border border-white/10 flex items-center gap-1 transition-colors">
                   <span class="material-symbols-outlined text-[13px]">code_blocks</span>
                   <span>Форматировать</span>
@@ -477,8 +483,12 @@
             </div>
 
             <div class="p-6 space-y-5">
+              <div class="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center gap-2 text-xs text-rose-200">
+                <span class="material-symbols-outlined text-rose-400 text-[17px] shrink-0">shield_lock</span>
+                <span><strong class="text-white">Защита от списывания активна:</strong> вставка (Ctrl+V) и перетаскивание текста отключены, уходы со вкладки фиксируются.</span>
+              </div>
               <div class="space-y-1.5">
-                <textarea id="solution-code" rows="13" spellcheck="false" oninput="onCodeEdited(); updateEditorCursorStats();" onclick="updateEditorCursorStats()" onkeyup="updateEditorCursorStats()" class="w-full font-mono text-xs sm:text-sm p-5 bg-[#080b12] text-emerald-400 rounded-2xl border border-white/15 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 leading-relaxed shadow-2xl" placeholder="Введите ваш код или подробное решение практического кейса..."></textarea>
+                <textarea id="solution-code" data-amk-no-paste="true" autocomplete="off" rows="13" spellcheck="false" oninput="onCodeEdited(); updateEditorCursorStats();" onclick="updateEditorCursorStats()" onkeyup="updateEditorCursorStats()" class="w-full font-mono text-xs sm:text-sm p-5 bg-[#080b12] text-emerald-400 rounded-2xl border border-white/15 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/30 leading-relaxed shadow-2xl" placeholder="Введите ваш код или подробное решение практического кейса самостоятельно (вставка отключена)..."></textarea>
                 <div class="flex items-center justify-between text-[11px] text-slate-500 px-1 font-mono">
                   <span id="editor-cursor-pos">Строка 1, Символ 1</span>
                   <span>Клавиша Tab вставляет 2 пробела • UTF-8</span>
@@ -641,6 +651,9 @@
 
       document.getElementById('sim-locked-container').classList.add('hidden');
       document.getElementById('sim-active-workspace').classList.remove('hidden');
+      if (window.AMKAntiCheat && typeof window.AMKAntiCheat.start === 'function') {
+        window.AMKAntiCheat.start(`sim-${activeSpecialty}-${activeTaskNumber}`);
+      }
 
       // Populate Header
       document.getElementById('sim-task-spec').textContent = course.title;

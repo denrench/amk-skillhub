@@ -209,16 +209,21 @@ def student_socratic_tutor(lesson_data, current_block, student_question, history
         "дай ответ", "скажи ответ", "какой ответ", "правильный ответ",
         "ответ на тест", "ответ на вопрос", "вариант а или б", "а, б, в или г",
         "номер правильного ответа", "какой вариант выбрать", "реши за меня",
-        "подскажи правильную букву", "скажи букву"
+        "подскажи правильную букву", "скажи букву", "напиши решение",
+        "готовое решение", "сделай за меня", "готовый код", "готовый чек-лист",
+        "полный ответ", "дай шаблон", "помоги списать", "напиши за меня",
+        "реши задачу полностью", "выполни задание"
     ]
     question_lower = student_question.lower()
+    is_exam_block = block_type in ("practical", "assessment", "inline_check")
     is_cheat_attempt = any(t in question_lower for t in cheat_triggers)
 
     system_prompt = (
-        "Ты — доброжелательный, чуткий и профессиональный Сократовский ИИ-тьютор образовательной платформы EduSpace. "
-        "Твоя задача — помогать студенту глубоко понимать учебный материал, объяснять сложные термины простыми аналогиями, "
-        "задавать наводящие вопросы и вдохновлять на самостоятельное решение. "
-        "ПРАВИЛО БЕЗОПАСНОСТИ: Если студент пытается узнать прямой ответ на проверочный вопрос, вежливо откажи и дай подсказку по принципу работы."
+        "Ты — доброжелательный, но принципиальный Сократовский ИИ-тьютор образовательной платформы AMK SkillHub. "
+        "Твоя задача — помогать студенту понимать учебный материал через объяснение принципов и наводящие вопросы. "
+        "СТРОГОЕ ПРАВИЛО АНТИСПИСЫВАНИЯ: Категорически ЗАПРЕЩЕНО выдавать готовые решения практических заданий, "
+        "готовый код для копирования, готовые чек-листы, точные ответы или буквы/номера вариантов тестов. "
+        "Если студент просит решить за него или дать готовый ответ — вежливо откажи и задай 1–2 коротких наводящих вопроса."
     )
 
     context_lines = []
@@ -241,7 +246,7 @@ def student_socratic_tutor(lesson_data, current_block, student_question, history
         f"Текущий блок: {block_title} ({block_type})\n"
         + ("Контекст 3D/симулятора:\n" + "\n".join(context_lines) + "\n" if context_lines else "")
         + ("История диалога:\n" + "\n".join(history_lines) + "\n" if history_lines else "")
-        + ("ВНИМАНИЕ: студент запросил готовый ответ на тест — не раскрывай ответ, дай только Сократовскую подсказку.\n" if is_cheat_attempt else "")
+        + ("ВНИМАНИЕ: студент находится на контрольном шаге практики/теста — НЕ пиши готовое решение или ответ, дай только принцип или наводящий вопрос.\n" if (is_cheat_attempt or is_exam_block) else "")
         + f"Вопрос студента: {student_question}\n"
         "Ответь структурированно, понятно и поддерживающе в стиле персонального наставника."
     )
@@ -354,6 +359,104 @@ def review_submission_ai(submission_data, task_data, user_api_key="", provider="
 
 
 
+def _analyze_lesson_integrity(integrity, solution_text, elapsed_seconds):
+    """
+    Server-side validation of anti-cheat proctoring telemetry.
+    Recomputes trust_score (0..100) and detects anomalies so clients cannot spoof clean scores.
+    """
+    raw = integrity if isinstance(integrity, dict) else {}
+    tab_switches = max(0, int(raw.get("tab_switches") or 0))
+    away_seconds = max(0, int(raw.get("away_seconds") or 0))
+    paste_attempts = max(0, int(raw.get("paste_attempts") or 0))
+    copy_attempts = max(0, int(raw.get("copy_attempts") or 0))
+    devtools_attempts = max(0, int(raw.get("devtools_attempts") or 0))
+    instant_injections = max(0, int(raw.get("instant_injections") or 0))
+    keystrokes = max(0, int(raw.get("keystrokes") or 0))
+    text_len = len((solution_text or "").strip())
+
+    score = 100
+    score -= paste_attempts * 15
+    score -= instant_injections * 20
+    score -= tab_switches * 12
+    score -= (away_seconds // 30) * 5
+    score -= copy_attempts * 6
+    score -= devtools_attempts * 10
+
+    flags = []
+    if paste_attempts > 0:
+        flags.append(f"попыток вставки из буфера: {paste_attempts}")
+    if instant_injections > 0:
+        flags.append(f"заблокированных автоподстановок: {instant_injections}")
+    if tab_switches > 0:
+        flags.append(f"уходов со вкладки: {tab_switches} (вне урока {away_seconds} сек)")
+    if copy_attempts > 0:
+        flags.append(f"попыток копирования задания: {copy_attempts}")
+    if devtools_attempts > 0:
+        flags.append(f"попыток открыть DevTools: {devtools_attempts}")
+
+    # Typing biometrics check (only if proctoring payload actually tracked keystrokes or sent explicit 0 with long text)
+    if "keystrokes" in raw and text_len >= 80 and keystrokes < int(text_len * 0.30):
+        score -= 22
+        flags.append(f"аномалия ввода ({keystrokes} нажатий на {text_len} симв.)")
+    if elapsed_seconds > 0 and elapsed_seconds < 12 and text_len >= 120:
+        score -= 15
+        flags.append(f"подозрительно быстрый ввод ({text_len} симв. за {elapsed_seconds} сек)")
+
+    trust_score = max(0, min(100, int(score)))
+    if trust_score >= 85:
+        status = "verified"
+        report = "Контроль самостоятельности пройден чисто (100% доверие, без переключений вкладок и вставки)." if not flags else (
+            f"Индекс честности {trust_score}% — незначительные замечания ({', '.join(flags)})."
+        )
+    elif trust_score >= 60:
+        status = "warning"
+        report = f"Индекс честности {trust_score}% — зафиксированы нарушения режима самостоятельности: {', '.join(flags)}."
+    else:
+        status = "flagged"
+        report = f"Индекс честности {trust_score}% — критический риск списывания: {', '.join(flags)}. Требуется самостоятельная пересдача."
+
+    return {
+        "trust_score": trust_score,
+        "status": status,
+        "report": report,
+        "flags": flags,
+        "tab_switches": tab_switches,
+        "away_seconds": away_seconds,
+        "paste_attempts": paste_attempts,
+        "copy_attempts": copy_attempts,
+        "devtools_attempts": devtools_attempts,
+        "instant_injections": instant_injections,
+        "keystrokes": keystrokes,
+    }
+
+
+def _apply_integrity_grade_cap(result_dict, integrity_info):
+    """Applies strict server-side grade ceiling when cheating violations are detected."""
+    trust = integrity_info["trust_score"]
+    result_dict["trust_score"] = trust
+    result_dict["integrity_status"] = integrity_info["status"]
+    result_dict["integrity_report"] = integrity_info["report"]
+
+    if trust < 45:
+        result_dict["grade_5"] = min(int(result_dict.get("grade_5", 2)), 2)
+        result_dict["score_100"] = min(int(result_dict.get("score_100", 45)), 45)
+        result_dict["passed"] = False
+        result_dict["verdict_title"] = "Работа не зачтена: зафиксированы признаки списывания"
+        imps = list(result_dict.get("improvements") or [])
+        imps.insert(0, "Пройдите урок самостоятельно без переключения вкладок и попыток вставки текста")
+        result_dict["improvements"] = imps[:4]
+    elif trust < 70:
+        result_dict["grade_5"] = min(int(result_dict.get("grade_5", 3)), 3)
+        result_dict["score_100"] = min(int(result_dict.get("score_100", 68)), 68)
+        imps = list(result_dict.get("improvements") or [])
+        imps.insert(0, f"Оценка ограничена из-за нарушений режима самостоятельности (индекс честности {trust}%)")
+        result_dict["improvements"] = imps[:4]
+    elif trust < 85:
+        result_dict["grade_5"] = min(int(result_dict.get("grade_5", 4)), 4)
+        result_dict["score_100"] = min(int(result_dict.get("score_100", 84)), 84)
+    return result_dict
+
+
 def evaluate_student_lesson_submission(
     lesson_title,
     specialty="it",
@@ -363,16 +466,18 @@ def evaluate_student_lesson_submission(
     elapsed_seconds=0,
     interactive_score=0,
     interactive_done=False,
+    integrity=None,
     user_api_key="",
     provider=""
 ):
     """
-    Comprehensive AI Examiner (Gemini / OpenAI) for end-of-lesson grading.
+    Comprehensive AI Examiner & Anti-Cheat Proctor (Gemini / OpenAI) for end-of-lesson grading.
     Evaluates:
       1. Written student solution against lesson criteria (substance, accuracy, completeness)
       2. Time spent on lesson (honesty, pacing, anti-rush detection)
       3. Interactive lab performance
-    Returns structured dict with grade_5 (2..5), score_100 (0..100), time_analysis, feedback, etc.
+      4. Anti-cheat proctoring telemetry (tab switches, away time, paste/copy/DevTools attempts, keystrokes)
+    Returns structured dict with grade_5 (2..5), score_100 (0..100), trust_score (0..100), integrity_report, feedback, etc.
     """
     criteria = criteria or []
     clean_solution = (solution_text or "").strip()
@@ -380,10 +485,11 @@ def evaluate_student_lesson_submission(
     mins = elapsed // 60
     secs = elapsed % 60
     time_label = f"{mins} мин {secs} сек" if mins > 0 else f"{secs} сек"
+    integrity_info = _analyze_lesson_integrity(integrity, clean_solution, elapsed)
 
     # Quick empty/too-short check
     if len(clean_solution) < 12:
-        return {
+        return _apply_integrity_grade_cap({
             "grade_5": 2,
             "score_100": 25,
             "passed": False,
@@ -394,18 +500,20 @@ def evaluate_student_lesson_submission(
             "improvements": ["Раскройте каждый пункт технического задания своими словами", "Укажите конкретные параметры, единицы измерения или код"],
             "provider": "AMK AI Guard",
             "elapsed_seconds": elapsed,
-        }
+        }, integrity_info)
 
     gemini_key, openai_key = resolve_llm_keys(user_api_key=user_api_key, provider=provider)
     criteria_text = "\n".join([f"- {c}" for c in criteria]) if criteria else "- Техническая точность и полнота ответа"
 
     system_prompt = (
-        "Ты строгий, но справедливый ИИ-экзаменатор технического колледжа AMK SkillHub. "
-        "Твоя задача — оценить самостоятельную работу студента в конце урока по трём факторам: "
+        "Ты строгий, но справедливый ИИ-экзаменатор и проктор технического колледжа AMK SkillHub. "
+        "Твоя задача — оценить самостоятельную работу студента в конце урока по четырём факторам: "
         "1) точность и полнота написанного решения по критериям ТЗ; "
-        "2) время выполнения (если меньше 20 секунд при длинном тексте — предупреди о возможном копипасте и снизь балл; "
+        "2) время выполнения (если меньше 20 секунд при длинном тексте — предупреди о возможном списывании и снизь балл; "
         "если от 1 до 20 минут — похвали за вдумчивый темп); "
-        "3) результаты интерактивной лаборатории. "
+        "3) результаты интерактивной лаборатории; "
+        "4) данные прокторинга антисписывания (уходы со вкладки, попытки вставки текста, копирования задания, DevTools и индекс честности). "
+        "Если индекс честности < 70% или были попытки вставки/частые уходы со вкладки, обязательно укажи это в feedback и снизь оценку. "
         "Верни ТОЛЬКО валидный JSON без markdown-обёрток со следующими ключами: "
         '{"grade_5": 5, "score_100": 92, "passed": true, "verdict_title": "...", '
         '"time_analysis": "...", "feedback": "...", "strengths": ["..."], "improvements": ["..."]}. '
@@ -418,6 +526,11 @@ def evaluate_student_lesson_submission(
         f"Критерии выполнения:\n{criteria_text}\n"
         f"Интерактивный тренажёр: {'пройден' if interactive_done else 'не завершён'} (очки: {interactive_score})\n"
         f"Затраченное время на урок: {time_label} ({elapsed} сек)\n"
+        f"Отчёт антисписывания (прокторинг): {integrity_info['report']} "
+        f"(trust_score={integrity_info['trust_score']}%, уходов={integrity_info['tab_switches']}, "
+        f"вне урока={integrity_info['away_seconds']}с, вставка={integrity_info['paste_attempts']}, "
+        f"копирование={integrity_info['copy_attempts']}, DevTools={integrity_info['devtools_attempts']}, "
+        f"нажатий клавиш={integrity_info['keystrokes']})\n"
         f"Решение студента:\n{clean_solution[:2500]}"
     )
 
@@ -440,7 +553,7 @@ def evaluate_student_lesson_submission(
             g5 = max(2, min(5, g5))
             s100 = int(parsed.get("score_100", g5 * 20 - 5))
             s100 = max(0, min(100, s100))
-            return {
+            return _apply_integrity_grade_cap({
                 "grade_5": g5,
                 "score_100": s100,
                 "passed": bool(parsed.get("passed", g5 >= 3)),
@@ -451,7 +564,7 @@ def evaluate_student_lesson_submission(
                 "improvements": list(parsed.get("improvements") or [])[:4],
                 "provider": used_provider,
                 "elapsed_seconds": elapsed,
-            }
+            }, integrity_info)
         except Exception:
             pass
 
@@ -467,22 +580,22 @@ def evaluate_student_lesson_submission(
     score = int(45 + ratio * 38 + (12 if interactive_done else 0) + (5 if words >= 18 else 0))
     if elapsed < 15 and words > 25:
         score = max(55, score - 15)
-        t_note = f"Время: {time_label} — слишком быстро для объёмного текста, зафиксировано подозрение на копипаст."
+        t_note = f"Время: {time_label} — слишком быстро для объёмного текста, зафиксировано подозрение на списывание."
     elif elapsed < 30:
         t_note = f"Время: {time_label} — очень быстрый темп, убедитесь, что внимательно проверили все детали."
     else:
         t_note = f"Время: {time_label} — спокойный, вдумчивый темп выполнения задания."
     score = max(30, min(98, score))
     g5 = 5 if score >= 88 else (4 if score >= 74 else (3 if score >= 58 else 2))
-    return {
+    return _apply_integrity_grade_cap({
         "grade_5": g5,
         "score_100": score,
         "passed": g5 >= 3,
         "verdict_title": "Отличное выполнение!" if g5 == 5 else ("Хороший результат" if g5 == 4 else ("Удовлетворительно" if g5 == 3 else "Нужна доработка")),
         "time_analysis": t_note,
         "feedback": (
-            f"Проверено соответствие критериям ({matched} из {max(1, len(criteria))}), объём ответа ({words} слов) "
-            f"и статус интерактивной лаборатории. "
+            f"Проверено соответствие критериям ({matched} из {max(1, len(criteria))}), объём ответа ({words} слов), "
+            f"самостоятельность ({integrity_info['trust_score']}%) и статус интерактивной лаборатории. "
             + ("Решение грамотное и структурированное." if g5 >= 4 else "Добавьте больше технических деталей и конкретных значений по ТЗ.")
         ),
         "strengths": [
@@ -492,4 +605,4 @@ def evaluate_student_lesson_submission(
         "improvements": [] if g5 == 5 else ["Проверьте все критерии ТЗ и раскройте пропущенные параметры"],
         "provider": "AMK AI Rubric",
         "elapsed_seconds": elapsed,
-    }
+    }, integrity_info)

@@ -33,6 +33,7 @@
   <script src="js/starter-lesson.js"></script>
   <script src="js/workshop-models.js"></script>
   <script src="js/lesson-interactives.js"></script>
+  <script src="js/anti-cheat.js"></script>
   <link rel="stylesheet" href="css/workshop.css">
   <script src="js/prism-fx.js" defer></script>
   <script src="js/theme.js"></script>
@@ -65,6 +66,13 @@
         <span class="material-symbols-outlined text-cyan-400 text-[15px]">timer</span>
         <span id="lp-timer-badge">00:00</span>
       </div>
+
+      <!-- Anti-Cheat Integrity HUD Badge -->
+      <button type="button" id="lp-integrity-badge" data-amk-integrity-badge onclick="window.AMKAntiCheat && window.AMKAntiCheat.openProctorLogModal()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl border font-mono font-bold text-xs transition-all cursor-pointer" style="color:#34d399;background:rgba(16,185,129,0.14);border-color:rgba(16,185,129,0.38);" title="AMK Контроль честности: нажмите для отчёта">
+        <span data-amk-integrity-icon class="material-symbols-outlined text-[15px]">verified_user</span>
+        <span class="hidden lg:inline text-[11px]">Честность:</span>
+        <span data-amk-integrity-score>100%</span>
+      </button>
 
       <!-- Progress Pill -->
       <div class="flex items-center gap-2 bg-dark-950/60 px-2 sm:px-3.5 py-1.5 rounded-2xl border border-white/10">
@@ -819,6 +827,9 @@
       const modelIndex = currentLesson.local_catalog && params.get('view') === 'model'
         ? blocks.findIndex(block => block.id === 'b4_interactive') : -1;
       currentBlockIdx = modelIndex >= 0 ? modelIndex : practiceIdx < 0 ? resumeIdx : Math.min(resumeIdx, practiceIdx);
+      if (window.AMKAntiCheat && typeof window.AMKAntiCheat.start === 'function') {
+        window.AMKAntiCheat.start(`${currentLesson.course_slug || 'it'}-${currentLesson.order_num || currentLesson.id || 1}`);
+      }
       renderCurrentBlock();
     }
 
@@ -1757,14 +1768,18 @@
               <ul id="lp-practical-guidelines-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">${guidelines}</ul>
             </div>
 
+            <div class="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-2.5 text-xs text-rose-200">
+              <span class="material-symbols-outlined text-rose-400 text-[18px] shrink-0 mt-0.5">shield_lock</span>
+              <div>
+                <strong class="text-white">Режим защиты от списывания активен:</strong>
+                вставка текста из буфера (<code class="px-1 rounded bg-white/10">Ctrl+V</code>), перетаскивание и копирование условия заблокированы. Переключения вкладок, время отсутствия и ручной набор клавиш передаются ИИ-экзаменатору.
+              </div>
+            </div>
+
             <div>
               <div class="flex items-center justify-between mb-2">
-                <label for="practical-code-input" class="block text-xs font-bold text-slate-300">Поле самостоятельного решения (без шаблонов и подсказок)</label>
+                <label for="practical-code-input" class="block text-xs font-bold text-slate-300">Поле самостоятельного решения (только ручной ввод, без шаблонов и вставки)</label>
                 <div class="flex items-center gap-1.5">
-                  <button type="button" onclick="copyPracticalCode()" class="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-semibold border border-white/10 transition-colors flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[13px]">content_copy</span>
-                    <span>Копировать</span>
-                  </button>
                   <button type="button" onclick="resetPracticalCode()" class="px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-[11px] font-semibold border border-white/10 transition-colors flex items-center gap-1">
                     <span class="material-symbols-outlined text-[13px]">delete_sweep</span>
                     <span>Очистить</span>
@@ -1779,9 +1794,9 @@
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500/80"></span>
                     <span class="text-[11px] font-mono text-slate-400 ml-2">solution.src</span>
                   </div>
-                  <span class="text-[10px] font-mono uppercase text-cyan-400 font-bold">Самостоятельный ввод</span>
+                  <span class="text-[10px] font-mono uppercase text-rose-300 font-bold flex items-center gap-1">🔒 Anti-Paste · Ручной ввод</span>
                 </div>
-                <textarea id="practical-code-input" rows="7" placeholder="Напишите ваше самостоятельное решение, расчёты, последовательность шагов или код с нуля..." class="w-full px-4 py-3 bg-dark-950 font-mono text-xs text-emerald-300 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/60 border-0 transition-all leading-relaxed">${escapeHtml(initialCode)}</textarea>
+                <textarea id="practical-code-input" data-amk-no-paste="true" autocomplete="off" spellcheck="false" rows="7" placeholder="Напишите ваше самостоятельное решение, расчёты, последовательность шагов или код с нуля (вставка отключена)..." class="w-full px-4 py-3 bg-dark-950 font-mono text-xs text-emerald-300 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/60 border-0 transition-all leading-relaxed">${escapeHtml(initialCode)}</textarea>
               </div>
             </div>
 
@@ -1965,6 +1980,9 @@
       const tone = g5 >= 5 ? '#34d399' : (g5 === 4 ? '#38bdf8' : (g5 === 3 ? '#fbbf24' : '#fb7185'));
       const strengths = (ev.strengths || []).map(x => `<li class="flex items-start gap-1.5 text-emerald-300"><span>✓</span><span>${escapeHtml(x)}</span></li>`).join('');
       const improvements = (ev.improvements || []).map(x => `<li class="flex items-start gap-1.5 text-amber-300"><span>→</span><span>${escapeHtml(x)}</span></li>`).join('');
+      const trustScore = (ev.trust_score !== undefined) ? Number(ev.trust_score) : (window.AMKAntiCheat ? window.AMKAntiCheat.computeTrustScore() : 100);
+      const trustColor = trustScore >= 85 ? '#34d399' : (trustScore >= 60 ? '#fbbf24' : '#fb7185');
+      const trustReport = ev.integrity_report || (trustScore >= 85 ? 'Контроль самостоятельности пройден чисто.' : 'Зафиксированы отклонения от режима самостоятельности.');
       return `
         <div class="p-5 rounded-2xl bg-dark-950/90 border space-y-4 shadow-xl" style="border-color:${tone};">
           <div class="flex flex-wrap items-center justify-between gap-3">
@@ -1980,9 +1998,15 @@
             </div>
             <span class="px-3 py-1 rounded-full text-xs font-extrabold font-mono" style="background:rgba(255,255,255,0.06);color:${tone};border:1px solid ${tone};">${ok ? 'ЗАЧТЕНО В ЗАЧЁТКУ' : 'НА ДОРАБОТКУ'}</span>
           </div>
-          <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-cyan-200 flex items-start gap-2">
-            <span class="material-symbols-outlined text-[18px] text-cyan-400 shrink-0">schedule</span>
-            <span>${escapeHtml(ev.time_analysis || '')}</span>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div class="p-3 rounded-xl bg-white/5 border border-white/10 text-xs text-cyan-200 flex items-start gap-2">
+              <span class="material-symbols-outlined text-[18px] text-cyan-400 shrink-0">schedule</span>
+              <span>${escapeHtml(ev.time_analysis || '')}</span>
+            </div>
+            <div class="p-3 rounded-xl bg-white/5 border text-xs flex items-start gap-2" style="border-color:${trustColor};color:${trustColor};">
+              <span class="material-symbols-outlined text-[18px] shrink-0">${trustScore >= 85 ? 'verified_user' : (trustScore >= 60 ? 'gpp_maybe' : 'gpp_bad')}</span>
+              <span><strong>Честность ${trustScore}%:</strong> <span class="text-slate-200">${escapeHtml(trustReport)}</span></span>
+            </div>
           </div>
           <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">${escapeHtml(ev.feedback || '')}</p>
           ${(strengths || improvements) ? `
@@ -2021,6 +2045,10 @@
       const interactiveDone = Boolean(gameState.game_completed || labState.lab_mode || labState.sequence_solved || labState.starterPassed);
       const interactiveScore = Number(gameState.score || 0);
 
+      const integrityReport = (window.AMKAntiCheat && typeof window.AMKAntiCheat.getReport === 'function')
+        ? window.AMKAntiCheat.getReport()
+        : null;
+
       let evaluation = null;
       try {
         const res = await fetch(`${lpApiBase()}/api/ai/evaluate-lesson`, {
@@ -2037,6 +2065,7 @@
             elapsed_seconds: lpElapsedSeconds,
             interactive_score: interactiveScore,
             interactive_done: interactiveDone,
+            integrity: integrityReport,
             user_id: userObj ? userObj.id : undefined
           })
         });
@@ -2046,15 +2075,25 @@
 
       if (!evaluation) {
         const words = val.trim().split(/\s+/).length;
-        const g5 = words >= 20 ? 5 : (words >= 10 ? 4 : 3);
-        const s100 = g5 === 5 ? 92 : (g5 === 4 ? 80 : 65);
+        const trust = integrityReport ? integrityReport.trust_score : 100;
+        let g5 = words >= 20 ? 5 : (words >= 10 ? 4 : 3);
+        let s100 = g5 === 5 ? 92 : (g5 === 4 ? 80 : 65);
+        if (trust < 45) { g5 = 2; s100 = Math.min(s100, 45); }
+        else if (trust < 70) { g5 = Math.min(g5, 3); s100 = Math.min(s100, 68); }
+        else if (trust < 85) { g5 = Math.min(g5, 4); s100 = Math.min(s100, 84); }
         const mins = Math.floor(lpElapsedSeconds / 60);
         const secs = lpElapsedSeconds % 60;
         evaluation = {
           grade_5: g5,
           score_100: s100,
           passed: g5 >= 3,
-          verdict_title: g5 >= 4 ? 'Хорошее самостоятельное решение' : 'Зачтено, можно дополнить',
+          trust_score: trust,
+          integrity_report: trust >= 85
+            ? 'Контроль самостоятельности пройден чисто.'
+            : `Индекс честности ${trust}% — зафиксированы нарушения режима самостоятельности.`,
+          verdict_title: trust < 45
+            ? 'Работа не зачтена: зафиксированы признаки списывания'
+            : (g5 >= 4 ? 'Хорошее самостоятельное решение' : 'Зачтено, можно дополнить'),
           time_analysis: `Затрачено времени: ${mins} мин ${secs} сек.`,
           feedback: 'Локальная проверка выполнена. Ответ принят и записан в зачётку практикума.',
           strengths: [`Написано самостоятельно (${words} слов)`],

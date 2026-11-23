@@ -1076,6 +1076,7 @@ def ai_evaluate_student_lesson():
     elapsed_seconds = int(data.get('elapsed_seconds') or 0)
     interactive_score = int(data.get('interactive_score') or 0)
     interactive_done = bool(data.get('interactive_done', False))
+    integrity = data.get('integrity') if isinstance(data.get('integrity'), dict) else None
     user_api_key = (data.get('user_api_key') or '').strip()
     provider = (data.get('provider') or '').strip().lower()
 
@@ -1088,6 +1089,7 @@ def ai_evaluate_student_lesson():
         elapsed_seconds=elapsed_seconds,
         interactive_score=interactive_score,
         interactive_done=interactive_done,
+        integrity=integrity,
         user_api_key=user_api_key,
         provider=provider,
     )
@@ -1117,7 +1119,8 @@ def ai_evaluate_student_lesson():
             if t_row:
                 task_id = t_row['id']
                 now_iso = datetime.now(timezone.utc).isoformat()
-                ai_comment = f"[AI {result['grade_5']}/5 · {result['provider']}] {result['time_analysis']} {result['feedback']}"
+                trust_tag = f"Честность {result.get('trust_score', 100)}%"
+                ai_comment = f"[AI {result['grade_5']}/5 · {trust_tag} · {result['provider']}] {result.get('integrity_report', '')} {result['time_analysis']} {result['feedback']}"
                 c.execute(
                     "SELECT id FROM task_submissions WHERE user_id = ? AND task_id = ? LIMIT 1",
                     (user['id'], task_id)
