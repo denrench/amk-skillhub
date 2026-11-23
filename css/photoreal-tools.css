@@ -1254,3 +1254,53 @@ header .max-w-7xl.h-20 {
 @keyframes amkShimmer {
   100% { transform: translateX(100%); }
 }
+
+
+/* ==================== LIGHT THEME HIGH-CONTRAST READABILITY GUARD ==================== */
+:root[data-theme="light"] body.workshop {
+  background-color: var(--bg) !important;
+  color: #0F172A !important;
+}
+:root[data-theme="light"] body.workshop header,
+:root[data-theme="light"] body.workshop .top-header,
+:root[data-theme="light"] body.workshop aside:not(.mobile-nav-drawer-dark) {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #0F172A !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) :is(.bg-dark-900, .bg-dark-850, .bg-dark-950, .bg-dark-900\/85, .bg-dark-900\/90, .bg-dark-850\/80, .bg-dark-950\/70, .bg-dark-950\/60):not(.code-workbench-container):not(#practical-code-input):not([class*="from-[#0"]):not([class*="from-indigo-950"]):not([class*="from-cyan-950"]) {
+  background-color: #FFFFFF !important;
+  border-color: rgba(37, 99, 235, 0.15) !important;
+  color: #0F172A !important;
+}
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) .text-white {
+  color: #0F172A !important;
+}
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) :is(.text-slate-100, .text-slate-200) {
+  color: #1E293B !important;
+}
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) :is(.text-slate-300, .text-slate-400) {
+  color: #475569 !important;
+}
+/* Keep white text inside intentionally dark surfaces, colored CTA buttons, and live lab stages */
+:root[data-theme="light"] body.workshop :is(.course-header-card, .tge-shell, .tge-live-pane, .code-workbench-container, #lp-video-overview-mount, #lp-theory-video-mount, [class*="from-indigo-950"], [class*="from-cyan-950"], [class*="from-[#0e172a]"], [class*="from-[#080d1c]"], #edu-modal-overlay, .bg-indigo-600, .bg-cyan-600, .bg-emerald-600, [class*="from-indigo-600"], [class*="from-indigo-500"], [class*="from-emerald-600"]) .text-white,
+:root[data-theme="light"] body.workshop :is(.bg-indigo-600, .bg-cyan-600, .bg-emerald-600, [class*="from-indigo-600"], [class*="from-indigo-500"], [class*="from-emerald-600"]).text-white {
+  color: #FFFFFF !important;
+}
+:root[data-theme="light"] body.workshop :is(.course-header-card, .tge-shell, .tge-live-pane, #lp-video-overview-mount, #lp-theory-video-mount, [class*="from-indigo-950"], [class*="from-cyan-950"], [class*="from-[#0e172a]"], [class*="from-[#080d1c]"], #edu-modal-overlay) :is(.text-slate-100, .text-slate-200, .text-slate-300) {
+  color: #E2E8F0 !important;
+}
+:root[data-theme="light"] body.workshop :is(.course-header-card, .tge-shell, .tge-live-pane, #lp-video-overview-mount, #lp-theory-video-mount, [class*="from-indigo-950"], [class*="from-cyan-950"], [class*="from-[#0e172a]"], [class*="from-[#080d1c]"], #edu-modal-overlay) .text-slate-400 {
+  color: #94A3B8 !important;
+}
+:root[data-theme="light"] #practical-code-input {
+  background-color: #0F172A !important;
+  color: #6EE7B7 !important;
+}
+:root[data-theme="light"] body.workshop input:not(#practical-code-input):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+:root[data-theme="light"] body.workshop select,
+:root[data-theme="light"] body.workshop textarea:not(#practical-code-input) {
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
+  border-color: rgba(15, 23, 42, 0.18) !important;
+}

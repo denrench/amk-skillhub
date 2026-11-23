@@ -494,12 +494,39 @@ window.LessonInteractives = (() => {
                 </label>
               `}
             </div>
-            <div style="padding:20px;border-radius:16px;background:#0f172a;border:2px ${bleedOn ? 'solid' : 'dashed'} ${ok ? '#34d399' : '#f59e0b'};position:relative;min-height:140px;display:flex;flex-direction:column;justify-content:center;">
-              <div style="font-size:15px;font-weight:800;color:${cmykMode ? '#2dd4bf' : (v === 'cmyk' ? '#00ffaa' : '#fff')};line-height:${lineHeight};text-align:${focusNode === 'third' ? 'left' : 'center'};">
-                ${v === 'typo' ? 'Типографика управляет вниманием читателя — дайте строкам воздух!' : 'Макет дизайна • АМК SkillHub'}
+            <div style="padding:18px;border-radius:16px;background:radial-gradient(circle at 50% 0%, rgba(192,132,252,0.14), #0c1220 75%);border:2px ${bleedOn ? 'solid' : 'dashed'} ${ok ? '#34d399' : '#f59e0b'};position:relative;min-height:156px;display:flex;flex-direction:column;justify-content:center;gap:8px;">
+              <div style="display:flex;justify-content:space-between;font-family:monospace;font-size:10px;color:#c084fc;font-weight:800;">
+                <span>LIVE DESIGN ARTBOARD</span>
+                <span style="color:${ok ? '#34d399' : '#fbbf24'};">${v === 'cmyk' ? (cmykMode ? 'CMYK SAFE' : 'RGB OUT-OF-GAMUT') : v === 'typo' ? `LH ${lineHeight.toFixed(1)}` : v === 'thirds' ? (focusNode === 'third' ? 'NODE 1/3 ✓' : 'CENTER') : (ok ? 'PREPRESS OK' : 'CHECK BLEED')}</span>
               </div>
-              <div style="font-size:11px;color:${ok ? '#34d399' : '#94a3b8'};margin-top:8px;text-align:${focusNode === 'third' ? 'left' : 'center'};">
-                ${ok ? '✓ Параметры соответствуют стандарту дизайн-студии' : 'Отрегулируйте макет до зелёного статуса слева'}
+              <svg viewBox="0 0 240 88" style="width:100%;height:84px;border-radius:10px;background:#090d16;border:1px solid rgba(255,255,255,0.12);">
+                ${v === 'thirds' ? `
+                  <line x1="80" y1="0" x2="80" y2="88" stroke="rgba(192,132,252,0.35)" stroke-dasharray="3 3"/>
+                  <line x1="160" y1="0" x2="160" y2="88" stroke="rgba(192,132,252,0.35)" stroke-dasharray="3 3"/>
+                  <line x1="0" y1="29" x2="240" y2="29" stroke="rgba(192,132,252,0.35)" stroke-dasharray="3 3"/>
+                  <line x1="0" y1="59" x2="240" y2="59" stroke="rgba(192,132,252,0.35)" stroke-dasharray="3 3"/>
+                  <circle cx="${focusNode === 'third' ? 80 : 120}" cy="${focusNode === 'third' ? 29 : 44}" r="14" fill="${focusNode === 'third' ? '#34d399' : '#fb7185'}" fill-opacity="0.3" stroke="${focusNode === 'third' ? '#34d399' : '#fb7185'}" stroke-width="2"/>
+                  <circle cx="${focusNode === 'third' ? 80 : 120}" cy="${focusNode === 'third' ? 29 : 44}" r="4" fill="#fff"/>
+                ` : v === 'cmyk' ? `
+                  <rect x="18" y="16" width="90" height="56" rx="10" fill="${cmykMode ? '#2dd4bf' : '#00ffaa'}" stroke="#fff" stroke-opacity="0.25"/>
+                  <text x="63" y="48" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="900">${cmykMode ? 'CMYK 300' : 'RGB NEON'}</text>
+                  <rect x="124" y="22" width="98" height="10" rx="5" fill="#06b6d4"/>
+                  <rect x="124" y="39" width="${cmykMode ? 76 : 98}" height="10" rx="5" fill="#ec4899"/>
+                  <rect x="124" y="56" width="${cmykMode ? 52 : 84}" height="10" rx="5" fill="#facc15"/>
+                ` : v === 'typo' ? `
+                  <text x="16" y="26" fill="#e2e8f0" font-size="11" font-weight="800">AMK DESIGN SYSTEM</text>
+                  <line x1="16" y1="${26 + Math.round(lineHeight * 12)}" x2="210" y2="${26 + Math.round(lineHeight * 12)}" stroke="#818cf8" stroke-width="4" stroke-linecap="round"/>
+                  <line x1="16" y1="${26 + Math.round(lineHeight * 24)}" x2="180" y2="${26 + Math.round(lineHeight * 24)}" stroke="#64748b" stroke-width="4" stroke-linecap="round"/>
+                  <line x1="16" y1="${26 + Math.round(lineHeight * 36)}" x2="145" y2="${26 + Math.round(lineHeight * 36)}" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+                ` : `
+                  <rect x="12" y="10" width="216" height="68" rx="4" fill="none" stroke="${bleedOn ? '#34d399' : '#f87171'}" stroke-width="1.5" stroke-dasharray="5 3"/>
+                  <rect x="24" y="18" width="192" height="52" rx="4" fill="rgba(99,102,241,0.16)" stroke="#38bdf8" stroke-width="1.5"/>
+                  <text x="120" y="42" text-anchor="middle" fill="#fff" font-size="11" font-weight="800">AMK PRINT LAYOUT</text>
+                  <text x="120" y="57" text-anchor="middle" fill="${ok ? '#34d399' : '#fbbf24'}" font-size="9">${bleedOn ? 'BLEED 3MM ✓' : 'NO BLEED'} · ${dpi300 ? '300 DPI ✓' : '72 DPI'}</text>
+                `}
+              </svg>
+              <div style="font-size:11px;color:${ok ? '#34d399' : '#94a3b8'};text-align:center;">
+                ${ok ? '✓ Параметры соответствуют стандарту дизайн-студии' : 'Отрегулируйте макет слева до зелёного статуса'}
               </div>
             </div>
           </div>
@@ -561,9 +588,19 @@ window.LessonInteractives = (() => {
               <button type="button" data-pt="BAD_NODE" style="padding:9px 12px;border-radius:10px;text-align:left;border:1px solid ${activePoint === 'BAD_NODE' ? '#fbbf24' : 'rgba(255,255,255,0.12)'};background:rgba(255,255,255,0.05);color:#fff;font-size:12px;font-weight:700;cursor:pointer;">2. Замерить проблемный узел / предохранитель</button>
               <button type="button" id="lab-fix-elec" style="padding:10px 12px;border-radius:10px;border:none;background:${fuseFixed ? '#059669' : '#d97706'};color:#fff;font-size:12px;font-weight:800;cursor:pointer;">${fuseFixed ? '✓ Контакт / Цепь восстановлены' : '🔧 Устранить неисправность в найденном узле'}</button>
             </div>
-            <div style="padding:20px;border-radius:16px;background:#0a1820;border:2px solid ${fuseFixed ? '#34d399' : '#f59e0b'};font-family:monospace;text-align:center;">
-              <div style="font-size:10px;color:#38bdf8;">FLUKE 87V DIGITAL MULTIMETER</div>
-              <div style="font-size:20px;font-weight:900;color:${fuseFixed ? '#34d399' : (activePoint === 'BAD_NODE' ? '#f87171' : '#38bdf8')};margin:12px 0;">${reading}</div>
+            <div style="padding:16px;border-radius:16px;background:radial-gradient(circle at 50% 0%, rgba(251,191,36,0.12), #0a1820 75%);border:2px solid ${fuseFixed ? '#34d399' : '#f59e0b'};font-family:monospace;text-align:center;">
+              <div style="font-size:10px;color:#38bdf8;font-weight:800;">FLUKE 87V · LIVE CIRCUIT PROBE</div>
+              <svg viewBox="0 0 240 66" style="width:100%;height:62px;margin:8px 0 4px;">
+                <rect x="14" y="16" width="54" height="34" rx="6" fill="#1e293b" stroke="${activePoint === 'BAT_POS' ? '#38bdf8' : '#64748b'}" stroke-width="2"/>
+                <text x="41" y="37" text-anchor="middle" fill="#fff" font-size="10" font-weight="800">АКБ 12V</text>
+                <line x1="68" y1="33" x2="112" y2="33" stroke="${fuseFixed ? '#34d399' : '#fbbf24'}" stroke-width="3"/>
+                <circle cx="122" cy="33" r="12" fill="${fuseFixed ? 'rgba(52,211,153,0.2)' : 'rgba(248,113,113,0.22)'}" stroke="${activePoint === 'BAD_NODE' ? '#fbbf24' : (fuseFixed ? '#34d399' : '#f87171')}" stroke-width="2.5"/>
+                <text x="122" y="37" text-anchor="middle" fill="#fff" font-size="9" font-weight="900">${fuseFixed ? 'OK' : 'ΔU'}</text>
+                <line x1="134" y1="33" x2="174" y2="33" stroke="${fuseFixed ? '#34d399' : '#f87171'}" stroke-width="3" stroke-dasharray="${fuseFixed ? 'none' : '5 3'}"/>
+                <rect x="174" y="16" width="52" height="34" rx="6" fill="#1e293b" stroke="${fuseFixed ? '#34d399' : '#64748b'}" stroke-width="2"/>
+                <text x="200" y="37" text-anchor="middle" fill="#cbd5e1" font-size="9" font-weight="800">НАГРУЗКА</text>
+              </svg>
+              <div style="font-size:17px;font-weight:900;color:${fuseFixed ? '#34d399' : (activePoint === 'BAD_NODE' ? '#f87171' : '#38bdf8')};margin:6px 0;">${reading}</div>
               <div style="font-size:11px;color:#94a3b8;">${fuseFixed ? 'Все параметры цепи в заводском допуске.' : 'Сначала найдите точку падения/утечки, затем устраните дефект.'}</div>
             </div>
           </div>
@@ -604,11 +641,32 @@ window.LessonInteractives = (() => {
                 </div>
               `}
             </div>
-            <div style="padding:20px;border-radius:16px;background:#0a1824;border:2px solid ${ok ? '#34d399' : '#f59e0b'};text-align:center;font-family:monospace;">
-              <div style="font-size:10px;color:#38bdf8;">${cfg.mode === 'hvac_diag' ? 'СЕРВИСНЫЙ КОНТРОЛЬ' : 'ПЕРЕГРЕВ (SUPERHEAT)'}</div>
-              <div style="font-size:32px;font-weight:900;color:${ok ? '#34d399' : (sh < 3 ? '#f87171' : '#fbbf24')};margin:8px 0;">
-                ${cfg.mode === 'hvac_diag' ? (fixedDiag ? 'НОРМА 100%' : 'ПРОВЕРКА...') : sh.toFixed(1) + ' K'}
-              </div>
+            <div style="padding:16px;border-radius:16px;background:radial-gradient(circle at 50% 0%, rgba(56,189,248,0.12), #08121d 75%);border:2px solid ${ok ? '#34d399' : '#f59e0b'};text-align:center;font-family:monospace;">
+              <div style="font-size:10px;color:#38bdf8;font-weight:800;">${cfg.mode === 'hvac_diag' ? 'LIVE HVAC SERVICE BENCH' : 'LIVE MANIFOLD & SUPERHEAT'}</div>
+              ${cfg.mode === 'hvac_diag' ? `
+                <svg viewBox="0 0 240 82" style="width:100%;height:78px;margin:8px 0;">
+                  <rect x="16" y="18" width="66" height="46" rx="8" fill="rgba(56,189,248,0.15)" stroke="${fixedDiag ? '#34d399' : '#38bdf8'}" stroke-width="2"/>
+                  <text x="49" y="45" text-anchor="middle" fill="#fff" font-size="10" font-weight="800">N₂ БАЛЛОН</text>
+                  <line x1="82" y1="41" x2="158" y2="41" stroke="${fixedDiag ? '#34d399' : '#fbbf24'}" stroke-width="5" stroke-dasharray="6 4"/>
+                  <circle cx="188" cy="41" r="24" fill="#0f172a" stroke="${fixedDiag ? '#34d399' : '#fbbf24'}" stroke-width="2.5"/>
+                  <text x="188" y="45" text-anchor="middle" fill="${fixedDiag ? '#34d399' : '#fbbf24'}" font-size="10" font-weight="900">${fixedDiag ? 'OK ✓' : 'WAIT'}</text>
+                </svg>
+              ` : `
+                <svg viewBox="0 0 240 90" style="width:100%;height:84px;margin:6px 0;">
+                  <g transform="translate(68,68)">
+                    <path d="M -42 0 A 42 42 0 0 1 42 0" fill="none" stroke="#1e293b" stroke-width="9" stroke-linecap="round"/>
+                    <path d="M -42 0 A 42 42 0 0 1 42 0" fill="none" stroke="${ok ? '#34d399' : '#38bdf8'}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${Math.round(((pressure - 1.0) / 2.2) * 132)} 140"/>
+                    <g transform="rotate(${-90 + ((pressure - 1.0) / 2.2) * 180})">
+                      <line x1="0" y1="0" x2="0" y2="-33" stroke="#f8fafc" stroke-width="2.5" stroke-linecap="round"/>
+                    </g>
+                    <circle r="5" fill="#38bdf8"/>
+                    <text y="16" text-anchor="middle" fill="#94a3b8" font-size="9">${pressure.toFixed(1)} bar</text>
+                  </g>
+                  <rect x="136" y="18" width="88" height="52" rx="10" fill="rgba(255,255,255,0.04)" stroke="${ok ? '#34d399' : (sh < 5 ? '#f87171' : '#fbbf24')}" stroke-width="1.8"/>
+                  <text x="180" y="36" text-anchor="middle" fill="#94a3b8" font-size="8">SUPERHEAT</text>
+                  <text x="180" y="57" text-anchor="middle" fill="${ok ? '#34d399' : (sh < 5 ? '#f87171' : '#fbbf24')}" font-size="18" font-weight="900">${sh.toFixed(1)} K</text>
+                </svg>
+              `}
               <div style="font-size:11px;color:#cbd5e1;">
                 ${cfg.mode === 'hvac_diag' ? (fixedDiag ? 'Шов чистый без окалины, обмотки C-S-R в норме.' : 'Нажмите кнопку запуска регламентной операции слева.') : (ok ? '✓ Зелёная зона (5–8 K): контур сбалансирован!' : sh < 5 ? '⚠️ Слишком низкий (<5 K): риск гидроудара!' : '⚠️ Высокий (>8 K): нехватка фреона. Цель: 5–8 K')}
               </div>
@@ -644,11 +702,33 @@ window.LessonInteractives = (() => {
                 <button type="button" id="lab-m3" ${stepDone < 2 ? 'disabled' : ''} style="padding:9px 12px;border-radius:10px;text-align:left;border:1px solid ${stepDone >= 3 ? '#34d399' : 'rgba(255,255,255,0.14)'};background:${stepDone >= 3 ? 'rgba(16,185,129,0.18)' : 'rgba(255,255,255,0.05)'};color:#fff;font-size:12px;font-weight:700;cursor:pointer;opacity:${stepDone < 2 ? 0.4 : 1};">3. Протянуть / зафиксировать в заказ-наряде</button>
               `}
             </div>
-            <div style="padding:20px;border-radius:16px;background:#141a24;border:2px solid ${ok ? '#34d399' : '#f97316'};text-align:center;font-family:monospace;">
-              <div style="font-size:10px;color:#fb923c;">ПОСТ ДИАГНОСТИКИ АМК</div>
-              <div style="font-size:28px;font-weight:900;color:${ok ? '#34d399' : '#fbbf24'};margin:10px 0;">
-                ${isAlign ? (ok ? `${val.toFixed(1)}° НОРМА` : `${val.toFixed(1)}° СБИТО`) : (ok ? 'ГОТОВО 3/3' : `ШАГ ${stepDone}/3`)}
-              </div>
+            <div style="padding:16px;border-radius:16px;background:radial-gradient(circle at 50% 0%, rgba(249,115,22,0.14), #0c121e 75%);border:2px solid ${ok ? '#34d399' : '#f97316'};text-align:center;font-family:monospace;">
+              <div style="font-size:10px;color:#fb923c;font-weight:800;">${isAlign ? 'LIVE 3D СТЕНД РАЗВАЛ-СХОЖДЕНИЯ' : 'LIVE ПОСТ ДИАГНОСТИКИ АМК'}</div>
+              ${isAlign ? `
+                <svg viewBox="0 0 240 94" style="width:100%;height:90px;margin:6px 0;">
+                  <line x1="120" y1="8" x2="120" y2="86" stroke="rgba(148,163,184,0.3)" stroke-dasharray="4 3"/>
+                  <line x1="56" y1="48" x2="184" y2="48" stroke="#64748b" stroke-width="5" stroke-linecap="round"/>
+                  <g transform="translate(56,48) rotate(${val * 9})">
+                    <rect x="-12" y="-28" width="24" height="56" rx="6" fill="#1e293b" stroke="${ok ? '#34d399' : '#fb923c'}" stroke-width="2.5"/>
+                    <line x1="0" y1="-34" x2="0" y2="34" stroke="${ok ? '#34d399' : '#f87171'}" stroke-width="1.5" stroke-dasharray="3 2"/>
+                  </g>
+                  <g transform="translate(184,48) rotate(${-val * 9})">
+                    <rect x="-12" y="-28" width="24" height="56" rx="6" fill="#1e293b" stroke="${ok ? '#34d399' : '#fb923c'}" stroke-width="2.5"/>
+                    <line x1="0" y1="-34" x2="0" y2="34" stroke="${ok ? '#34d399' : '#f87171'}" stroke-width="1.5" stroke-dasharray="3 2"/>
+                  </g>
+                  <text x="120" y="34" text-anchor="middle" fill="${ok ? '#34d399' : '#fbbf24'}" font-size="15" font-weight="900">${val.toFixed(1)}°</text>
+                </svg>
+              ` : `
+                <svg viewBox="0 0 240 86" style="width:100%;height:82px;margin:6px 0;">
+                  ${[1,2,3].map((st, idx) => {
+                    const active = stepDone >= st;
+                    const cx = 48 + idx * 72;
+                    return `<g><circle cx="${cx}" cy="40" r="22" fill="${active ? 'rgba(52,211,153,0.18)' : 'rgba(255,255,255,0.04)'}" stroke="${active ? '#34d399' : '#475569'}" stroke-width="2.5"/><text x="${cx}" y="45" text-anchor="middle" fill="${active ? '#34d399' : '#94a3b8'}" font-size="13" font-weight="900">${active ? '✓' : st}</text></g>`;
+                  }).join('')}
+                  <line x1="70" y1="40" x2="98" y2="40" stroke="${stepDone >= 2 ? '#34d399' : '#334155'}" stroke-width="3"/>
+                  <line x1="142" y1="40" x2="170" y2="40" stroke="${stepDone >= 3 ? '#34d399' : '#334155'}" stroke-width="3"/>
+                </svg>
+              `}
               <div style="font-size:11px;color:#cbd5e1;">${ok ? '✓ Все параметры соответствуют технологической карте.' : 'Выполните операции слева до зелёного статуса.'}</div>
             </div>
           </div>

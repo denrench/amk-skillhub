@@ -1343,7 +1343,7 @@
         sender_name: tr('modal.chat.curatorRole', `Куратор курса · ${course.curator}`, { curator: course.curator }),
         body: tr('modal.chat.welcomeMessage', `Здравствуйте! Добро пожаловать на курс «${locTitle}». Здесь вы можете задать вопрос по текущему уроку, разбору ошибок или дедлайнам.`, { course: locTitle })
       });
-      status.textContent = tr('modal.chat.guestStatus', 'Чат с куратором курса (Ознакомительный режим)');
+      status.textContent = tr('modal.chat.guestStatus', 'AI Тьютор AMK SkillHub (Онлайн)');
       form.hidden = false;
       form.addEventListener('submit', event => {
         event.preventDefault();
@@ -1963,7 +1963,7 @@
     const user = getActiveUser();
 
     if (!user) return;
-    openModal('🏆 Достижения и награды платформы — EduSpace Milestones', `
+    openModal('🏆 Достижения и награды — AMK SkillHub', `
       <div class="space-y-4">
         <div class="text-xs text-slate-400">Награды открываются автоматически за сдачу заданий, квизов и поддержание серии обучения</div>
         <div id="achievements-modal-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-h-[60vh] overflow-y-auto pr-1">
@@ -1979,8 +1979,8 @@
 
       const userAchs = (data.achievements || []).map(a => a.id || a);
       const catalog = [
-        { id: 'first_step', title: 'Первый шаг в EduSpace', desc: 'Сдано первое практическое задание курса', xp: 50, icon: 'school', color: '#06b6d4' },
-        { id: 'quiz_master', title: 'Эрудит EduSpace', desc: 'Сдан проверочный тест на 3/3 баллов', xp: 50, icon: 'psychology', color: '#818cf8' },
+        { id: 'first_step', title: 'Первый шаг в AMK SkillHub', desc: 'Сдано первое практическое задание курса', xp: 50, icon: 'school', color: '#06b6d4' },
+        { id: 'quiz_master', title: 'Эрудит AMK SkillHub', desc: 'Сдан проверочный тест на 3/3 баллов', xp: 50, icon: 'psychology', color: '#818cf8' },
         { id: 'high_five', title: 'Твёрдая пятёрка', desc: 'Успешно сдано 5 заданий специализации', xp: 150, icon: 'stars', color: '#10b981' },
         { id: 'perfect_score', title: 'Высший балл (100/100)', desc: 'Идеальная оценка от куратора курса', xp: 100, icon: 'military_tech', color: '#f59e0b' },
         { id: 'streak_master', title: 'Хранитель серии', desc: 'Серия непрерывного обучения 3+ дня', xp: 100, icon: 'local_fire_department', color: '#ef4444' },

@@ -184,7 +184,7 @@
               <span class="material-symbols-outlined text-[16px]">smart_toy</span>
             </div>
             <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-slate-300 max-w-[85%] leading-relaxed">
-              Здравствуйте! Я ваш интерактивный наставник EduSpace. Я учитываю текущий урок, задание и выбранную деталь 3D-мастерской. Что вас интересует?
+              Здравствуйте! Я ваш AI-наставник AMK SkillHub. Я учитываю текущий урок и практическое задание. Чем помочь?
             </div>
           </div>
         </div>
@@ -715,20 +715,28 @@
       return '';
     }
 
+    let _lpAuthChecked = false;
+    let _lpIsAuthenticated = false;
     async function lpEnsureCsrf() {
-      if (_lpCsrfToken) return _lpCsrfToken;
+      if (_lpAuthChecked && _lpCsrfToken) return _lpCsrfToken;
       const cookieTok = lpReadCookieCsrf();
-      if (cookieTok) { _lpCsrfToken = cookieTok; return _lpCsrfToken; }
-      try {
-        const res = await fetch(lpApiBase() + '/api/auth/session', { credentials: lpApiBase() ? 'include' : 'same-origin', signal: AbortSignal.timeout(4000) });
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.csrf_token) {
-            _lpCsrfToken = data.csrf_token;
-            try { sessionStorage.setItem('eduspace_csrf', data.csrf_token); } catch (_) {}
+      if (cookieTok) _lpCsrfToken = cookieTok;
+      if (!_lpAuthChecked) {
+        try {
+          const res = await fetch(lpApiBase() + '/api/auth/session', { credentials: lpApiBase() ? 'include' : 'same-origin', signal: AbortSignal.timeout(4000) });
+          if (res.ok) {
+            const data = await res.json();
+            _lpAuthChecked = true;
+            _lpIsAuthenticated = Boolean(data && data.authenticated);
+            if (data && data.csrf_token) {
+              _lpCsrfToken = data.csrf_token;
+              try { sessionStorage.setItem('eduspace_csrf', data.csrf_token); } catch (_) {}
+            }
           }
+        } catch (e) {
+          _lpAuthChecked = true;
         }
-      } catch (e) {}
+      }
       return _lpCsrfToken;
     }
 
@@ -2168,11 +2176,12 @@
       let awardedXp = xpVal;
       try {
         const csrf = await lpEnsureCsrf();
+        if (!_lpIsAuthenticated) return awardedXp;
         const headers = {};
         if (csrf) headers['X-CSRF-Token'] = csrf;
         const res = await fetch(`${lpApiBase()}/api/lessons/${currentLesson.id}/complete`, {
           method: 'POST',
-          credentials: 'same-origin',
+          credentials: lpApiBase() ? 'include' : 'same-origin',
           headers
         });
         const data = await res.json();
@@ -2249,11 +2258,12 @@
       if (currentLesson.local_catalog) return savedLocally ? 'local' : 'memory';
       try {
         const csrf = await lpEnsureCsrf();
+        if (!_lpIsAuthenticated) return savedLocally ? 'local' : 'memory';
         const headers = { 'Content-Type': 'application/json' };
         if (csrf) headers['X-CSRF-Token'] = csrf;
         const response = await fetch(`${lpApiBase()}/api/lessons/${currentLesson.id}/block_progress`, {
           method: 'POST',
-          credentials: 'same-origin',
+          credentials: lpApiBase() ? 'include' : 'same-origin',
           headers,
           signal: isStarterLesson ? AbortSignal.timeout(3000) : undefined,
           body: JSON.stringify({
