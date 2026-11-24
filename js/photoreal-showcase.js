@@ -1,79 +1,61 @@
 /**
- * AMK SkillHub · Photoreal 3D Spatial Showcase
- * - Режим по умолчанию «Фотореал 8K»: реальные 8K-сцены мастерских и студий АМК
- *   с 3D-перспективным наклоном (parallax), плавным зумом до 2.6×, панорамированием,
- *   динамическими пресетами студийного освещения и интерактивными инженерными точками (hotspots).
- * - Режимы «3D-скан 360°» и «Сетка»: реальные фотограмметрические PBR-сканы Poly Haven (CC0)
- *   на Three.js + HDRI-освещение (RGBELoader / PMREMGenerator) + контактные тени + OrbitControls.
+ * AMK SkillHub · True WebGL 3D Photoreal Showcase (Three.js r128)
+ * - Режим по умолчанию «Фотореал 3D»: реальные 8K-сцены мастерских и студий АМК,
+ *   реконструированные в настоящую 3D-геометрию рельефа (56 000+ треугольников)
+ *   по нейросетевым картам глубины Depth-Anything-V2 с перспективной развёрткой,
+ *   живым 3D-светом, частицами в объёме, 3D-камерой OrbitControls и 3D-точками узлов (hotspots).
+ * - Режимы «Глина 3D» и «Сетка 3D»: инспекция реальной 3D-геометрии рельефа.
+ * - Режим «Скан 360°»: реальные фотограмметрические PBR-сканы Poly Haven (CC0) на 360°.
  */
 window.PhotorealShowcase = (function () {
   'use strict';
 
-  const THEME_BG = {
-    light: { top: '#e2ecff', mid: '#f4f7ff', bottom: '#d8e3f5', exposure: 1.06, shadow: 0.45 },
-    graphite: { top: '#1e1b3a', mid: '#141928', bottom: '#090b12', exposure: 1.15, shadow: 0.65 },
-    neon: { top: '#1a1040', mid: '#0c1b3a', bottom: '#050814', exposure: 1.22, shadow: 0.72 },
-  };
-
-  const SCENE_ENVS = {
-    sport_wheel_garage: {
-      top: '#240f1f', mid: '#18142c', horizon: '#6b211a', bottom: '#090a12',
-      accent: 0xf97316, secondary: 0x38bdf8, fog: 0x120d1a,
-    },
-    gaming_room_rig: {
-      top: '#1e0b42', mid: '#0b1e48', horizon: '#3b1066', bottom: '#050816',
-      accent: 0x22d3ee, secondary: 0xec4899, fog: 0x0b0f26,
-    },
-    autoelectric_lab: {
-      top: '#062c3d', mid: '#072a28', horizon: '#1e3a2f', bottom: '#040a10',
-      accent: 0xfbbf24, secondary: 0x34d399, fog: 0x06191e,
-    },
-    hvac_rooftop: {
-      top: '#082f49', mid: '#0e3b5c', horizon: '#155e75', bottom: '#06101f',
-      accent: 0x38bdf8, secondary: 0xa5f3fc, fog: 0x081e33,
-    },
-    design_studio: {
-      top: '#3b0764', mid: '#1e1b4b', horizon: '#701a75', bottom: '#090514',
-      accent: 0xf472b6, secondary: 0x818cf8, fog: 0x18092b,
-    },
-  };
-
   const BG_PRESETS = {
     atmosphere: {
       label: 'Реал HDR',
-      photoFilter: 'contrast(1.03) saturate(1.05)',
-      sheenColor: 'rgba(255, 255, 255, 0.14)',
-      tintBg: 'none',
+      bgHex: 0x070b14,
+      hemiSky: 0xffffff, hemiGround: 0xdbeafe, hemiInt: 0.78,
+      keyColor: 0xffffff, keyInt: 0.36,
+      rimColor: 0x7dd3fc, rimInt: 0.26,
+      cursorColor: 0x38bdf8, cursorInt: 0.32,
+      emissiveInt: 0.22,
+      exposure: 1.0,
+      particleColor: 0x7dd3fc,
     },
     sunset: {
       label: 'Закат',
-      top: '#1c0c2e', mid: '#581c4f', horizon: '#ea580c', bottom: '#12081a',
-      accent: 0xfb923c, secondary: 0xc084fc, fog: 0x1d0e24,
-      photoFilter: 'sepia(0.18) saturate(1.24) contrast(1.06) brightness(0.97)',
-      sheenColor: 'rgba(251, 146, 60, 0.22)',
-      tintBg: 'radial-gradient(ellipse at 78% 18%, rgba(251,146,60,0.26), rgba(168,85,247,0.12) 55%, rgba(12,7,20,0.28) 100%)',
+      bgHex: 0x160a1c,
+      hemiSky: 0xffedd5, hemiGround: 0x6b21a8, hemiInt: 0.72,
+      keyColor: 0xfb923c, keyInt: 0.72,
+      rimColor: 0xc084fc, rimInt: 0.58,
+      cursorColor: 0xf97316, cursorInt: 0.55,
+      emissiveInt: 0.14,
+      exposure: 1.02,
+      particleColor: 0xfdba74,
     },
     cyber: {
       label: 'Кибер-свет',
-      top: '#040614', mid: '#09112e', horizon: '#1d4ed8', bottom: '#02040c',
-      accent: 0x22d3ee, secondary: 0xa855f7, fog: 0x05091c,
-      photoFilter: 'contrast(1.12) saturate(1.16) hue-rotate(-8deg) brightness(0.93)',
-      sheenColor: 'rgba(56, 189, 248, 0.24)',
-      tintBg: 'linear-gradient(135deg, rgba(14,165,233,0.18) 0%, rgba(15,23,42,0.06) 45%, rgba(168,85,247,0.22) 100%)',
+      bgHex: 0x040714,
+      hemiSky: 0xbae6fd, hemiGround: 0x312e81, hemiInt: 0.66,
+      keyColor: 0x38bdf8, keyInt: 0.65,
+      rimColor: 0xe879f9, rimInt: 0.68,
+      cursorColor: 0x22d3ee, cursorInt: 0.62,
+      emissiveInt: 0.13,
+      exposure: 1.0,
+      particleColor: 0x22d3ee,
     },
     studio: {
       label: 'Дневной',
-      top: '#dbeafe', mid: '#eff6ff', horizon: '#f8fafc', bottom: '#cbd5e1',
-      accent: 0x2563eb, secondary: 0x06b6d4, fog: 0xe2e8f0, lightBg: true,
-      photoFilter: 'brightness(1.1) contrast(1.02) saturate(1.03)',
-      sheenColor: 'rgba(255, 255, 255, 0.22)',
-      tintBg: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.18), transparent 65%)',
+      bgHex: 0x1e293b,
+      hemiSky: 0xffffff, hemiGround: 0xf1f5f9, hemiInt: 0.96,
+      keyColor: 0xfffbeb, keyInt: 0.45,
+      rimColor: 0x93c5fd, rimInt: 0.28,
+      cursorColor: 0xffffff, cursorInt: 0.3,
+      emissiveInt: 0.28,
+      exposure: 1.06,
+      particleColor: 0xe2e8f0,
     },
   };
-
-  function currentTheme() {
-    return document.documentElement.getAttribute('data-theme') || 'neon';
-  }
 
   function hasWebGL() {
     try {
@@ -114,15 +96,26 @@ window.PhotorealShowcase = (function () {
     return Math.max(min, Math.min(max, v));
   }
 
+  function loadImage(url) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = (e) => reject(new Error('Image load failed: ' + url));
+      img.src = url;
+    });
+  }
+
   function mount(container, items, opts) {
     opts = opts || {};
     if (!container || !items || !items.length) return null;
+    const T = window.THREE;
 
     container.classList.add('pr-showcase');
     container.innerHTML = '';
 
     // Tabs
-    const tabs = el('div', { class: 'pr-tabs', role: 'tablist', 'aria-label': 'Реалистичные сцены по курсам' });
+    const tabs = el('div', { class: 'pr-tabs', role: 'tablist', 'aria-label': '3D-сцены по курсам' });
     items.forEach((it, i) => {
       const b = el('button', {
         type: 'button',
@@ -134,207 +127,617 @@ window.PhotorealShowcase = (function () {
       tabs.appendChild(b);
     });
 
-    // Stage shell
-    const stage = el('div', { class: 'pr-stage pr-stage--real' });
+    // Stage
+    const stage = el('div', { class: 'pr-stage pr-stage--3d' });
+    const canvasHost = el('div', { class: 'pr-canvas', 'aria-label': 'Интерактивная 3D-сцена WebGL' });
+    const hotspotsLayer = el('div', { class: 'pr-hotspots pr-hotspots--3d' });
 
-    // Real-life 8K interactive 3D spatial layer
-    const realView = el('div', { class: 'pr-real-view', 'aria-label': 'Интерактивная фотореалистичная сцена' });
-    const realTilt = el('div', { class: 'pr-real-tilt' });
-    const realWorld = el('div', { class: 'pr-real-world' });
-    const realMedia = el('div', { class: 'pr-real-media' });
-    const realImg = el('img', {
-      class: 'pr-real-img',
-      alt: items[0].title || 'Фотореалистичная сцена',
-      draggable: 'false',
-      decoding: 'async',
-    });
-    const realTint = el('div', { class: 'pr-real-tint' });
-    const realSheen = el('div', { class: 'pr-real-sheen' });
-    const hotspotsLayer = el('div', { class: 'pr-hotspots' });
-    realMedia.append(realImg, hotspotsLayer);
-    realWorld.append(realMedia);
-    realTilt.append(realWorld, realTint, realSheen);
-    realView.append(realTilt);
-
-    // WebGL 3D scan layer (lazy mounted when user clicks 3D-скан 360° or Сетка)
-    const canvasHost = el('div', { class: 'pr-canvas', 'aria-label': 'Интерактивный 3D-скан 360°', hidden: 'true' });
-
-    // HUD controls
     const label = el('div', { class: 'pr-label' });
-    const modes = el('div', { class: 'pr-modes', role: 'group', 'aria-label': 'Режим просмотра' }, [
-      { id: 'real', text: 'Фотореал 8K' },
-      { id: 'scan', text: '3D-скан 360°' },
-      { id: 'wire', text: 'Сетка' },
+    const modes = el('div', { class: 'pr-modes', role: 'group', 'aria-label': 'Режим 3D-рендера' }, [
+      { id: 'photo3d', text: 'Фотореал 3D' },
+      { id: 'clay3d', text: 'Глина 3D' },
+      { id: 'wire3d', text: 'Сетка 3D' },
+      { id: 'scan360', text: 'Скан 360°' },
     ].map((m, i) => `<button type="button" class="pr-mode" data-pr-mode="${m.id}" aria-pressed="${i === 0}">${m.text}</button>`).join(''));
 
-    const zoomBar = el('div', { class: 'pr-zoom-bar', role: 'group', 'aria-label': 'Управление масштабом' }, `
-      <button type="button" class="pr-zoom-btn" data-pr-zoom="out" title="Отдалить" aria-label="Отдалить">−</button>
-      <button type="button" class="pr-zoom-btn pr-zoom-val" data-pr-zoom="reset" title="Сбросить вид">100%</button>
-      <button type="button" class="pr-zoom-btn" data-pr-zoom="in" title="Приблизить" aria-label="Приблизить">+</button>
+    const zoomBar = el('div', { class: 'pr-zoom-bar', role: 'group', 'aria-label': 'Управление 3D-камерой' }, `
+      <button type="button" class="pr-zoom-btn" data-pr-zoom="out" title="Отдалить 3D-камеру" aria-label="Отдалить">−</button>
+      <button type="button" class="pr-zoom-btn pr-zoom-val" data-pr-zoom="reset" title="Сбросить 3D-ракурс">3D</button>
+      <button type="button" class="pr-zoom-btn" data-pr-zoom="in" title="Приблизить 3D-камеру" aria-label="Приблизить">+</button>
     `);
 
-    const bgSwitcher = el('div', { class: 'pr-bg-modes', role: 'group', 'aria-label': 'Освещение сцены' },
+    const bgSwitcher = el('div', { class: 'pr-bg-modes', role: 'group', 'aria-label': '3D-освещение сцены' },
       Object.entries(BG_PRESETS).map(([key, cfg], i) => `<button type="button" class="pr-bg-btn" data-pr-bg="${key}" aria-pressed="${i === 0}">${escapeHtml(cfg.label)}</button>`).join(''));
 
     const hotspotCard = el('div', { class: 'pr-hotspot-card', hidden: 'true' });
-    const loader = el('div', { class: 'pr-loader', role: 'status', hidden: 'true' }, '<span class="pr-spinner"></span><span class="pr-loader-text">Загрузка 3D-скана…</span>');
-    const hint = el('div', { class: 'pr-hint' }, 'Нажимайте точки узлов · Колесо — зум · Перетаскивайте сцену');
+    const loader = el('div', { class: 'pr-loader', role: 'status' }, '<span class="pr-spinner"></span><span class="pr-loader-text">Построение 3D-сцены…</span>');
+    const hint = el('div', { class: 'pr-hint' }, 'Вращайте 3D-сцену мышью · Колесо — зум · Кликайте точки узлов');
 
-    stage.append(realView, canvasHost, label, modes, zoomBar, bgSwitcher, hotspotCard, loader, hint);
+    stage.append(canvasHost, hotspotsLayer, label, modes, zoomBar, bgSwitcher, hotspotCard, loader, hint);
 
     const info = el('div', { class: 'pr-info' });
     container.append(tabs, stage, info);
 
     const state = {
       active: 0,
-      mode: 'real',
+      mode: 'photo3d',
       bgPreset: 'atmosphere',
       activeHotspot: -1,
-      zoom: 1,
-      panX: 0,
-      panY: 0,
-      mediaW: 720,
-      mediaH: 402,
-      natW: 1376,
-      natH: 768,
-      loaded: {},
-      pending: {},
       ready: false,
       visible: true,
       errors: [],
       envReady: false,
       renderer: null,
-      glBooted: false,
+      frames: 0,
+      activeTriangles: 0,
+      activeMeshes: 0,
+      depthLoaded: {},
+      scanLoaded: {},
+      scanPending: {},
     };
     container.__photoreal = state;
 
-    // ==================== SPATIAL REAL-LIFE ENGINE ====================
-    let targetZoom = 1;
-    let targetPanX = 0;
-    let targetPanY = 0;
-    let tiltX = 0;
-    let tiltY = 0;
-    let curTiltX = 0;
-    let curTiltY = 0;
-    let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let dragOrigPanX = 0;
-    let dragOrigPanY = 0;
-    let spatialRaf = 0;
+    function renderInfo(i) {
+      const it = items[i];
+      const list = it.hotspots || [];
+      label.innerHTML = `<b>${escapeHtml(it.course)}</b><span>${escapeHtml(it.title)}</span>`;
+      const chipsHtml = list.length ? `
+        <div class="pr-parts-block">
+          <div class="pr-parts-label">3D-разбор узлов (клик — подлёт камеры)</div>
+          <div class="pr-parts-chips">
+            ${list.map((h, idx) => `<button type="button" class="pr-part-chip" data-pr-hotspot="${idx}" aria-pressed="false"><span>${idx + 1}</span>${escapeHtml(h.short || h.title)}</button>`).join('')}
+          </div>
+        </div>
+      ` : '';
+      info.innerHTML = `
+        <h3 class="pr-info-title">${escapeHtml(it.title)}</h3>
+        <p class="pr-info-text">${escapeHtml(it.text)}</p>
+        ${chipsHtml}
+        <ul class="pr-info-facts">${(it.facts || []).map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
+        <div class="pr-info-meta">3D-движок: <a href="${safeHref(it.sourceUrl)}">${escapeHtml(it.source)}</a> · WebGL + Depth 3D + CC0</div>
+        <a class="pr-info-cta" href="${safeHref(it.href)}">${escapeHtml(it.cta)} →</a>`;
+    }
+    renderInfo(0);
+
+    if (!T || !hasWebGL()) {
+      loader.innerHTML = 'WebGL недоступен — откройте страницу в современном браузере.';
+      state.errors.push('no-webgl');
+      return state;
+    }
+
+    // ==================== THREE.JS WEBGL 3D ENGINE ====================
+    const renderer = new T.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+    state.renderer = renderer;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputEncoding = T.sRGBEncoding;
+    renderer.toneMapping = T.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.04;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = T.PCFSoftShadowMap;
+    canvasHost.appendChild(renderer.domElement);
+
+    const scene = new T.Scene();
+    scene.background = new T.Color(0x070b14);
+
+    // Camera configured for true perspective matching the real-life lens (34° vertical FOV)
+    const CAM_FOV = 34;
+    const CAM_Z_HOME = 3.55;
+    const PLANE_H = 2.66;
+    const PLANE_W = PLANE_H * (1376 / 768);
+    const DEPTH_AMP = 1.04; // Rich, clean 3D relief with crisp foreground silhouettes
+    const SEG_X = 224;
+    const SEG_Y = 126;
+
+    const camera = new T.PerspectiveCamera(CAM_FOV, 1.72, 0.08, 60);
+    camera.position.set(0, 0, CAM_Z_HOME);
+
+    // Studio 3D lighting rig
+    const hemiLight = new T.HemisphereLight(0xffffff, 0xdbeafe, 1.55);
+    scene.add(hemiLight);
+
+    const keyLight = new T.DirectionalLight(0xffffff, 0.72);
+    keyLight.position.set(2.8, 3.6, 4.2);
+    scene.add(keyLight);
+
+    const rimLight = new T.DirectionalLight(0x7dd3fc, 0.65);
+    rimLight.position.set(-3.4, 2.2, 2.6);
+    scene.add(rimLight);
+
+    const cursorLight = new T.PointLight(0x38bdf8, 0.55, 7.5);
+    cursorLight.position.set(0, 0.4, 2.3);
+    scene.add(cursorLight);
+
+    // Clay-mode dramatic 3-point sculpt lights (raking angles carve crisp ZBrush-style 3D relief!)
+    const clayKey = new T.DirectionalLight(0xfff7ed, 0);
+    clayKey.position.set(4.8, 3.4, 1.35);
+    scene.add(clayKey);
+    const clayRim = new T.DirectionalLight(0x38bdf8, 0);
+    clayRim.position.set(-4.6, -1.8, 1.25);
+    scene.add(clayRim);
+
+    // Subtle 3D volumetric particles floating in XYZ space in front of the 3D scene
+    const pCount = 72;
+    const pPos = new Float32Array(pCount * 3);
+    const pBase = new Float32Array(pCount * 3);
+    for (let k = 0; k < pCount; k++) {
+      const px = (((k * 73) % 100) / 100 - 0.5) * 4.4;
+      const py = (((k * 41) % 100) / 100 - 0.5) * 2.4;
+      const pz = 0.25 + (((k * 29) % 100) / 100) * 1.15;
+      pPos[k * 3] = px; pPos[k * 3 + 1] = py; pPos[k * 3 + 2] = pz;
+      pBase[k * 3] = px; pBase[k * 3 + 1] = py; pBase[k * 3 + 2] = pz;
+    }
+    const pGeo = new T.BufferGeometry();
+    pGeo.setAttribute('position', new T.BufferAttribute(pPos, 3));
+    const pMat = new T.PointsMaterial({
+      color: 0x7dd3fc,
+      size: 0.024,
+      transparent: true,
+      opacity: 0.48,
+      depthWrite: false,
+      blending: T.AdditiveBlending,
+    });
+    const particles = new T.Points(pGeo, pMat);
+    scene.add(particles);
+
+    // HDRI Environment for 360° photogrammetry & glossy reflections
+    const pmrem = new T.PMREMGenerator(renderer);
+    pmrem.compileEquirectangularShader();
+    function setFallbackEnv() {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 128;
+      const g = c.getContext('2d');
+      const grad = g.createLinearGradient(0, 0, 0, 128);
+      grad.addColorStop(0, '#9aa3ad'); grad.addColorStop(0.5, '#e7e9ec'); grad.addColorStop(1, '#3a3d42');
+      g.fillStyle = grad; g.fillRect(0, 0, 256, 128);
+      g.fillStyle = '#ffffff'; g.fillRect(30, 20, 60, 25); g.fillRect(160, 25, 70, 20);
+      const tex = new T.CanvasTexture(c);
+      tex.mapping = T.EquirectangularReflectionMapping;
+      tex.encoding = T.sRGBEncoding;
+      scene.environment = pmrem.fromEquirectangular(tex).texture;
+      tex.dispose();
+      state.envReady = true;
+    }
+    if (T.RGBELoader) {
+      const rgbe = new T.RGBELoader();
+      if (rgbe.setDataType && T.UnsignedByteType !== undefined) rgbe.setDataType(T.UnsignedByteType);
+      rgbe.load(opts.hdri || 'assets/hdri/studio_small_09_1k.hdr', (tex) => {
+        scene.environment = pmrem.fromEquirectangular(tex).texture;
+        tex.dispose();
+        state.envReady = true;
+      }, undefined, () => setFallbackEnv());
+    } else {
+      setFallbackEnv();
+    }
+
+    // Roots: one for the Neural Depth 3D Scene, one for the 360° Photogrammetry Scan
+    const depthRoot = new T.Group();
+    scene.add(depthRoot);
+
+    const scanRoot = new T.Group();
+    scanRoot.visible = false;
+    scene.add(scanRoot);
+
+    const scanPodium = new T.Mesh(
+      new T.CylinderGeometry(1.72, 1.86, 0.08, 64),
+      new T.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.28, metalness: 0.72 })
+    );
+    scanPodium.position.y = -0.04;
+    scanRoot.add(scanPodium);
+
+    const scanRingMat = new T.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.45 });
+    const scanRing = new T.Mesh(new T.TorusGeometry(1.78, 0.014, 12, 96), scanRingMat);
+    scanRing.rotation.x = Math.PI / 2;
+    scanRing.position.y = 0.006;
+    scanRoot.add(scanRing);
+
+    const scanModelHolder = new T.Group();
+    scanRoot.add(scanModelHolder);
+
+    // OrbitControls (TRUE 3D camera rotation & zoom!)
     const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let controls = null;
+    let userInteracted = false;
+    let idleResumeAt = 0;
 
-    function layoutRealMedia() {
-      const sw = stage.clientWidth || 720;
-      const sh = stage.clientHeight || 470;
-      const natR = (state.natW || 1376) / (state.natH || 768);
-      const stageR = sw / sh;
-      if (stageR < natR) {
-        state.mediaH = sh;
-        state.mediaW = Math.ceil(sh * natR);
+    if (T.OrbitControls) {
+      controls = new T.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.065;
+      controls.rotateSpeed = 0.55;
+      controls.zoomSpeed = 0.85;
+      controls.enablePan = false;
+      controls.addEventListener('start', () => {
+        userInteracted = true;
+        cancelCameraFly();
+      });
+      controls.addEventListener('end', () => {
+        idleResumeAt = performance.now() + 6500;
+      });
+    }
+
+    function configureControlsForMode() {
+      if (!controls) return;
+      if (state.mode === 'scan360') {
+        controls.minAzimuthAngle = -Infinity;
+        controls.maxAzimuthAngle = Infinity;
+        controls.minPolarAngle = 0.15;
+        controls.maxPolarAngle = Math.PI / 2 - 0.03;
+        controls.minDistance = 1.45;
+        controls.maxDistance = 6.2;
+        controls.autoRotate = !reducedMotion;
+        controls.autoRotateSpeed = 1.15;
       } else {
-        state.mediaW = sw;
-        state.mediaH = Math.ceil(sw / natR);
+        // Depth 3D Relief Scene: dramatic 3D orbit (±18° yaw, ±11° pitch) with zero edge clipping
+        controls.minAzimuthAngle = -0.31;
+        controls.maxAzimuthAngle = 0.31;
+        controls.minPolarAngle = Math.PI / 2 - 0.19;
+        controls.maxPolarAngle = Math.PI / 2 + 0.19;
+        controls.minDistance = 1.35;
+        controls.maxDistance = 3.42;
+        controls.autoRotate = false;
       }
-      realMedia.style.width = `${state.mediaW}px`;
-      realMedia.style.height = `${state.mediaH}px`;
-      clampTargets();
-      applySpatialTransform(true);
+      controls.update();
     }
 
-    function clampTargets() {
-      const sw = stage.clientWidth || 720;
-      const sh = stage.clientHeight || 470;
-      targetZoom = clamp(targetZoom, 1, 2.6);
-      const maxX = Math.max(0, (state.mediaW * targetZoom - sw) * 0.5);
-      const maxY = Math.max(0, (state.mediaH * targetZoom - sh) * 0.5);
-      targetPanX = clamp(targetPanX, -maxX, maxX);
-      targetPanY = clamp(targetPanY, -maxY, maxY);
+    // Smooth 3D Camera Flight Animator
+    let camFly = null;
+    function flyCameraTo(targetPos, targetLook, durationMs) {
+      camFly = {
+        startPos: camera.position.clone(),
+        endPos: targetPos.clone(),
+        startLook: controls ? controls.target.clone() : new T.Vector3(0, 0, 0),
+        endLook: targetLook.clone(),
+        startTime: performance.now(),
+        duration: durationMs || 720,
+      };
+    }
+    function cancelCameraFly() {
+      camFly = null;
     }
 
-    function updateZoomReadout() {
-      const btn = zoomBar.querySelector('[data-pr-zoom="reset"]');
-      if (!btn) return;
-      btn.textContent = state.mode === 'real' ? `${Math.round(targetZoom * 100)}%` : '360°';
+    function getDepthHomeDistance() {
+      // Auto-fit 3D relief plane cleanly with inset margin so orbiting never exposes edges
+      const w = canvasHost.clientWidth || stage.clientWidth || 760;
+      const h = canvasHost.clientHeight || stage.clientHeight || 455;
+      const aspect = Math.max(0.5, w / Math.max(1, h));
+      const vFovRad = (CAM_FOV * Math.PI) / 180;
+      const halfTanV = Math.tan(vFovRad / 2);
+      const halfTanH = halfTanV * aspect;
+      const distV = (PLANE_H * 0.42) / halfTanV;
+      const distH = (PLANE_W * 0.42) / halfTanH;
+      return clamp(Math.min(distV, distH), 2.15, 3.32);
     }
 
-    function applySpatialTransform(instant) {
-      if (instant) {
-        state.zoom = targetZoom;
-        state.panX = targetPanX;
-        state.panY = targetPanY;
-        curTiltX = tiltX;
-        curTiltY = tiltY;
-      }
-      realWorld.style.transform = `translate3d(${state.panX.toFixed(2)}px, ${state.panY.toFixed(2)}px, 0) scale(${state.zoom.toFixed(4)})`;
-      if (!reducedMotion) {
-        const damp = clamp(1 - (state.zoom - 1) * 0.75, 0.15, 1);
-        const rx = (curTiltX * damp).toFixed(2);
-        const ry = (curTiltY * damp).toFixed(2);
-        const scaleBoost = state.zoom <= 1.02 ? 1.035 : 1;
-        realTilt.style.transform = `perspective(1200px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${scaleBoost})`;
-      } else {
-        realTilt.style.transform = 'none';
-      }
-      // Keep hotspot markers crisp at constant screen size regardless of zoom
-      const inv = (1 / Math.max(1, state.zoom)).toFixed(3);
-      hotspotsLayer.style.setProperty('--pin-inv-scale', inv);
-    }
-
-    function spatialLoop() {
-      spatialRaf = requestAnimationFrame(spatialLoop);
-      if (!state.visible || document.hidden || state.mode !== 'real') return;
-      const lerp = isDragging ? 0.38 : 0.14;
-      const dz = targetZoom - state.zoom;
-      const dx = targetPanX - state.panX;
-      const dy = targetPanY - state.panY;
-      const dtx = tiltX - curTiltX;
-      const dty = tiltY - curTiltY;
-      if (Math.abs(dz) > 0.0005 || Math.abs(dx) > 0.08 || Math.abs(dy) > 0.08 || Math.abs(dtx) > 0.02 || Math.abs(dty) > 0.02) {
-        state.zoom += dz * lerp;
-        state.panX += dx * lerp;
-        state.panY += dy * lerp;
-        curTiltX += dtx * 0.12;
-        curTiltY += dty * 0.12;
-        applySpatialTransform(false);
-      }
-    }
-
-    function applyPhotoLighting() {
-      const preset = BG_PRESETS[state.bgPreset] || BG_PRESETS.atmosphere;
-      realImg.style.filter = preset.photoFilter || 'none';
-      realTint.style.background = preset.tintBg || 'none';
-      realSheen.style.setProperty('--sheen-color', preset.sheenColor || 'rgba(255,255,255,0.14)');
-    }
-
-    function resetRealView() {
+    function resetView(instant) {
       state.activeHotspot = -1;
-      targetZoom = 1;
-      targetPanX = 0;
-      targetPanY = 0;
-      clampTargets();
-      updateZoomReadout();
       syncHotspotUI();
-    }
-
-    function focusHotspot(idx) {
-      const it = items[state.active];
-      const list = (it && it.hotspots) || [];
-      if (idx < 0 || idx >= list.length) {
-        resetRealView();
+      if (state.mode === 'scan360') {
+        const homePos = state.scanHome ? state.scanHome.pos : new T.Vector3(1.8, 1.1, 2.4);
+        const homeLook = state.scanHome ? state.scanHome.target : new T.Vector3(0, 0.5, 0);
+        if (instant) {
+          camera.position.copy(homePos);
+          if (controls) { controls.target.copy(homeLook); controls.update(); }
+        } else {
+          flyCameraTo(homePos, homeLook, 620);
+        }
         return;
       }
-      if (state.mode !== 'real') setMode('real');
-      state.activeHotspot = idx;
-      const h = list[idx];
-      const z = h.zoom || 1.92;
-      targetZoom = z;
-      // Pan so hotspot lands slightly above center (leaving breathing room for inspection card)
-      targetPanX = (0.5 - h.x / 100) * state.mediaW * z;
-      targetPanY = (0.44 - h.y / 100) * state.mediaH * z;
-      clampTargets();
-      updateZoomReadout();
-      syncHotspotUI();
+      const d = getDepthHomeDistance();
+      const homePos = new T.Vector3(0, 0, d);
+      const homeLook = new T.Vector3(0, 0, 0.08);
+      if (instant) {
+        camera.position.copy(homePos);
+        if (controls) { controls.target.copy(homeLook); controls.update(); }
+      } else {
+        flyCameraTo(homePos, homeLook, 640);
+      }
+      userInteracted = false;
+    }
+
+    renderer.domElement.addEventListener('dblclick', () => resetView(false));
+
+    // ==================== NEURAL DEPTH 3D MESH BUILDER ====================
+    const clayMat = new T.MeshStandardMaterial({
+      color: 0x8fa0b8,
+      roughness: 0.78,
+      metalness: 0.06,
+      envMapIntensity: 0.08,
+      vertexColors: true,
+    });
+    const wireOverlayMat = new T.MeshBasicMaterial({
+      color: 0x38bdf8,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.55,
+    });
+    const wireBaseMat = new T.MeshStandardMaterial({
+      color: 0x071022,
+      roughness: 0.88,
+      metalness: 0.15,
+      envMapIntensity: 0.12,
+    });
+
+    async function buildDepthScene(i) {
+      if (state.depthLoaded[i]) return state.depthLoaded[i];
+      const it = items[i];
+      const [colorImg, depthImg] = await Promise.all([
+        loadImage(it.photoUrl),
+        loadImage(it.depthUrl),
+      ]);
+
+      // Sample depth map onto exact grid (SEG_X + 1) x (SEG_Y + 1)
+      const gw = SEG_X + 1;
+      const gh = SEG_Y + 1;
+      const c = document.createElement('canvas');
+      c.width = gw;
+      c.height = gh;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(depthImg, 0, 0, gw, gh);
+      const raw = ctx.getImageData(0, 0, gw, gh).data;
+
+      // Normalized depth array [0..1] + gentle 1-pass smoothing to prevent jagged vertical cliff spikes
+      const d0 = new Float32Array(gw * gh);
+      for (let idx = 0; idx < gw * gh; idx++) {
+        d0[idx] = raw[idx * 4] / 255.0;
+      }
+      const depthGrid = new Float32Array(gw * gh);
+      for (let y = 0; y < gh; y++) {
+        for (let x = 0; x < gw; x++) {
+          let sum = 0, wSum = 0;
+          for (let dy = -1; dy <= 1; dy++) {
+            const ny = clamp(y + dy, 0, gh - 1);
+            for (let dx = -1; dx <= 1; dx++) {
+              const nx = clamp(x + dx, 0, gw - 1);
+              const wt = (dx === 0 && dy === 0) ? 4 : (dx === 0 || dy === 0 ? 2 : 1);
+              sum += d0[ny * gw + nx] * wt;
+              wSum += wt;
+            }
+          }
+          depthGrid[y * gw + x] = sum / wSum;
+        }
+      }
+
+      // Build Perspective-Unprojected 3D Relief Geometry (56,448 real triangles!) + depth AO vertex colors
+      const geo = new T.PlaneGeometry(PLANE_W, PLANE_H, SEG_X, SEG_Y);
+      const posAttr = geo.attributes.position;
+      const vColors = new Float32Array(posAttr.count * 3);
+      const camZRef = CAM_Z_HOME;
+      for (let v = 0; v < posAttr.count; v++) {
+        const ix = v % gw;
+        const iy = Math.floor(v / gw);
+        const d = depthGrid[iy * gw + ix];
+        const x0 = posAttr.getX(v);
+        const y0 = posAttr.getY(v);
+        // Subtle panoramic bowl wrap at outer edges enhances immersion when orbiting
+        const nx = (ix / SEG_X) * 2 - 1;
+        const edgeCurve = -0.09 * (nx * nx);
+        const z = (d - 0.45) * DEPTH_AMP + edgeCurve;
+        // True perspective unprojection along camera ray from (0, 0, camZRef)
+        const rayScale = (camZRef - z) / camZRef;
+        posAttr.setXYZ(v, x0 * rayScale, y0 * rayScale, z);
+        // Subtle depth-based ambient occlusion shading for ZBrush-like Clay 3D relief
+        const ao = 0.34 + 0.66 * Math.pow(d, 0.85);
+        vColors[v * 3] = ao;
+        vColors[v * 3 + 1] = ao * 1.02;
+        vColors[v * 3 + 2] = Math.min(1, ao * 1.07);
+      }
+      posAttr.needsUpdate = true;
+      geo.setAttribute('color', new T.BufferAttribute(vColors, 3));
+      geo.computeVertexNormals();
+
+      // High-res color texture (sRGB + anisotropic filtering for razor sharpness at grazing 3D angles!)
+      const colorTex = new T.Texture(colorImg);
+      colorTex.encoding = T.sRGBEncoding;
+      colorTex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+      colorTex.needsUpdate = true;
+
+      const photoMat = new T.MeshStandardMaterial({
+        map: colorTex,
+        emissiveMap: colorTex,
+        emissive: new T.Color(0xffffff),
+        emissiveIntensity: 0.22,
+        roughness: 0.78,
+        metalness: 0.05,
+        envMapIntensity: 0.14,
+      });
+
+      const group = new T.Group();
+      const mesh = new T.Mesh(geo, photoMat);
+      group.add(mesh);
+
+      const wireOverlay = new T.Mesh(geo, wireOverlayMat);
+      wireOverlay.position.z = 0.004;
+      wireOverlay.visible = false;
+      group.add(wireOverlay);
+
+      // Compute exact 3D world position (x, y, z) for any (u%, v%) on the displaced 3D surface!
+      function sampleSurface3D(xPct, yPct) {
+        const ix = clamp(Math.round((xPct / 100) * SEG_X), 0, SEG_X);
+        const iy = clamp(Math.round((yPct / 100) * SEG_Y), 0, SEG_Y);
+        const vi = iy * gw + ix;
+        return new T.Vector3(posAttr.getX(vi), posAttr.getY(vi), posAttr.getZ(vi) + 0.035);
+      }
+
+      const hotspotPoints3D = (it.hotspots || []).map((h) => sampleSurface3D(h.x, h.y));
+
+      const entry = {
+        group,
+        mesh,
+        wireOverlay,
+        photoMat,
+        hotspotPoints3D,
+        triangles: SEG_X * SEG_Y * 2,
+      };
+      state.depthLoaded[i] = entry;
+      return entry;
+    }
+
+    // ==================== 360° REAL PHOTOGRAMMETRY GLTF BUILDER ====================
+    const gltfLoader = T.GLTFLoader ? new T.GLTFLoader() : null;
+    function loadPart(part) {
+      return new Promise((resolve, reject) => {
+        if (!gltfLoader) { reject(new Error('GLTFLoader missing')); return; }
+        gltfLoader.load(part.url, (gltf) => resolve(gltf.scene), undefined, reject);
+      });
+    }
+    function normalizeObj(obj, targetSize) {
+      obj.updateMatrixWorld(true);
+      const box = new T.Box3().setFromObject(obj);
+      const size = box.getSize(new T.Vector3());
+      const s = targetSize / Math.max(size.x, size.y, size.z, 1e-4);
+      obj.scale.multiplyScalar(s);
+      obj.updateMatrixWorld(true);
+      const b2 = new T.Box3().setFromObject(obj);
+      const c = b2.getCenter(new T.Vector3());
+      obj.position.x -= c.x;
+      obj.position.z -= c.z;
+      obj.position.y -= b2.min.y;
+    }
+    async function buildScanItem(i) {
+      if (state.scanLoaded[i]) return state.scanLoaded[i];
+      if (state.scanPending[i]) return state.scanPending[i];
+      state.scanPending[i] = (async () => {
+        const it = items[i];
+        const wrap = new T.Group();
+        const parts = await Promise.all((it.parts || []).map(loadPart));
+        parts.forEach((sceneObj, pi) => {
+          const p = it.parts[pi];
+          const holder = new T.Group();
+          if (p.rotation) sceneObj.rotation.set(...p.rotation);
+          holder.add(sceneObj);
+          normalizeObj(holder, p.size || 1.75);
+          if (p.offset) holder.position.add(new T.Vector3(...p.offset));
+          wrap.add(holder);
+        });
+        normalizeObj(wrap, it.scanSize || 2.15);
+        const meshes = [];
+        wrap.traverse((o) => {
+          if (!o.isMesh) return;
+          if (o.material) {
+            o.material.envMapIntensity = it.envIntensity || 1.25;
+            if (o.material.aoMap && o.geometry && !o.geometry.attributes.uv2 && o.geometry.attributes.uv) {
+              o.geometry.setAttribute('uv2', o.geometry.attributes.uv);
+            }
+            o.material.needsUpdate = true;
+          }
+          meshes.push(o);
+        });
+        const entry = { object: wrap, meshes };
+        state.scanLoaded[i] = entry;
+        delete state.scanPending[i];
+        return entry;
+      })();
+      try {
+        return await state.scanPending[i];
+      } catch (e) {
+        delete state.scanPending[i];
+        throw e;
+      }
+    }
+
+    // ==================== LIGHTING, MODES & HOTSPOTS ====================
+    function applyLighting() {
+      const p = BG_PRESETS[state.bgPreset] || BG_PRESETS.atmosphere;
+      const isClay = state.mode === 'clay3d';
+      const isWire = state.mode === 'wire3d';
+      scene.background = new T.Color(isWire ? 0x040814 : p.bgHex);
+      renderer.toneMappingExposure = isClay ? 1.08 : p.exposure;
+
+      hemiLight.color.setHex(isClay ? 0x94a3b8 : p.hemiSky);
+      hemiLight.groundColor.setHex(isClay ? 0x0f172a : p.hemiGround);
+      hemiLight.intensity = isClay ? 0.24 : p.hemiInt;
+
+      keyLight.color.setHex(p.keyColor);
+      keyLight.intensity = isClay ? 0.15 : p.keyInt;
+      rimLight.color.setHex(p.rimColor);
+      rimLight.intensity = isClay ? 0.22 : p.rimInt;
+      cursorLight.color.setHex(p.cursorColor);
+      cursorLight.intensity = isClay ? 0.55 : p.cursorInt;
+
+      clayKey.intensity = isClay ? 1.45 : 0;
+      clayRim.intensity = isClay ? 0.92 : 0;
+
+      pMat.color.setHex(p.particleColor);
+      scanRingMat.color.setHex(p.cursorColor);
+
+      const entry = state.depthLoaded[state.active];
+      if (entry && entry.photoMat) {
+        entry.photoMat.emissiveIntensity = p.emissiveInt;
+      }
+    }
+
+    function applyRenderMode() {
+      const isScan = state.mode === 'scan360';
+      depthRoot.visible = !isScan;
+      scanRoot.visible = isScan;
+      particles.visible = !isScan;
+      hotspotsLayer.hidden = isScan;
+
+      const entry = state.depthLoaded[state.active];
+      if (entry && !isScan) {
+        if (state.mode === 'clay3d') {
+          entry.mesh.material = clayMat;
+          entry.wireOverlay.visible = false;
+        } else if (state.mode === 'wire3d') {
+          entry.mesh.material = wireBaseMat;
+          entry.wireOverlay.visible = true;
+        } else {
+          entry.mesh.material = entry.photoMat;
+          entry.wireOverlay.visible = false;
+        }
+      }
+
+      const resetBtn = zoomBar.querySelector('[data-pr-zoom="reset"]');
+      if (resetBtn) resetBtn.textContent = isScan ? '360°' : '3D';
+      hint.textContent = isScan
+        ? 'Вращайте 3D-скан на 360° · Колесо — зум · Двойной клик — сброс'
+        : 'Вращайте 3D-сцену мышью · Колесо — зум · Кликайте точки узлов';
+
+      applyLighting();
+      configureControlsForMode();
+    }
+
+    function renderHotspotPins(i) {
+      const it = items[i] || {};
+      const list = it.hotspots || [];
+      hotspotsLayer.innerHTML = list.map((h, idx) => `
+        <button type="button"
+          class="pr-hotspot pr-hotspot--3d"
+          data-pr-hotspot="${idx}"
+          aria-pressed="false"
+          aria-label="${escapeHtml(h.title)}">
+          <span class="pr-hotspot-pulse"></span>
+          <span class="pr-hotspot-dot">${idx + 1}</span>
+          <span class="pr-hotspot-tip">${escapeHtml(h.title)}</span>
+        </button>
+      `).join('');
+    }
+
+    const _projVec = new T.Vector3();
+    function updateProjectedHotspots() {
+      if (state.mode === 'scan360') return;
+      const entry = state.depthLoaded[state.active];
+      if (!entry || !entry.hotspotPoints3D) return;
+      const w = canvasHost.clientWidth || stage.clientWidth || 760;
+      const h = canvasHost.clientHeight || stage.clientHeight || 455;
+      const btns = hotspotsLayer.querySelectorAll('.pr-hotspot');
+      entry.hotspotPoints3D.forEach((pt3, idx) => {
+        const btn = btns[idx];
+        if (!btn) return;
+        _projVec.copy(pt3).project(camera);
+        const visible = _projVec.z < 1 && _projVec.x > -1.04 && _projVec.x < 1.04 && _projVec.y > -1.04 && _projVec.y < 1.04;
+        if (!visible) {
+          btn.style.opacity = '0';
+          btn.style.pointerEvents = 'none';
+          return;
+        }
+        const sx = (_projVec.x * 0.5 + 0.5) * w;
+        const sy = (-_projVec.y * 0.5 + 0.5) * h;
+        btn.style.left = `${sx.toFixed(1)}px`;
+        btn.style.top = `${sy.toFixed(1)}px`;
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+      });
     }
 
     function syncHotspotUI() {
@@ -351,13 +754,12 @@ window.PhotorealShowcase = (function () {
         chip.setAttribute('aria-pressed', String(hi === state.activeHotspot));
       });
 
-      if (state.mode === 'real' && state.activeHotspot >= 0 && list[state.activeHotspot]) {
+      if (state.mode !== 'scan360' && state.activeHotspot >= 0 && list[state.activeHotspot]) {
         const h = list[state.activeHotspot];
-        const total = list.length;
         hotspotCard.innerHTML = `
           <div class="pr-hc-head">
-            <span class="pr-hc-badge">Узел ${state.activeHotspot + 1} / ${total}${h.spec ? ' · ' + escapeHtml(h.spec) : ''}</span>
-            <button type="button" class="pr-hc-close" data-pr-hc="close" aria-label="Сбросить приближение">×</button>
+            <span class="pr-hc-badge">3D-узел ${state.activeHotspot + 1} / ${list.length}${h.spec ? ' · ' + escapeHtml(h.spec) : ''}</span>
+            <button type="button" class="pr-hc-close" data-pr-hc="close" aria-label="Сбросить 3D-камеру">×</button>
           </div>
           <h4 class="pr-hc-title">${escapeHtml(h.title)}</h4>
           <p class="pr-hc-desc">${escapeHtml(h.desc)}</p>
@@ -372,662 +774,200 @@ window.PhotorealShowcase = (function () {
       }
     }
 
-    function renderHotspots(i) {
-      const it = items[i] || {};
-      const list = it.hotspots || [];
-      hotspotsLayer.innerHTML = list.map((h, idx) => `
-        <button type="button"
-          class="pr-hotspot"
-          data-pr-hotspot="${idx}"
-          aria-pressed="false"
-          aria-label="${escapeHtml(h.title)}"
-          style="left:${Number(h.x)}%;top:${Number(h.y)}%;">
-          <span class="pr-hotspot-pulse"></span>
-          <span class="pr-hotspot-dot">${idx + 1}</span>
-          <span class="pr-hotspot-tip">${escapeHtml(h.title)}</span>
-        </button>
-      `).join('');
-    }
-
-    function renderInfo(i) {
-      const it = items[i];
-      const list = it.hotspots || [];
-      label.innerHTML = `<b>${escapeHtml(it.course)}</b><span>${escapeHtml(it.title)}</span>`;
-      const chipsHtml = list.length ? `
-        <div class="pr-parts-block">
-          <div class="pr-parts-label">Интерактивный разбор узлов (клик — приблизить)</div>
-          <div class="pr-parts-chips">
-            ${list.map((h, idx) => `<button type="button" class="pr-part-chip" data-pr-hotspot="${idx}" aria-pressed="false"><span>${idx + 1}</span>${escapeHtml(h.short || h.title)}</button>`).join('')}
-          </div>
-        </div>
-      ` : '';
-      info.innerHTML = `
-        <h3 class="pr-info-title">${escapeHtml(it.title)}</h3>
-        <p class="pr-info-text">${escapeHtml(it.text)}</p>
-        ${chipsHtml}
-        <ul class="pr-info-facts">${(it.facts || []).map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
-        <div class="pr-info-meta">Сцена: <a href="${safeHref(it.sourceUrl)}">${escapeHtml(it.source)}</a> · 3D-сканы CC0</div>
-        <a class="pr-info-cta" href="${safeHref(it.href)}">${escapeHtml(it.cta)} →</a>`;
-    }
-
-    // Pointer interactions on Real-Life Stage
-    realView.addEventListener('pointermove', (e) => {
-      if (state.mode !== 'real') return;
-      const rect = realView.getBoundingClientRect();
-      const nx = clamp((e.clientX - rect.left) / Math.max(1, rect.width), 0, 1);
-      const ny = clamp((e.clientY - rect.top) / Math.max(1, rect.height), 0, 1);
-      realSheen.style.setProperty('--mx', `${(nx * 100).toFixed(1)}%`);
-      realSheen.style.setProperty('--my', `${(ny * 100).toFixed(1)}%`);
-
-      if (isDragging) {
-        targetPanX = dragOrigPanX + (e.clientX - dragStartX);
-        targetPanY = dragOrigPanY + (e.clientY - dragStartY);
-        clampTargets();
+    function focusHotspot(idx) {
+      const it = items[state.active];
+      const list = (it && it.hotspots) || [];
+      if (idx < 0 || idx >= list.length) {
+        resetView(false);
         return;
       }
-      if (!reducedMotion) {
-        tiltY = (nx - 0.5) * 7.5;
-        tiltX = (0.5 - ny) * 5.2;
-      }
-    });
+      if (state.mode === 'scan360') setMode('photo3d');
+      const entry = state.depthLoaded[state.active];
+      if (!entry || !entry.hotspotPoints3D[idx]) return;
 
-    realView.addEventListener('pointerleave', () => {
-      tiltX = 0;
-      tiltY = 0;
-      isDragging = false;
-      realView.classList.remove('is-dragging');
-    });
+      state.activeHotspot = idx;
+      userInteracted = true;
+      syncHotspotUI();
 
-    realView.addEventListener('pointerdown', (e) => {
-      if (state.mode !== 'real') return;
-      if (e.target.closest('.pr-hotspot')) return;
-      isDragging = true;
-      dragStartX = e.clientX;
-      dragStartY = e.clientY;
-      dragOrigPanX = targetPanX;
-      dragOrigPanY = targetPanY;
-      realView.classList.add('is-dragging');
-      if (realView.setPointerCapture) {
-        try { realView.setPointerCapture(e.pointerId); } catch (err) {}
-      }
-    });
-
-    realView.addEventListener('pointerup', (e) => {
-      isDragging = false;
-      realView.classList.remove('is-dragging');
-      if (realView.releasePointerCapture) {
-        try { realView.releasePointerCapture(e.pointerId); } catch (err) {}
-      }
-    });
-
-    realView.addEventListener('wheel', (e) => {
-      if (state.mode !== 'real') return;
-      e.preventDefault();
-      const factor = e.deltaY < 0 ? 1.16 : 0.86;
-      targetZoom = clamp(targetZoom * factor, 1, 2.6);
-      if (targetZoom <= 1.03) {
-        targetZoom = 1;
-        targetPanX = 0;
-        targetPanY = 0;
-      }
-      clampTargets();
-      updateZoomReadout();
-    }, { passive: false });
-
-    realView.addEventListener('dblclick', (e) => {
-      if (e.target.closest('.pr-hotspot')) return;
-      resetRealView();
-    });
-
-    hotspotsLayer.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-pr-hotspot]');
-      if (!btn) return;
-      e.stopPropagation();
-      const idx = Number(btn.dataset.prHotspot);
-      if (idx === state.activeHotspot) resetRealView();
-      else focusHotspot(idx);
-    });
-
-    info.addEventListener('click', (e) => {
-      const btn = e.target.closest('.pr-part-chip[data-pr-hotspot]');
-      if (!btn) return;
-      const idx = Number(btn.dataset.prHotspot);
-      if (idx === state.activeHotspot) resetRealView();
-      else focusHotspot(idx);
-    });
-
-    hotspotCard.addEventListener('click', (e) => {
-      const act = e.target.closest('[data-pr-hc]');
-      if (!act) return;
-      const list = (items[state.active] && items[state.active].hotspots) || [];
-      if (!list.length) return;
-      const cmd = act.dataset.prHc;
-      if (cmd === 'close') resetRealView();
-      else if (cmd === 'next') focusHotspot((state.activeHotspot + 1) % list.length);
-      else if (cmd === 'prev') focusHotspot((state.activeHotspot - 1 + list.length) % list.length);
-    });
-
-    zoomBar.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-pr-zoom]');
-      if (!btn) return;
-      const cmd = btn.dataset.prZoom;
-      if (state.mode === 'real') {
-        if (cmd === 'in') targetZoom = clamp(targetZoom + 0.35, 1, 2.6);
-        else if (cmd === 'out') targetZoom = clamp(targetZoom - 0.35, 1, 2.6);
-        else { resetRealView(); return; }
-        if (targetZoom <= 1.03) { targetZoom = 1; targetPanX = 0; targetPanY = 0; }
-        clampTargets();
-        updateZoomReadout();
-      } else if (gl) {
-        if (cmd === 'reset') gl.resetView();
-        else if (cmd === 'in') gl.dolly(0.84);
-        else if (cmd === 'out') gl.dolly(1.18);
-      }
-    });
-
-    // ==================== LAZY WEBGL 3D PHOTOGRAMMETRY ENGINE ====================
-    let gl = null;
-
-    function ensureWebGL() {
-      if (gl) return gl;
-      const T = window.THREE;
-      if (!T || !hasWebGL()) {
-        state.errors.push('no-webgl');
-        loader.innerHTML = 'WebGL недоступен — используйте режим «Фотореал 8K».';
-        loader.hidden = false;
-        return null;
-      }
-
-      const renderer = new T.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-      state.renderer = renderer;
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.outputEncoding = T.sRGBEncoding;
-      renderer.toneMapping = T.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.15;
-      renderer.physicallyCorrectLights = true;
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = T.PCFSoftShadowMap;
-      canvasHost.appendChild(renderer.domElement);
-
-      const scene = new T.Scene();
-      const camera = new T.PerspectiveCamera(32, 1, 0.05, 100);
-      camera.position.set(2.4, 1.35, 2.9);
-
-      function getActiveEnvCfg() {
-        const preset = BG_PRESETS[state.bgPreset];
-        if (preset && preset.top) return preset;
-        const it = items[state.active] || {};
-        const byScene = SCENE_ENVS[it.sceneType];
-        if (currentTheme() === 'light' && state.bgPreset === 'atmosphere') {
-          return {
-            top: '#dbeafe', mid: '#e0e7ff', horizon: '#f0f9ff', bottom: '#cbd5e1',
-            accent: (byScene && byScene.accent) || 0x2563eb,
-            secondary: (byScene && byScene.secondary) || 0x06b6d4,
-            fog: 0xdbeafe, lightBg: true,
-          };
-        }
-        return byScene || {
-          top: '#1a1040', mid: '#0c1b3a', horizon: '#1e3a8a', bottom: '#050814',
-          accent: 0x38bdf8, secondary: 0xa855f7, fog: 0x090f24,
-        };
-      }
-
-      function makeBgTexture() {
-        const env = getActiveEnvCfg();
-        const c = document.createElement('canvas');
-        c.width = 512; c.height = 512;
-        const g = c.getContext('2d');
-        const grad = g.createLinearGradient(0, 0, 0, 512);
-        grad.addColorStop(0.0, env.top);
-        grad.addColorStop(0.4, env.mid);
-        grad.addColorStop(0.68, env.horizon || env.mid);
-        grad.addColorStop(1.0, env.bottom);
-        g.fillStyle = grad;
-        g.fillRect(0, 0, 512, 512);
-        const tex = new T.CanvasTexture(c);
-        tex.encoding = T.sRGBEncoding;
-        return tex;
-      }
-
-      const podium = new T.Mesh(
-        new T.CylinderGeometry(1.75, 1.88, 0.08, 64),
-        new T.MeshStandardMaterial({ color: 0x111827, roughness: 0.28, metalness: 0.72 })
+      // True 3D camera flight straight to the 3D surface point at a dramatic angled 3D perspective!
+      const pt = entry.hotspotPoints3D[idx].clone();
+      const sideSign = pt.x >= 0 ? -1 : 1;
+      const targetLook = new T.Vector3(
+        clamp(pt.x * 0.78, -1.25, 1.25),
+        clamp(pt.y * 0.75 - 0.08, -0.68, 0.68),
+        pt.z * 0.85
       );
-      podium.position.y = -0.04;
-      podium.receiveShadow = true;
-      scene.add(podium);
-
-      const haloMat = new T.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.4 });
-      const haloRing = new T.Mesh(new T.TorusGeometry(1.82, 0.012, 12, 96), haloMat);
-      haloRing.rotation.x = Math.PI / 2;
-      haloRing.position.y = 0.005;
-      scene.add(haloRing);
-
-      const key = new T.DirectionalLight(0xffffff, 2.6);
-      key.position.set(3.2, 5.2, 3.0);
-      scene.add(key);
-      const rim = new T.DirectionalLight(0x38bdf8, 1.8);
-      rim.position.set(-3.2, 2.8, -3.0);
-      scene.add(rim);
-      const fill = new T.PointLight(0xa855f7, 2.0, 10);
-      fill.position.set(2.5, 1.5, -2.2);
-      scene.add(fill);
-
-      // Soft contact shadow plane
-      const SH_W = 4, SH_H = 4, SH_RES = 512, SH_CAM_H = 1.6;
-      const shadowGroup = new T.Group();
-      scene.add(shadowGroup);
-      const rtShadow = new T.WebGLRenderTarget(SH_RES, SH_RES);
-      rtShadow.texture.generateMipmaps = false;
-      const rtBlur = new T.WebGLRenderTarget(SH_RES, SH_RES);
-      rtBlur.texture.generateMipmaps = false;
-      const planeGeo = new T.PlaneGeometry(SH_W, SH_H).rotateX(Math.PI / 2);
-      const shadowPlaneMat = new T.MeshBasicMaterial({ map: rtShadow.texture, opacity: 0.55, transparent: true, depthWrite: false });
-      const shadowPlane = new T.Mesh(planeGeo, shadowPlaneMat);
-      shadowPlane.position.y = 0.002;
-      shadowPlane.renderOrder = 1;
-      shadowPlane.scale.y = -1;
-      shadowGroup.add(shadowPlane);
-      const blurPlane = new T.Mesh(planeGeo);
-      blurPlane.visible = false;
-      shadowGroup.add(blurPlane);
-      const shadowCam = new T.OrthographicCamera(-SH_W / 2, SH_W / 2, SH_H / 2, -SH_H / 2, 0, SH_CAM_H);
-      shadowCam.rotation.x = Math.PI / 2;
-      shadowGroup.add(shadowCam);
-      const depthMat = new T.MeshDepthMaterial();
-      depthMat.onBeforeCompile = (shader) => {
-        shader.uniforms.darkness = { value: 1.5 };
-        shader.fragmentShader = 'uniform float darkness;\n' + shader.fragmentShader.replace(
-          'gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );',
-          'gl_FragColor = vec4( vec3( 0.0 ), ( 1.0 - fragCoordZ ) * darkness );');
-      };
-      depthMat.depthTest = false;
-      depthMat.depthWrite = false;
-      const hBlur = T.HorizontalBlurShader ? new T.ShaderMaterial(T.HorizontalBlurShader) : null;
-      const vBlur = T.VerticalBlurShader ? new T.ShaderMaterial(T.VerticalBlurShader) : null;
-      if (hBlur) hBlur.depthTest = false;
-      if (vBlur) vBlur.depthTest = false;
-
-      function blurShadow(amount) {
-        if (!hBlur || !vBlur) return;
-        blurPlane.visible = true;
-        blurPlane.material = hBlur;
-        hBlur.uniforms.tDiffuse.value = rtShadow.texture;
-        hBlur.uniforms.h.value = amount / 256;
-        renderer.setRenderTarget(rtBlur);
-        renderer.render(blurPlane, shadowCam);
-        blurPlane.material = vBlur;
-        vBlur.uniforms.tDiffuse.value = rtBlur.texture;
-        vBlur.uniforms.v.value = amount / 256;
-        renderer.setRenderTarget(rtShadow);
-        renderer.render(blurPlane, shadowCam);
-        blurPlane.visible = false;
-      }
-
-      function renderContactShadow() {
-        const bg = scene.background;
-        scene.background = null;
-        shadowPlane.visible = false;
-        podium.visible = false;
-        haloRing.visible = false;
-        scene.overrideMaterial = depthMat;
-        const prevClear = renderer.getClearAlpha();
-        renderer.setClearAlpha(0);
-        renderer.setRenderTarget(rtShadow);
-        renderer.clear();
-        renderer.render(scene, shadowCam);
-        scene.overrideMaterial = null;
-        blurShadow(3.0);
-        blurShadow(1.2);
-        renderer.setRenderTarget(null);
-        renderer.setClearAlpha(prevClear);
-        shadowPlane.visible = true;
-        podium.visible = true;
-        haloRing.visible = true;
-        scene.background = bg;
-      }
-
-      let controls = null;
-      if (T.OrbitControls) {
-        controls = new T.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.06;
-        controls.rotateSpeed = 0.72;
-        controls.zoomSpeed = 0.85;
-        controls.enablePan = false;
-        controls.minDistance = 1.4;
-        controls.maxDistance = 6.5;
-        controls.minPolarAngle = 0.15;
-        controls.maxPolarAngle = Math.PI / 2 - 0.03;
-        controls.autoRotate = !reducedMotion;
-        controls.autoRotateSpeed = 1.05;
-        controls.target.set(0, 0.5, 0);
-        controls.addEventListener('start', () => { controls.autoRotate = false; });
-        controls.addEventListener('change', requestRender);
-      }
-      renderer.domElement.addEventListener('dblclick', () => resetView());
-
-      // HDRI
-      const pmrem = new T.PMREMGenerator(renderer);
-      pmrem.compileEquirectangularShader();
-      function setFallbackEnv() {
-        const c = document.createElement('canvas');
-        c.width = 512; c.height = 256;
-        const g = c.getContext('2d');
-        const grad = g.createLinearGradient(0, 0, 0, 256);
-        grad.addColorStop(0, '#9aa3ad'); grad.addColorStop(0.5, '#e7e9ec'); grad.addColorStop(1, '#3a3d42');
-        g.fillStyle = grad; g.fillRect(0, 0, 512, 256);
-        g.fillStyle = '#ffffff'; g.fillRect(60, 40, 120, 50); g.fillRect(320, 50, 140, 40);
-        const tex = new T.CanvasTexture(c);
-        tex.mapping = T.EquirectangularReflectionMapping;
-        tex.encoding = T.sRGBEncoding;
-        scene.environment = pmrem.fromEquirectangular(tex).texture;
-        tex.dispose();
-        state.envReady = true;
-      }
-      if (T.RGBELoader) {
-        const rgbe = new T.RGBELoader();
-        if (rgbe.setDataType && T.UnsignedByteType !== undefined) rgbe.setDataType(T.UnsignedByteType);
-        rgbe.load(opts.hdri || 'assets/hdri/studio_small_09_1k.hdr', (tex) => {
-          scene.environment = pmrem.fromEquirectangular(tex).texture;
-          tex.dispose();
-          state.envReady = true;
-          requestRender();
-        }, undefined, () => { setFallbackEnv(); requestRender(); });
-      } else {
-        setFallbackEnv();
-      }
-
-      const gltfLoader = T.GLTFLoader ? new T.GLTFLoader() : null;
-      const root = new T.Group();
-      scene.add(root);
-      const wireMat = new T.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.85 });
-
-      function loadPart(part) {
-        return new Promise((resolve, reject) => {
-          if (!gltfLoader) { reject(new Error('GLTFLoader missing')); return; }
-          gltfLoader.load(part.url, (gltf) => resolve(gltf.scene), undefined, reject);
-        });
-      }
-
-      function normalize(obj, targetSize) {
-        obj.updateMatrixWorld(true);
-        const box = new T.Box3().setFromObject(obj);
-        const size = box.getSize(new T.Vector3());
-        const s = targetSize / Math.max(size.x, size.y, size.z, 1e-4);
-        obj.scale.multiplyScalar(s);
-        obj.updateMatrixWorld(true);
-        const b2 = new T.Box3().setFromObject(obj);
-        const c = b2.getCenter(new T.Vector3());
-        obj.position.x -= c.x;
-        obj.position.z -= c.z;
-        obj.position.y -= b2.min.y;
-      }
-
-      async function buildScanItem(i) {
-        if (state.loaded[i]) return state.loaded[i];
-        if (state.pending[i]) return state.pending[i];
-        state.pending[i] = (async () => {
-          const it = items[i];
-          const wrap = new T.Group();
-          if (it.parts && it.parts.length && gltfLoader) {
-            const group = new T.Group();
-            const parts = await Promise.all(it.parts.map(loadPart));
-            parts.forEach((sceneObj, pi) => {
-              const p = it.parts[pi];
-              const holder = new T.Group();
-              if (p.rotation) sceneObj.rotation.set(...p.rotation);
-              holder.add(sceneObj);
-              normalize(holder, p.size || 1.75);
-              if (p.offset) holder.position.add(new T.Vector3(...p.offset));
-              group.add(holder);
-            });
-            wrap.add(group);
-            normalize(wrap, it.scanSize || 2.15);
-          } else {
-            throw new Error('No 3D photogrammetry parts configured');
-          }
-
-          const meshes = [];
-          wrap.traverse((o) => {
-            if (!o.isMesh) return;
-            o.castShadow = true;
-            o.receiveShadow = true;
-            const m = o.material;
-            if (m) {
-              m.envMapIntensity = it.envIntensity || 1.25;
-              if (m.aoMap && o.geometry && !o.geometry.attributes.uv2 && o.geometry.attributes.uv) {
-                o.geometry.setAttribute('uv2', o.geometry.attributes.uv);
-              }
-              m.needsUpdate = true;
-            }
-            o.userData.photoMat = m;
-            meshes.push(o);
-          });
-          const entry = { object: wrap, meshes };
-          state.loaded[i] = entry;
-          delete state.pending[i];
-          return entry;
-        })();
-        try {
-          return await state.pending[i];
-        } catch (err) {
-          delete state.pending[i];
-          throw err;
-        }
-      }
-
-      let needsRender = true;
-      let shadowDirty = true;
-      let glRafId = 0;
-      let loadToken = 0;
-
-      function requestRender() { needsRender = true; }
-
-      function applyGLTheme() {
-        const t = THEME_BG[currentTheme()] || THEME_BG.neon;
-        const env = getActiveEnvCfg();
-        if (scene.background && scene.background.dispose) scene.background.dispose();
-        scene.background = makeBgTexture();
-        scene.fog = new T.FogExp2(env.fog, env.lightBg ? 0.04 : 0.065);
-        renderer.toneMappingExposure = env.lightBg ? 1.08 : t.exposure;
-        shadowPlaneMat.opacity = env.lightBg ? 0.4 : t.shadow;
-        rim.color.setHex(env.accent);
-        fill.color.setHex(env.secondary);
-        haloMat.color.setHex(env.accent);
-        podium.material.color.setHex(env.lightBg ? 0xdbeafe : 0x111827);
-        requestRender();
-      }
-
-      function applyGLMode() {
-        const entry = state.loaded[state.active];
-        if (!entry) return;
-        entry.meshes.forEach((m) => {
-          m.material = state.mode === 'wire' ? wireMat : m.userData.photoMat;
-        });
-        shadowGroup.visible = state.mode !== 'wire';
-        requestRender();
-      }
-
-      function frame(entry) {
-        const box = new T.Box3().setFromObject(entry.object);
-        const size = box.getSize(new T.Vector3());
-        const center = box.getCenter(new T.Vector3());
-        const dist = Math.max(size.x, size.y * 1.25, size.z) * 1.55 + 0.5;
-        if (controls) controls.target.copy(center);
-        state.home = {
-          target: center.clone(),
-          pos: new T.Vector3(center.x + dist * 0.56, center.y + dist * 0.34, center.z + dist * 0.8),
-        };
-        camera.position.copy(state.home.pos);
-        camera.lookAt(center);
-        if (controls) controls.update();
-      }
-
-      function resetView() {
-        if (!state.home) return;
-        camera.position.copy(state.home.pos);
-        if (controls) { controls.target.copy(state.home.target); controls.update(); }
-        requestRender();
-      }
-
-      function dolly(mult) {
-        if (!controls) return;
-        const offset = camera.position.clone().sub(controls.target).multiplyScalar(mult);
-        const len = clamp(offset.length(), controls.minDistance, controls.maxDistance);
-        offset.setLength(len);
-        camera.position.copy(controls.target).add(offset);
-        controls.update();
-        requestRender();
-      }
-
-      function resizeGL() {
-        const w = canvasHost.clientWidth || stage.clientWidth || 640;
-        const h = canvasHost.clientHeight || stage.clientHeight || 470;
-        renderer.setSize(w, h, false);
-        renderer.domElement.style.width = '100%';
-        renderer.domElement.style.height = '100%';
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        requestRender();
-      }
-
-      async function showScan(i) {
-        const token = ++loadToken;
-        loader.innerHTML = '<span class="pr-spinner"></span><span class="pr-loader-text">Загрузка реального 3D-скана…</span>';
-        loader.hidden = false;
-        try {
-          const entry = await buildScanItem(i);
-          if (token !== loadToken) return;
-          while (root.children.length) root.remove(root.children[0]);
-          root.add(entry.object);
-          applyGLTheme();
-          frame(entry);
-          applyGLMode();
-          shadowDirty = true;
-          state.activeMeshes = entry.meshes.length;
-          loader.hidden = true;
-          requestRender();
-        } catch (err) {
-          state.errors.push(String(err && err.message || err));
-          loader.innerHTML = 'Не удалось загрузить 3D-скан. Переключитесь на «Фотореал 8K».';
-        }
-      }
-
-      function glLoop() {
-        glRafId = requestAnimationFrame(glLoop);
-        if (!state.visible || document.hidden || state.mode === 'real') return;
-        let changed = false;
-        if (controls) changed = controls.update() || controls.autoRotate || changed;
-        if (!changed && !needsRender) return;
-        needsRender = false;
-        if (shadowDirty && state.mode !== 'wire') {
-          renderContactShadow();
-          shadowDirty = false;
-        }
-        renderer.render(scene, camera);
-      }
-
-      applyGLTheme();
-      resizeGL();
-      glLoop();
-      state.glBooted = true;
-
-      gl = {
-        scene, renderer, controls, rtShadow, rtBlur,
-        applyGLTheme, applyGLMode, showScan, resizeGL, resetView, dolly,
-        stop: () => cancelAnimationFrame(glRafId),
-      };
-      return gl;
+      const camPos = new T.Vector3(
+        clamp(targetLook.x + sideSign * 0.42, -1.15, 1.15),
+        clamp(targetLook.y + 0.14, -0.55, 0.65),
+        clamp(pt.z + 1.65, 1.55, 2.35)
+      );
+      flyCameraTo(camPos, targetLook, 760);
     }
 
-    // ==================== UNIFIED STAGE CONTROLLER ====================
-    function updateHint() {
-      if (state.mode === 'real') {
-        hint.textContent = 'Нажимайте точки узлов · Колесо — зум · Перетаскивайте сцену';
-      } else {
-        hint.textContent = 'Вращайте 3D-скан на 360° · Колесо — зум · Двойной клик — сброс';
+    let loadToken = 0;
+    async function show(i) {
+      state.active = i;
+      const token = ++loadToken;
+      tabs.querySelectorAll('[data-pr-tab]').forEach((b) => {
+        b.setAttribute('aria-selected', String(Number(b.dataset.prTab) === i));
+      });
+      renderInfo(i);
+      renderHotspotPins(i);
+      state.activeHotspot = -1;
+      syncHotspotUI();
+
+      loader.innerHTML = '<span class="pr-spinner"></span><span class="pr-loader-text">Построение 3D-рельефа…</span>';
+      loader.hidden = false;
+      state.ready = false;
+
+      try {
+        if (state.mode === 'scan360') {
+          await showScan360(i, token);
+        } else {
+          const entry = await buildDepthScene(i);
+          if (token !== loadToken) return;
+          while (depthRoot.children.length) depthRoot.remove(depthRoot.children[0]);
+          depthRoot.add(entry.group);
+          state.activeTriangles = entry.triangles;
+          state.activeMeshes = 1;
+          applyRenderMode();
+          resetView(true);
+          state.ready = true;
+          loader.hidden = true;
+          container.dispatchEvent(new CustomEvent('photoreal:ready', { detail: { index: i } }));
+          // Background preload next scene's depth 3D mesh
+          const nextIdx = (i + 1) % items.length;
+          if (!state.depthLoaded[nextIdx] && 'requestIdleCallback' in window) {
+            requestIdleCallback(() => buildDepthScene(nextIdx).catch(() => {}));
+          }
+        }
+      } catch (err) {
+        state.errors.push(String(err && err.message || err));
+        loader.innerHTML = 'Не удалось загрузить 3D-сцену. Проверьте соединение.';
       }
+    }
+
+    async function showScan360(i, token) {
+      loader.innerHTML = '<span class="pr-spinner"></span><span class="pr-loader-text">Загрузка 3D-скана 360°…</span>';
+      loader.hidden = false;
+      const entry = await buildScanItem(i);
+      if (token !== loadToken) return;
+      while (scanModelHolder.children.length) scanModelHolder.remove(scanModelHolder.children[0]);
+      scanModelHolder.add(entry.object);
+      const box = new T.Box3().setFromObject(entry.object);
+      const size = box.getSize(new T.Vector3());
+      const center = box.getCenter(new T.Vector3());
+      const dist = Math.max(size.x, size.y * 1.2, size.z) * 1.55 + 0.55;
+      state.scanHome = {
+        target: center.clone(),
+        pos: new T.Vector3(center.x + dist * 0.55, center.y + dist * 0.34, center.z + dist * 0.8),
+      };
+      state.activeMeshes = entry.meshes.length;
+      applyRenderMode();
+      resetView(true);
+      state.ready = true;
+      loader.hidden = true;
     }
 
     function setMode(nextMode) {
+      const prevMode = state.mode;
       state.mode = nextMode;
       modes.querySelectorAll('[data-pr-mode]').forEach((b) => {
         b.setAttribute('aria-pressed', String(b.dataset.prMode === nextMode));
       });
-      stage.classList.toggle('pr-stage--real', nextMode === 'real');
-      stage.classList.toggle('pr-stage--scan', nextMode !== 'real');
-      realView.hidden = nextMode !== 'real';
-      canvasHost.hidden = nextMode === 'real';
-      updateHint();
-      updateZoomReadout();
-
-      if (nextMode === 'real') {
-        loader.hidden = true;
-        layoutRealMedia();
+      if (nextMode === 'scan360') {
+        state.activeHotspot = -1;
         syncHotspotUI();
+        show(state.active);
+      } else if (prevMode === 'scan360') {
+        show(state.active);
       } else {
-        hotspotCard.hidden = true;
-        const engine = ensureWebGL();
-        if (engine) {
-          engine.resizeGL();
-          engine.showScan(state.active);
+        applyRenderMode();
+      }
+    }
+
+    // ==================== RESIZE & 60 FPS RENDER LOOP ====================
+    function resize() {
+      const w = canvasHost.clientWidth || stage.clientWidth || 760;
+      const h = canvasHost.clientHeight || stage.clientHeight || 455;
+      renderer.setSize(w, h, false);
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
+      camera.aspect = w / Math.max(1, h);
+      camera.updateProjectionMatrix();
+      if (state.mode !== 'scan360' && state.activeHotspot < 0 && !userInteracted) {
+        camera.position.z = getDepthHomeDistance();
+      }
+    }
+    const ro = 'ResizeObserver' in window ? new ResizeObserver(resize) : null;
+    if (ro) ro.observe(stage); else window.addEventListener('resize', resize);
+
+    // Subtle pointer-reactive 3D light tracking
+    let ptrNX = 0, ptrNY = 0;
+    stage.addEventListener('pointermove', (e) => {
+      const r = stage.getBoundingClientRect();
+      ptrNX = ((e.clientX - r.left) / Math.max(1, r.width)) * 2 - 1;
+      ptrNY = -(((e.clientY - r.top) / Math.max(1, r.height)) * 2 - 1);
+    });
+
+    let rafId = 0;
+    const t0 = performance.now();
+    function loop() {
+      rafId = requestAnimationFrame(loop);
+      if (!state.visible || document.hidden) return;
+      const now = performance.now();
+      const sec = (now - t0) * 0.001;
+
+      // Move cursor 3D light smoothly in front of scene for real 3D surface sheen
+      cursorLight.position.x += (ptrNX * 2.1 - cursorLight.position.x) * 0.08;
+      cursorLight.position.y += (ptrNY * 1.2 - cursorLight.position.y) * 0.08;
+
+      // Animate floating 3D depth particles
+      if (particles.visible) {
+        const arr = pGeo.attributes.position.array;
+        for (let k = 0; k < pCount; k++) {
+          arr[k * 3] = pBase[k * 3] + Math.sin(sec * 0.45 + k) * 0.08;
+          arr[k * 3 + 1] = pBase[k * 3 + 1] + Math.cos(sec * 0.38 + k * 1.3) * 0.06;
+        }
+        pGeo.attributes.position.needsUpdate = true;
+      }
+
+      // Smooth 3D camera flight animation
+      if (camFly) {
+        const u = clamp((now - camFly.startTime) / camFly.duration, 0, 1);
+        const ease = 1 - Math.pow(1 - u, 3);
+        camera.position.lerpVectors(camFly.startPos, camFly.endPos, ease);
+        if (controls) controls.target.lerpVectors(camFly.startLook, camFly.endLook, ease);
+        if (u >= 1) camFly = null;
+      } else if (!reducedMotion && state.mode !== 'scan360' && state.activeHotspot < 0) {
+        // Gentle living 3D idle orbit sway so depth parallax is immediately unmistakable!
+        if (userInteracted && idleResumeAt && now > idleResumeAt) {
+          userInteracted = false;
+        }
+        if (!userInteracted && controls) {
+          const homeD = getDepthHomeDistance();
+          const yaw = Math.sin(sec * 0.55) * 0.21;
+          const pitch = Math.sin(sec * 0.36) * 0.075;
+          const tx = Math.sin(yaw) * homeD;
+          const ty = Math.sin(pitch) * homeD;
+          const tz = Math.cos(yaw) * Math.cos(pitch) * homeD;
+          camera.position.x += (tx - camera.position.x) * 0.04;
+          camera.position.y += (ty - camera.position.y) * 0.04;
+          camera.position.z += (tz - camera.position.z) * 0.04;
+          controls.target.x += (0 - controls.target.x) * 0.05;
+          controls.target.y += (0 - controls.target.y) * 0.05;
+          controls.target.z += (0.08 - controls.target.z) * 0.05;
         }
       }
+
+      if (controls) controls.update();
+      renderer.render(scene, camera);
+      updateProjectedHotspots();
+      state.frames++;
     }
 
-    function show(i) {
-      state.active = i;
-      tabs.querySelectorAll('[data-pr-tab]').forEach((b) => {
-        b.setAttribute('aria-selected', String(Number(b.dataset.prTab) === i));
-      });
-      const it = items[i];
-      renderInfo(i);
-      renderHotspots(i);
-      resetRealView();
-
-      if (it.photoUrl) {
-        realImg.classList.remove('is-loaded');
-        realImg.alt = it.title || it.course || '';
-        realImg.onload = () => {
-          state.natW = realImg.naturalWidth || 1376;
-          state.natH = realImg.naturalHeight || 768;
-          layoutRealMedia();
-          realImg.classList.add('is-loaded');
-          state.ready = true;
-          container.dispatchEvent(new CustomEvent('photoreal:ready', { detail: { index: i } }));
-        };
-        realImg.src = it.photoUrl;
-        if (realImg.complete && realImg.naturalWidth) {
-          state.natW = realImg.naturalWidth;
-          state.natH = realImg.naturalHeight;
-          layoutRealMedia();
-          realImg.classList.add('is-loaded');
-          state.ready = true;
-        }
-      }
-
-      applyPhotoLighting();
-
-      if (state.mode !== 'real') {
-        const engine = ensureWebGL();
-        if (engine) engine.showScan(i);
-      }
-
-      // Preload next scene image in background for instant tab switching
-      const nextItem = items[(i + 1) % items.length];
-      if (nextItem && nextItem.photoUrl) {
-        const pre = new Image();
-        pre.src = nextItem.photoUrl;
-      }
-    }
-
-    function applyTheme() {
-      applyPhotoLighting();
-      if (gl) gl.applyGLTheme();
-    }
-
-    // Events
+    // ==================== UI EVENTS ====================
     tabs.addEventListener('click', (e) => {
       const b = e.target.closest('[data-pr-tab]');
       if (b) show(Number(b.dataset.prTab));
@@ -1048,47 +988,72 @@ window.PhotorealShowcase = (function () {
       if (!b) return;
       state.bgPreset = b.dataset.prBg;
       bgSwitcher.querySelectorAll('[data-pr-bg]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-      applyTheme();
+      applyLighting();
+    });
+    hotspotsLayer.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-pr-hotspot]');
+      if (!btn) return;
+      e.stopPropagation();
+      const idx = Number(btn.dataset.prHotspot);
+      if (idx === state.activeHotspot) resetView(false);
+      else focusHotspot(idx);
+    });
+    info.addEventListener('click', (e) => {
+      const btn = e.target.closest('.pr-part-chip[data-pr-hotspot]');
+      if (!btn) return;
+      const idx = Number(btn.dataset.prHotspot);
+      if (idx === state.activeHotspot) resetView(false);
+      else focusHotspot(idx);
+    });
+    hotspotCard.addEventListener('click', (e) => {
+      const act = e.target.closest('[data-pr-hc]');
+      if (!act) return;
+      const list = (items[state.active] && items[state.active].hotspots) || [];
+      if (!list.length) return;
+      const cmd = act.dataset.prHc;
+      if (cmd === 'close') resetView(false);
+      else if (cmd === 'next') focusHotspot((state.activeHotspot + 1) % list.length);
+      else if (cmd === 'prev') focusHotspot((state.activeHotspot - 1 + list.length) % list.length);
+    });
+    zoomBar.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-pr-zoom]');
+      if (!btn) return;
+      const cmd = btn.dataset.prZoom;
+      if (cmd === 'reset') { resetView(false); return; }
+      if (!controls) return;
+      userInteracted = true;
+      cancelCameraFly();
+      const mult = cmd === 'in' ? 0.82 : 1.22;
+      const offset = camera.position.clone().sub(controls.target).multiplyScalar(mult);
+      offset.setLength(clamp(offset.length(), controls.minDistance, controls.maxDistance));
+      camera.position.copy(controls.target).add(offset);
+      controls.update();
     });
 
-    const onResize = () => {
-      layoutRealMedia();
-      if (gl && state.mode !== 'real') gl.resizeGL();
-    };
-    const ro = 'ResizeObserver' in window ? new ResizeObserver(onResize) : null;
-    if (ro) ro.observe(stage); else window.addEventListener('resize', onResize);
-
     const cleanupListeners = [
-      () => document.removeEventListener('amk:theme', applyTheme),
+      () => document.removeEventListener('amk:theme', applyLighting),
     ];
-    if (!ro) cleanupListeners.push(() => window.removeEventListener('resize', onResize));
-    document.addEventListener('amk:theme', applyTheme);
+    if (!ro) cleanupListeners.push(() => window.removeEventListener('resize', resize));
+    document.addEventListener('amk:theme', applyLighting);
 
     let io = null;
     function dispose() {
-      cancelAnimationFrame(spatialRaf);
+      cancelAnimationFrame(rafId);
       if (io && typeof io.disconnect === 'function') io.disconnect();
-      if (gl) {
-        gl.stop();
-        if (typeof window.disposeThreeScene === 'function') {
-          window.disposeThreeScene({
-            resizeObserver: ro,
-            scene: gl.scene,
-            renderer: gl.renderer,
-            controls: gl.controls,
-            rtShadow: gl.rtShadow,
-            rtBlur: gl.rtBlur,
-            cleanupListeners,
-          });
-        } else {
-          cleanupListeners.forEach((fn) => { try { fn(); } catch (e) {} });
-          if (ro) ro.disconnect();
-          try { if (gl.controls) gl.controls.dispose(); } catch (e) {}
-          try { gl.renderer.dispose(); } catch (e) {}
-        }
+      if (typeof window.disposeThreeScene === 'function') {
+        window.disposeThreeScene({
+          rafId,
+          resizeObserver: ro,
+          scene,
+          renderer,
+          controls,
+          cleanupListeners,
+        });
       } else {
         cleanupListeners.forEach((fn) => { try { fn(); } catch (e) {} });
         if (ro) ro.disconnect();
+        try { if (controls) controls.dispose(); } catch (e) {}
+        try { renderer.dispose(); } catch (e) {}
       }
     }
     const onPageHide = () => dispose();
@@ -1102,12 +1067,24 @@ window.PhotorealShowcase = (function () {
       io.observe(container);
     }
 
+    resize();
     show(0);
-    spatialLoop();
+    loop();
 
     state.show = show;
     state.setMode = setMode;
     state.focusHotspot = focusHotspot;
+    state.orbitTo = (yawRad, pitchRad) => {
+      userInteracted = true;
+      cancelCameraFly();
+      const d = getDepthHomeDistance();
+      camera.position.set(
+        Math.sin(yawRad) * d,
+        Math.sin(pitchRad) * d,
+        Math.cos(yawRad) * Math.cos(pitchRad) * d
+      );
+      if (controls) { controls.target.set(0, 0, 0.08); controls.update(); }
+    };
     state.dispose = dispose;
     return state;
   }

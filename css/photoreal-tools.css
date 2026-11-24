@@ -1834,12 +1834,25 @@ html, body, main, aside, div, nav {
   background: #070b14;
 }
 .pr-label {
-  max-width: calc(100% - 290px);
+  max-width: calc(100% - 360px);
 }
 .pr-label span {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.pr-hotspots--3d {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+.pr-hotspots--3d[hidden] {
+  display: none !important;
+}
+.pr-hotspot--3d {
+  transition: opacity 150ms ease;
 }
 .pr-canvas {
   width: 100%;
@@ -2247,11 +2260,16 @@ html, body, main, aside, div, nav {
   }
   .pr-modes {
     left: 10px;
-    right: auto;
+    right: 10px;
     top: 10px;
+    justify-content: space-between;
+  }
+  .pr-mode {
+    padding: 4px 7px;
+    font-size: 10px;
   }
   .pr-zoom-bar {
-    top: 10px;
+    top: 50px;
     right: 10px;
   }
   .pr-hotspot-card {
