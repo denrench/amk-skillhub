@@ -1262,10 +1262,12 @@ window.PhotorealShowcase = (function () {
         const wrap = new T.Group();
         let animators = [];
         if (it.sceneType) {
-          const built = buildProceduralScene(it.sceneType);
+          const built = (window.AMKDioramas && typeof window.AMKDioramas.build === 'function')
+            ? window.AMKDioramas.build(T, it.sceneType)
+            : buildProceduralScene(it.sceneType);
           wrap.add(built.group);
           animators = built.animators || [];
-          normalize(wrap, it.size || 2.35);
+          normalize(wrap, it.size || 2.55);
         } else {
           const group = new T.Group();
           const parts = await Promise.all(it.parts.map(loadPart));
