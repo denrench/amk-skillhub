@@ -48,27 +48,48 @@
   </header>
 
   <main id="main-content">
-    <section class="landing-hero" style="padding-top:1.75rem;padding-bottom:0.75rem;">
-      <div class="container" style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:1.5rem;">
-        <div class="landing-hero-copy" style="max-width:62ch;">
-          <h1 style="margin:0 0 0.6rem;">Знания, которые <span class="hero-highlight">можно применить</span></h1>
-          <p style="margin:0;">100 интерактивных уроков, фотореалистичные 3D-сканы реальных узлов и рабочие инструменты студента по 5 специальностям АМК.</p>
+    <section class="landing-hero amk-hero-v3">
+      <div class="container amk-hero-grid">
+        <div class="landing-hero-copy">
+          <div class="amk-live-pill">
+            <span class="amk-live-dot" aria-hidden="true"></span>
+            <span>Алматинский многопрофильный колледж · 5 специальностей ТиПО</span>
+          </div>
+          <h1>Знания, которые <span class="amk-grad-text">можно применить</span> на практике</h1>
+          <p class="amk-hero-lead">100 интерактивных уроков с озвучкой, живые 3D-стенды с настраиваемой студией, обученный ИИ-экзаменатор Gemini и защита от списывания.</p>
+          <div class="amk-hero-actions">
+            <a class="amk-btn-glow" href="tasks.html">Начать обучение →</a>
+            <a class="amk-btn-glass" href="learn.html">Открыть учебник</a>
+            <a class="amk-btn-ghost" href="auth.html">Войти</a>
+          </div>
         </div>
-        <div class="landing-cta-row" style="margin:0;">
-          <a class="button primary" href="learn.html">Открыть учебник</a>
-          <a class="button" href="tasks.html">Практикум</a>
-          <a class="button" href="auth.html">Войти</a>
-          <a class="button" href="auth.html?mode=register">Регистрация</a>
+        <div class="amk-hero-bento" aria-label="Ключевые возможности платформы">
+          <div class="amk-kpi-tile" data-tone="cyan">
+            <span class="amk-kpi-num">100</span>
+            <span class="amk-kpi-label">Интерактивных уроков с озвучкой и тренажёрами</span>
+          </div>
+          <div class="amk-kpi-tile" data-tone="violet">
+            <span class="amk-kpi-num">3D PBR</span>
+            <span class="amk-kpi-label">5 живых 3D-сцен со студийным светом и фонами</span>
+          </div>
+          <div class="amk-kpi-tile" data-tone="emerald">
+            <span class="amk-kpi-num">Gemini AI</span>
+            <span class="amk-kpi-label">Обученный ИИ-наставник и экзаменатор по ГОСТ/DIN</span>
+          </div>
+          <div class="amk-kpi-tile" data-tone="amber">
+            <span class="amk-kpi-num">Anti-Cheat</span>
+            <span class="amk-kpi-label">Контроль самостоятельности и цифровой ID студента</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="container section" id="photoreal-3d-showcase" aria-labelledby="photoreal-title" style="padding-top:1rem;">
+    <section class="container section" id="photoreal-3d-showcase" aria-labelledby="photoreal-title" style="padding-top:1.25rem;">
       <div class="section-head">
         <div class="stack">
-          <p class="eyebrow">Фотореалистичный 3D-шоукейс · PBR · HDRI · Contact Shadows</p>
-          <h2 id="photoreal-title" class="pr-section-title">Реальные 3D-сканы по направлениям АМК</h2>
-          <p class="muted" style="max-width:62ch;">Крутите объекты с физическими материалами, переключайте студийный свет и режимы <strong>Final Photo-Real / Clay / Wireframe</strong> прямо на холсте.</p>
+          <p class="eyebrow">3D-ШОУКЕЙС · PBR · HDRI · СТУДИЙНЫЕ ФОНЫ</p>
+          <h2 id="photoreal-title" class="pr-section-title">Интерактивные 3D-стенды по направлениям АМК</h2>
+          <p class="muted" style="max-width:64ch;">Вращайте сцены на 360°, меняйте атмосферу фона (<strong>Атмосфера / Закат / Кибер-сетка / Циклорама</strong>) и режимы <strong>Photo-Real / Clay / Wire</strong>.</p>
         </div>
       </div>
       <div id="photoreal-showcase-mount"></div>

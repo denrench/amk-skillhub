@@ -11,9 +11,52 @@ window.PhotorealShowcase = (function () {
   'use strict';
 
   const THEME_BG = {
-    light: { top: '#f7f5f0', bottom: '#e4dfd5', exposure: 1.0, shadow: 0.55 },
-    graphite: { top: '#34353b', bottom: '#1c1d21', exposure: 1.08, shadow: 0.75 },
-    neon: { top: '#13161f', bottom: '#05060a', exposure: 1.12, shadow: 0.8 },
+    light: { top: '#e2ecff', mid: '#f4f7ff', bottom: '#d8e3f5', exposure: 1.06, shadow: 0.45 },
+    graphite: { top: '#1e1b3a', mid: '#141928', bottom: '#090b12', exposure: 1.15, shadow: 0.65 },
+    neon: { top: '#1a1040', mid: '#0c1b3a', bottom: '#050814', exposure: 1.22, shadow: 0.72 },
+  };
+
+  // Rich per-scene atmospheric studio environments (unique palette, glow, rim light & particles)
+  const SCENE_ENVS = {
+    sport_wheel_garage: {
+      top: '#240f1f', mid: '#18142c', horizon: '#6b211a', bottom: '#090a12',
+      accent: 0xf97316, secondary: 0x38bdf8, grid: 0xf97316, fog: 0x120d1a,
+    },
+    gaming_room_rig: {
+      top: '#1e0b42', mid: '#0b1e48', horizon: '#3b1066', bottom: '#050816',
+      accent: 0x22d3ee, secondary: 0xec4899, grid: 0x6366f1, fog: 0x0b0f26,
+    },
+    autoelectric_lab: {
+      top: '#062c3d', mid: '#072a28', horizon: '#1e3a2f', bottom: '#040a10',
+      accent: 0xfbbf24, secondary: 0x34d399, grid: 0x10b981, fog: 0x06191e,
+    },
+    hvac_rooftop: {
+      top: '#082f49', mid: '#0e3b5c', horizon: '#155e75', bottom: '#06101f',
+      accent: 0x38bdf8, secondary: 0xa5f3fc, grid: 0x0ea5e9, fog: 0x081e33,
+    },
+    design_studio: {
+      top: '#3b0764', mid: '#1e1b4b', horizon: '#701a75', bottom: '#090514',
+      accent: 0xf472b6, secondary: 0x818cf8, grid: 0xc084fc, fog: 0x18092b,
+    },
+  };
+
+  const BG_PRESETS = {
+    atmosphere: { label: 'Атмосфера' },
+    sunset: {
+      label: 'Закат',
+      top: '#1c0c2e', mid: '#581c4f', horizon: '#ea580c', bottom: '#12081a',
+      accent: 0xfb923c, secondary: 0xc084fc, grid: 0xf97316, fog: 0x1d0e24,
+    },
+    cyber: {
+      label: 'Кибер-сетка',
+      top: '#040614', mid: '#09112e', horizon: '#1d4ed8', bottom: '#02040c',
+      accent: 0x22d3ee, secondary: 0xa855f7, grid: 0x22d3ee, fog: 0x05091c,
+    },
+    studio: {
+      label: 'Циклорама',
+      top: '#dbeafe', mid: '#eff6ff', horizon: '#f8fafc', bottom: '#cbd5e1',
+      accent: 0x2563eb, secondary: 0x06b6d4, grid: 0x94a3b8, fog: 0xe2e8f0, lightBg: true,
+    },
   };
 
   function currentTheme() {
@@ -76,17 +119,19 @@ window.PhotorealShowcase = (function () {
     const canvasHost = el('div', { class: 'pr-canvas', 'aria-label': 'Интерактивная 3D-модель' });
     const modes = el('div', { class: 'pr-modes', role: 'group', 'aria-label': 'Режим рендера' },
       ['photo', 'clay', 'wire'].map((m, i) => `<button type="button" class="pr-mode" data-pr-mode="${m}" aria-pressed="${i === 0}">${
-        m === 'photo' ? 'Final Photo-Real' : m === 'clay' ? 'Clay' : 'Wireframe'}</button>`).join(''));
+        m === 'photo' ? 'Photo-Real' : m === 'clay' ? 'Clay' : 'Wire'}</button>`).join(''));
+    const bgSwitcher = el('div', { class: 'pr-bg-modes', role: 'group', 'aria-label': 'Фон 3D-студии' },
+      Object.entries(BG_PRESETS).map(([key, cfg], i) => `<button type="button" class="pr-bg-btn" data-pr-bg="${key}" aria-pressed="${i === 0}">${escapeHtml(cfg.label)}</button>`).join(''));
     const label = el('div', { class: 'pr-label' });
     const loader = el('div', { class: 'pr-loader', role: 'status' }, '<span class="pr-spinner"></span><span class="pr-loader-text">Загрузка 3D-скана…</span>');
-    const hint = el('div', { class: 'pr-hint' }, 'Вращайте · Колесо — зум · Двойной клик — сброс');
-    stage.append(canvasHost, label, modes, loader, hint);
+    const hint = el('div', { class: 'pr-hint' }, 'Вращайте на 360° · Колесо — зум · Двойной клик — сброс');
+    stage.append(canvasHost, label, modes, bgSwitcher, loader, hint);
 
     const info = el('div', { class: 'pr-info' });
     container.append(tabs, stage, info);
 
     const state = {
-      active: 0, mode: 'photo', loaded: {}, pending: {}, ready: false, visible: false,
+      active: 0, mode: 'photo', bgPreset: 'atmosphere', loaded: {}, pending: {}, ready: false, visible: false,
       errors: [], envReady: false, renderer: null,
     };
     container.__photoreal = state;
@@ -125,37 +170,139 @@ window.PhotorealShowcase = (function () {
     const camera = new T.PerspectiveCamera(32, 1, 0.05, 100);
     camera.position.set(2.6, 1.5, 3.2);
 
+    function getActiveEnvCfg() {
+      const preset = BG_PRESETS[state.bgPreset];
+      if (preset && preset.top) return preset;
+      const it = items[state.active] || {};
+      const byScene = SCENE_ENVS[it.sceneType];
+      if (currentTheme() === 'light' && state.bgPreset === 'atmosphere') {
+        return {
+          top: '#dbeafe', mid: '#e0e7ff', horizon: '#f0f9ff', bottom: '#cbd5e1',
+          accent: (byScene && byScene.accent) || 0x2563eb,
+          secondary: (byScene && byScene.secondary) || 0x06b6d4,
+          grid: 0x64748b, fog: 0xdbeafe, lightBg: true,
+        };
+      }
+      return byScene || {
+        top: '#1a1040', mid: '#0c1b3a', horizon: '#1e3a8a', bottom: '#050814',
+        accent: 0x38bdf8, secondary: 0xa855f7, grid: 0x38bdf8, fog: 0x090f24,
+      };
+    }
+
     function makeBgTexture() {
-      const t = THEME_BG[currentTheme()] || THEME_BG.light;
+      const env = getActiveEnvCfg();
       const c = document.createElement('canvas');
-      c.width = 4; c.height = 256;
+      c.width = 512; c.height = 512;
       const g = c.getContext('2d');
-      const grad = g.createLinearGradient(0, 0, 0, 256);
-      grad.addColorStop(0, t.top);
-      grad.addColorStop(1, t.bottom);
+      // Rich multi-stop atmospheric studio sky gradient
+      const grad = g.createLinearGradient(0, 0, 0, 512);
+      grad.addColorStop(0.0, env.top);
+      grad.addColorStop(0.38, env.mid);
+      grad.addColorStop(0.64, env.horizon || env.mid);
+      grad.addColorStop(1.0, env.bottom);
       g.fillStyle = grad;
-      g.fillRect(0, 0, 4, 256);
+      g.fillRect(0, 0, 512, 512);
+
+      // Soft studio aurora orbs & horizon studio glow
+      const orb1 = g.createRadialGradient(130, 180, 10, 130, 180, 210);
+      orb1.addColorStop(0, env.lightBg ? 'rgba(56,189,248,0.22)' : 'rgba(56,189,248,0.28)');
+      orb1.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = orb1;
+      g.fillRect(0, 0, 512, 512);
+
+      const orb2 = g.createRadialGradient(390, 240, 10, 390, 240, 220);
+      orb2.addColorStop(0, env.lightBg ? 'rgba(139,92,246,0.16)' : 'rgba(236,72,153,0.22)');
+      orb2.addColorStop(1, 'rgba(0,0,0,0)');
+      g.fillStyle = orb2;
+      g.fillRect(0, 0, 512, 512);
+
+      // Subtle glowing horizon band
+      const hBand = g.createLinearGradient(0, 280, 0, 365);
+      hBand.addColorStop(0, 'rgba(255,255,255,0)');
+      hBand.addColorStop(0.5, env.lightBg ? 'rgba(255,255,255,0.45)' : 'rgba(125,211,252,0.18)');
+      hBand.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = hBand;
+      g.fillRect(0, 280, 512, 85);
+
       const tex = new T.CanvasTexture(c);
       tex.encoding = T.sRGBEncoding;
       return tex;
     }
+
+    // === 3D ATMOSPHERIC STAGE BACKDROP (Glow Rings, Cyber Grid & Floating Dust Particles) ===
+    const backdropGroup = new T.Group();
+    scene.add(backdropGroup);
+
+    const floorGrid = new T.PolarGridHelper(4.8, 12, 6, 48, 0x38bdf8, 0x1e293b);
+    floorGrid.position.y = -0.02;
+    if (floorGrid.material) {
+      floorGrid.material.transparent = true;
+      floorGrid.material.opacity = 0.28;
+    }
+    backdropGroup.add(floorGrid);
+
+    const haloMat1 = new T.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 });
+    const haloRing1 = new T.Mesh(new T.TorusGeometry(2.35, 0.014, 12, 96), haloMat1);
+    haloRing1.rotation.x = Math.PI / 2;
+    haloRing1.position.y = 0.01;
+    backdropGroup.add(haloRing1);
+
+    const haloMat2 = new T.MeshBasicMaterial({ color: 0xa855f7, transparent: true, opacity: 0.24 });
+    const haloRing2 = new T.Mesh(new T.TorusGeometry(2.95, 0.01, 12, 96), haloMat2);
+    haloRing2.rotation.x = Math.PI / 2;
+    haloRing2.position.y = 0.015;
+    backdropGroup.add(haloRing2);
+
+    // Floating luminous studio bokeh particles around the showcase
+    const pCount = 90;
+    const pPositions = new Float32Array(pCount * 3);
+    for (let pi = 0; pi < pCount; pi++) {
+      const ang = (pi / pCount) * Math.PI * 2 + (pi % 7) * 0.4;
+      const rad = 1.8 + ((pi * 37) % 100) / 100 * 3.2;
+      pPositions[pi * 3] = Math.cos(ang) * rad;
+      pPositions[pi * 3 + 1] = 0.25 + ((pi * 53) % 100) / 100 * 2.9;
+      pPositions[pi * 3 + 2] = Math.sin(ang) * rad;
+    }
+    const pGeo = new T.BufferGeometry();
+    pGeo.setAttribute('position', new T.BufferAttribute(pPositions, 3));
+    const pMat = new T.PointsMaterial({ color: 0x7dd3fc, size: 0.055, transparent: true, opacity: 0.65, depthWrite: false });
+    const starField = new T.Points(pGeo, pMat);
+    backdropGroup.add(starField);
+
+    // Key, Rim & Accent Studio Lights
+    const key = new T.DirectionalLight(0xffffff, 2.4);
+    key.position.set(3.2, 5.2, 3.0);
+    scene.add(key);
+    const rim = new T.DirectionalLight(0x38bdf8, 1.8);
+    rim.position.set(-3.2, 2.8, -3.0);
+    scene.add(rim);
+    const accentFill = new T.PointLight(0xa855f7, 2.2, 10);
+    accentFill.position.set(2.8, 1.6, -2.2);
+    scene.add(accentFill);
+
     function applyTheme() {
-      const t = THEME_BG[currentTheme()] || THEME_BG.light;
+      const t = THEME_BG[currentTheme()] || THEME_BG.neon;
+      const env = getActiveEnvCfg();
       if (scene.background && scene.background.dispose) scene.background.dispose();
       scene.background = makeBgTexture();
-      renderer.toneMappingExposure = t.exposure;
-      if (shadowPlaneMat) shadowPlaneMat.opacity = t.shadow;
-      if (bloomPass) bloomPass.strength = currentTheme() === 'neon' ? 0.42 : 0.22;
+      scene.fog = new T.FogExp2(env.fog, env.lightBg ? 0.05 : 0.075);
+      renderer.toneMappingExposure = env.lightBg ? 1.06 : t.exposure;
+      if (shadowPlaneMat) shadowPlaneMat.opacity = env.lightBg ? 0.42 : t.shadow;
+      if (bloomPass) bloomPass.strength = env.lightBg ? 0.14 : (state.bgPreset === 'cyber' ? 0.52 : 0.36);
+
+      rim.color.setHex(env.accent);
+      accentFill.color.setHex(env.secondary);
+      haloMat1.color.setHex(env.accent);
+      haloMat1.opacity = env.lightBg ? 0.28 : 0.42;
+      haloMat2.color.setHex(env.secondary);
+      haloMat2.opacity = env.lightBg ? 0.18 : 0.28;
+      pMat.color.setHex(env.accent);
+      pMat.opacity = env.lightBg ? 0.32 : 0.72;
+      if (floorGrid.material) {
+        floorGrid.material.opacity = state.bgPreset === 'cyber' ? 0.5 : (env.lightBg ? 0.18 : 0.3);
+      }
       requestRender();
     }
-
-    // Key light for crisp shading (HDRI gives reflections/ambient)
-    const key = new T.DirectionalLight(0xffffff, 2.2);
-    key.position.set(3, 5, 2.5);
-    scene.add(key);
-    const rim = new T.DirectionalLight(0xdbeafe, 1.1);
-    rim.position.set(-3, 2.5, -3);
-    scene.add(rim);
 
     // ---------- Contact shadows (port of three.js webgl_shadow_contact) ----------
     const SH_W = 4, SH_H = 4, SH_RES = 512, SH_CAM_H = 1.6;
@@ -417,20 +564,16 @@ window.PhotorealShowcase = (function () {
         floor.position.y = -0.04;
         group.add(floor);
 
-        // Garage back wall + hydraulic lift pillars + red mechanic cabinet
-        const backWall = new T.Mesh(
-          new T.BoxGeometry(3.6, 2.1, 0.08),
-          new T.MeshStandardMaterial({ color: 0x1a1e28, roughness: 0.75, metalness: 0.2 })
-        );
-        backWall.position.set(0, 1.05, -1.35);
-        group.add(backWall);
-
-        // Overhead neon garage light tube
+        // Open 360° Neon Showroom Portal Arch (never blocks camera from behind!)
+        const archMat = new T.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.28, metalness: 0.85 });
+        const archOuter = new T.Mesh(new T.TorusGeometry(1.55, 0.06, 16, 64, Math.PI), archMat);
+        archOuter.position.set(0, 0.02, -0.85);
+        group.add(archOuter);
         const ledTube = new T.Mesh(
-          new T.BoxGeometry(2.4, 0.05, 0.06),
-          new T.MeshStandardMaterial({ color: 0xe0f2fe, emissive: 0x38bdf8, emissiveIntensity: 2.2 })
+          new T.TorusGeometry(1.48, 0.022, 12, 64, Math.PI),
+          new T.MeshStandardMaterial({ color: 0xfed7aa, emissive: 0xf97316, emissiveIntensity: 2.4 })
         );
-        ledTube.position.set(0, 1.92, -1.26);
+        ledTube.position.set(0, 0.02, -0.84);
         group.add(ledTube);
 
         // Two-post hydraulic lift columns
@@ -578,18 +721,25 @@ window.PhotorealShowcase = (function () {
       } else if (sceneType === 'gaming_room_rig') {
         // === CYBER GAMING ROOM ENVIRONMENT ===
         const floor = new T.Mesh(
-          new T.CylinderGeometry(2.3, 2.3, 0.08, 48),
-          new T.MeshStandardMaterial({ color: 0x111522, roughness: 0.55, metalness: 0.2 })
+          new T.CylinderGeometry(1.78, 1.88, 0.09, 48),
+          new T.MeshStandardMaterial({ color: 0x0b1020, roughness: 0.24, metalness: 0.72 })
         );
-        floor.position.y = -0.04;
+        floor.position.y = -0.045;
         group.add(floor);
-
-        // Back wall with glowing acoustic RGB hex strips
-        const wall = new T.Mesh(
-          new T.BoxGeometry(3.4, 2.1, 0.08),
-          new T.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.8, metalness: 0.15 })
+        const floorRim = new T.Mesh(
+          new T.TorusGeometry(1.81, 0.016, 12, 64),
+          new T.MeshStandardMaterial({ color: 0x22d3ee, emissive: 0x22d3ee, emissiveIntensity: 2.2 })
         );
-        wall.position.set(0, 1.05, -1.05);
+        floorRim.rotation.x = Math.PI / 2;
+        floorRim.position.y = 0.004;
+        group.add(floorRim);
+
+        // Open 360° Translucent Holographic Cyber Frame (never blocks rear orbit)
+        const wall = new T.Mesh(
+          new T.TorusGeometry(1.45, 0.03, 12, 64, Math.PI),
+          new T.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3, metalness: 0.85 })
+        );
+        wall.position.set(0, 0.1, -0.95);
         group.add(wall);
 
         const rgbStrips = [];
@@ -745,11 +895,18 @@ window.PhotorealShowcase = (function () {
         });
       } else if (sceneType === 'autoelectric_lab') {
         const floor = new T.Mesh(
-          new T.CylinderGeometry(2.1, 2.1, 0.08, 48),
-          new T.MeshStandardMaterial({ color: 0x131926, roughness: 0.48, metalness: 0.25 })
+          new T.CylinderGeometry(1.75, 1.85, 0.09, 48),
+          new T.MeshStandardMaterial({ color: 0x0b1520, roughness: 0.26, metalness: 0.68 })
         );
-        floor.position.y = -0.04;
+        floor.position.y = -0.045;
         group.add(floor);
+        const floorRim = new T.Mesh(
+          new T.TorusGeometry(1.78, 0.016, 12, 64),
+          new T.MeshStandardMaterial({ color: 0x34d399, emissive: 0x34d399, emissiveIntensity: 2.0 })
+        );
+        floorRim.rotation.x = Math.PI / 2;
+        floorRim.position.y = 0.004;
+        group.add(floorRim);
         // ESD Anti-Static Bench
         const bench = new T.Mesh(
           new T.BoxGeometry(2.1, 0.08, 1.15),
@@ -792,11 +949,18 @@ window.PhotorealShowcase = (function () {
         group.add(led);
       } else if (sceneType === 'hvac_rooftop') {
         const floor = new T.Mesh(
-          new T.CylinderGeometry(2.2, 2.2, 0.08, 48),
-          new T.MeshStandardMaterial({ color: 0x222731, roughness: 0.82 })
+          new T.CylinderGeometry(1.75, 1.85, 0.09, 48),
+          new T.MeshStandardMaterial({ color: 0x0d1726, roughness: 0.28, metalness: 0.65 })
         );
-        floor.position.y = -0.04;
+        floor.position.y = -0.045;
         group.add(floor);
+        const floorRim = new T.Mesh(
+          new T.TorusGeometry(1.78, 0.016, 12, 64),
+          new T.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 2.0 })
+        );
+        floorRim.rotation.x = Math.PI / 2;
+        floorRim.position.y = 0.004;
+        group.add(floorRim);
         // Inverter Condenser Unit
         const box = new T.Mesh(
           new T.BoxGeometry(1.36, 0.98, 0.56),
@@ -839,11 +1003,18 @@ window.PhotorealShowcase = (function () {
       } else {
         // === DESIGN STUDIO ===
         const floor = new T.Mesh(
-          new T.CylinderGeometry(2.1, 2.1, 0.08, 48),
-          new T.MeshStandardMaterial({ color: 0x161822, roughness: 0.5 })
+          new T.CylinderGeometry(1.72, 1.82, 0.09, 48),
+          new T.MeshStandardMaterial({ color: 0x120d22, roughness: 0.24, metalness: 0.72 })
         );
-        floor.position.y = -0.04;
+        floor.position.y = -0.045;
         group.add(floor);
+        const floorRim = new T.Mesh(
+          new T.TorusGeometry(1.75, 0.016, 12, 64),
+          new T.MeshStandardMaterial({ color: 0xf472b6, emissive: 0xf472b6, emissiveIntensity: 2.2 })
+        );
+        floorRim.rotation.x = Math.PI / 2;
+        floorRim.position.y = 0.004;
+        group.add(floorRim);
         const desk = new T.Mesh(
           new T.BoxGeometry(2.1, 0.07, 1.1),
           new T.MeshStandardMaterial({ color: 0x452c1e, roughness: 0.55 })
@@ -959,9 +1130,9 @@ window.PhotorealShowcase = (function () {
       const box = new T.Box3().setFromObject(entry.object);
       const size = box.getSize(new T.Vector3());
       const center = box.getCenter(new T.Vector3());
-      const dist = Math.max(size.x, size.y * 1.28, size.z) * 1.95 + 0.65;
+      const dist = Math.max(size.x, size.y * 1.2, size.z) * 1.52 + 0.45;
       if (controls) controls.target.copy(center);
-      state.home = { target: center.clone(), pos: new T.Vector3(center.x + dist * 0.62, center.y + dist * 0.34, center.z + dist * 0.72) };
+      state.home = { target: center.clone(), pos: new T.Vector3(center.x + dist * 0.52, center.y + dist * 0.28, center.z + dist * 0.82) };
       camera.position.copy(state.home.pos);
       camera.lookAt(center);
       if (controls) controls.update();
@@ -987,6 +1158,7 @@ window.PhotorealShowcase = (function () {
         if (token !== loadToken) return;
         while (root.children.length) root.remove(root.children[0]);
         root.add(entry.object);
+        applyTheme();
         frame(entry);
         applyMode();
         shadowDirty = true;
@@ -1031,8 +1203,14 @@ window.PhotorealShowcase = (function () {
       if (!state.visible || document.hidden) return;
       let changed = false;
       const activeEntry = state.loaded[state.active];
+      const sec = (performance.now() - t0) * 0.001;
+      if (starField) {
+        starField.rotation.y = sec * 0.08;
+        haloRing1.rotation.z = sec * 0.14;
+        haloRing2.rotation.z = -sec * 0.1;
+        changed = true;
+      }
       if (activeEntry && activeEntry.animators && activeEntry.animators.length) {
-        const sec = (performance.now() - t0) * 0.001;
         activeEntry.animators.forEach((fn) => fn(sec));
         changed = true;
       }
@@ -1066,6 +1244,13 @@ window.PhotorealShowcase = (function () {
       state.mode = b.dataset.prMode;
       modes.querySelectorAll('[data-pr-mode]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       applyMode();
+    });
+    bgSwitcher.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-pr-bg]');
+      if (!b) return;
+      state.bgPreset = b.dataset.prBg;
+      bgSwitcher.querySelectorAll('[data-pr-bg]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      applyTheme();
     });
     const cleanupListeners = [
       () => document.removeEventListener('amk:theme', applyTheme)
