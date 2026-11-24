@@ -626,19 +626,16 @@ window.PhotorealShowcase = (function () {
         const spinGroup = new T.Group();
         wheelAssembly.add(spinGroup);
 
-        // Low-profile Sport Tire (matte carbon rubber)
-        const tireMat = new T.MeshStandardMaterial({ color: 0x16181e, roughness: 0.86, metalness: 0.06 });
-        const tire = new T.Mesh(new T.TorusGeometry(0.62, 0.19, 28, 64), tireMat);
+        // Low-profile Sport Tire (smooth matte carbon rubber + twin circumferential rain grooves)
+        const tireMat = new T.MeshStandardMaterial({ color: 0x16181e, roughness: 0.82, metalness: 0.08 });
+        const tire = new T.Mesh(new T.TorusGeometry(0.62, 0.19, 36, 80), tireMat);
         spinGroup.add(tire);
-
-        // Tread ribs around tire
-        for (let i = 0; i < 36; i++) {
-          const a = (i / 36) * Math.PI * 2;
-          const rib = new T.Mesh(new T.BoxGeometry(0.035, 0.04, 0.34), tireMat);
-          rib.position.set(Math.cos(a) * 0.805, Math.sin(a) * 0.805, 0);
-          rib.rotation.z = a + Math.PI / 2;
-          spinGroup.add(rib);
-        }
+        const grooveMat = new T.MeshStandardMaterial({ color: 0x090b0f, roughness: 0.95, metalness: 0.02 });
+        [-0.06, 0.06].forEach((gz) => {
+          const groove = new T.Mesh(new T.TorusGeometry(0.805, 0.008, 10, 72), grooveMat);
+          groove.position.z = gz;
+          spinGroup.add(groove);
+        });
 
         // Polished Machined Chrome Outer Barrel & Rim Lip
         const chromeMat = new T.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.96, roughness: 0.12 });
@@ -907,98 +904,288 @@ window.PhotorealShowcase = (function () {
         floorRim.rotation.x = Math.PI / 2;
         floorRim.position.y = 0.004;
         group.add(floorRim);
-        // ESD Anti-Static Bench
+        // ESD Anti-Static Bench + 4 Steel Legs
         const bench = new T.Mesh(
           new T.BoxGeometry(2.1, 0.08, 1.15),
-          new T.MeshStandardMaterial({ color: 0x0f2942, roughness: 0.65, metalness: 0.2 })
+          new T.MeshStandardMaterial({ color: 0x0f2942, roughness: 0.55, metalness: 0.28 })
         );
         bench.position.set(0, 0.55, 0);
         group.add(bench);
+        const legMatE = new T.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.82, roughness: 0.28 });
+        [[-0.95, -0.48], [0.95, -0.48], [-0.95, 0.48], [0.95, 0.48]].forEach(([lx, lz]) => {
+          const leg = new T.Mesh(new T.BoxGeometry(0.06, 0.55, 0.06), legMatE);
+          leg.position.set(lx, 0.275, lz);
+          group.add(leg);
+        });
+        // 12V Automotive AGM Battery on left side of bench
+        const bat = new T.Mesh(new T.BoxGeometry(0.42, 0.28, 0.26), new T.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.45, metalness: 0.3 }));
+        bat.position.set(-0.76, 0.73, 0.22);
+        group.add(bat);
+        const posPost = new T.Mesh(new T.CylinderGeometry(0.022, 0.024, 0.05, 16), new T.MeshStandardMaterial({ color: 0xef4444, metalness: 0.6, roughness: 0.3 }));
+        posPost.position.set(-0.64, 0.89, 0.22);
+        group.add(posPost);
+        const negPost = new T.Mesh(new T.CylinderGeometry(0.022, 0.024, 0.05, 16), new T.MeshStandardMaterial({ color: 0x3b82f6, metalness: 0.6, roughness: 0.3 }));
+        negPost.position.set(-0.88, 0.89, 0.22);
+        group.add(negPost);
         // Pro Digital Oscilloscope & Diagnostic Station
         const scopeBody = new T.Mesh(
           new T.BoxGeometry(1.08, 0.66, 0.34),
           new T.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.65, roughness: 0.3 })
         );
-        scopeBody.position.set(-0.18, 0.92, -0.08);
+        scopeBody.position.set(-0.08, 0.92, -0.14);
         group.add(scopeBody);
         const sTex = makeScreenTex('CAN-BUS', '#34d399', 'scope');
         const sMesh = new T.Mesh(
           new T.PlaneGeometry(0.72, 0.46),
           new T.MeshStandardMaterial({ map: sTex, emissiveMap: sTex, emissive: 0xffffff, emissiveIntensity: 1.0 })
         );
-        sMesh.position.set(-0.32, 0.94, 0.095);
+        sMesh.position.set(-0.22, 0.94, 0.036);
         group.add(sMesh);
         // Knobs
         for (let k = 0; k < 4; k++) {
           const knob = new T.Mesh(new T.CylinderGeometry(0.036, 0.04, 0.05, 20), chromeMatSafe(T));
           knob.rotation.x = Math.PI / 2;
-          knob.position.set(0.22, 0.74 + k * 0.12, 0.11);
+          knob.position.set(0.32, 0.74 + k * 0.12, 0.045);
           group.add(knob);
         }
-        // Smart Digital Multimeter beside it
+        // Smart Digital Multimeter (Fluke-style) resting on tilt stand with LCD screen
+        const multiGrp = new T.Group();
+        multiGrp.position.set(0.68, 0.83, 0.12);
+        multiGrp.rotation.y = -0.35;
+        multiGrp.rotation.x = -0.25;
+        group.add(multiGrp);
         const multi = new T.Mesh(
-          new T.BoxGeometry(0.32, 0.52, 0.12),
-          new T.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.42, metalness: 0.2 })
+          new T.BoxGeometry(0.30, 0.50, 0.10),
+          new T.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.4, metalness: 0.2 })
         );
-        multi.position.set(0.68, 0.85, 0.12);
-        multi.rotation.y = -0.35;
-        multi.rotation.x = -0.25;
-        group.add(multi);
+        multiGrp.add(multi);
+        const multiFace = new T.Mesh(
+          new T.BoxGeometry(0.24, 0.42, 0.015),
+          new T.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 })
+        );
+        multiFace.position.z = 0.05;
+        multiGrp.add(multiFace);
+        const multiLcd = new T.Mesh(
+          new T.PlaneGeometry(0.20, 0.13),
+          new T.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.85 })
+        );
+        multiLcd.position.set(0, 0.11, 0.06);
+        multiGrp.add(multiLcd);
+        const multiDial = new T.Mesh(
+          new T.CylinderGeometry(0.065, 0.07, 0.03, 24),
+          new T.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.6 })
+        );
+        multiDial.rotation.x = Math.PI / 2;
+        multiDial.position.set(0, -0.05, 0.065);
+        multiGrp.add(multiDial);
         const led = new T.PointLight(0x34d399, 2.8, 5);
         led.position.set(0, 1.8, 1.2);
         group.add(led);
       } else if (sceneType === 'hvac_rooftop') {
         const floor = new T.Mesh(
-          new T.CylinderGeometry(1.75, 1.85, 0.09, 48),
-          new T.MeshStandardMaterial({ color: 0x0d1726, roughness: 0.28, metalness: 0.65 })
+          new T.CylinderGeometry(1.78, 1.88, 0.09, 48),
+          new T.MeshStandardMaterial({ color: 0x0d1726, roughness: 0.26, metalness: 0.68 })
         );
         floor.position.y = -0.045;
         group.add(floor);
         const floorRim = new T.Mesh(
-          new T.TorusGeometry(1.78, 0.016, 12, 64),
-          new T.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 2.0 })
+          new T.TorusGeometry(1.81, 0.016, 12, 64),
+          new T.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 2.1 })
         );
         floorRim.rotation.x = Math.PI / 2;
         floorRim.position.y = 0.004;
         group.add(floorRim);
-        // Inverter Condenser Unit
-        const box = new T.Mesh(
-          new T.BoxGeometry(1.36, 0.98, 0.56),
-          new T.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.35, metalness: 0.45 })
+
+        // Helper for crisp analog pressure gauge dial textures (LP Blue / HP Red)
+        function makeGaugeDialTex(label, color, needleAngle) {
+          const c = document.createElement('canvas');
+          c.width = 256; c.height = 256;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#f8fafc';
+          ctx.beginPath(); ctx.arc(128, 128, 122, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = color; ctx.lineWidth = 14;
+          ctx.beginPath(); ctx.arc(128, 128, 114, Math.PI * 0.78, Math.PI * 2.22); ctx.stroke();
+          ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 4;
+          for (let i = 0; i <= 10; i++) {
+            const a = Math.PI * 0.8 + (i / 10) * Math.PI * 1.4;
+            ctx.beginPath();
+            ctx.moveTo(128 + Math.cos(a) * 84, 128 + Math.sin(a) * 84);
+            ctx.lineTo(128 + Math.cos(a) * 102, 128 + Math.sin(a) * 102);
+            ctx.stroke();
+          }
+          ctx.fillStyle = '#0f172a'; ctx.font = 'bold 28px monospace'; ctx.textAlign = 'center';
+          ctx.fillText(label, 128, 198);
+          ctx.save();
+          ctx.translate(128, 128);
+          ctx.rotate(needleAngle);
+          ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 7; ctx.lineCap = 'round';
+          ctx.beginPath(); ctx.moveTo(-18, 0); ctx.lineTo(84, 0); ctx.stroke();
+          ctx.restore();
+          ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(128, 128, 14, 0, Math.PI * 2); ctx.fill();
+          const tex = new T.CanvasTexture(c);
+          tex.encoding = T.sRGBEncoding;
+          return tex;
+        }
+
+        const metalWhite = new T.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.34, metalness: 0.42 });
+        const darkMetal = new T.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.78 });
+        const steelMat = new T.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.3, metalness: 0.82 });
+        const copperMat = new T.MeshStandardMaterial({ color: 0xd97706, metalness: 0.92, roughness: 0.2 });
+
+        // Anti-vibration mounting feet
+        [-0.64, 0.24].forEach((fx) => {
+          const foot = new T.Mesh(new T.BoxGeometry(0.16, 0.08, 0.64), darkMetal);
+          foot.position.set(fx, 0.04, 0);
+          group.add(foot);
+        });
+
+        // Inverter Condenser Main Housing (x: -0.20, width 1.38 -> right side at +0.49, front at +0.28)
+        const housing = new T.Mesh(new T.BoxGeometry(1.38, 0.96, 0.56), metalWhite);
+        housing.position.set(-0.20, 0.56, 0);
+        group.add(housing);
+        // Top beveled rain cap lid
+        const topCap = new T.Mesh(new T.BoxGeometry(1.42, 0.05, 0.60), steelMat);
+        topCap.position.set(-0.20, 1.065, 0);
+        group.add(topCap);
+        // Right electrical inverter compartment panel with blue accent stripe & badge
+        const compPanel = new T.Mesh(new T.BoxGeometry(0.36, 0.82, 0.025), new T.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.32, metalness: 0.5 }));
+        compPanel.position.set(0.28, 0.56, 0.285);
+        group.add(compPanel);
+        const brandStripe = new T.Mesh(new T.BoxGeometry(0.26, 0.045, 0.03), new T.MeshStandardMaterial({ color: 0x0284c7, emissive: 0x0284c7, emissiveIntensity: 0.8 }));
+        brandStripe.position.set(0.28, 0.86, 0.288);
+        group.add(brandStripe);
+        // Rear aluminum condenser fin louvers (visible from back/sides)
+        for (let r = 0; r < 11; r++) {
+          const fin = new T.Mesh(new T.BoxGeometry(1.24, 0.025, 0.025), steelMat);
+          fin.position.set(-0.20, 0.18 + r * 0.075, -0.288);
+          group.add(fin);
+        }
+
+        // === DEEP FAN SHROUD CAVITY + 5-BLADE AXIAL FAN + PROTECTIVE GRILLE (ZERO CLIPPING!) ===
+        const fanCx = -0.44, fanCy = 0.57;
+        // Dark cylindrical diffuser chamber projecting cleanly in front of housing (z = 0.28..0.33)
+        const cavity = new T.Mesh(
+          new T.CylinderGeometry(0.36, 0.36, 0.04, 48),
+          new T.MeshStandardMaterial({ color: 0x060912, roughness: 0.9, metalness: 0.1 })
         );
-        box.position.set(-0.1, 0.56, 0);
-        group.add(box);
-        const grille = new T.Mesh(
-          new T.TorusGeometry(0.36, 0.025, 14, 36),
-          new T.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.3 })
-        );
-        grille.position.set(-0.28, 0.58, 0.285);
-        group.add(grille);
+        cavity.rotation.x = Math.PI / 2;
+        cavity.position.set(fanCx, fanCy, 0.285);
+        group.add(cavity);
+        // Outer aerodynamic shroud ring
+        const shroudOuter = new T.Mesh(new T.TorusGeometry(0.37, 0.028, 16, 48), darkMetal);
+        shroudOuter.position.set(fanCx, fanCy, 0.315);
+        group.add(shroudOuter);
+
+        // Rotating Fan Hub + 5 Properly Pitched Blades (safely in front of cavity at z = 0.325)
         const fan = new T.Group();
-        fan.position.set(-0.28, 0.58, 0.27);
+        fan.position.set(fanCx, fanCy, 0.325);
         group.add(fan);
-        const bladeMat = new T.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.65, roughness: 0.25 });
+        const hub = new T.Mesh(new T.CylinderGeometry(0.085, 0.095, 0.04, 24), darkMetal);
+        hub.rotation.x = Math.PI / 2;
+        fan.add(hub);
+        const bladeMat = new T.MeshStandardMaterial({ color: 0x0ea5e9, metalness: 0.55, roughness: 0.26 });
         for (let b = 0; b < 5; b++) {
           const a = (b / 5) * Math.PI * 2;
-          const blade = new T.Mesh(new T.BoxGeometry(0.09, 0.31, 0.02), bladeMat);
-          blade.position.set(Math.cos(a) * 0.16, Math.sin(a) * 0.16, 0);
-          blade.rotation.z = a + Math.PI / 2;
-          blade.rotation.y = 0.25;
-          fan.add(blade);
+          const bPivot = new T.Group();
+          bPivot.rotation.z = a;
+          const blade = new T.Mesh(new T.BoxGeometry(0.095, 0.24, 0.012), bladeMat);
+          blade.position.set(0, 0.19, 0);
+          blade.rotation.y = 0.22; // aerodynamic pitch without touching cavity behind!
+          bPivot.add(blade);
+          fan.add(bPivot);
         }
-        // Copper Refrigerant Coils & Pressure Manifold Gauges
-        const copperMat = new T.MeshStandardMaterial({ color: 0xd97706, metalness: 0.92, roughness: 0.22 });
-        const pipe1 = new T.Mesh(new T.CylinderGeometry(0.032, 0.032, 0.72, 16), copperMat);
-        pipe1.position.set(0.74, 0.42, 0.1);
-        group.add(pipe1);
-        const lpGauge = new T.Mesh(new T.CylinderGeometry(0.11, 0.11, 0.05, 24), new T.MeshStandardMaterial({ color: 0x0284c7, emissive: 0x0284c7, emissiveIntensity: 0.6 }));
-        lpGauge.rotation.x = Math.PI / 2;
-        lpGauge.position.set(0.68, 0.82, 0.12);
-        group.add(lpGauge);
-        const hpGauge = new T.Mesh(new T.CylinderGeometry(0.11, 0.11, 0.05, 24), new T.MeshStandardMaterial({ color: 0xe11d48, emissive: 0xe11d48, emissiveIntensity: 0.6 }));
-        hpGauge.rotation.x = Math.PI / 2;
-        hpGauge.position.set(0.92, 0.82, 0.12);
-        group.add(hpGauge);
+
+        // Front Protective Wire Grille (4 concentric rings + 4 radial struts at z = 0.355)
+        const grilleGroup = new T.Group();
+        grilleGroup.position.set(fanCx, fanCy, 0.355);
+        group.add(grilleGroup);
+        [0.12, 0.20, 0.28, 0.36].forEach((rad) => {
+          const ring = new T.Mesh(new T.TorusGeometry(rad, 0.007, 8, 40), darkMetal);
+          grilleGroup.add(ring);
+        });
+        for (let s = 0; s < 4; s++) {
+          const strut = new T.Mesh(new T.BoxGeometry(0.73, 0.012, 0.012), darkMetal);
+          strut.rotation.z = (s * Math.PI) / 4;
+          grilleGroup.add(strut);
+        }
+        const centerCap = new T.Mesh(new T.CylinderGeometry(0.055, 0.055, 0.016, 20), new T.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.7, roughness: 0.2 }));
+        centerCap.rotation.x = Math.PI / 2;
+        grilleGroup.add(centerCap);
+
+        // === RIGHT SIDE SERVICE VALVES + MANIFOLD GAUGE STAND + SERVICE HOSES + R410A CYLINDER ===
+        // Brass service ports on right side of condenser
+        [0.24, 0.38].forEach((vy) => {
+          const valve = new T.Mesh(new T.CylinderGeometry(0.028, 0.028, 0.10, 16), copperMat);
+          valve.rotation.z = Math.PI / 2;
+          valve.position.set(0.53, vy, 0.08);
+          group.add(valve);
+        });
+
+        // Manifold Stand & Aluminum Block (x = 0.88)
+        const standBase = new T.Mesh(new T.CylinderGeometry(0.16, 0.19, 0.04, 24), darkMetal);
+        standBase.position.set(0.88, 0.02, 0.08);
+        group.add(standBase);
+        const standPole = new T.Mesh(new T.CylinderGeometry(0.022, 0.022, 0.70, 16), steelMat);
+        standPole.position.set(0.88, 0.37, 0.08);
+        group.add(standPole);
+        const manifoldBlock = new T.Mesh(new T.BoxGeometry(0.42, 0.10, 0.09), steelMat);
+        manifoldBlock.position.set(0.88, 0.72, 0.08);
+        group.add(manifoldBlock);
+        // Sight glass in center of manifold
+        const sightGlass = new T.Mesh(new T.CylinderGeometry(0.026, 0.026, 0.02, 16), new T.MeshStandardMaterial({ color: 0x7dd3fc, emissive: 0x38bdf8, emissiveIntensity: 0.9 }));
+        sightGlass.rotation.x = Math.PI / 2;
+        sightGlass.position.set(0.88, 0.72, 0.13);
+        group.add(sightGlass);
+        // LP (Blue) & HP (Red) Handwheels
+        const lpWheel = new T.Mesh(new T.CylinderGeometry(0.045, 0.045, 0.035, 16), new T.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.35 }));
+        lpWheel.rotation.z = Math.PI / 2; lpWheel.position.set(0.64, 0.72, 0.08); group.add(lpWheel);
+        const hpWheel = new T.Mesh(new T.CylinderGeometry(0.045, 0.045, 0.035, 16), new T.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.35 }));
+        hpWheel.rotation.z = Math.PI / 2; hpWheel.position.set(1.12, 0.72, 0.08); group.add(hpWheel);
+
+        // Two Real Analog Gauges with Dial Faces & Brass Stems
+        const lpTex = makeGaugeDialTex('LP bar', '#0284c7', -0.6);
+        const hpTex = makeGaugeDialTex('HP bar', '#e11d48', 0.45);
+        [
+          { x: 0.75, color: 0x0284c7, tex: lpTex },
+          { x: 1.01, color: 0xe11d48, tex: hpTex },
+        ].forEach((g) => {
+          const stem = new T.Mesh(new T.CylinderGeometry(0.016, 0.016, 0.09, 12), copperMat);
+          stem.position.set(g.x, 0.80, 0.08);
+          group.add(stem);
+          const bezel = new T.Mesh(new T.CylinderGeometry(0.115, 0.115, 0.055, 28), new T.MeshStandardMaterial({ color: g.color, metalness: 0.55, roughness: 0.25 }));
+          bezel.rotation.x = Math.PI / 2;
+          bezel.position.set(g.x, 0.94, 0.08);
+          group.add(bezel);
+          const dial = new T.Mesh(new T.CircleGeometry(0.098, 28), new T.MeshStandardMaterial({ map: g.tex, roughness: 0.2, metalness: 0.05 }));
+          dial.position.set(g.x, 0.94, 0.11);
+          group.add(dial);
+        });
+
+        // Curved Service Hoses (Blue LP & Red HP connecting manifold to condenser valves)
+        const blueCurve = new T.CatmullRomCurve3([
+          new T.Vector3(0.56, 0.38, 0.08),
+          new T.Vector3(0.66, 0.46, 0.18),
+          new T.Vector3(0.75, 0.67, 0.08),
+        ]);
+        group.add(new T.Mesh(new T.TubeGeometry(blueCurve, 20, 0.014, 10, false), new T.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.45 })));
+        const redCurve = new T.CatmullRomCurve3([
+          new T.Vector3(0.56, 0.24, 0.08),
+          new T.Vector3(0.78, 0.22, 0.24),
+          new T.Vector3(1.01, 0.67, 0.08),
+        ]);
+        group.add(new T.Mesh(new T.TubeGeometry(redCurve, 20, 0.014, 10, false), new T.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.45 })));
+
+        // Compact Refrigerant Cylinder (R410A Pink/Teal Cylinder) on floor
+        const tank = new T.Mesh(new T.CylinderGeometry(0.13, 0.13, 0.34, 24), new T.MeshStandardMaterial({ color: 0xec4899, roughness: 0.32, metalness: 0.35 }));
+        tank.position.set(1.16, 0.17, -0.18);
+        group.add(tank);
+        const tankDome = new T.Mesh(new T.SphereGeometry(0.13, 20, 14, 0, Math.PI * 2, 0, Math.PI / 2), new T.MeshStandardMaterial({ color: 0xec4899, roughness: 0.32, metalness: 0.35 }));
+        tankDome.position.set(1.16, 0.34, -0.18);
+        group.add(tankDome);
+        const tankValve = new T.Mesh(new T.CylinderGeometry(0.025, 0.025, 0.06, 12), copperMat);
+        tankValve.position.set(1.16, 0.49, -0.18);
+        group.add(tankValve);
+
         animators.push((t) => { fan.rotation.z = -t * 3.8; });
       } else {
         // === DESIGN STUDIO ===
@@ -1017,14 +1204,26 @@ window.PhotorealShowcase = (function () {
         group.add(floorRim);
         const desk = new T.Mesh(
           new T.BoxGeometry(2.1, 0.07, 1.1),
-          new T.MeshStandardMaterial({ color: 0x452c1e, roughness: 0.55 })
+          new T.MeshStandardMaterial({ color: 0x2a1d17, roughness: 0.42, metalness: 0.15 })
         );
         desk.position.set(0, 0.55, 0);
         group.add(desk);
+        // 4 Sleek Studio Desk Legs (so desk stands firmly on podium!)
+        const dLegMat = new T.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.85, roughness: 0.22 });
+        [[-0.94, -0.44], [0.94, -0.44], [-0.94, 0.44], [0.94, 0.44]].forEach(([lx, lz]) => {
+          const leg = new T.Mesh(new T.CylinderGeometry(0.028, 0.022, 0.55, 16), dLegMat);
+          leg.position.set(lx, 0.275, lz);
+          group.add(leg);
+        });
+        // Aluminum Stand behind Pen Display Tablet
+        const tStand = new T.Mesh(new T.BoxGeometry(0.42, 0.34, 0.06), new T.MeshStandardMaterial({ color: 0x475569, metalness: 0.85, roughness: 0.25 }));
+        tStand.position.set(-0.12, 0.73, -0.14);
+        tStand.rotation.x = 0.28;
+        group.add(tStand);
         // Pro Pen Display Tablet
         const tablet = new T.Group();
-        tablet.position.set(-0.12, 0.84, 0);
-        tablet.rotation.x = -0.42;
+        tablet.position.set(-0.12, 0.86, 0);
+        tablet.rotation.x = -0.38;
         group.add(tablet);
         const body = new T.Mesh(new T.BoxGeometry(1.18, 0.72, 0.035), new T.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.75, roughness: 0.25 }));
         tablet.add(body);
@@ -1032,10 +1231,16 @@ window.PhotorealShowcase = (function () {
         const scr = new T.Mesh(new T.PlaneGeometry(1.08, 0.63), new T.MeshStandardMaterial({ map: dTex, emissiveMap: dTex, emissive: 0xffffff, emissiveIntensity: 0.9 }));
         scr.position.z = 0.02;
         tablet.add(scr);
-        // Pantone Swatches
+        // Stylus Pen on Desk
+        const pen = new T.Mesh(new T.CylinderGeometry(0.012, 0.008, 0.28, 12), dLegMat);
+        pen.rotation.z = Math.PI / 2;
+        pen.rotation.y = 0.35;
+        pen.position.set(-0.12, 0.598, 0.34);
+        group.add(pen);
+        // Pantone Swatches Fan
         [0x06b6d4, 0xec4899, 0xfacc15, 0x8b5cf6].forEach((col, idx) => {
           const sw = new T.Mesh(new T.BoxGeometry(0.14, 0.36, 0.015), new T.MeshStandardMaterial({ color: col, roughness: 0.35 }));
-          sw.position.set(0.76, 0.62, 0.16);
+          sw.position.set(0.76, 0.595 + idx * 0.005, 0.16);
           sw.rotation.x = -Math.PI / 2;
           sw.rotation.z = -0.35 + idx * 0.24;
           group.add(sw);
