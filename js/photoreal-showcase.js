@@ -1,11 +1,10 @@
 /**
- * AMK SkillHub · Photoreal 3D Showcase (Three.js r128, без React)
- * - PBR-материалы из glTF (map / normalMap / roughnessMap / metalnessMap / aoMap)
- * - Студийная HDRI (RGBELoader + PMREMGenerator) → scene.environment
- * - Мягкие контактные тени (аналог drei ContactShadows: depth → blur → plane)
- * - Лёгкий Bloom (UnrealBloomPass), OrbitControls с демпфированием
- * - Режимы на канвасе: Final Photo-Real / Clay / Wireframe
- * Модели: Poly Haven (CC0) фотограмметрия реальных предметов.
+ * AMK SkillHub · Photoreal 3D Spatial Showcase
+ * - Режим по умолчанию «Фотореал 8K»: реальные 8K-сцены мастерских и студий АМК
+ *   с 3D-перспективным наклоном (parallax), плавным зумом до 2.6×, панорамированием,
+ *   динамическими пресетами студийного освещения и интерактивными инженерными точками (hotspots).
+ * - Режимы «3D-скан 360°» и «Сетка»: реальные фотограмметрические PBR-сканы Poly Haven (CC0)
+ *   на Three.js + HDRI-освещение (RGBELoader / PMREMGenerator) + контактные тени + OrbitControls.
  */
 window.PhotorealShowcase = (function () {
   'use strict';
@@ -16,51 +15,64 @@ window.PhotorealShowcase = (function () {
     neon: { top: '#1a1040', mid: '#0c1b3a', bottom: '#050814', exposure: 1.22, shadow: 0.72 },
   };
 
-  // Rich per-scene atmospheric studio environments (unique palette, glow, rim light & particles)
   const SCENE_ENVS = {
     sport_wheel_garage: {
       top: '#240f1f', mid: '#18142c', horizon: '#6b211a', bottom: '#090a12',
-      accent: 0xf97316, secondary: 0x38bdf8, grid: 0xf97316, fog: 0x120d1a,
+      accent: 0xf97316, secondary: 0x38bdf8, fog: 0x120d1a,
     },
     gaming_room_rig: {
       top: '#1e0b42', mid: '#0b1e48', horizon: '#3b1066', bottom: '#050816',
-      accent: 0x22d3ee, secondary: 0xec4899, grid: 0x6366f1, fog: 0x0b0f26,
+      accent: 0x22d3ee, secondary: 0xec4899, fog: 0x0b0f26,
     },
     autoelectric_lab: {
       top: '#062c3d', mid: '#072a28', horizon: '#1e3a2f', bottom: '#040a10',
-      accent: 0xfbbf24, secondary: 0x34d399, grid: 0x10b981, fog: 0x06191e,
+      accent: 0xfbbf24, secondary: 0x34d399, fog: 0x06191e,
     },
     hvac_rooftop: {
       top: '#082f49', mid: '#0e3b5c', horizon: '#155e75', bottom: '#06101f',
-      accent: 0x38bdf8, secondary: 0xa5f3fc, grid: 0x0ea5e9, fog: 0x081e33,
+      accent: 0x38bdf8, secondary: 0xa5f3fc, fog: 0x081e33,
     },
     design_studio: {
       top: '#3b0764', mid: '#1e1b4b', horizon: '#701a75', bottom: '#090514',
-      accent: 0xf472b6, secondary: 0x818cf8, grid: 0xc084fc, fog: 0x18092b,
+      accent: 0xf472b6, secondary: 0x818cf8, fog: 0x18092b,
     },
   };
 
   const BG_PRESETS = {
-    atmosphere: { label: 'Атмосфера' },
+    atmosphere: {
+      label: 'Реал HDR',
+      photoFilter: 'contrast(1.03) saturate(1.05)',
+      sheenColor: 'rgba(255, 255, 255, 0.14)',
+      tintBg: 'none',
+    },
     sunset: {
       label: 'Закат',
       top: '#1c0c2e', mid: '#581c4f', horizon: '#ea580c', bottom: '#12081a',
-      accent: 0xfb923c, secondary: 0xc084fc, grid: 0xf97316, fog: 0x1d0e24,
+      accent: 0xfb923c, secondary: 0xc084fc, fog: 0x1d0e24,
+      photoFilter: 'sepia(0.18) saturate(1.24) contrast(1.06) brightness(0.97)',
+      sheenColor: 'rgba(251, 146, 60, 0.22)',
+      tintBg: 'radial-gradient(ellipse at 78% 18%, rgba(251,146,60,0.26), rgba(168,85,247,0.12) 55%, rgba(12,7,20,0.28) 100%)',
     },
     cyber: {
-      label: 'Кибер-сетка',
+      label: 'Кибер-свет',
       top: '#040614', mid: '#09112e', horizon: '#1d4ed8', bottom: '#02040c',
-      accent: 0x22d3ee, secondary: 0xa855f7, grid: 0x22d3ee, fog: 0x05091c,
+      accent: 0x22d3ee, secondary: 0xa855f7, fog: 0x05091c,
+      photoFilter: 'contrast(1.12) saturate(1.16) hue-rotate(-8deg) brightness(0.93)',
+      sheenColor: 'rgba(56, 189, 248, 0.24)',
+      tintBg: 'linear-gradient(135deg, rgba(14,165,233,0.18) 0%, rgba(15,23,42,0.06) 45%, rgba(168,85,247,0.22) 100%)',
     },
     studio: {
-      label: 'Циклорама',
+      label: 'Дневной',
       top: '#dbeafe', mid: '#eff6ff', horizon: '#f8fafc', bottom: '#cbd5e1',
-      accent: 0x2563eb, secondary: 0x06b6d4, grid: 0x94a3b8, fog: 0xe2e8f0, lightBg: true,
+      accent: 0x2563eb, secondary: 0x06b6d4, fog: 0xe2e8f0, lightBg: true,
+      photoFilter: 'brightness(1.1) contrast(1.02) saturate(1.03)',
+      sheenColor: 'rgba(255, 255, 255, 0.22)',
+      tintBg: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.18), transparent 65%)',
     },
   };
 
   function currentTheme() {
-    return document.documentElement.getAttribute('data-theme') || 'light';
+    return document.documentElement.getAttribute('data-theme') || 'neon';
   }
 
   function hasWebGL() {
@@ -85,7 +97,7 @@ window.PhotorealShowcase = (function () {
   function safeHref(url) {
     if (!url) return '#';
     const raw = String(url).trim();
-    if (/^(https?:\/\/|\/|[A-Za-z0-9_.\-]+\.html([?#].*)?$)/i.test(raw)) {
+    if (/^(https?:\/\/|\/|[A-Za-z0-9_.\-]+\.html([?#].*)?$|assets\/[A-Za-z0-9_./\-]+)$/i.test(raw)) {
       return escapeHtml(raw);
     }
     return '#';
@@ -98,1343 +110,924 @@ window.PhotorealShowcase = (function () {
     return n;
   }
 
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+
   function mount(container, items, opts) {
     opts = opts || {};
     if (!container || !items || !items.length) return null;
-    const T = window.THREE;
 
     container.classList.add('pr-showcase');
     container.innerHTML = '';
 
-    const tabs = el('div', { class: 'pr-tabs', role: 'tablist', 'aria-label': '3D-объекты по курсам' });
+    // Tabs
+    const tabs = el('div', { class: 'pr-tabs', role: 'tablist', 'aria-label': 'Реалистичные сцены по курсам' });
     items.forEach((it, i) => {
       const b = el('button', {
-        type: 'button', role: 'tab', class: 'pr-tab', 'data-pr-tab': String(i),
+        type: 'button',
+        role: 'tab',
+        class: 'pr-tab',
+        'data-pr-tab': String(i),
         'aria-selected': i === 0 ? 'true' : 'false',
       }, `<span class="pr-tab-course">${escapeHtml(it.course)}</span><span class="pr-tab-title">${escapeHtml(it.short)}</span>`);
       tabs.appendChild(b);
     });
 
-    const stage = el('div', { class: 'pr-stage' });
-    const canvasHost = el('div', { class: 'pr-canvas', 'aria-label': 'Интерактивная 3D-модель' });
-    const modes = el('div', { class: 'pr-modes', role: 'group', 'aria-label': 'Режим рендера' },
-      ['photo', 'clay', 'wire'].map((m, i) => `<button type="button" class="pr-mode" data-pr-mode="${m}" aria-pressed="${i === 0}">${
-        m === 'photo' ? 'Photo-Real' : m === 'clay' ? 'Clay' : 'Wire'}</button>`).join(''));
-    const bgSwitcher = el('div', { class: 'pr-bg-modes', role: 'group', 'aria-label': 'Фон 3D-студии' },
-      Object.entries(BG_PRESETS).map(([key, cfg], i) => `<button type="button" class="pr-bg-btn" data-pr-bg="${key}" aria-pressed="${i === 0}">${escapeHtml(cfg.label)}</button>`).join(''));
+    // Stage shell
+    const stage = el('div', { class: 'pr-stage pr-stage--real' });
+
+    // Real-life 8K interactive 3D spatial layer
+    const realView = el('div', { class: 'pr-real-view', 'aria-label': 'Интерактивная фотореалистичная сцена' });
+    const realTilt = el('div', { class: 'pr-real-tilt' });
+    const realWorld = el('div', { class: 'pr-real-world' });
+    const realMedia = el('div', { class: 'pr-real-media' });
+    const realImg = el('img', {
+      class: 'pr-real-img',
+      alt: items[0].title || 'Фотореалистичная сцена',
+      draggable: 'false',
+      decoding: 'async',
+    });
+    const realTint = el('div', { class: 'pr-real-tint' });
+    const realSheen = el('div', { class: 'pr-real-sheen' });
+    const hotspotsLayer = el('div', { class: 'pr-hotspots' });
+    realMedia.append(realImg, hotspotsLayer);
+    realWorld.append(realMedia);
+    realTilt.append(realWorld, realTint, realSheen);
+    realView.append(realTilt);
+
+    // WebGL 3D scan layer (lazy mounted when user clicks 3D-скан 360° or Сетка)
+    const canvasHost = el('div', { class: 'pr-canvas', 'aria-label': 'Интерактивный 3D-скан 360°', hidden: 'true' });
+
+    // HUD controls
     const label = el('div', { class: 'pr-label' });
-    const loader = el('div', { class: 'pr-loader', role: 'status' }, '<span class="pr-spinner"></span><span class="pr-loader-text">Загрузка 3D-скана…</span>');
-    const hint = el('div', { class: 'pr-hint' }, 'Вращайте на 360° · Колесо — зум · Двойной клик — сброс');
-    stage.append(canvasHost, label, modes, bgSwitcher, loader, hint);
+    const modes = el('div', { class: 'pr-modes', role: 'group', 'aria-label': 'Режим просмотра' }, [
+      { id: 'real', text: 'Фотореал 8K' },
+      { id: 'scan', text: '3D-скан 360°' },
+      { id: 'wire', text: 'Сетка' },
+    ].map((m, i) => `<button type="button" class="pr-mode" data-pr-mode="${m.id}" aria-pressed="${i === 0}">${m.text}</button>`).join(''));
+
+    const zoomBar = el('div', { class: 'pr-zoom-bar', role: 'group', 'aria-label': 'Управление масштабом' }, `
+      <button type="button" class="pr-zoom-btn" data-pr-zoom="out" title="Отдалить" aria-label="Отдалить">−</button>
+      <button type="button" class="pr-zoom-btn pr-zoom-val" data-pr-zoom="reset" title="Сбросить вид">100%</button>
+      <button type="button" class="pr-zoom-btn" data-pr-zoom="in" title="Приблизить" aria-label="Приблизить">+</button>
+    `);
+
+    const bgSwitcher = el('div', { class: 'pr-bg-modes', role: 'group', 'aria-label': 'Освещение сцены' },
+      Object.entries(BG_PRESETS).map(([key, cfg], i) => `<button type="button" class="pr-bg-btn" data-pr-bg="${key}" aria-pressed="${i === 0}">${escapeHtml(cfg.label)}</button>`).join(''));
+
+    const hotspotCard = el('div', { class: 'pr-hotspot-card', hidden: 'true' });
+    const loader = el('div', { class: 'pr-loader', role: 'status', hidden: 'true' }, '<span class="pr-spinner"></span><span class="pr-loader-text">Загрузка 3D-скана…</span>');
+    const hint = el('div', { class: 'pr-hint' }, 'Нажимайте точки узлов · Колесо — зум · Перетаскивайте сцену');
+
+    stage.append(realView, canvasHost, label, modes, zoomBar, bgSwitcher, hotspotCard, loader, hint);
 
     const info = el('div', { class: 'pr-info' });
     container.append(tabs, stage, info);
 
     const state = {
-      active: 0, mode: 'photo', bgPreset: 'atmosphere', loaded: {}, pending: {}, ready: false, visible: false,
-      errors: [], envReady: false, renderer: null,
+      active: 0,
+      mode: 'real',
+      bgPreset: 'atmosphere',
+      activeHotspot: -1,
+      zoom: 1,
+      panX: 0,
+      panY: 0,
+      mediaW: 720,
+      mediaH: 402,
+      natW: 1376,
+      natH: 768,
+      loaded: {},
+      pending: {},
+      ready: false,
+      visible: true,
+      errors: [],
+      envReady: false,
+      renderer: null,
+      glBooted: false,
     };
     container.__photoreal = state;
 
+    // ==================== SPATIAL REAL-LIFE ENGINE ====================
+    let targetZoom = 1;
+    let targetPanX = 0;
+    let targetPanY = 0;
+    let tiltX = 0;
+    let tiltY = 0;
+    let curTiltX = 0;
+    let curTiltY = 0;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let dragOrigPanX = 0;
+    let dragOrigPanY = 0;
+    let spatialRaf = 0;
+    const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function layoutRealMedia() {
+      const sw = stage.clientWidth || 720;
+      const sh = stage.clientHeight || 470;
+      const natR = (state.natW || 1376) / (state.natH || 768);
+      const stageR = sw / sh;
+      if (stageR < natR) {
+        state.mediaH = sh;
+        state.mediaW = Math.ceil(sh * natR);
+      } else {
+        state.mediaW = sw;
+        state.mediaH = Math.ceil(sw / natR);
+      }
+      realMedia.style.width = `${state.mediaW}px`;
+      realMedia.style.height = `${state.mediaH}px`;
+      clampTargets();
+      applySpatialTransform(true);
+    }
+
+    function clampTargets() {
+      const sw = stage.clientWidth || 720;
+      const sh = stage.clientHeight || 470;
+      targetZoom = clamp(targetZoom, 1, 2.6);
+      const maxX = Math.max(0, (state.mediaW * targetZoom - sw) * 0.5);
+      const maxY = Math.max(0, (state.mediaH * targetZoom - sh) * 0.5);
+      targetPanX = clamp(targetPanX, -maxX, maxX);
+      targetPanY = clamp(targetPanY, -maxY, maxY);
+    }
+
+    function updateZoomReadout() {
+      const btn = zoomBar.querySelector('[data-pr-zoom="reset"]');
+      if (!btn) return;
+      btn.textContent = state.mode === 'real' ? `${Math.round(targetZoom * 100)}%` : '360°';
+    }
+
+    function applySpatialTransform(instant) {
+      if (instant) {
+        state.zoom = targetZoom;
+        state.panX = targetPanX;
+        state.panY = targetPanY;
+        curTiltX = tiltX;
+        curTiltY = tiltY;
+      }
+      realWorld.style.transform = `translate3d(${state.panX.toFixed(2)}px, ${state.panY.toFixed(2)}px, 0) scale(${state.zoom.toFixed(4)})`;
+      if (!reducedMotion) {
+        const damp = clamp(1 - (state.zoom - 1) * 0.75, 0.15, 1);
+        const rx = (curTiltX * damp).toFixed(2);
+        const ry = (curTiltY * damp).toFixed(2);
+        const scaleBoost = state.zoom <= 1.02 ? 1.035 : 1;
+        realTilt.style.transform = `perspective(1200px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${scaleBoost})`;
+      } else {
+        realTilt.style.transform = 'none';
+      }
+      // Keep hotspot markers crisp at constant screen size regardless of zoom
+      const inv = (1 / Math.max(1, state.zoom)).toFixed(3);
+      hotspotsLayer.style.setProperty('--pin-inv-scale', inv);
+    }
+
+    function spatialLoop() {
+      spatialRaf = requestAnimationFrame(spatialLoop);
+      if (!state.visible || document.hidden || state.mode !== 'real') return;
+      const lerp = isDragging ? 0.38 : 0.14;
+      const dz = targetZoom - state.zoom;
+      const dx = targetPanX - state.panX;
+      const dy = targetPanY - state.panY;
+      const dtx = tiltX - curTiltX;
+      const dty = tiltY - curTiltY;
+      if (Math.abs(dz) > 0.0005 || Math.abs(dx) > 0.08 || Math.abs(dy) > 0.08 || Math.abs(dtx) > 0.02 || Math.abs(dty) > 0.02) {
+        state.zoom += dz * lerp;
+        state.panX += dx * lerp;
+        state.panY += dy * lerp;
+        curTiltX += dtx * 0.12;
+        curTiltY += dty * 0.12;
+        applySpatialTransform(false);
+      }
+    }
+
+    function applyPhotoLighting() {
+      const preset = BG_PRESETS[state.bgPreset] || BG_PRESETS.atmosphere;
+      realImg.style.filter = preset.photoFilter || 'none';
+      realTint.style.background = preset.tintBg || 'none';
+      realSheen.style.setProperty('--sheen-color', preset.sheenColor || 'rgba(255,255,255,0.14)');
+    }
+
+    function resetRealView() {
+      state.activeHotspot = -1;
+      targetZoom = 1;
+      targetPanX = 0;
+      targetPanY = 0;
+      clampTargets();
+      updateZoomReadout();
+      syncHotspotUI();
+    }
+
+    function focusHotspot(idx) {
+      const it = items[state.active];
+      const list = (it && it.hotspots) || [];
+      if (idx < 0 || idx >= list.length) {
+        resetRealView();
+        return;
+      }
+      if (state.mode !== 'real') setMode('real');
+      state.activeHotspot = idx;
+      const h = list[idx];
+      const z = h.zoom || 1.92;
+      targetZoom = z;
+      // Pan so hotspot lands slightly above center (leaving breathing room for inspection card)
+      targetPanX = (0.5 - h.x / 100) * state.mediaW * z;
+      targetPanY = (0.44 - h.y / 100) * state.mediaH * z;
+      clampTargets();
+      updateZoomReadout();
+      syncHotspotUI();
+    }
+
+    function syncHotspotUI() {
+      const it = items[state.active] || {};
+      const list = it.hotspots || [];
+      hotspotsLayer.querySelectorAll('.pr-hotspot').forEach((btn) => {
+        const hi = Number(btn.dataset.prHotspot);
+        btn.classList.toggle('is-active', hi === state.activeHotspot);
+        btn.setAttribute('aria-pressed', String(hi === state.activeHotspot));
+      });
+      info.querySelectorAll('.pr-part-chip').forEach((chip) => {
+        const hi = Number(chip.dataset.prHotspot);
+        chip.classList.toggle('is-active', hi === state.activeHotspot);
+        chip.setAttribute('aria-pressed', String(hi === state.activeHotspot));
+      });
+
+      if (state.mode === 'real' && state.activeHotspot >= 0 && list[state.activeHotspot]) {
+        const h = list[state.activeHotspot];
+        const total = list.length;
+        hotspotCard.innerHTML = `
+          <div class="pr-hc-head">
+            <span class="pr-hc-badge">Узел ${state.activeHotspot + 1} / ${total}${h.spec ? ' · ' + escapeHtml(h.spec) : ''}</span>
+            <button type="button" class="pr-hc-close" data-pr-hc="close" aria-label="Сбросить приближение">×</button>
+          </div>
+          <h4 class="pr-hc-title">${escapeHtml(h.title)}</h4>
+          <p class="pr-hc-desc">${escapeHtml(h.desc)}</p>
+          <div class="pr-hc-nav">
+            <button type="button" class="pr-hc-step" data-pr-hc="prev">← Пред.</button>
+            <button type="button" class="pr-hc-step pr-hc-step--next" data-pr-hc="next">След. узел →</button>
+          </div>
+        `;
+        hotspotCard.hidden = false;
+      } else {
+        hotspotCard.hidden = true;
+      }
+    }
+
+    function renderHotspots(i) {
+      const it = items[i] || {};
+      const list = it.hotspots || [];
+      hotspotsLayer.innerHTML = list.map((h, idx) => `
+        <button type="button"
+          class="pr-hotspot"
+          data-pr-hotspot="${idx}"
+          aria-pressed="false"
+          aria-label="${escapeHtml(h.title)}"
+          style="left:${Number(h.x)}%;top:${Number(h.y)}%;">
+          <span class="pr-hotspot-pulse"></span>
+          <span class="pr-hotspot-dot">${idx + 1}</span>
+          <span class="pr-hotspot-tip">${escapeHtml(h.title)}</span>
+        </button>
+      `).join('');
+    }
+
     function renderInfo(i) {
       const it = items[i];
+      const list = it.hotspots || [];
       label.innerHTML = `<b>${escapeHtml(it.course)}</b><span>${escapeHtml(it.title)}</span>`;
+      const chipsHtml = list.length ? `
+        <div class="pr-parts-block">
+          <div class="pr-parts-label">Интерактивный разбор узлов (клик — приблизить)</div>
+          <div class="pr-parts-chips">
+            ${list.map((h, idx) => `<button type="button" class="pr-part-chip" data-pr-hotspot="${idx}" aria-pressed="false"><span>${idx + 1}</span>${escapeHtml(h.short || h.title)}</button>`).join('')}
+          </div>
+        </div>
+      ` : '';
       info.innerHTML = `
         <h3 class="pr-info-title">${escapeHtml(it.title)}</h3>
         <p class="pr-info-text">${escapeHtml(it.text)}</p>
+        ${chipsHtml}
         <ul class="pr-info-facts">${(it.facts || []).map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
-        <div class="pr-info-meta">3D-скан: <a href="${safeHref(it.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(it.source)}</a> · CC0</div>
+        <div class="pr-info-meta">Сцена: <a href="${safeHref(it.sourceUrl)}">${escapeHtml(it.source)}</a> · 3D-сканы CC0</div>
         <a class="pr-info-cta" href="${safeHref(it.href)}">${escapeHtml(it.cta)} →</a>`;
     }
-    renderInfo(0);
 
-    if (!T || !hasWebGL()) {
-      loader.innerHTML = 'WebGL недоступен — откройте страницу в современном браузере.';
-      state.errors.push('no-webgl');
-      return state;
-    }
+    // Pointer interactions on Real-Life Stage
+    realView.addEventListener('pointermove', (e) => {
+      if (state.mode !== 'real') return;
+      const rect = realView.getBoundingClientRect();
+      const nx = clamp((e.clientX - rect.left) / Math.max(1, rect.width), 0, 1);
+      const ny = clamp((e.clientY - rect.top) / Math.max(1, rect.height), 0, 1);
+      realSheen.style.setProperty('--mx', `${(nx * 100).toFixed(1)}%`);
+      realSheen.style.setProperty('--my', `${(ny * 100).toFixed(1)}%`);
 
-    // ---------- Renderer / scene ----------
-    const renderer = new T.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
-    state.renderer = renderer;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.outputEncoding = T.sRGBEncoding;
-    renderer.toneMapping = T.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
-    renderer.physicallyCorrectLights = true;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = T.PCFSoftShadowMap;
-    canvasHost.appendChild(renderer.domElement);
+      if (isDragging) {
+        targetPanX = dragOrigPanX + (e.clientX - dragStartX);
+        targetPanY = dragOrigPanY + (e.clientY - dragStartY);
+        clampTargets();
+        return;
+      }
+      if (!reducedMotion) {
+        tiltY = (nx - 0.5) * 7.5;
+        tiltX = (0.5 - ny) * 5.2;
+      }
+    });
 
-    const scene = new T.Scene();
-    const camera = new T.PerspectiveCamera(32, 1, 0.05, 100);
-    camera.position.set(2.6, 1.5, 3.2);
+    realView.addEventListener('pointerleave', () => {
+      tiltX = 0;
+      tiltY = 0;
+      isDragging = false;
+      realView.classList.remove('is-dragging');
+    });
 
-    function getActiveEnvCfg() {
-      const preset = BG_PRESETS[state.bgPreset];
-      if (preset && preset.top) return preset;
-      const it = items[state.active] || {};
-      const byScene = SCENE_ENVS[it.sceneType];
-      if (currentTheme() === 'light' && state.bgPreset === 'atmosphere') {
-        return {
-          top: '#dbeafe', mid: '#e0e7ff', horizon: '#f0f9ff', bottom: '#cbd5e1',
-          accent: (byScene && byScene.accent) || 0x2563eb,
-          secondary: (byScene && byScene.secondary) || 0x06b6d4,
-          grid: 0x64748b, fog: 0xdbeafe, lightBg: true,
+    realView.addEventListener('pointerdown', (e) => {
+      if (state.mode !== 'real') return;
+      if (e.target.closest('.pr-hotspot')) return;
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      dragOrigPanX = targetPanX;
+      dragOrigPanY = targetPanY;
+      realView.classList.add('is-dragging');
+      if (realView.setPointerCapture) {
+        try { realView.setPointerCapture(e.pointerId); } catch (err) {}
+      }
+    });
+
+    realView.addEventListener('pointerup', (e) => {
+      isDragging = false;
+      realView.classList.remove('is-dragging');
+      if (realView.releasePointerCapture) {
+        try { realView.releasePointerCapture(e.pointerId); } catch (err) {}
+      }
+    });
+
+    realView.addEventListener('wheel', (e) => {
+      if (state.mode !== 'real') return;
+      e.preventDefault();
+      const factor = e.deltaY < 0 ? 1.16 : 0.86;
+      targetZoom = clamp(targetZoom * factor, 1, 2.6);
+      if (targetZoom <= 1.03) {
+        targetZoom = 1;
+        targetPanX = 0;
+        targetPanY = 0;
+      }
+      clampTargets();
+      updateZoomReadout();
+    }, { passive: false });
+
+    realView.addEventListener('dblclick', (e) => {
+      if (e.target.closest('.pr-hotspot')) return;
+      resetRealView();
+    });
+
+    hotspotsLayer.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-pr-hotspot]');
+      if (!btn) return;
+      e.stopPropagation();
+      const idx = Number(btn.dataset.prHotspot);
+      if (idx === state.activeHotspot) resetRealView();
+      else focusHotspot(idx);
+    });
+
+    info.addEventListener('click', (e) => {
+      const btn = e.target.closest('.pr-part-chip[data-pr-hotspot]');
+      if (!btn) return;
+      const idx = Number(btn.dataset.prHotspot);
+      if (idx === state.activeHotspot) resetRealView();
+      else focusHotspot(idx);
+    });
+
+    hotspotCard.addEventListener('click', (e) => {
+      const act = e.target.closest('[data-pr-hc]');
+      if (!act) return;
+      const list = (items[state.active] && items[state.active].hotspots) || [];
+      if (!list.length) return;
+      const cmd = act.dataset.prHc;
+      if (cmd === 'close') resetRealView();
+      else if (cmd === 'next') focusHotspot((state.activeHotspot + 1) % list.length);
+      else if (cmd === 'prev') focusHotspot((state.activeHotspot - 1 + list.length) % list.length);
+    });
+
+    zoomBar.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-pr-zoom]');
+      if (!btn) return;
+      const cmd = btn.dataset.prZoom;
+      if (state.mode === 'real') {
+        if (cmd === 'in') targetZoom = clamp(targetZoom + 0.35, 1, 2.6);
+        else if (cmd === 'out') targetZoom = clamp(targetZoom - 0.35, 1, 2.6);
+        else { resetRealView(); return; }
+        if (targetZoom <= 1.03) { targetZoom = 1; targetPanX = 0; targetPanY = 0; }
+        clampTargets();
+        updateZoomReadout();
+      } else if (gl) {
+        if (cmd === 'reset') gl.resetView();
+        else if (cmd === 'in') gl.dolly(0.84);
+        else if (cmd === 'out') gl.dolly(1.18);
+      }
+    });
+
+    // ==================== LAZY WEBGL 3D PHOTOGRAMMETRY ENGINE ====================
+    let gl = null;
+
+    function ensureWebGL() {
+      if (gl) return gl;
+      const T = window.THREE;
+      if (!T || !hasWebGL()) {
+        state.errors.push('no-webgl');
+        loader.innerHTML = 'WebGL недоступен — используйте режим «Фотореал 8K».';
+        loader.hidden = false;
+        return null;
+      }
+
+      const renderer = new T.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+      state.renderer = renderer;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.outputEncoding = T.sRGBEncoding;
+      renderer.toneMapping = T.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
+      renderer.physicallyCorrectLights = true;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = T.PCFSoftShadowMap;
+      canvasHost.appendChild(renderer.domElement);
+
+      const scene = new T.Scene();
+      const camera = new T.PerspectiveCamera(32, 1, 0.05, 100);
+      camera.position.set(2.4, 1.35, 2.9);
+
+      function getActiveEnvCfg() {
+        const preset = BG_PRESETS[state.bgPreset];
+        if (preset && preset.top) return preset;
+        const it = items[state.active] || {};
+        const byScene = SCENE_ENVS[it.sceneType];
+        if (currentTheme() === 'light' && state.bgPreset === 'atmosphere') {
+          return {
+            top: '#dbeafe', mid: '#e0e7ff', horizon: '#f0f9ff', bottom: '#cbd5e1',
+            accent: (byScene && byScene.accent) || 0x2563eb,
+            secondary: (byScene && byScene.secondary) || 0x06b6d4,
+            fog: 0xdbeafe, lightBg: true,
+          };
+        }
+        return byScene || {
+          top: '#1a1040', mid: '#0c1b3a', horizon: '#1e3a8a', bottom: '#050814',
+          accent: 0x38bdf8, secondary: 0xa855f7, fog: 0x090f24,
         };
       }
-      return byScene || {
-        top: '#1a1040', mid: '#0c1b3a', horizon: '#1e3a8a', bottom: '#050814',
-        accent: 0x38bdf8, secondary: 0xa855f7, grid: 0x38bdf8, fog: 0x090f24,
-      };
-    }
 
-    function makeBgTexture() {
-      const env = getActiveEnvCfg();
-      const c = document.createElement('canvas');
-      c.width = 512; c.height = 512;
-      const g = c.getContext('2d');
-      // Rich multi-stop atmospheric studio sky gradient
-      const grad = g.createLinearGradient(0, 0, 0, 512);
-      grad.addColorStop(0.0, env.top);
-      grad.addColorStop(0.38, env.mid);
-      grad.addColorStop(0.64, env.horizon || env.mid);
-      grad.addColorStop(1.0, env.bottom);
-      g.fillStyle = grad;
-      g.fillRect(0, 0, 512, 512);
-
-      // Soft studio aurora orbs & horizon studio glow
-      const orb1 = g.createRadialGradient(130, 180, 10, 130, 180, 210);
-      orb1.addColorStop(0, env.lightBg ? 'rgba(56,189,248,0.22)' : 'rgba(56,189,248,0.28)');
-      orb1.addColorStop(1, 'rgba(0,0,0,0)');
-      g.fillStyle = orb1;
-      g.fillRect(0, 0, 512, 512);
-
-      const orb2 = g.createRadialGradient(390, 240, 10, 390, 240, 220);
-      orb2.addColorStop(0, env.lightBg ? 'rgba(139,92,246,0.16)' : 'rgba(236,72,153,0.22)');
-      orb2.addColorStop(1, 'rgba(0,0,0,0)');
-      g.fillStyle = orb2;
-      g.fillRect(0, 0, 512, 512);
-
-      // Subtle glowing horizon band
-      const hBand = g.createLinearGradient(0, 280, 0, 365);
-      hBand.addColorStop(0, 'rgba(255,255,255,0)');
-      hBand.addColorStop(0.5, env.lightBg ? 'rgba(255,255,255,0.45)' : 'rgba(125,211,252,0.18)');
-      hBand.addColorStop(1, 'rgba(255,255,255,0)');
-      g.fillStyle = hBand;
-      g.fillRect(0, 280, 512, 85);
-
-      const tex = new T.CanvasTexture(c);
-      tex.encoding = T.sRGBEncoding;
-      return tex;
-    }
-
-    // === 3D ATMOSPHERIC STAGE BACKDROP (Glow Rings, Cyber Grid & Floating Dust Particles) ===
-    const backdropGroup = new T.Group();
-    scene.add(backdropGroup);
-
-    const floorGrid = new T.PolarGridHelper(4.8, 12, 6, 48, 0x38bdf8, 0x1e293b);
-    floorGrid.position.y = -0.02;
-    if (floorGrid.material) {
-      floorGrid.material.transparent = true;
-      floorGrid.material.opacity = 0.28;
-    }
-    backdropGroup.add(floorGrid);
-
-    const haloMat1 = new T.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 });
-    const haloRing1 = new T.Mesh(new T.TorusGeometry(2.35, 0.014, 12, 96), haloMat1);
-    haloRing1.rotation.x = Math.PI / 2;
-    haloRing1.position.y = 0.01;
-    backdropGroup.add(haloRing1);
-
-    const haloMat2 = new T.MeshBasicMaterial({ color: 0xa855f7, transparent: true, opacity: 0.24 });
-    const haloRing2 = new T.Mesh(new T.TorusGeometry(2.95, 0.01, 12, 96), haloMat2);
-    haloRing2.rotation.x = Math.PI / 2;
-    haloRing2.position.y = 0.015;
-    backdropGroup.add(haloRing2);
-
-    // Floating luminous studio bokeh particles around the showcase
-    const pCount = 90;
-    const pPositions = new Float32Array(pCount * 3);
-    for (let pi = 0; pi < pCount; pi++) {
-      const ang = (pi / pCount) * Math.PI * 2 + (pi % 7) * 0.4;
-      const rad = 1.8 + ((pi * 37) % 100) / 100 * 3.2;
-      pPositions[pi * 3] = Math.cos(ang) * rad;
-      pPositions[pi * 3 + 1] = 0.25 + ((pi * 53) % 100) / 100 * 2.9;
-      pPositions[pi * 3 + 2] = Math.sin(ang) * rad;
-    }
-    const pGeo = new T.BufferGeometry();
-    pGeo.setAttribute('position', new T.BufferAttribute(pPositions, 3));
-    const pMat = new T.PointsMaterial({ color: 0x7dd3fc, size: 0.055, transparent: true, opacity: 0.65, depthWrite: false });
-    const starField = new T.Points(pGeo, pMat);
-    backdropGroup.add(starField);
-
-    // Key, Rim & Accent Studio Lights
-    const key = new T.DirectionalLight(0xffffff, 2.4);
-    key.position.set(3.2, 5.2, 3.0);
-    scene.add(key);
-    const rim = new T.DirectionalLight(0x38bdf8, 1.8);
-    rim.position.set(-3.2, 2.8, -3.0);
-    scene.add(rim);
-    const accentFill = new T.PointLight(0xa855f7, 2.2, 10);
-    accentFill.position.set(2.8, 1.6, -2.2);
-    scene.add(accentFill);
-
-    function applyTheme() {
-      const t = THEME_BG[currentTheme()] || THEME_BG.neon;
-      const env = getActiveEnvCfg();
-      if (scene.background && scene.background.dispose) scene.background.dispose();
-      scene.background = makeBgTexture();
-      scene.fog = new T.FogExp2(env.fog, env.lightBg ? 0.05 : 0.075);
-      renderer.toneMappingExposure = env.lightBg ? 1.06 : t.exposure;
-      if (shadowPlaneMat) shadowPlaneMat.opacity = env.lightBg ? 0.42 : t.shadow;
-      if (bloomPass) bloomPass.strength = env.lightBg ? 0.14 : (state.bgPreset === 'cyber' ? 0.52 : 0.36);
-
-      rim.color.setHex(env.accent);
-      accentFill.color.setHex(env.secondary);
-      haloMat1.color.setHex(env.accent);
-      haloMat1.opacity = env.lightBg ? 0.28 : 0.42;
-      haloMat2.color.setHex(env.secondary);
-      haloMat2.opacity = env.lightBg ? 0.18 : 0.28;
-      pMat.color.setHex(env.accent);
-      pMat.opacity = env.lightBg ? 0.32 : 0.72;
-      if (floorGrid.material) {
-        floorGrid.material.opacity = state.bgPreset === 'cyber' ? 0.5 : (env.lightBg ? 0.18 : 0.3);
-      }
-      requestRender();
-    }
-
-    // ---------- Contact shadows (port of three.js webgl_shadow_contact) ----------
-    const SH_W = 4, SH_H = 4, SH_RES = 512, SH_CAM_H = 1.6;
-    const shadowGroup = new T.Group();
-    scene.add(shadowGroup);
-    const rtShadow = new T.WebGLRenderTarget(SH_RES, SH_RES);
-    rtShadow.texture.generateMipmaps = false;
-    const rtBlur = new T.WebGLRenderTarget(SH_RES, SH_RES);
-    rtBlur.texture.generateMipmaps = false;
-    const planeGeo = new T.PlaneGeometry(SH_W, SH_H).rotateX(Math.PI / 2);
-    const shadowPlaneMat = new T.MeshBasicMaterial({ map: rtShadow.texture, opacity: 0.55, transparent: true, depthWrite: false });
-    const shadowPlane = new T.Mesh(planeGeo, shadowPlaneMat);
-    shadowPlane.renderOrder = 1;
-    shadowPlane.scale.y = -1;
-    shadowGroup.add(shadowPlane);
-    const blurPlane = new T.Mesh(planeGeo);
-    blurPlane.visible = false;
-    shadowGroup.add(blurPlane);
-    const shadowCam = new T.OrthographicCamera(-SH_W / 2, SH_W / 2, SH_H / 2, -SH_H / 2, 0, SH_CAM_H);
-    shadowCam.rotation.x = Math.PI / 2;
-    shadowGroup.add(shadowCam);
-    const depthMat = new T.MeshDepthMaterial();
-    depthMat.onBeforeCompile = (shader) => {
-      shader.uniforms.darkness = { value: 1.6 };
-      shader.fragmentShader = 'uniform float darkness;\n' + shader.fragmentShader.replace(
-        'gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );',
-        'gl_FragColor = vec4( vec3( 0.0 ), ( 1.0 - fragCoordZ ) * darkness );');
-    };
-    depthMat.depthTest = false;
-    depthMat.depthWrite = false;
-    const hBlur = T.HorizontalBlurShader ? new T.ShaderMaterial(T.HorizontalBlurShader) : null;
-    const vBlur = T.VerticalBlurShader ? new T.ShaderMaterial(T.VerticalBlurShader) : null;
-    if (hBlur) hBlur.depthTest = false;
-    if (vBlur) vBlur.depthTest = false;
-
-    function blurShadow(amount) {
-      if (!hBlur || !vBlur) return;
-      blurPlane.visible = true;
-      blurPlane.material = hBlur;
-      hBlur.uniforms.tDiffuse.value = rtShadow.texture;
-      hBlur.uniforms.h.value = amount / 256;
-      renderer.setRenderTarget(rtBlur);
-      renderer.render(blurPlane, shadowCam);
-      blurPlane.material = vBlur;
-      vBlur.uniforms.tDiffuse.value = rtBlur.texture;
-      vBlur.uniforms.v.value = amount / 256;
-      renderer.setRenderTarget(rtShadow);
-      renderer.render(blurPlane, shadowCam);
-      blurPlane.visible = false;
-    }
-    function renderContactShadow() {
-      const bg = scene.background;
-      scene.background = null;
-      shadowPlane.visible = false;
-      scene.overrideMaterial = depthMat;
-      const prevClear = renderer.getClearAlpha();
-      renderer.setClearAlpha(0);
-      renderer.setRenderTarget(rtShadow);
-      renderer.clear();
-      renderer.render(scene, shadowCam);
-      scene.overrideMaterial = null;
-      blurShadow(3.2);
-      blurShadow(1.2);
-      renderer.setRenderTarget(null);
-      renderer.setClearAlpha(prevClear);
-      shadowPlane.visible = true;
-      scene.background = bg;
-    }
-
-    // ---------- Post-processing (Bloom) ----------
-    let composer = null, bloomPass = null;
-    const lowPower = (navigator.hardwareConcurrency || 4) <= 2;
-    if (T.EffectComposer && T.RenderPass && T.UnrealBloomPass && !lowPower) {
-      composer = new T.EffectComposer(renderer);
-      composer.addPass(new T.RenderPass(scene, camera));
-      bloomPass = new T.UnrealBloomPass(new T.Vector2(512, 512), 0.22, 0.45, 0.9);
-      composer.addPass(bloomPass);
-    }
-
-    // ---------- Controls ----------
-    let controls = null;
-    if (T.OrbitControls) {
-      controls = new T.OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.06;
-      controls.rotateSpeed = 0.7;
-      controls.zoomSpeed = 0.8;
-      controls.enablePan = false;
-      controls.minDistance = 1.8;
-      controls.maxDistance = 7;
-      controls.minPolarAngle = 0.15;
-      controls.maxPolarAngle = Math.PI / 2 - 0.04;
-      controls.autoRotate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      controls.autoRotateSpeed = 0.9;
-      controls.target.set(0, 0.5, 0);
-      controls.addEventListener('start', () => { controls.autoRotate = false; });
-      controls.addEventListener('change', requestRender);
-    }
-    renderer.domElement.addEventListener('dblclick', () => resetView());
-
-    // ---------- HDRI environment ----------
-    const pmrem = new T.PMREMGenerator(renderer);
-    pmrem.compileEquirectangularShader();
-    function setFallbackEnv() {
-      // Процедурная студия, если HDRI не загрузилась
-      const c = document.createElement('canvas');
-      c.width = 512; c.height = 256;
-      const g = c.getContext('2d');
-      const grad = g.createLinearGradient(0, 0, 0, 256);
-      grad.addColorStop(0, '#9aa3ad'); grad.addColorStop(0.5, '#e7e9ec'); grad.addColorStop(1, '#3a3d42');
-      g.fillStyle = grad; g.fillRect(0, 0, 512, 256);
-      g.fillStyle = '#ffffff'; g.fillRect(60, 40, 120, 50); g.fillRect(320, 50, 140, 40);
-      const tex = new T.CanvasTexture(c);
-      tex.mapping = T.EquirectangularReflectionMapping;
-      tex.encoding = T.sRGBEncoding;
-      scene.environment = pmrem.fromEquirectangular(tex).texture;
-      tex.dispose();
-      state.envReady = true;
-    }
-    if (T.RGBELoader) {
-      const rgbe = new T.RGBELoader();
-      if (rgbe.setDataType && T.UnsignedByteType !== undefined) rgbe.setDataType(T.UnsignedByteType);
-      rgbe.load(opts.hdri || 'assets/hdri/studio_small_09_1k.hdr', (tex) => {
-        scene.environment = pmrem.fromEquirectangular(tex).texture;
-        tex.dispose();
-        state.envReady = true;
-        state.envSource = 'hdri';
-        requestRender();
-      }, undefined, () => { setFallbackEnv(); state.envSource = 'procedural'; requestRender(); });
-    } else {
-      setFallbackEnv();
-      state.envSource = 'procedural';
-    }
-
-    // ---------- Model loading ----------
-    const gltfLoader = T.GLTFLoader ? new T.GLTFLoader() : null;
-    const root = new T.Group();
-    scene.add(root);
-    const clayMat = new T.MeshStandardMaterial({ color: 0xd8d2c6, roughness: 0.78, metalness: 0.0 });
-    const wireMat = new T.MeshBasicMaterial({ color: 0x2563eb, wireframe: true, transparent: true, opacity: 0.85 });
-
-    function loadPart(part) {
-      return new Promise((resolve, reject) => {
-        gltfLoader.load(part.url, (gltf) => resolve(gltf.scene), undefined, reject);
-      });
-    }
-
-    function normalize(obj, targetSize) {
-      obj.updateMatrixWorld(true);
-      const box = new T.Box3().setFromObject(obj);
-      const size = box.getSize(new T.Vector3());
-      const s = targetSize / Math.max(size.x, size.y, size.z, 1e-4);
-      obj.scale.multiplyScalar(s);
-      obj.updateMatrixWorld(true);
-      const b2 = new T.Box3().setFromObject(obj);
-      const c = b2.getCenter(new T.Vector3());
-      obj.position.x -= c.x;
-      obj.position.z -= c.z;
-      obj.position.y -= b2.min.y;
-    }
-
-    function buildProceduralScene(sceneType) {
-      const group = new T.Group();
-      const animators = [];
-
-      function makeScreenTex(title, accent, mode) {
+      function makeBgTexture() {
+        const env = getActiveEnvCfg();
         const c = document.createElement('canvas');
-        c.width = 512; c.height = 288;
-        const ctx = c.getContext('2d');
-        const g = ctx.createLinearGradient(0, 0, 512, 288);
-        g.addColorStop(0, '#090d1f');
-        g.addColorStop(1, '#111b36');
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, 512, 288);
-        ctx.strokeStyle = 'rgba(56,189,248,0.18)';
-        for (let x = 0; x < 512; x += 32) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 288); ctx.stroke(); }
-        for (let y = 0; y < 288; y += 32) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke(); }
-
-        if (mode === 'code') {
-          ctx.fillStyle = '#0f172a';
-          ctx.fillRect(18, 18, 130, 252);
-          ctx.fillStyle = '#1e293b';
-          ctx.fillRect(162, 18, 332, 252);
-          const colors = ['#38bdf8', '#c084fc', '#34d399', '#fbbf24', '#f472b6'];
-          for (let r = 0; r < 11; r++) {
-            ctx.fillStyle = colors[r % colors.length];
-            ctx.fillRect(180 + (r % 3) * 18, 36 + r * 20, 75 + ((r * 37) % 160), 9);
-          }
-          ctx.fillStyle = '#38bdf8';
-          ctx.font = 'bold 20px monospace';
-          ctx.fillText('AMK SKILLHUB IDE', 28, 52);
-          ctx.fillStyle = '#34d399';
-          ctx.fillRect(28, 72, 95, 10);
-          ctx.fillStyle = '#818cf8';
-          ctx.fillRect(28, 94, 78, 10);
-          ctx.fillStyle = '#38bdf8';
-          ctx.fillRect(28, 116, 102, 10);
-        } else if (mode === 'scope') {
-          ctx.strokeStyle = '#34d399';
-          ctx.lineWidth = 4;
-          ctx.beginPath();
-          for (let x = 20; x < 492; x += 4) {
-            const y = 144 + Math.sin(x * 0.06) * 58 + Math.sin(x * 0.18) * 18;
-            if (x === 20) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
-          ctx.strokeStyle = '#38bdf8';
-          ctx.lineWidth = 3;
-          ctx.beginPath();
-          for (let x = 20; x < 492; x += 4) {
-            const sq = (Math.floor(x / 36) % 2 === 0) ? -42 : 42;
-            const y = 144 + sq;
-            if (x === 20) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-          }
-          ctx.stroke();
-          ctx.fillStyle = '#34d399';
-          ctx.font = 'bold 22px monospace';
-          ctx.fillText('CAN-BUS 500 kbps · 14.2V', 26, 42);
-        } else if (mode === 'design') {
-          const rg = ctx.createRadialGradient(256, 144, 15, 256, 144, 130);
-          rg.addColorStop(0, '#f43f5e');
-          rg.addColorStop(0.5, '#8b5cf6');
-          rg.addColorStop(1, '#06b6d4');
-          ctx.fillStyle = rg;
-          ctx.beginPath(); ctx.arc(256, 144, 96, 0, Math.PI * 2); ctx.fill();
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 3;
-          ctx.strokeRect(110, 42, 292, 204);
-          ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 22px sans-serif';
-          ctx.fillText('CMYK · 300 DPI · BLEED 5mm', 100, 272);
-        }
+        c.width = 512; c.height = 512;
+        const g = c.getContext('2d');
+        const grad = g.createLinearGradient(0, 0, 0, 512);
+        grad.addColorStop(0.0, env.top);
+        grad.addColorStop(0.4, env.mid);
+        grad.addColorStop(0.68, env.horizon || env.mid);
+        grad.addColorStop(1.0, env.bottom);
+        g.fillStyle = grad;
+        g.fillRect(0, 0, 512, 512);
         const tex = new T.CanvasTexture(c);
         tex.encoding = T.sRGBEncoding;
         return tex;
       }
 
-      if (sceneType === 'sport_wheel_garage') {
-        // === AUTO WORKSHOP ENVIRONMENT ===
-        const floorCanvas = document.createElement('canvas');
-        floorCanvas.width = 512; floorCanvas.height = 512;
-        const fctx = floorCanvas.getContext('2d');
-        fctx.fillStyle = '#1d212b';
-        fctx.fillRect(0, 0, 512, 512);
-        for (let y = 0; y < 512; y += 64) {
-          for (let x = 0; x < 512; x += 64) {
-            fctx.fillStyle = ((x / 64 + y / 64) % 2 === 0) ? '#232834' : '#181c24';
-            fctx.fillRect(x, y, 64, 64);
-          }
-        }
-        fctx.fillStyle = '#f59e0b';
-        fctx.fillRect(0, 468, 512, 16);
-        const floorTex = new T.CanvasTexture(floorCanvas);
-        floorTex.encoding = T.sRGBEncoding;
-        const floor = new T.Mesh(
-          new T.CylinderGeometry(2.3, 2.3, 0.08, 48),
-          new T.MeshStandardMaterial({ map: floorTex, roughness: 0.35, metalness: 0.25 })
-        );
-        floor.position.y = -0.04;
-        group.add(floor);
+      const podium = new T.Mesh(
+        new T.CylinderGeometry(1.75, 1.88, 0.08, 64),
+        new T.MeshStandardMaterial({ color: 0x111827, roughness: 0.28, metalness: 0.72 })
+      );
+      podium.position.y = -0.04;
+      podium.receiveShadow = true;
+      scene.add(podium);
 
-        // Open 360° Neon Showroom Portal Arch (never blocks camera from behind!)
-        const archMat = new T.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.28, metalness: 0.85 });
-        const archOuter = new T.Mesh(new T.TorusGeometry(1.55, 0.06, 16, 64, Math.PI), archMat);
-        archOuter.position.set(0, 0.02, -0.85);
-        group.add(archOuter);
-        const ledTube = new T.Mesh(
-          new T.TorusGeometry(1.48, 0.022, 12, 64, Math.PI),
-          new T.MeshStandardMaterial({ color: 0xfed7aa, emissive: 0xf97316, emissiveIntensity: 2.4 })
-        );
-        ledTube.position.set(0, 0.02, -0.84);
-        group.add(ledTube);
+      const haloMat = new T.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.4 });
+      const haloRing = new T.Mesh(new T.TorusGeometry(1.82, 0.012, 12, 96), haloMat);
+      haloRing.rotation.x = Math.PI / 2;
+      haloRing.position.y = 0.005;
+      scene.add(haloRing);
 
-        // Two-post hydraulic lift columns
-        const liftMat = new T.MeshStandardMaterial({ color: 0x2563eb, roughness: 0.35, metalness: 0.7 });
-        [-1.35, 1.35].forEach((lx) => {
-          const post = new T.Mesh(new T.BoxGeometry(0.14, 1.95, 0.14), liftMat);
-          post.position.set(lx, 0.98, -0.95);
-          group.add(post);
-        });
+      const key = new T.DirectionalLight(0xffffff, 2.6);
+      key.position.set(3.2, 5.2, 3.0);
+      scene.add(key);
+      const rim = new T.DirectionalLight(0x38bdf8, 1.8);
+      rim.position.set(-3.2, 2.8, -3.0);
+      scene.add(rim);
+      const fill = new T.PointLight(0xa855f7, 2.0, 10);
+      fill.position.set(2.5, 1.5, -2.2);
+      scene.add(fill);
 
-        // Red Mechanic Tool Chest Cabinet
-        const chest = new T.Mesh(
-          new T.BoxGeometry(0.85, 0.78, 0.42),
-          new T.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.28, metalness: 0.55 })
-        );
-        chest.position.set(-1.1, 0.39, -0.82);
-        chest.rotation.y = 0.28;
-        group.add(chest);
-        for (let d = 0; d < 4; d++) {
-          const handle = new T.Mesh(
-            new T.BoxGeometry(0.62, 0.03, 0.03),
-            new T.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.9, roughness: 0.18 })
-          );
-          handle.position.set(-1.05, 0.16 + d * 0.16, -0.61);
-          handle.rotation.y = 0.28;
-          group.add(handle);
-        }
+      // Soft contact shadow plane
+      const SH_W = 4, SH_H = 4, SH_RES = 512, SH_CAM_H = 1.6;
+      const shadowGroup = new T.Group();
+      scene.add(shadowGroup);
+      const rtShadow = new T.WebGLRenderTarget(SH_RES, SH_RES);
+      rtShadow.texture.generateMipmaps = false;
+      const rtBlur = new T.WebGLRenderTarget(SH_RES, SH_RES);
+      rtBlur.texture.generateMipmaps = false;
+      const planeGeo = new T.PlaneGeometry(SH_W, SH_H).rotateX(Math.PI / 2);
+      const shadowPlaneMat = new T.MeshBasicMaterial({ map: rtShadow.texture, opacity: 0.55, transparent: true, depthWrite: false });
+      const shadowPlane = new T.Mesh(planeGeo, shadowPlaneMat);
+      shadowPlane.position.y = 0.002;
+      shadowPlane.renderOrder = 1;
+      shadowPlane.scale.y = -1;
+      shadowGroup.add(shadowPlane);
+      const blurPlane = new T.Mesh(planeGeo);
+      blurPlane.visible = false;
+      shadowGroup.add(blurPlane);
+      const shadowCam = new T.OrthographicCamera(-SH_W / 2, SH_W / 2, SH_H / 2, -SH_H / 2, 0, SH_CAM_H);
+      shadowCam.rotation.x = Math.PI / 2;
+      shadowGroup.add(shadowCam);
+      const depthMat = new T.MeshDepthMaterial();
+      depthMat.onBeforeCompile = (shader) => {
+        shader.uniforms.darkness = { value: 1.5 };
+        shader.fragmentShader = 'uniform float darkness;\n' + shader.fragmentShader.replace(
+          'gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );',
+          'gl_FragColor = vec4( vec3( 0.0 ), ( 1.0 - fragCoordZ ) * darkness );');
+      };
+      depthMat.depthTest = false;
+      depthMat.depthWrite = false;
+      const hBlur = T.HorizontalBlurShader ? new T.ShaderMaterial(T.HorizontalBlurShader) : null;
+      const vBlur = T.VerticalBlurShader ? new T.ShaderMaterial(T.VerticalBlurShader) : null;
+      if (hBlur) hBlur.depthTest = false;
+      if (vBlur) vBlur.depthTest = false;
 
-        // Display Podium Stand
-        const stand = new T.Mesh(
-          new T.CylinderGeometry(0.65, 0.78, 0.12, 32),
-          new T.MeshStandardMaterial({ color: 0x111827, roughness: 0.3, metalness: 0.8 })
-        );
-        stand.position.y = 0.06;
-        group.add(stand);
-        const standRing = new T.Mesh(
-          new T.TorusGeometry(0.71, 0.014, 12, 48),
-          new T.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 2.0 })
-        );
-        standRing.rotation.x = Math.PI / 2;
-        standRing.position.y = 0.12;
-        group.add(standRing);
+      function blurShadow(amount) {
+        if (!hBlur || !vBlur) return;
+        blurPlane.visible = true;
+        blurPlane.material = hBlur;
+        hBlur.uniforms.tDiffuse.value = rtShadow.texture;
+        hBlur.uniforms.h.value = amount / 256;
+        renderer.setRenderTarget(rtBlur);
+        renderer.render(blurPlane, shadowCam);
+        blurPlane.material = vBlur;
+        vBlur.uniforms.tDiffuse.value = rtBlur.texture;
+        vBlur.uniforms.v.value = amount / 256;
+        renderer.setRenderTarget(rtShadow);
+        renderer.render(blurPlane, shadowCam);
+        blurPlane.visible = false;
+      }
 
-        // === HERO: FORGED 10-SPOKE SPORT ALLOY WHEEL + BREMBO BRAKE ===
-        const wheelAssembly = new T.Group();
-        wheelAssembly.position.set(0, 0.92, 0.05);
-        wheelAssembly.rotation.y = -0.32;
-        group.add(wheelAssembly);
+      function renderContactShadow() {
+        const bg = scene.background;
+        scene.background = null;
+        shadowPlane.visible = false;
+        podium.visible = false;
+        haloRing.visible = false;
+        scene.overrideMaterial = depthMat;
+        const prevClear = renderer.getClearAlpha();
+        renderer.setClearAlpha(0);
+        renderer.setRenderTarget(rtShadow);
+        renderer.clear();
+        renderer.render(scene, shadowCam);
+        scene.overrideMaterial = null;
+        blurShadow(3.0);
+        blurShadow(1.2);
+        renderer.setRenderTarget(null);
+        renderer.setClearAlpha(prevClear);
+        shadowPlane.visible = true;
+        podium.visible = true;
+        haloRing.visible = true;
+        scene.background = bg;
+      }
 
-        const spinGroup = new T.Group();
-        wheelAssembly.add(spinGroup);
+      let controls = null;
+      if (T.OrbitControls) {
+        controls = new T.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.06;
+        controls.rotateSpeed = 0.72;
+        controls.zoomSpeed = 0.85;
+        controls.enablePan = false;
+        controls.minDistance = 1.4;
+        controls.maxDistance = 6.5;
+        controls.minPolarAngle = 0.15;
+        controls.maxPolarAngle = Math.PI / 2 - 0.03;
+        controls.autoRotate = !reducedMotion;
+        controls.autoRotateSpeed = 1.05;
+        controls.target.set(0, 0.5, 0);
+        controls.addEventListener('start', () => { controls.autoRotate = false; });
+        controls.addEventListener('change', requestRender);
+      }
+      renderer.domElement.addEventListener('dblclick', () => resetView());
 
-        // Low-profile Sport Tire (smooth matte carbon rubber + twin circumferential rain grooves)
-        const tireMat = new T.MeshStandardMaterial({ color: 0x16181e, roughness: 0.82, metalness: 0.08 });
-        const tire = new T.Mesh(new T.TorusGeometry(0.62, 0.19, 36, 80), tireMat);
-        spinGroup.add(tire);
-        const grooveMat = new T.MeshStandardMaterial({ color: 0x090b0f, roughness: 0.95, metalness: 0.02 });
-        [-0.06, 0.06].forEach((gz) => {
-          const groove = new T.Mesh(new T.TorusGeometry(0.805, 0.008, 10, 72), grooveMat);
-          groove.position.z = gz;
-          spinGroup.add(groove);
-        });
-
-        // Polished Machined Chrome Outer Barrel & Rim Lip
-        const chromeMat = new T.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.96, roughness: 0.12 });
-        const gunmetalMat = new T.MeshStandardMaterial({ color: 0x334155, metalness: 0.88, roughness: 0.22 });
-
-        const barrel = new T.Mesh(new T.CylinderGeometry(0.49, 0.49, 0.34, 48, 1, true), gunmetalMat);
-        barrel.rotation.x = Math.PI / 2;
-        spinGroup.add(barrel);
-
-        const frontLip = new T.Mesh(new T.TorusGeometry(0.49, 0.028, 16, 48), chromeMat);
-        frontLip.position.z = 0.165;
-        spinGroup.add(frontLip);
-
-        // 10 Y-Spokes (Forged Sport Pattern)
-        for (let i = 0; i < 5; i++) {
-          const baseA = (i / 5) * Math.PI * 2;
-          [-0.17, 0.17].forEach((offset) => {
-            const a = baseA + offset;
-            const spoke = new T.Mesh(new T.BoxGeometry(0.048, 0.42, 0.042), gunmetalMat);
-            spoke.position.set(Math.cos(a) * 0.27, Math.sin(a) * 0.27, 0.12);
-            spoke.rotation.z = a - Math.PI / 2;
-            spinGroup.add(spoke);
-
-            const accentStrip = new T.Mesh(new T.BoxGeometry(0.018, 0.40, 0.012), chromeMat);
-            accentStrip.position.set(Math.cos(a) * 0.27, Math.sin(a) * 0.27, 0.145);
-            accentStrip.rotation.z = a - Math.PI / 2;
-            spinGroup.add(accentStrip);
-          });
-        }
-
-        // Center Hub + Carbon Cap + 5 Chrome Lug Nuts
-        const hub = new T.Mesh(new T.CylinderGeometry(0.14, 0.16, 0.14, 24), gunmetalMat);
-        hub.rotation.x = Math.PI / 2;
-        hub.position.z = 0.11;
-        spinGroup.add(hub);
-
-        const cap = new T.Mesh(
-          new T.CylinderGeometry(0.065, 0.065, 0.03, 24),
-          new T.MeshStandardMaterial({ color: 0xef4444, metalness: 0.7, roughness: 0.22 })
-        );
-        cap.rotation.x = Math.PI / 2;
-        cap.position.z = 0.18;
-        spinGroup.add(cap);
-
-        for (let n = 0; n < 5; n++) {
-          const a = (n / 5) * Math.PI * 2;
-          const nut = new T.Mesh(new T.CylinderGeometry(0.018, 0.018, 0.04, 6), chromeMat);
-          nut.rotation.x = Math.PI / 2;
-          nut.position.set(Math.cos(a) * 0.105, Math.sin(a) * 0.105, 0.175);
-          spinGroup.add(nut);
-        }
-
-        // Drilled Ventilated Brake Rotor (behind spokes)
-        const rotor = new T.Mesh(
-          new T.CylinderGeometry(0.37, 0.37, 0.045, 40),
-          new T.MeshStandardMaterial({ color: 0xcbd5e1, metalness: 0.92, roughness: 0.26 })
-        );
-        rotor.rotation.x = Math.PI / 2;
-        rotor.position.z = -0.02;
-        spinGroup.add(rotor);
-
-        // Fixed Brembo-Red Sport Brake Caliper (doesn't spin!)
-        const caliper = new T.Mesh(
-          new T.BoxGeometry(0.16, 0.34, 0.15),
-          new T.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.22, metalness: 0.45, emissive: 0x4c0519, emissiveIntensity: 0.4 })
-        );
-        caliper.position.set(0.32, 0.08, -0.01);
-        caliper.rotation.z = -0.25;
-        wheelAssembly.add(caliper);
-
-        // Subtle warm/cool garage lights
-        const gLight1 = new T.PointLight(0x38bdf8, 3.2, 5);
-        gLight1.position.set(1.4, 1.8, 1.2);
-        group.add(gLight1);
-        const gLight2 = new T.PointLight(0xf59e0b, 2.4, 5);
-        gLight2.position.set(-1.5, 1.4, 0.8);
-        group.add(gLight2);
-
-        animators.push((t) => { spinGroup.rotation.z = -t * 0.42; });
-      } else if (sceneType === 'gaming_room_rig') {
-        // === CYBER GAMING ROOM ENVIRONMENT ===
-        const floor = new T.Mesh(
-          new T.CylinderGeometry(1.78, 1.88, 0.09, 48),
-          new T.MeshStandardMaterial({ color: 0x0b1020, roughness: 0.24, metalness: 0.72 })
-        );
-        floor.position.y = -0.045;
-        group.add(floor);
-        const floorRim = new T.Mesh(
-          new T.TorusGeometry(1.81, 0.016, 12, 64),
-          new T.MeshStandardMaterial({ color: 0x22d3ee, emissive: 0x22d3ee, emissiveIntensity: 2.2 })
-        );
-        floorRim.rotation.x = Math.PI / 2;
-        floorRim.position.y = 0.004;
-        group.add(floorRim);
-
-        // Open 360° Translucent Holographic Cyber Frame (never blocks rear orbit)
-        const wall = new T.Mesh(
-          new T.TorusGeometry(1.45, 0.03, 12, 64, Math.PI),
-          new T.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3, metalness: 0.85 })
-        );
-        wall.position.set(0, 0.1, -0.95);
-        group.add(wall);
-
-        const rgbStrips = [];
-        [
-          { pos: [-0.85, 1.48, -0.99], rot: 0.35, color: 0x38bdf8 },
-          { pos: [0, 1.65, -0.99], rot: 0, color: 0xa855f7 },
-          { pos: [0.85, 1.48, -0.99], rot: -0.35, color: 0xec4899 },
-        ].forEach((s) => {
-          const mat = new T.MeshStandardMaterial({ color: s.color, emissive: s.color, emissiveIntensity: 2.4 });
-          const bar = new T.Mesh(new T.BoxGeometry(0.68, 0.045, 0.03), mat);
-          bar.position.set(...s.pos);
-          bar.rotation.z = s.rot;
-          group.add(bar);
-          rgbStrips.push(mat);
-        });
-
-        // Carbon Gaming Desk
-        const deskTop = new T.Mesh(
-          new T.BoxGeometry(2.3, 0.065, 1.15),
-          new T.MeshStandardMaterial({ color: 0x181c28, roughness: 0.32, metalness: 0.45 })
-        );
-        deskTop.position.set(0, 0.72, -0.15);
-        group.add(deskTop);
-
-        // Desk RGB Underglow Edge Strip
-        const deskLedMat = new T.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x06b6d4, emissiveIntensity: 2.5 });
-        const deskLed = new T.Mesh(new T.BoxGeometry(2.32, 0.02, 0.02), deskLedMat);
-        deskLed.position.set(0, 0.71, 0.43);
-        group.add(deskLed);
-        rgbStrips.push(deskLedMat);
-
-        // Desk Legs
-        const legMat = new T.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.8, roughness: 0.3 });
-        [[-1.02, -0.58], [1.02, -0.58], [-1.02, 0.28], [1.02, 0.28]].forEach(([x, z]) => {
-          const leg = new T.Mesh(new T.BoxGeometry(0.06, 0.72, 0.06), legMat);
-          leg.position.set(x, 0.36, z);
-          group.add(leg);
-        });
-
-        // XXL Deskmat
-        const matMesh = new T.Mesh(
-          new T.BoxGeometry(1.32, 0.008, 0.56),
-          new T.MeshStandardMaterial({ color: 0x0b1120, roughness: 0.9 })
-        );
-        matMesh.position.set(-0.22, 0.757, 0.08);
-        group.add(matMesh);
-
-        // === HERO 1: POWERFUL GAMING LAPTOP (LEFT-CENTER) ===
-        const laptop = new T.Group();
-        laptop.position.set(-0.28, 0.765, 0.05);
-        laptop.rotation.y = 0.14;
-        group.add(laptop);
-
-        const chassisMat = new T.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.85, roughness: 0.22 });
-        const base = new T.Mesh(new T.BoxGeometry(0.62, 0.028, 0.42), chassisMat);
-        laptop.add(base);
-
-        // Glowing RGB Keyboard Deck
-        const kbMat = new T.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x6366f1, emissiveIntensity: 1.4, roughness: 0.4 });
-        const kb = new T.Mesh(new T.BoxGeometry(0.52, 0.006, 0.22), kbMat);
-        kb.position.set(0, 0.017, -0.02);
-        laptop.add(kb);
-        rgbStrips.push(kbMat);
-
-        // Tilted Laptop Lid with Glowing IDE Screen
-        const lidGroup = new T.Group();
-        lidGroup.position.set(0, 0.014, -0.205);
-        lidGroup.rotation.x = -0.26;
-        laptop.add(lidGroup);
-        const lid = new T.Mesh(new T.BoxGeometry(0.62, 0.39, 0.016), chassisMat);
-        lid.position.y = 0.195;
-        lidGroup.add(lid);
-        const screenTex = makeScreenTex('AMK IDE', '#38bdf8', 'code');
-        const screen = new T.Mesh(
-          new T.PlaneGeometry(0.57, 0.34),
-          new T.MeshStandardMaterial({ map: screenTex, emissiveMap: screenTex, emissive: 0xffffff, emissiveIntensity: 0.95, roughness: 0.15 })
-        );
-        screen.position.set(0, 0.198, 0.01);
-        lidGroup.add(screen);
-
-        // === HERO 2: ULTRA-WIDE CURVED MONITOR (BEHIND) ===
-        const monStand = new T.Mesh(new T.BoxGeometry(0.08, 0.24, 0.06), legMat);
-        monStand.position.set(-0.22, 0.87, -0.48);
-        group.add(monStand);
-        const monFrame = new T.Mesh(new T.BoxGeometry(1.16, 0.48, 0.03), chassisMat);
-        monFrame.position.set(-0.22, 1.15, -0.45);
-        group.add(monFrame);
-        const monScreen = new T.Mesh(
-          new T.PlaneGeometry(1.11, 0.43),
-          new T.MeshStandardMaterial({ map: screenTex, emissiveMap: screenTex, emissive: 0xffffff, emissiveIntensity: 0.9, roughness: 0.15 })
-        );
-        monScreen.position.set(-0.22, 1.15, -0.433);
-        group.add(monScreen);
-
-        // === HERO 3: TEMPERED GLASS RGB GAMING PC TOWER (RIGHT) ===
-        const pc = new T.Group();
-        pc.position.set(0.76, 1.05, -0.14);
-        pc.rotation.y = -0.22;
-        group.add(pc);
-        const pcBody = new T.Mesh(
-          new T.BoxGeometry(0.36, 0.62, 0.62),
-          new T.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.78, roughness: 0.24 })
-        );
-        pc.add(pcBody);
-        const glass = new T.Mesh(
-          new T.PlaneGeometry(0.54, 0.54),
-          new T.MeshStandardMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.18, roughness: 0.06, metalness: 0.9 })
-        );
-        glass.rotation.y = -Math.PI / 2;
-        glass.position.x = -0.182;
-        pc.add(glass);
-
-        // 3 Front Glowing RGB Cooling Fans
-        const fans = [];
-        for (let f = 0; f < 3; f++) {
-          const fanRingMat = new T.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 2.2 });
-          const ring = new T.Mesh(new T.TorusGeometry(0.075, 0.012, 12, 28), fanRingMat);
-          ring.position.set(0, -0.17 + f * 0.17, 0.315);
-          pc.add(ring);
-          rgbStrips.push(fanRingMat);
-          const hub = new T.Mesh(new T.BoxGeometry(0.11, 0.02, 0.01), chromeMatSafe(T));
-          hub.position.set(0, -0.17 + f * 0.17, 0.314);
-          pc.add(hub);
-          fans.push(hub);
-        }
-
-        // RGB Wireless Gaming Mouse
-        const mouse = new T.Mesh(new T.BoxGeometry(0.09, 0.036, 0.15), chassisMat);
-        mouse.position.set(0.24, 0.778, 0.16);
-        group.add(mouse);
-        const mouseLed = new T.Mesh(new T.BoxGeometry(0.02, 0.01, 0.06), deskLedMat);
-        mouseLed.position.set(0.24, 0.798, 0.16);
-        group.add(mouseLed);
-
-        // Neon Room Point Lights
-        const nl1 = new T.PointLight(0x38bdf8, 3.0, 5);
-        nl1.position.set(-1.1, 1.6, 0.8);
-        group.add(nl1);
-        const nl2 = new T.PointLight(0xc084fc, 2.8, 5);
-        nl2.position.set(1.2, 1.5, 0.9);
-        group.add(nl2);
-
-        animators.push((t) => {
-          const hue = (t * 0.08) % 1;
-          const col = new T.Color().setHSL(hue, 0.9, 0.56);
-          rgbStrips.forEach((m, idx) => {
-            const c2 = new T.Color().setHSL((hue + idx * 0.14) % 1, 0.92, 0.58);
-            m.emissive.copy(c2);
-            m.color.copy(c2);
-          });
-          fans.forEach((fan) => { fan.rotation.z = t * 5.2; });
-          nl2.color.copy(col);
-        });
-      } else if (sceneType === 'autoelectric_lab') {
-        const floor = new T.Mesh(
-          new T.CylinderGeometry(1.75, 1.85, 0.09, 48),
-          new T.MeshStandardMaterial({ color: 0x0b1520, roughness: 0.26, metalness: 0.68 })
-        );
-        floor.position.y = -0.045;
-        group.add(floor);
-        const floorRim = new T.Mesh(
-          new T.TorusGeometry(1.78, 0.016, 12, 64),
-          new T.MeshStandardMaterial({ color: 0x34d399, emissive: 0x34d399, emissiveIntensity: 2.0 })
-        );
-        floorRim.rotation.x = Math.PI / 2;
-        floorRim.position.y = 0.004;
-        group.add(floorRim);
-        // ESD Anti-Static Bench + 4 Steel Legs
-        const bench = new T.Mesh(
-          new T.BoxGeometry(2.1, 0.08, 1.15),
-          new T.MeshStandardMaterial({ color: 0x0f2942, roughness: 0.55, metalness: 0.28 })
-        );
-        bench.position.set(0, 0.55, 0);
-        group.add(bench);
-        const legMatE = new T.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.82, roughness: 0.28 });
-        [[-0.95, -0.48], [0.95, -0.48], [-0.95, 0.48], [0.95, 0.48]].forEach(([lx, lz]) => {
-          const leg = new T.Mesh(new T.BoxGeometry(0.06, 0.55, 0.06), legMatE);
-          leg.position.set(lx, 0.275, lz);
-          group.add(leg);
-        });
-        // 12V Automotive AGM Battery on left side of bench
-        const bat = new T.Mesh(new T.BoxGeometry(0.42, 0.28, 0.26), new T.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.45, metalness: 0.3 }));
-        bat.position.set(-0.76, 0.73, 0.22);
-        group.add(bat);
-        const posPost = new T.Mesh(new T.CylinderGeometry(0.022, 0.024, 0.05, 16), new T.MeshStandardMaterial({ color: 0xef4444, metalness: 0.6, roughness: 0.3 }));
-        posPost.position.set(-0.64, 0.89, 0.22);
-        group.add(posPost);
-        const negPost = new T.Mesh(new T.CylinderGeometry(0.022, 0.024, 0.05, 16), new T.MeshStandardMaterial({ color: 0x3b82f6, metalness: 0.6, roughness: 0.3 }));
-        negPost.position.set(-0.88, 0.89, 0.22);
-        group.add(negPost);
-        // Pro Digital Oscilloscope & Diagnostic Station
-        const scopeBody = new T.Mesh(
-          new T.BoxGeometry(1.08, 0.66, 0.34),
-          new T.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.65, roughness: 0.3 })
-        );
-        scopeBody.position.set(-0.08, 0.92, -0.14);
-        group.add(scopeBody);
-        const sTex = makeScreenTex('CAN-BUS', '#34d399', 'scope');
-        const sMesh = new T.Mesh(
-          new T.PlaneGeometry(0.72, 0.46),
-          new T.MeshStandardMaterial({ map: sTex, emissiveMap: sTex, emissive: 0xffffff, emissiveIntensity: 1.0 })
-        );
-        sMesh.position.set(-0.22, 0.94, 0.036);
-        group.add(sMesh);
-        // Knobs
-        for (let k = 0; k < 4; k++) {
-          const knob = new T.Mesh(new T.CylinderGeometry(0.036, 0.04, 0.05, 20), chromeMatSafe(T));
-          knob.rotation.x = Math.PI / 2;
-          knob.position.set(0.32, 0.74 + k * 0.12, 0.045);
-          group.add(knob);
-        }
-        // Smart Digital Multimeter (Fluke-style) resting on tilt stand with LCD screen
-        const multiGrp = new T.Group();
-        multiGrp.position.set(0.68, 0.83, 0.12);
-        multiGrp.rotation.y = -0.35;
-        multiGrp.rotation.x = -0.25;
-        group.add(multiGrp);
-        const multi = new T.Mesh(
-          new T.BoxGeometry(0.30, 0.50, 0.10),
-          new T.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.4, metalness: 0.2 })
-        );
-        multiGrp.add(multi);
-        const multiFace = new T.Mesh(
-          new T.BoxGeometry(0.24, 0.42, 0.015),
-          new T.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 })
-        );
-        multiFace.position.z = 0.05;
-        multiGrp.add(multiFace);
-        const multiLcd = new T.Mesh(
-          new T.PlaneGeometry(0.20, 0.13),
-          new T.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x0284c7, emissiveIntensity: 0.85 })
-        );
-        multiLcd.position.set(0, 0.11, 0.06);
-        multiGrp.add(multiLcd);
-        const multiDial = new T.Mesh(
-          new T.CylinderGeometry(0.065, 0.07, 0.03, 24),
-          new T.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.6 })
-        );
-        multiDial.rotation.x = Math.PI / 2;
-        multiDial.position.set(0, -0.05, 0.065);
-        multiGrp.add(multiDial);
-        const led = new T.PointLight(0x34d399, 2.8, 5);
-        led.position.set(0, 1.8, 1.2);
-        group.add(led);
-      } else if (sceneType === 'hvac_rooftop') {
-        const floor = new T.Mesh(
-          new T.CylinderGeometry(1.78, 1.88, 0.09, 48),
-          new T.MeshStandardMaterial({ color: 0x0d1726, roughness: 0.26, metalness: 0.68 })
-        );
-        floor.position.y = -0.045;
-        group.add(floor);
-        const floorRim = new T.Mesh(
-          new T.TorusGeometry(1.81, 0.016, 12, 64),
-          new T.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x38bdf8, emissiveIntensity: 2.1 })
-        );
-        floorRim.rotation.x = Math.PI / 2;
-        floorRim.position.y = 0.004;
-        group.add(floorRim);
-
-        // Helper for crisp analog pressure gauge dial textures (LP Blue / HP Red)
-        function makeGaugeDialTex(label, color, needleAngle) {
-          const c = document.createElement('canvas');
-          c.width = 256; c.height = 256;
-          const ctx = c.getContext('2d');
-          ctx.fillStyle = '#f8fafc';
-          ctx.beginPath(); ctx.arc(128, 128, 122, 0, Math.PI * 2); ctx.fill();
-          ctx.strokeStyle = color; ctx.lineWidth = 14;
-          ctx.beginPath(); ctx.arc(128, 128, 114, Math.PI * 0.78, Math.PI * 2.22); ctx.stroke();
-          ctx.strokeStyle = '#0f172a'; ctx.lineWidth = 4;
-          for (let i = 0; i <= 10; i++) {
-            const a = Math.PI * 0.8 + (i / 10) * Math.PI * 1.4;
-            ctx.beginPath();
-            ctx.moveTo(128 + Math.cos(a) * 84, 128 + Math.sin(a) * 84);
-            ctx.lineTo(128 + Math.cos(a) * 102, 128 + Math.sin(a) * 102);
-            ctx.stroke();
-          }
-          ctx.fillStyle = '#0f172a'; ctx.font = 'bold 28px monospace'; ctx.textAlign = 'center';
-          ctx.fillText(label, 128, 198);
-          ctx.save();
-          ctx.translate(128, 128);
-          ctx.rotate(needleAngle);
-          ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 7; ctx.lineCap = 'round';
-          ctx.beginPath(); ctx.moveTo(-18, 0); ctx.lineTo(84, 0); ctx.stroke();
-          ctx.restore();
-          ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(128, 128, 14, 0, Math.PI * 2); ctx.fill();
-          const tex = new T.CanvasTexture(c);
-          tex.encoding = T.sRGBEncoding;
-          return tex;
-        }
-
-        const metalWhite = new T.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.34, metalness: 0.42 });
-        const darkMetal = new T.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.35, metalness: 0.78 });
-        const steelMat = new T.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.3, metalness: 0.82 });
-        const copperMat = new T.MeshStandardMaterial({ color: 0xd97706, metalness: 0.92, roughness: 0.2 });
-
-        // Anti-vibration mounting feet
-        [-0.64, 0.24].forEach((fx) => {
-          const foot = new T.Mesh(new T.BoxGeometry(0.16, 0.08, 0.64), darkMetal);
-          foot.position.set(fx, 0.04, 0);
-          group.add(foot);
-        });
-
-        // Inverter Condenser Main Housing (x: -0.20, width 1.38 -> right side at +0.49, front at +0.28)
-        const housing = new T.Mesh(new T.BoxGeometry(1.38, 0.96, 0.56), metalWhite);
-        housing.position.set(-0.20, 0.56, 0);
-        group.add(housing);
-        // Top beveled rain cap lid
-        const topCap = new T.Mesh(new T.BoxGeometry(1.42, 0.05, 0.60), steelMat);
-        topCap.position.set(-0.20, 1.065, 0);
-        group.add(topCap);
-        // Right electrical inverter compartment panel with blue accent stripe & badge
-        const compPanel = new T.Mesh(new T.BoxGeometry(0.36, 0.82, 0.025), new T.MeshStandardMaterial({ color: 0xcbd5e1, roughness: 0.32, metalness: 0.5 }));
-        compPanel.position.set(0.28, 0.56, 0.285);
-        group.add(compPanel);
-        const brandStripe = new T.Mesh(new T.BoxGeometry(0.26, 0.045, 0.03), new T.MeshStandardMaterial({ color: 0x0284c7, emissive: 0x0284c7, emissiveIntensity: 0.8 }));
-        brandStripe.position.set(0.28, 0.86, 0.288);
-        group.add(brandStripe);
-        // Rear aluminum condenser fin louvers (visible from back/sides)
-        for (let r = 0; r < 11; r++) {
-          const fin = new T.Mesh(new T.BoxGeometry(1.24, 0.025, 0.025), steelMat);
-          fin.position.set(-0.20, 0.18 + r * 0.075, -0.288);
-          group.add(fin);
-        }
-
-        // === DEEP FAN SHROUD CAVITY + 5-BLADE AXIAL FAN + PROTECTIVE GRILLE (ZERO CLIPPING!) ===
-        const fanCx = -0.44, fanCy = 0.57;
-        // Dark cylindrical diffuser chamber projecting cleanly in front of housing (z = 0.28..0.33)
-        const cavity = new T.Mesh(
-          new T.CylinderGeometry(0.36, 0.36, 0.04, 48),
-          new T.MeshStandardMaterial({ color: 0x060912, roughness: 0.9, metalness: 0.1 })
-        );
-        cavity.rotation.x = Math.PI / 2;
-        cavity.position.set(fanCx, fanCy, 0.285);
-        group.add(cavity);
-        // Outer aerodynamic shroud ring
-        const shroudOuter = new T.Mesh(new T.TorusGeometry(0.37, 0.028, 16, 48), darkMetal);
-        shroudOuter.position.set(fanCx, fanCy, 0.315);
-        group.add(shroudOuter);
-
-        // Rotating Fan Hub + 5 Properly Pitched Blades (safely in front of cavity at z = 0.325)
-        const fan = new T.Group();
-        fan.position.set(fanCx, fanCy, 0.325);
-        group.add(fan);
-        const hub = new T.Mesh(new T.CylinderGeometry(0.085, 0.095, 0.04, 24), darkMetal);
-        hub.rotation.x = Math.PI / 2;
-        fan.add(hub);
-        const bladeMat = new T.MeshStandardMaterial({ color: 0x0ea5e9, metalness: 0.55, roughness: 0.26 });
-        for (let b = 0; b < 5; b++) {
-          const a = (b / 5) * Math.PI * 2;
-          const bPivot = new T.Group();
-          bPivot.rotation.z = a;
-          const blade = new T.Mesh(new T.BoxGeometry(0.095, 0.24, 0.012), bladeMat);
-          blade.position.set(0, 0.19, 0);
-          blade.rotation.y = 0.22; // aerodynamic pitch without touching cavity behind!
-          bPivot.add(blade);
-          fan.add(bPivot);
-        }
-
-        // Front Protective Wire Grille (4 concentric rings + 4 radial struts at z = 0.355)
-        const grilleGroup = new T.Group();
-        grilleGroup.position.set(fanCx, fanCy, 0.355);
-        group.add(grilleGroup);
-        [0.12, 0.20, 0.28, 0.36].forEach((rad) => {
-          const ring = new T.Mesh(new T.TorusGeometry(rad, 0.007, 8, 40), darkMetal);
-          grilleGroup.add(ring);
-        });
-        for (let s = 0; s < 4; s++) {
-          const strut = new T.Mesh(new T.BoxGeometry(0.73, 0.012, 0.012), darkMetal);
-          strut.rotation.z = (s * Math.PI) / 4;
-          grilleGroup.add(strut);
-        }
-        const centerCap = new T.Mesh(new T.CylinderGeometry(0.055, 0.055, 0.016, 20), new T.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.7, roughness: 0.2 }));
-        centerCap.rotation.x = Math.PI / 2;
-        grilleGroup.add(centerCap);
-
-        // === RIGHT SIDE SERVICE VALVES + MANIFOLD GAUGE STAND + SERVICE HOSES + R410A CYLINDER ===
-        // Brass service ports on right side of condenser
-        [0.24, 0.38].forEach((vy) => {
-          const valve = new T.Mesh(new T.CylinderGeometry(0.028, 0.028, 0.10, 16), copperMat);
-          valve.rotation.z = Math.PI / 2;
-          valve.position.set(0.53, vy, 0.08);
-          group.add(valve);
-        });
-
-        // Manifold Stand & Aluminum Block (x = 0.88)
-        const standBase = new T.Mesh(new T.CylinderGeometry(0.16, 0.19, 0.04, 24), darkMetal);
-        standBase.position.set(0.88, 0.02, 0.08);
-        group.add(standBase);
-        const standPole = new T.Mesh(new T.CylinderGeometry(0.022, 0.022, 0.70, 16), steelMat);
-        standPole.position.set(0.88, 0.37, 0.08);
-        group.add(standPole);
-        const manifoldBlock = new T.Mesh(new T.BoxGeometry(0.42, 0.10, 0.09), steelMat);
-        manifoldBlock.position.set(0.88, 0.72, 0.08);
-        group.add(manifoldBlock);
-        // Sight glass in center of manifold
-        const sightGlass = new T.Mesh(new T.CylinderGeometry(0.026, 0.026, 0.02, 16), new T.MeshStandardMaterial({ color: 0x7dd3fc, emissive: 0x38bdf8, emissiveIntensity: 0.9 }));
-        sightGlass.rotation.x = Math.PI / 2;
-        sightGlass.position.set(0.88, 0.72, 0.13);
-        group.add(sightGlass);
-        // LP (Blue) & HP (Red) Handwheels
-        const lpWheel = new T.Mesh(new T.CylinderGeometry(0.045, 0.045, 0.035, 16), new T.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.35 }));
-        lpWheel.rotation.z = Math.PI / 2; lpWheel.position.set(0.64, 0.72, 0.08); group.add(lpWheel);
-        const hpWheel = new T.Mesh(new T.CylinderGeometry(0.045, 0.045, 0.035, 16), new T.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.35 }));
-        hpWheel.rotation.z = Math.PI / 2; hpWheel.position.set(1.12, 0.72, 0.08); group.add(hpWheel);
-
-        // Two Real Analog Gauges with Dial Faces & Brass Stems
-        const lpTex = makeGaugeDialTex('LP bar', '#0284c7', -0.6);
-        const hpTex = makeGaugeDialTex('HP bar', '#e11d48', 0.45);
-        [
-          { x: 0.75, color: 0x0284c7, tex: lpTex },
-          { x: 1.01, color: 0xe11d48, tex: hpTex },
-        ].forEach((g) => {
-          const stem = new T.Mesh(new T.CylinderGeometry(0.016, 0.016, 0.09, 12), copperMat);
-          stem.position.set(g.x, 0.80, 0.08);
-          group.add(stem);
-          const bezel = new T.Mesh(new T.CylinderGeometry(0.115, 0.115, 0.055, 28), new T.MeshStandardMaterial({ color: g.color, metalness: 0.55, roughness: 0.25 }));
-          bezel.rotation.x = Math.PI / 2;
-          bezel.position.set(g.x, 0.94, 0.08);
-          group.add(bezel);
-          const dial = new T.Mesh(new T.CircleGeometry(0.098, 28), new T.MeshStandardMaterial({ map: g.tex, roughness: 0.2, metalness: 0.05 }));
-          dial.position.set(g.x, 0.94, 0.11);
-          group.add(dial);
-        });
-
-        // Curved Service Hoses (Blue LP & Red HP connecting manifold to condenser valves)
-        const blueCurve = new T.CatmullRomCurve3([
-          new T.Vector3(0.56, 0.38, 0.08),
-          new T.Vector3(0.66, 0.46, 0.18),
-          new T.Vector3(0.75, 0.67, 0.08),
-        ]);
-        group.add(new T.Mesh(new T.TubeGeometry(blueCurve, 20, 0.014, 10, false), new T.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.45 })));
-        const redCurve = new T.CatmullRomCurve3([
-          new T.Vector3(0.56, 0.24, 0.08),
-          new T.Vector3(0.78, 0.22, 0.24),
-          new T.Vector3(1.01, 0.67, 0.08),
-        ]);
-        group.add(new T.Mesh(new T.TubeGeometry(redCurve, 20, 0.014, 10, false), new T.MeshStandardMaterial({ color: 0xe11d48, roughness: 0.45 })));
-
-        // Compact Refrigerant Cylinder (R410A Pink/Teal Cylinder) on floor
-        const tank = new T.Mesh(new T.CylinderGeometry(0.13, 0.13, 0.34, 24), new T.MeshStandardMaterial({ color: 0xec4899, roughness: 0.32, metalness: 0.35 }));
-        tank.position.set(1.16, 0.17, -0.18);
-        group.add(tank);
-        const tankDome = new T.Mesh(new T.SphereGeometry(0.13, 20, 14, 0, Math.PI * 2, 0, Math.PI / 2), new T.MeshStandardMaterial({ color: 0xec4899, roughness: 0.32, metalness: 0.35 }));
-        tankDome.position.set(1.16, 0.34, -0.18);
-        group.add(tankDome);
-        const tankValve = new T.Mesh(new T.CylinderGeometry(0.025, 0.025, 0.06, 12), copperMat);
-        tankValve.position.set(1.16, 0.49, -0.18);
-        group.add(tankValve);
-
-        animators.push((t) => { fan.rotation.z = -t * 3.8; });
+      // HDRI
+      const pmrem = new T.PMREMGenerator(renderer);
+      pmrem.compileEquirectangularShader();
+      function setFallbackEnv() {
+        const c = document.createElement('canvas');
+        c.width = 512; c.height = 256;
+        const g = c.getContext('2d');
+        const grad = g.createLinearGradient(0, 0, 0, 256);
+        grad.addColorStop(0, '#9aa3ad'); grad.addColorStop(0.5, '#e7e9ec'); grad.addColorStop(1, '#3a3d42');
+        g.fillStyle = grad; g.fillRect(0, 0, 512, 256);
+        g.fillStyle = '#ffffff'; g.fillRect(60, 40, 120, 50); g.fillRect(320, 50, 140, 40);
+        const tex = new T.CanvasTexture(c);
+        tex.mapping = T.EquirectangularReflectionMapping;
+        tex.encoding = T.sRGBEncoding;
+        scene.environment = pmrem.fromEquirectangular(tex).texture;
+        tex.dispose();
+        state.envReady = true;
+      }
+      if (T.RGBELoader) {
+        const rgbe = new T.RGBELoader();
+        if (rgbe.setDataType && T.UnsignedByteType !== undefined) rgbe.setDataType(T.UnsignedByteType);
+        rgbe.load(opts.hdri || 'assets/hdri/studio_small_09_1k.hdr', (tex) => {
+          scene.environment = pmrem.fromEquirectangular(tex).texture;
+          tex.dispose();
+          state.envReady = true;
+          requestRender();
+        }, undefined, () => { setFallbackEnv(); requestRender(); });
       } else {
-        // === DESIGN STUDIO ===
-        const floor = new T.Mesh(
-          new T.CylinderGeometry(1.72, 1.82, 0.09, 48),
-          new T.MeshStandardMaterial({ color: 0x120d22, roughness: 0.24, metalness: 0.72 })
-        );
-        floor.position.y = -0.045;
-        group.add(floor);
-        const floorRim = new T.Mesh(
-          new T.TorusGeometry(1.75, 0.016, 12, 64),
-          new T.MeshStandardMaterial({ color: 0xf472b6, emissive: 0xf472b6, emissiveIntensity: 2.2 })
-        );
-        floorRim.rotation.x = Math.PI / 2;
-        floorRim.position.y = 0.004;
-        group.add(floorRim);
-        const desk = new T.Mesh(
-          new T.BoxGeometry(2.1, 0.07, 1.1),
-          new T.MeshStandardMaterial({ color: 0x2a1d17, roughness: 0.42, metalness: 0.15 })
-        );
-        desk.position.set(0, 0.55, 0);
-        group.add(desk);
-        // 4 Sleek Studio Desk Legs (so desk stands firmly on podium!)
-        const dLegMat = new T.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.85, roughness: 0.22 });
-        [[-0.94, -0.44], [0.94, -0.44], [-0.94, 0.44], [0.94, 0.44]].forEach(([lx, lz]) => {
-          const leg = new T.Mesh(new T.CylinderGeometry(0.028, 0.022, 0.55, 16), dLegMat);
-          leg.position.set(lx, 0.275, lz);
-          group.add(leg);
-        });
-        // Aluminum Stand behind Pen Display Tablet
-        const tStand = new T.Mesh(new T.BoxGeometry(0.42, 0.34, 0.06), new T.MeshStandardMaterial({ color: 0x475569, metalness: 0.85, roughness: 0.25 }));
-        tStand.position.set(-0.12, 0.73, -0.14);
-        tStand.rotation.x = 0.28;
-        group.add(tStand);
-        // Pro Pen Display Tablet
-        const tablet = new T.Group();
-        tablet.position.set(-0.12, 0.86, 0);
-        tablet.rotation.x = -0.38;
-        group.add(tablet);
-        const body = new T.Mesh(new T.BoxGeometry(1.18, 0.72, 0.035), new T.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.75, roughness: 0.25 }));
-        tablet.add(body);
-        const dTex = makeScreenTex('CMYK', '#f43f5e', 'design');
-        const scr = new T.Mesh(new T.PlaneGeometry(1.08, 0.63), new T.MeshStandardMaterial({ map: dTex, emissiveMap: dTex, emissive: 0xffffff, emissiveIntensity: 0.9 }));
-        scr.position.z = 0.02;
-        tablet.add(scr);
-        // Stylus Pen on Desk
-        const pen = new T.Mesh(new T.CylinderGeometry(0.012, 0.008, 0.28, 12), dLegMat);
-        pen.rotation.z = Math.PI / 2;
-        pen.rotation.y = 0.35;
-        pen.position.set(-0.12, 0.598, 0.34);
-        group.add(pen);
-        // Pantone Swatches Fan
-        [0x06b6d4, 0xec4899, 0xfacc15, 0x8b5cf6].forEach((col, idx) => {
-          const sw = new T.Mesh(new T.BoxGeometry(0.14, 0.36, 0.015), new T.MeshStandardMaterial({ color: col, roughness: 0.35 }));
-          sw.position.set(0.76, 0.595 + idx * 0.005, 0.16);
-          sw.rotation.x = -Math.PI / 2;
-          sw.rotation.z = -0.35 + idx * 0.24;
-          group.add(sw);
+        setFallbackEnv();
+      }
+
+      const gltfLoader = T.GLTFLoader ? new T.GLTFLoader() : null;
+      const root = new T.Group();
+      scene.add(root);
+      const wireMat = new T.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.85 });
+
+      function loadPart(part) {
+        return new Promise((resolve, reject) => {
+          if (!gltfLoader) { reject(new Error('GLTFLoader missing')); return; }
+          gltfLoader.load(part.url, (gltf) => resolve(gltf.scene), undefined, reject);
         });
       }
 
-      return { group, animators };
-    }
+      function normalize(obj, targetSize) {
+        obj.updateMatrixWorld(true);
+        const box = new T.Box3().setFromObject(obj);
+        const size = box.getSize(new T.Vector3());
+        const s = targetSize / Math.max(size.x, size.y, size.z, 1e-4);
+        obj.scale.multiplyScalar(s);
+        obj.updateMatrixWorld(true);
+        const b2 = new T.Box3().setFromObject(obj);
+        const c = b2.getCenter(new T.Vector3());
+        obj.position.x -= c.x;
+        obj.position.z -= c.z;
+        obj.position.y -= b2.min.y;
+      }
 
-    function chromeMatSafe(T) {
-      return new T.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.94, roughness: 0.14 });
-    }
+      async function buildScanItem(i) {
+        if (state.loaded[i]) return state.loaded[i];
+        if (state.pending[i]) return state.pending[i];
+        state.pending[i] = (async () => {
+          const it = items[i];
+          const wrap = new T.Group();
+          if (it.parts && it.parts.length && gltfLoader) {
+            const group = new T.Group();
+            const parts = await Promise.all(it.parts.map(loadPart));
+            parts.forEach((sceneObj, pi) => {
+              const p = it.parts[pi];
+              const holder = new T.Group();
+              if (p.rotation) sceneObj.rotation.set(...p.rotation);
+              holder.add(sceneObj);
+              normalize(holder, p.size || 1.75);
+              if (p.offset) holder.position.add(new T.Vector3(...p.offset));
+              group.add(holder);
+            });
+            wrap.add(group);
+            normalize(wrap, it.scanSize || 2.15);
+          } else {
+            throw new Error('No 3D photogrammetry parts configured');
+          }
 
-    async function buildItem(i) {
-      if (state.loaded[i]) return state.loaded[i];
-      if (state.pending[i]) return state.pending[i];
-      state.pending[i] = (async () => {
-        const it = items[i];
-        const wrap = new T.Group();
-        let animators = [];
-        if (it.sceneType) {
-          const built = (window.AMKDioramas && typeof window.AMKDioramas.build === 'function')
-            ? window.AMKDioramas.build(T, it.sceneType)
-            : buildProceduralScene(it.sceneType);
-          wrap.add(built.group);
-          animators = built.animators || [];
-          normalize(wrap, it.size || 2.55);
-        } else {
-          const group = new T.Group();
-          const parts = await Promise.all(it.parts.map(loadPart));
-          parts.forEach((sceneObj, pi) => {
-            const p = it.parts[pi];
-            const holder = new T.Group();
-            if (p.rotation) sceneObj.rotation.set(...p.rotation);
-            holder.add(sceneObj);
-            normalize(holder, p.size || 1.6);
-            if (p.offset) holder.position.add(new T.Vector3(...p.offset));
-            group.add(holder);
-          });
-          wrap.add(group);
-          normalize(wrap, it.size || 1.9);
-        }
-
-        const meshes = [];
-        let maps = { normal: 0, rough: 0, ao: 0, color: 0 };
-        wrap.traverse((o) => {
-          if (!o.isMesh) return;
-          o.castShadow = true;
-          o.receiveShadow = true;
-          const m = o.material;
-          if (m) {
-            if (m.normalMap) maps.normal++;
-            if (m.roughnessMap) maps.rough++;
-            if (m.aoMap) maps.ao++;
-            if (m.map) maps.color++;
-            m.envMapIntensity = it.envIntensity || 1.0;
-            if (m.aoMap && o.geometry && !o.geometry.attributes.uv2 && o.geometry.attributes.uv) {
-              o.geometry.setAttribute('uv2', o.geometry.attributes.uv);
+          const meshes = [];
+          wrap.traverse((o) => {
+            if (!o.isMesh) return;
+            o.castShadow = true;
+            o.receiveShadow = true;
+            const m = o.material;
+            if (m) {
+              m.envMapIntensity = it.envIntensity || 1.25;
+              if (m.aoMap && o.geometry && !o.geometry.attributes.uv2 && o.geometry.attributes.uv) {
+                o.geometry.setAttribute('uv2', o.geometry.attributes.uv);
+              }
+              m.needsUpdate = true;
             }
-            m.needsUpdate = true;
-          }
-          o.userData.photoMat = m;
-          o.userData.clayMat = clayMat.clone();
-          if (m && m.normalMap) {
-            o.userData.clayMat.normalMap = m.normalMap;
-            o.userData.clayMat.normalScale = m.normalScale ? m.normalScale.clone() : new T.Vector2(1, 1);
-          }
-          meshes.push(o);
-        });
-        const entry = { object: wrap, meshes, maps, animators };
-        state.loaded[i] = entry;
-        delete state.pending[i];
-        return entry;
-      })();
-      try {
-        return await state.pending[i];
-      } catch (e) {
-        delete state.pending[i];
-        throw e;
-      }
-    }
-
-    function applyMode() {
-      const entry = state.loaded[state.active];
-      if (!entry) return;
-      entry.meshes.forEach((m) => {
-        m.material = state.mode === 'clay' ? m.userData.clayMat : state.mode === 'wire' ? wireMat : m.userData.photoMat;
-      });
-      shadowGroup.visible = state.mode !== 'wire';
-      requestRender();
-    }
-
-    function frame(entry) {
-      const box = new T.Box3().setFromObject(entry.object);
-      const size = box.getSize(new T.Vector3());
-      const center = box.getCenter(new T.Vector3());
-      const dist = Math.max(size.x, size.y * 1.2, size.z) * 1.52 + 0.45;
-      if (controls) controls.target.copy(center);
-      state.home = { target: center.clone(), pos: new T.Vector3(center.x + dist * 0.52, center.y + dist * 0.28, center.z + dist * 0.82) };
-      camera.position.copy(state.home.pos);
-      camera.lookAt(center);
-      if (controls) controls.update();
-    }
-    function resetView() {
-      if (!state.home) return;
-      camera.position.copy(state.home.pos);
-      if (controls) { controls.target.copy(state.home.target); controls.update(); }
-      requestRender();
-    }
-
-    let loadToken = 0;
-    async function show(i) {
-      state.active = i;
-      const token = ++loadToken;
-      tabs.querySelectorAll('[data-pr-tab]').forEach((b) => b.setAttribute('aria-selected', String(Number(b.dataset.prTab) === i)));
-      renderInfo(i);
-      if (!items[i].sceneType && !gltfLoader) { loader.textContent = 'GLTFLoader не найден'; return; }
-      loader.hidden = false;
-      state.ready = false;
-      try {
-        const entry = await buildItem(i);
-        if (token !== loadToken) return;
-        while (root.children.length) root.remove(root.children[0]);
-        root.add(entry.object);
-        applyTheme();
-        frame(entry);
-        applyMode();
-        shadowDirty = true;
-        state.ready = true;
-        state.activeMaps = entry.maps;
-        state.activeMeshes = entry.meshes.length;
-        loader.hidden = true;
-        container.dispatchEvent(new CustomEvent('photoreal:ready', { detail: { index: i } }));
-        // фоновая подгрузка соседней модели
-        const next = (i + 1) % items.length;
-        if (!state.loaded[next] && 'requestIdleCallback' in window) {
-          requestIdleCallback(() => buildItem(next).catch(() => {}));
+            o.userData.photoMat = m;
+            meshes.push(o);
+          });
+          const entry = { object: wrap, meshes };
+          state.loaded[i] = entry;
+          delete state.pending[i];
+          return entry;
+        })();
+        try {
+          return await state.pending[i];
+        } catch (err) {
+          delete state.pending[i];
+          throw err;
         }
-      } catch (err) {
-        state.errors.push(String(err && err.message || err));
-        loader.innerHTML = 'Не удалось загрузить 3D-сцену. Проверьте соединение.';
       }
-      requestRender();
+
+      let needsRender = true;
+      let shadowDirty = true;
+      let glRafId = 0;
+      let loadToken = 0;
+
+      function requestRender() { needsRender = true; }
+
+      function applyGLTheme() {
+        const t = THEME_BG[currentTheme()] || THEME_BG.neon;
+        const env = getActiveEnvCfg();
+        if (scene.background && scene.background.dispose) scene.background.dispose();
+        scene.background = makeBgTexture();
+        scene.fog = new T.FogExp2(env.fog, env.lightBg ? 0.04 : 0.065);
+        renderer.toneMappingExposure = env.lightBg ? 1.08 : t.exposure;
+        shadowPlaneMat.opacity = env.lightBg ? 0.4 : t.shadow;
+        rim.color.setHex(env.accent);
+        fill.color.setHex(env.secondary);
+        haloMat.color.setHex(env.accent);
+        podium.material.color.setHex(env.lightBg ? 0xdbeafe : 0x111827);
+        requestRender();
+      }
+
+      function applyGLMode() {
+        const entry = state.loaded[state.active];
+        if (!entry) return;
+        entry.meshes.forEach((m) => {
+          m.material = state.mode === 'wire' ? wireMat : m.userData.photoMat;
+        });
+        shadowGroup.visible = state.mode !== 'wire';
+        requestRender();
+      }
+
+      function frame(entry) {
+        const box = new T.Box3().setFromObject(entry.object);
+        const size = box.getSize(new T.Vector3());
+        const center = box.getCenter(new T.Vector3());
+        const dist = Math.max(size.x, size.y * 1.25, size.z) * 1.55 + 0.5;
+        if (controls) controls.target.copy(center);
+        state.home = {
+          target: center.clone(),
+          pos: new T.Vector3(center.x + dist * 0.56, center.y + dist * 0.34, center.z + dist * 0.8),
+        };
+        camera.position.copy(state.home.pos);
+        camera.lookAt(center);
+        if (controls) controls.update();
+      }
+
+      function resetView() {
+        if (!state.home) return;
+        camera.position.copy(state.home.pos);
+        if (controls) { controls.target.copy(state.home.target); controls.update(); }
+        requestRender();
+      }
+
+      function dolly(mult) {
+        if (!controls) return;
+        const offset = camera.position.clone().sub(controls.target).multiplyScalar(mult);
+        const len = clamp(offset.length(), controls.minDistance, controls.maxDistance);
+        offset.setLength(len);
+        camera.position.copy(controls.target).add(offset);
+        controls.update();
+        requestRender();
+      }
+
+      function resizeGL() {
+        const w = canvasHost.clientWidth || stage.clientWidth || 640;
+        const h = canvasHost.clientHeight || stage.clientHeight || 470;
+        renderer.setSize(w, h, false);
+        renderer.domElement.style.width = '100%';
+        renderer.domElement.style.height = '100%';
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        requestRender();
+      }
+
+      async function showScan(i) {
+        const token = ++loadToken;
+        loader.innerHTML = '<span class="pr-spinner"></span><span class="pr-loader-text">Загрузка реального 3D-скана…</span>';
+        loader.hidden = false;
+        try {
+          const entry = await buildScanItem(i);
+          if (token !== loadToken) return;
+          while (root.children.length) root.remove(root.children[0]);
+          root.add(entry.object);
+          applyGLTheme();
+          frame(entry);
+          applyGLMode();
+          shadowDirty = true;
+          state.activeMeshes = entry.meshes.length;
+          loader.hidden = true;
+          requestRender();
+        } catch (err) {
+          state.errors.push(String(err && err.message || err));
+          loader.innerHTML = 'Не удалось загрузить 3D-скан. Переключитесь на «Фотореал 8K».';
+        }
+      }
+
+      function glLoop() {
+        glRafId = requestAnimationFrame(glLoop);
+        if (!state.visible || document.hidden || state.mode === 'real') return;
+        let changed = false;
+        if (controls) changed = controls.update() || controls.autoRotate || changed;
+        if (!changed && !needsRender) return;
+        needsRender = false;
+        if (shadowDirty && state.mode !== 'wire') {
+          renderContactShadow();
+          shadowDirty = false;
+        }
+        renderer.render(scene, camera);
+      }
+
+      applyGLTheme();
+      resizeGL();
+      glLoop();
+      state.glBooted = true;
+
+      gl = {
+        scene, renderer, controls, rtShadow, rtBlur,
+        applyGLTheme, applyGLMode, showScan, resizeGL, resetView, dolly,
+        stop: () => cancelAnimationFrame(glRafId),
+      };
+      return gl;
     }
 
-    // ---------- Resize / render loop (только когда видно) ----------
-    function resize() {
-      const w = canvasHost.clientWidth || 600;
-      const h = canvasHost.clientHeight || 420;
-      renderer.setSize(w, h, false);
-      renderer.domElement.style.width = '100%';
-      renderer.domElement.style.height = '100%';
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      if (composer) composer.setSize(w, h);
-      requestRender();
-    }
-    const ro = 'ResizeObserver' in window ? new ResizeObserver(resize) : null;
-    if (ro) ro.observe(canvasHost); else window.addEventListener('resize', resize);
-
-    let needsRender = true, shadowDirty = true, rafId = 0;
-    function requestRender() { needsRender = true; }
-    let frames = 0;
-    const t0 = performance.now();
-    function loop() {
-      rafId = requestAnimationFrame(loop);
-      if (!state.visible || document.hidden) return;
-      let changed = false;
-      const activeEntry = state.loaded[state.active];
-      const sec = (performance.now() - t0) * 0.001;
-      if (starField) {
-        starField.rotation.y = sec * 0.08;
-        haloRing1.rotation.z = sec * 0.14;
-        haloRing2.rotation.z = -sec * 0.1;
-        changed = true;
+    // ==================== UNIFIED STAGE CONTROLLER ====================
+    function updateHint() {
+      if (state.mode === 'real') {
+        hint.textContent = 'Нажимайте точки узлов · Колесо — зум · Перетаскивайте сцену';
+      } else {
+        hint.textContent = 'Вращайте 3D-скан на 360° · Колесо — зум · Двойной клик — сброс';
       }
-      if (activeEntry && activeEntry.animators && activeEntry.animators.length) {
-        activeEntry.animators.forEach((fn) => fn(sec));
-        changed = true;
-      }
-      if (controls) changed = controls.update() || controls.autoRotate || changed;
-      if (!changed && !needsRender) return;
-      needsRender = false;
-      if (shadowDirty && state.mode !== 'wire' && state.ready) {
-        renderContactShadow();
-        shadowDirty = false;
-      }
-      if (composer && state.mode === 'photo') composer.render();
-      else renderer.render(scene, camera);
-      frames++;
-      state.frames = frames;
     }
 
-    // ---------- UI events ----------
+    function setMode(nextMode) {
+      state.mode = nextMode;
+      modes.querySelectorAll('[data-pr-mode]').forEach((b) => {
+        b.setAttribute('aria-pressed', String(b.dataset.prMode === nextMode));
+      });
+      stage.classList.toggle('pr-stage--real', nextMode === 'real');
+      stage.classList.toggle('pr-stage--scan', nextMode !== 'real');
+      realView.hidden = nextMode !== 'real';
+      canvasHost.hidden = nextMode === 'real';
+      updateHint();
+      updateZoomReadout();
+
+      if (nextMode === 'real') {
+        loader.hidden = true;
+        layoutRealMedia();
+        syncHotspotUI();
+      } else {
+        hotspotCard.hidden = true;
+        const engine = ensureWebGL();
+        if (engine) {
+          engine.resizeGL();
+          engine.showScan(state.active);
+        }
+      }
+    }
+
+    function show(i) {
+      state.active = i;
+      tabs.querySelectorAll('[data-pr-tab]').forEach((b) => {
+        b.setAttribute('aria-selected', String(Number(b.dataset.prTab) === i));
+      });
+      const it = items[i];
+      renderInfo(i);
+      renderHotspots(i);
+      resetRealView();
+
+      if (it.photoUrl) {
+        realImg.classList.remove('is-loaded');
+        realImg.alt = it.title || it.course || '';
+        realImg.onload = () => {
+          state.natW = realImg.naturalWidth || 1376;
+          state.natH = realImg.naturalHeight || 768;
+          layoutRealMedia();
+          realImg.classList.add('is-loaded');
+          state.ready = true;
+          container.dispatchEvent(new CustomEvent('photoreal:ready', { detail: { index: i } }));
+        };
+        realImg.src = it.photoUrl;
+        if (realImg.complete && realImg.naturalWidth) {
+          state.natW = realImg.naturalWidth;
+          state.natH = realImg.naturalHeight;
+          layoutRealMedia();
+          realImg.classList.add('is-loaded');
+          state.ready = true;
+        }
+      }
+
+      applyPhotoLighting();
+
+      if (state.mode !== 'real') {
+        const engine = ensureWebGL();
+        if (engine) engine.showScan(i);
+      }
+
+      // Preload next scene image in background for instant tab switching
+      const nextItem = items[(i + 1) % items.length];
+      if (nextItem && nextItem.photoUrl) {
+        const pre = new Image();
+        pre.src = nextItem.photoUrl;
+      }
+    }
+
+    function applyTheme() {
+      applyPhotoLighting();
+      if (gl) gl.applyGLTheme();
+    }
+
+    // Events
     tabs.addEventListener('click', (e) => {
       const b = e.target.closest('[data-pr-tab]');
       if (b) show(Number(b.dataset.prTab));
@@ -1443,14 +1036,12 @@ window.PhotorealShowcase = (function () {
       if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
       const n = (state.active + (e.key === 'ArrowRight' ? 1 : items.length - 1)) % items.length;
       show(n);
-      tabs.querySelector(`[data-pr-tab="${n}"]`).focus();
+      const nextBtn = tabs.querySelector(`[data-pr-tab="${n}"]`);
+      if (nextBtn) nextBtn.focus();
     });
     modes.addEventListener('click', (e) => {
       const b = e.target.closest('[data-pr-mode]');
-      if (!b) return;
-      state.mode = b.dataset.prMode;
-      modes.querySelectorAll('[data-pr-mode]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-      applyMode();
+      if (b) setMode(b.dataset.prMode);
     });
     bgSwitcher.addEventListener('click', (e) => {
       const b = e.target.closest('[data-pr-bg]');
@@ -1459,59 +1050,64 @@ window.PhotorealShowcase = (function () {
       bgSwitcher.querySelectorAll('[data-pr-bg]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       applyTheme();
     });
+
+    const onResize = () => {
+      layoutRealMedia();
+      if (gl && state.mode !== 'real') gl.resizeGL();
+    };
+    const ro = 'ResizeObserver' in window ? new ResizeObserver(onResize) : null;
+    if (ro) ro.observe(stage); else window.addEventListener('resize', onResize);
+
     const cleanupListeners = [
-      () => document.removeEventListener('amk:theme', applyTheme)
+      () => document.removeEventListener('amk:theme', applyTheme),
     ];
-    if (!ro) cleanupListeners.push(() => window.removeEventListener('resize', resize));
+    if (!ro) cleanupListeners.push(() => window.removeEventListener('resize', onResize));
     document.addEventListener('amk:theme', applyTheme);
 
     let io = null;
     function dispose() {
-      cancelAnimationFrame(rafId);
+      cancelAnimationFrame(spatialRaf);
       if (io && typeof io.disconnect === 'function') io.disconnect();
-      if (typeof window.disposeThreeScene === 'function') {
-        window.disposeThreeScene({
-          rafId,
-          resizeObserver: ro,
-          scene,
-          renderer,
-          controls,
-          composer,
-          rtShadow,
-          rtBlur,
-          cleanupListeners
-        });
+      if (gl) {
+        gl.stop();
+        if (typeof window.disposeThreeScene === 'function') {
+          window.disposeThreeScene({
+            resizeObserver: ro,
+            scene: gl.scene,
+            renderer: gl.renderer,
+            controls: gl.controls,
+            rtShadow: gl.rtShadow,
+            rtBlur: gl.rtBlur,
+            cleanupListeners,
+          });
+        } else {
+          cleanupListeners.forEach((fn) => { try { fn(); } catch (e) {} });
+          if (ro) ro.disconnect();
+          try { if (gl.controls) gl.controls.dispose(); } catch (e) {}
+          try { gl.renderer.dispose(); } catch (e) {}
+        }
       } else {
         cleanupListeners.forEach((fn) => { try { fn(); } catch (e) {} });
         if (ro) ro.disconnect();
-        try { controls?.dispose(); } catch (e) {}
-        try { renderer.dispose(); } catch (e) {}
       }
     }
     const onPageHide = () => dispose();
     window.addEventListener('pagehide', onPageHide);
     cleanupListeners.push(() => window.removeEventListener('pagehide', onPageHide));
 
-    applyTheme();
-    resize();
-    let started = false;
-    const start = () => { if (!started) { started = true; show(0); } };
     if ('IntersectionObserver' in window) {
       io = new IntersectionObserver((entries) => {
-        entries.forEach((en) => {
-          state.visible = en.isIntersecting;
-          if (en.isIntersecting) { start(); requestRender(); }
-        });
+        entries.forEach((en) => { state.visible = en.isIntersecting; });
       }, { rootMargin: '200px' });
       io.observe(container);
-    } else {
-      state.visible = true;
-      start();
     }
-    loop();
+
+    show(0);
+    spatialLoop();
 
     state.show = show;
-    state.setMode = (m) => { const b = modes.querySelector(`[data-pr-mode="${m}"]`); if (b) b.click(); };
+    state.setMode = setMode;
+    state.focusHotspot = focusHotspot;
     state.dispose = dispose;
     return state;
   }
