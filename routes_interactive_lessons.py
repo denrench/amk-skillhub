@@ -924,7 +924,9 @@ def ai_student_tutor():
             lesson_data["title"] = l_row["title"]
             lesson_data["course_slug"] = l_row["course_slug"]
             try:
+                from ai_knowledge_base import extract_lesson_digest
                 blocks = json.loads(l_row["content_json"] or "[]")
+                lesson_data["lesson_digest"] = extract_lesson_digest(blocks)
                 for b in blocks:
                     if b.get("id") == block_id:
                         current_block = b
@@ -1149,6 +1151,43 @@ def ai_evaluate_student_lesson():
         "lesson_title": lesson_title,
         "evaluation": result
     })
+
+
+@interactive_lessons_bp.route('/api/ai/status', methods=['GET'])
+def ai_engine_status():
+    """Returns live AI configuration, active model chain, and RAG training status."""
+    from ai_knowledge_base import get_knowledge_base_summary
+    gemini_key, openai_key = resolve_llm_keys()
+    return jsonify({
+        "ok": True,
+        "configured": bool(gemini_key or openai_key),
+        "primary_provider": "gemini" if gemini_key else ("openai" if openai_key else "none"),
+        "model_chain": ["gemini-3.1-flash-lite", "gemini-3-flash-preview", "gemini-2.5-flash"],
+        "knowledge_base": get_knowledge_base_summary(),
+    })
+
+
+@interactive_lessons_bp.route('/api/ai/feedback', methods=['POST'])
+def ai_tutor_feedback():
+    """Stores student thumbs-up / needs-simpler feedback for AI Tutor continuous improvement."""
+    data = request.get_json() or {}
+    helpful = bool(data.get("helpful", True))
+    specialty = (data.get("specialty") or data.get("course_slug") or "it").strip().lower()
+    lesson_id = str(data.get("lesson_id") or "")
+    note = str(data.get("note") or ("helpful" if helpful else "needs_simpler"))[:200]
+    user = _get_current_user()
+    uid = int(user["id"]) if (user and user.get("id")) else 0
+    try:
+        conn = _get_db()
+        c = conn.cursor()
+        c.execute(
+            "INSERT INTO ai_conversations (user_id, context_type, context_id, user_message, assistant_message) VALUES (?, 'ai_feedback', ?, ?, ?)",
+            (uid, f"{specialty}:{lesson_id}", f"helpful={helpful}", note)
+        )
+        conn.commit()
+    except Exception:
+        pass
+    return jsonify({"ok": True, "saved": True, "helpful": helpful})
 
 # ==========================================
 # 5. LESSON PLAYER PAGE ROUTE

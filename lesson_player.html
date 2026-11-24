@@ -199,14 +199,17 @@
 
         <!-- Quick Prompts Strip -->
         <div class="px-4 py-2 border-t border-white/5 flex gap-2 overflow-x-auto no-scrollbar text-[11px]">
-          <button type="button" onclick="sendAiPrompt('Объясни проще теорию этого блока')" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 whitespace-nowrap transition-colors">
-            💡 Объясни проще
+          <button type="button" onclick="sendAiPrompt('Объясни простыми словами и приведи жизненную аналогию по теме этого урока')" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 whitespace-nowrap transition-colors">
+            💡 Простыми словами
           </button>
-          <button type="button" onclick="sendAiPrompt('Дай подсказку к заданию')" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 whitespace-nowrap transition-colors">
-            🎯 Дай подсказку
+          <button type="button" onclick="sendAiPrompt('Какие главные нормативы, цифры и ошибки важно запомнить в этой теме?')" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 whitespace-nowrap transition-colors">
+            📐 Нормативы и ошибки
           </button>
-          <button type="button" onclick="sendAiPrompt('Приведи пример из реальной практики')" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 whitespace-nowrap transition-colors">
-            🏢 Пример из жизни
+          <button type="button" onclick="sendAiPrompt('Как это применяется на практике в мастерской или на реальном объекте?')" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 whitespace-nowrap transition-colors">
+            🔧 Как на практике
+          </button>
+          <button type="button" onclick="sendAiPrompt('Задай мне короткий проверочный вопрос по теме, чтобы я проверил свою логику')" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 whitespace-nowrap transition-colors">
+            🧠 Проверь мою логику
           </button>
         </div>
 
@@ -2414,7 +2417,28 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    function appendLpTutorReplyMsg(container, text) {
+    let lpAiHistory = [];
+
+    async function sendLpAiFeedback(helpful, btnEl) {
+      try {
+        const { spec, num } = getLpVideoSpecAndNum();
+        fetch(`${lpApiBase()}/api/ai/feedback`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ helpful: Boolean(helpful), specialty: spec, lesson_id: num })
+        }).catch(() => {});
+      } catch (_) {}
+      if (btnEl && btnEl.parentElement) {
+        const bar = btnEl.parentElement;
+        bar.textContent = helpful ? '✓ Спасибо! Учтено в обучении ИИ' : '↻ Переобъясняю проще...';
+        bar.className = 'mt-2 text-[10px] font-semibold text-emerald-300';
+      }
+      if (!helpful) {
+        sendAiPrompt('Не совсем понял — объясни ещё проще, коротко и с понятной жизненной аналогией');
+      }
+    }
+
+    function appendLpTutorReplyMsg(container, text, withFeedback = true) {
       const wrap = document.createElement('div');
       wrap.className = 'flex items-start gap-2.5 animate-fade-in';
       const iconBox = document.createElement('div');
@@ -2424,8 +2448,27 @@
       icon.textContent = 'smart_toy';
       iconBox.appendChild(icon);
       const bubble = document.createElement('div');
-      bubble.className = 'p-3.5 rounded-2xl bg-white/5 border border-white/10 text-slate-200 max-w-[85%] leading-relaxed whitespace-pre-line';
-      bubble.textContent = text;
+      bubble.className = 'p-3.5 rounded-2xl bg-white/5 border border-white/10 text-slate-200 max-w-[85%] leading-relaxed';
+      const msgBody = document.createElement('div');
+      msgBody.className = 'whitespace-pre-line';
+      msgBody.textContent = text;
+      bubble.appendChild(msgBody);
+      if (withFeedback && !String(text || '').startsWith('[BLOCKED]')) {
+        const fbBar = document.createElement('div');
+        fbBar.className = 'mt-2.5 pt-2 border-t border-white/10 flex items-center gap-2';
+        const okBtn = document.createElement('button');
+        okBtn.type = 'button';
+        okBtn.className = 'px-2 py-0.5 rounded-md bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-[10px] font-bold transition-colors';
+        okBtn.textContent = '👍 Понятно';
+        okBtn.addEventListener('click', () => sendLpAiFeedback(true, okBtn));
+        const simplerBtn = document.createElement('button');
+        simplerBtn.type = 'button';
+        simplerBtn.className = 'px-2 py-0.5 rounded-md bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 text-[10px] font-bold transition-colors';
+        simplerBtn.textContent = '🔄 Объясни проще';
+        simplerBtn.addEventListener('click', () => sendLpAiFeedback(false, simplerBtn));
+        fbBar.append(okBtn, simplerBtn);
+        bubble.appendChild(fbBar);
+      }
       wrap.append(iconBox, bubble);
       container.appendChild(wrap);
       container.scrollTop = container.scrollHeight;
@@ -2486,6 +2529,7 @@
           course_slug: courseSlug,
           message: question,
           question: question,
+          history: lpAiHistory.slice(-6),
           context: tutorContext,
           user_id: activeUser ? activeUser.id : null,
           user_email: activeUser ? activeUser.email : null
@@ -2503,7 +2547,10 @@
 
         if (res.ok && (data.success || data.ok)) {
           const replyMsg = (data.reply && data.reply.message) || data.reply || data.message || 'Ответ получен.';
-          appendLpTutorReplyMsg(container, typeof replyMsg === 'string' ? replyMsg : JSON.stringify(replyMsg));
+          const replyStr = typeof replyMsg === 'string' ? replyMsg : JSON.stringify(replyMsg);
+          lpAiHistory.push({ role: 'user', content: question }, { role: 'assistant', content: replyStr });
+          if (lpAiHistory.length > 10) lpAiHistory = lpAiHistory.slice(-10);
+          appendLpTutorReplyMsg(container, replyStr, true);
         } else {
           const badge = document.getElementById('lp-ai-status-badge');
           const banner = document.getElementById('lp-ai-blocked-banner');

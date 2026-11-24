@@ -36,22 +36,45 @@ def resolve_llm_keys(user_api_key="", provider=""):
     return gemini_key, openai_key
 
 
-def _call_gemini_api(api_key, system_prompt, user_prompt):
-    """Calls Google Gemini API safely via standard urllib with automatic model fallback."""
-    preferred_models = ["gemini-3.1-flash-lite", "gemini-2.5-flash", "gemini-1.5-flash"]
+def _call_gemini_api(
+    api_key,
+    system_prompt,
+    user_prompt,
+    json_mode=False,
+    temperature=0.35,
+    history=None,
+    max_tokens=2048,
+):
+    """
+    Calls Google Gemini API (v1beta) using native systemInstruction, multi-turn contents,
+    optional strict JSON output (responseMimeType), and automatic model fallback.
+    """
+    preferred_models = ["gemini-3.1-flash-lite", "gemini-3-flash-preview", "gemini-2.5-flash"]
+    contents = []
+    if isinstance(history, list):
+        for item in history[-8:]:
+            if not isinstance(item, dict):
+                continue
+            txt = str(item.get("content") or item.get("text") or "").strip()
+            if not txt:
+                continue
+            role = "model" if str(item.get("role", "")).lower() in ("assistant", "model", "ai") else "user"
+            contents.append({"role": role, "parts": [{"text": txt[:600]}]})
+    contents.append({"role": "user", "parts": [{"text": user_prompt}]})
+
+    gen_cfg = {
+        "temperature": float(temperature),
+        "maxOutputTokens": int(max_tokens),
+    }
+    if json_mode:
+        gen_cfg["responseMimeType"] = "application/json"
+
     payload = {
-        "contents": [
-            {
-                "role": "user",
-                "parts": [
-                    {"text": f"SYSTEM INSTRUCTION: {system_prompt}\n\nUSER PROMPT: {user_prompt}"}
-                ]
-            }
-        ],
-        "generationConfig": {
-            "temperature": 0.4,
-            "maxOutputTokens": 2048
-        }
+        "systemInstruction": {
+            "parts": [{"text": system_prompt}]
+        },
+        "contents": contents,
+        "generationConfig": gen_cfg,
     }
     encoded = json.dumps(payload).encode("utf-8")
     for model_name in preferred_models:
@@ -65,7 +88,7 @@ def _call_gemini_api(api_key, system_prompt, user_prompt):
             }
         )
         try:
-            with urllib.request.urlopen(req, timeout=15) as response:
+            with urllib.request.urlopen(req, timeout=18) as response:
                 res_data = json.loads(response.read().decode("utf-8"))
                 candidates = res_data.get("candidates", [])
                 if candidates and "content" in candidates[0]:
@@ -73,7 +96,7 @@ def _call_gemini_api(api_key, system_prompt, user_prompt):
                     if parts and "text" in parts[0]:
                         return parts[0]["text"]
         except urllib.error.HTTPError as err:
-            if err.code in (404, 503):
+            if err.code in (404, 429, 503):
                 continue
             raise err
         except Exception:
@@ -81,18 +104,28 @@ def _call_gemini_api(api_key, system_prompt, user_prompt):
     return None
 
 
-def _call_openai_api(api_key, system_prompt, user_prompt):
-    """Calls OpenAI API safely via standard urllib."""
+def _call_openai_api(api_key, system_prompt, user_prompt, json_mode=False, temperature=0.35, history=None, max_tokens=2048):
+    """Calls OpenAI API safely via standard urllib with optional history and JSON mode."""
     url = "https://api.openai.com/v1/chat/completions"
+    messages = [{"role": "system", "content": system_prompt}]
+    if isinstance(history, list):
+        for item in history[-8:]:
+            if not isinstance(item, dict):
+                continue
+            txt = str(item.get("content") or item.get("text") or "").strip()
+            if not txt:
+                continue
+            role = "assistant" if str(item.get("role", "")).lower() in ("assistant", "model", "ai") else "user"
+            messages.append({"role": role, "content": txt[:600]})
+    messages.append({"role": "user", "content": user_prompt})
     payload = {
         "model": "gpt-4o-mini",
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ],
-        "temperature": 0.4,
-        "max_tokens": 2048
+        "messages": messages,
+        "temperature": float(temperature),
+        "max_tokens": int(max_tokens)
     }
+    if json_mode:
+        payload["response_format"] = {"type": "json_object"}
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
@@ -101,7 +134,7 @@ def _call_openai_api(api_key, system_prompt, user_prompt):
             "Authorization": f"Bearer {api_key}"
         }
     )
-    with urllib.request.urlopen(req, timeout=12) as response:
+    with urllib.request.urlopen(req, timeout=15) as response:
         res_data = json.loads(response.read().decode("utf-8"))
         choices = res_data.get("choices", [])
         if choices and "message" in choices[0]:
@@ -134,7 +167,7 @@ def generate_lesson_content(
         )
 
     system_prompt = (
-        "Ты — ведущий методист и эксперт образовательной платформы EduSpace. "
+        "Ты — ведущий методист и эксперт образовательной платформы AMK SkillHub (Алматинский многопрофильный колледж). "
         "Твоя задача — создать профессиональный интерактивный урок из 8 обязательных блоков. "
         "Строго верни валидный JSON без markdown-обёртки: "
         "["
@@ -161,7 +194,7 @@ def generate_lesson_content(
     last_error = None
     if gemini_key:
         try:
-            raw_text = _call_gemini_api(gemini_key, system_prompt, user_prompt)
+            raw_text = _call_gemini_api(gemini_key, system_prompt, user_prompt, json_mode=True, temperature=0.3)
             if raw_text:
                 blocks = json.loads(_strip_json_fences(raw_text))
                 if isinstance(blocks, list) and len(blocks) >= 1 and all(isinstance(b, dict) for b in blocks):
@@ -198,12 +231,16 @@ def student_socratic_tutor(lesson_data, current_block, student_question, history
             "AI-наставник недоступен: не задан API-ключ LLM (укажите в настройках или переменных окружения)."
         )
 
+    from ai_knowledge_base import build_tutor_system_prompt, retrieve_domain_knowledge
+
     history = history or []
     context = context if isinstance(context, dict) else {}
     lesson_title = lesson_data.get("title", "Текущий урок")
     course_slug = lesson_data.get("course_slug") or context.get("course_slug") or "it"
+    lesson_digest = str(lesson_data.get("lesson_digest") or "").strip()
     block_type = current_block.get("type", "general")
     block_title = current_block.get("title", "")
+    tutor_mode = str(context.get("mode") or "default").strip().lower()
 
     cheat_triggers = [
         "дай ответ", "скажи ответ", "какой ответ", "правильный ответ",
@@ -212,60 +249,80 @@ def student_socratic_tutor(lesson_data, current_block, student_question, history
         "подскажи правильную букву", "скажи букву", "напиши решение",
         "готовое решение", "сделай за меня", "готовый код", "готовый чек-лист",
         "полный ответ", "дай шаблон", "помоги списать", "напиши за меня",
-        "реши задачу полностью", "выполни задание"
+        "реши задачу полностью", "выполни задание",
+        "жауабын бер", "дайын жауап", "менің орныма жаз"
     ]
     question_lower = student_question.lower()
     is_exam_block = block_type in ("practical", "assessment", "inline_check")
     is_cheat_attempt = any(t in question_lower for t in cheat_triggers)
 
-    system_prompt = (
-        "Ты — доброжелательный, но принципиальный Сократовский ИИ-тьютор образовательной платформы AMK SkillHub. "
-        "Твоя задача — помогать студенту понимать учебный материал через объяснение принципов и наводящие вопросы. "
-        "СТРОГОЕ ПРАВИЛО АНТИСПИСЫВАНИЯ: Категорически ЗАПРЕЩЕНО выдавать готовые решения практических заданий, "
-        "готовый код для копирования, готовые чек-листы, точные ответы или буквы/номера вариантов тестов. "
-        "Если студент просит решить за него или дать готовый ответ — вежливо откажи и задай 1–2 коротких наводящих вопроса."
-    )
+    if any(k in question_lower for k in ("проще", "простыми словами", "аналог", "қарапайым")):
+        tutor_mode = "simple"
+    elif any(k in question_lower for k in ("на практике", "мастерской", "инструмент", "тәжірибеде")):
+        tutor_mode = "practice"
+    elif any(k in question_lower for k in ("проверь", "правильно ли я думаю", "логик")):
+        tutor_mode = "check_logic"
+
+    rag = retrieve_domain_knowledge(course_slug, query_text=student_question, lesson_title=lesson_title, max_standards=4)
+    system_prompt = build_tutor_system_prompt(course_slug, is_exam_block=is_exam_block, mode=tutor_mode)
 
     context_lines = []
     if context.get("selected_part"):
-        context_lines.append(f"Выбранная 3D-деталь: {context.get('selected_part')}")
+        context_lines.append(f"Выбранная деталь: {context.get('selected_part')}")
     if context.get("disassembled_parts"):
         context_lines.append(f"Разобранные детали: {', '.join(map(str, context.get('disassembled_parts') or []))}")
     if context.get("simulator_state"):
         context_lines.append(f"Состояние симулятора: {json.dumps(context.get('simulator_state'), ensure_ascii=False)[:600]}")
     if context.get("recent_errors"):
         context_lines.append(f"Недавние ошибки: {json.dumps(context.get('recent_errors'), ensure_ascii=False)[:600]}")
-    history_lines = []
-    for item in history[-6:]:
-        if isinstance(item, dict) and item.get("content"):
-            history_lines.append(f"{item.get('role', 'user')}: {str(item.get('content'))[:300]}")
+
+    rag_block = (
+        "БАЗА ЗНАНИЙ И СТАНДАРТЫ СПЕЦИАЛЬНОСТИ (опирайся на эти факты):\n"
+        + "\n".join(f"- {s}" for s in rag["standards"])
+        + "\nЧАСТЫЕ ОШИБКИ СТУДЕНТОВ:\n"
+        + "\n".join(f"- {m}" for m in rag["common_mistakes"])
+    )
 
     user_prompt = (
-        f"Курс: {course_slug}\n"
+        f"Специальность: {rag['title']} ({course_slug})\n"
         f"Урок: {lesson_title}\n"
         f"Текущий блок: {block_title} ({block_type})\n"
-        + ("Контекст 3D/симулятора:\n" + "\n".join(context_lines) + "\n" if context_lines else "")
-        + ("История диалога:\n" + "\n".join(history_lines) + "\n" if history_lines else "")
-        + ("ВНИМАНИЕ: студент находится на контрольном шаге практики/теста — НЕ пиши готовое решение или ответ, дай только принцип или наводящий вопрос.\n" if (is_cheat_attempt or is_exam_block) else "")
-        + f"Вопрос студента: {student_question}\n"
-        "Ответь структурированно, понятно и поддерживающе в стиле персонального наставника."
+        + (f"\nКОНСПЕКТ ТЕКУЩЕГО УРОКА:\n{lesson_digest}\n" if lesson_digest else "")
+        + f"\n{rag_block}\n"
+        + ("\nКонтекст тренажёра:\n" + "\n".join(context_lines) + "\n" if context_lines else "")
+        + ("\nВНИМАНИЕ: студент на контрольном шаге или просит готовый ответ — НЕ выдавай готовое решение или букву варианта, дай только принцип и 1–2 наводящих вопроса!\n" if (is_cheat_attempt or is_exam_block) else "")
+        + f"\nВопрос студента: {student_question}"
     )
 
     last_error = None
     if gemini_key:
         try:
-            ans = _call_gemini_api(gemini_key, system_prompt, user_prompt)
+            ans = _call_gemini_api(gemini_key, system_prompt, user_prompt, json_mode=False, temperature=0.45, history=history)
             if ans:
-                return {"role": "assistant", "anti_cheat_triggered": is_cheat_attempt, "message": ans.strip(), "provider": "gemini"}
+                return {
+                    "role": "assistant",
+                    "anti_cheat_triggered": is_cheat_attempt,
+                    "mode": tutor_mode,
+                    "rag_grounded": True,
+                    "message": ans.strip(),
+                    "provider": "gemini",
+                }
         except Exception as e:
             last_error = e
             print(f"[WARN] Gemini tutor failed: {e}")
 
     if openai_key:
         try:
-            ans = _call_openai_api(openai_key, system_prompt, user_prompt)
+            ans = _call_openai_api(openai_key, system_prompt, user_prompt, json_mode=False, temperature=0.45, history=history)
             if ans:
-                return {"role": "assistant", "anti_cheat_triggered": is_cheat_attempt, "message": ans.strip(), "provider": "openai"}
+                return {
+                    "role": "assistant",
+                    "anti_cheat_triggered": is_cheat_attempt,
+                    "mode": tutor_mode,
+                    "rag_grounded": True,
+                    "message": ans.strip(),
+                    "provider": "openai",
+                }
         except Exception as e:
             last_error = e
             print(f"[WARN] OpenAI tutor failed: {e}")
@@ -316,8 +373,8 @@ def review_submission_ai(submission_data, task_data, user_api_key="", provider="
     max_score = int(task_data.get("max_score", 100) or 100)
 
     system_prompt = (
-        "Ты — методист-эксперт образовательной платформы EduSpace. "
-        "Оцени практическую работу студента объективно по критериям задания. "
+        "Ты — методист-эксперт образовательной платформы AMK SkillHub. "
+        "Оцени практическую работу студента объективно по критериям задания и техническим нормативам. "
         "Строго верни только валидный JSON без markdown-обёртки вида:\n"
         "{\n"
         f'  "recommended_score": <целое число от 0 до {max_score}>,\n'
@@ -327,6 +384,7 @@ def review_submission_ai(submission_data, task_data, user_api_key="", provider="
         "}"
     )
     user_prompt = (
+        f"Оцени практическую работу студента.\n"
         f"Задание: {task_title}\n"
         f"Максимальный балл: {max_score}\n"
         f"Ответ / код студента:\n{code_or_text[:6000] if code_or_text else '(пустой ответ)'}"
@@ -335,7 +393,7 @@ def review_submission_ai(submission_data, task_data, user_api_key="", provider="
     last_error = None
     if gemini_key:
         try:
-            raw_text = _call_gemini_api(gemini_key, system_prompt, user_prompt)
+            raw_text = _call_gemini_api(gemini_key, system_prompt, user_prompt, json_mode=True, temperature=0.3)
             if raw_text:
                 return _parse_review_json(raw_text, max_score, "gemini")
             last_error = ValueError("Empty Gemini review response")
@@ -502,26 +560,18 @@ def evaluate_student_lesson_submission(
             "elapsed_seconds": elapsed,
         }, integrity_info)
 
+    from ai_knowledge_base import build_examiner_system_prompt, retrieve_domain_knowledge
+
     gemini_key, openai_key = resolve_llm_keys(user_api_key=user_api_key, provider=provider)
     criteria_text = "\n".join([f"- {c}" for c in criteria]) if criteria else "- Техническая точность и полнота ответа"
+    rag = retrieve_domain_knowledge(specialty, query_text=f"{task_prompt} {criteria_text} {clean_solution[:400]}", lesson_title=lesson_title, max_standards=4)
+    standards_text = "\n".join(f"- {s}" for s in rag["standards"])
 
-    system_prompt = (
-        "Ты строгий, но справедливый ИИ-экзаменатор и проктор технического колледжа AMK SkillHub. "
-        "Твоя задача — оценить самостоятельную работу студента в конце урока по четырём факторам: "
-        "1) точность и полнота написанного решения по критериям ТЗ; "
-        "2) время выполнения (если меньше 20 секунд при длинном тексте — предупреди о возможном списывании и снизь балл; "
-        "если от 1 до 20 минут — похвали за вдумчивый темп); "
-        "3) результаты интерактивной лаборатории; "
-        "4) данные прокторинга антисписывания (уходы со вкладки, попытки вставки текста, копирования задания, DevTools и индекс честности). "
-        "Если индекс честности < 70% или были попытки вставки/частые уходы со вкладки, обязательно укажи это в feedback и снизь оценку. "
-        "Верни ТОЛЬКО валидный JSON без markdown-обёрток со следующими ключами: "
-        '{"grade_5": 5, "score_100": 92, "passed": true, "verdict_title": "...", '
-        '"time_analysis": "...", "feedback": "...", "strengths": ["..."], "improvements": ["..."]}. '
-        "grade_5 — целое число от 2 до 5. passed — true если grade_5 >= 3. Язык ответа: русский."
-    )
+    system_prompt = build_examiner_system_prompt(specialty)
     user_prompt = (
-        f"Специальность: {specialty}\n"
+        f"Специальность: {rag['title']} ({specialty})\n"
         f"Тема урока: {lesson_title}\n"
+        f"Эталонные нормативы специальности:\n{standards_text}\n"
         f"Задание: {task_prompt}\n"
         f"Критерии выполнения:\n{criteria_text}\n"
         f"Интерактивный тренажёр: {'пройден' if interactive_done else 'не завершён'} (очки: {interactive_score})\n"
@@ -538,10 +588,10 @@ def evaluate_student_lesson_submission(
     used_provider = "fallback"
     try:
         if gemini_key:
-            raw_reply = _call_gemini_api(gemini_key, system_prompt, user_prompt)
+            raw_reply = _call_gemini_api(gemini_key, system_prompt, user_prompt, json_mode=True, temperature=0.2)
             used_provider = "Gemini AI"
         elif openai_key:
-            raw_reply = _call_openai_api(openai_key, system_prompt, user_prompt)
+            raw_reply = _call_openai_api(openai_key, system_prompt, user_prompt, json_mode=True, temperature=0.2)
             used_provider = "OpenAI"
     except Exception:
         raw_reply = None

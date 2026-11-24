@@ -278,6 +278,7 @@ _CSRF_EXEMPT_PATHS = {
     '/api/ai/tutor',
     '/api/ai/chat',
     '/api/ai/evaluate-lesson',
+    '/api/ai/feedback',
 }
 
 
@@ -5118,13 +5119,12 @@ def ai_mentor_chat():
         }), 503
 
     course = COURSES_BY_SLUG.get(specialty, COURSES_META[0])
-    sys_prompt = (
-        f"Ты AI-наставник AMK SkillHub по специальности «{course['title']}» (модуль #{task_num}). "
-        "Помогай студенту понять ошибки и шаги решения без выдачи готового ответа на экзамен."
-    )
+    from ai_knowledge_base import build_tutor_system_prompt, retrieve_domain_knowledge
+    rag = retrieve_domain_knowledge(specialty, query_text=user_prompt, lesson_title=f"Урок {task_num} {course['title']}", max_standards=4)
+    sys_prompt = build_tutor_system_prompt(specialty, is_exam_block=bool(user_code), mode="default")
     context_lines = []
     if context.get("selected_part"):
-        context_lines.append(f"Выбранная 3D-деталь: {context.get('selected_part')}")
+        context_lines.append(f"Выбранная деталь: {context.get('selected_part')}")
     if context.get("disassembled_parts"):
         context_lines.append(f"Разобранные детали: {', '.join(map(str, context.get('disassembled_parts') or []))}")
     if context.get("simulator_state"):
@@ -5132,20 +5132,25 @@ def ai_mentor_chat():
     if context.get("recent_errors"):
         context_lines.append(f"Недавние ошибки: {json.dumps(context.get('recent_errors'), ensure_ascii=False)[:600]}")
 
+    rag_block = (
+        f"Специальность: {rag['title']} (модуль #{task_num})\n"
+        "Стандарты специальности:\n" + "\n".join(f"- {s}" for s in rag["standards"])
+    )
     full_user_prompt = (
-        user_prompt
-        + ("\n\nКонтекст 3D/симулятора:\n" + "\n".join(context_lines) if context_lines else "")
+        rag_block
+        + ("\n\nКонтекст тренажёра:\n" + "\n".join(context_lines) if context_lines else "")
         + (f"\n\nКонтекст кода/ответа студента:\n{user_code[:2000]}" if user_code else "")
+        + f"\n\nВопрос студента: {user_prompt}"
     )
 
     try:
         reply_text = None
         used_model = None
         if gemini_key:
-            reply_text = _call_gemini_api(gemini_key, sys_prompt, full_user_prompt)
-            used_model = "gemini-1.5-flash"
+            reply_text = _call_gemini_api(gemini_key, sys_prompt, full_user_prompt, temperature=0.4)
+            used_model = "gemini-3.1-flash-lite"
         elif openai_key:
-            reply_text = _call_openai_api(openai_key, sys_prompt, full_user_prompt)
+            reply_text = _call_openai_api(openai_key, sys_prompt, full_user_prompt, temperature=0.4)
             used_model = "gpt-4o-mini"
         if not reply_text:
             return jsonify({
