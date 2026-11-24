@@ -1645,13 +1645,13 @@
           </p>
         </div>
         <div class="space-y-2.5 pt-1">
-          <a href="auth.html?mode=login" class="w-full py-2.5 px-4 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 font-bold text-xs transition-colors block">
+          <a href="auth.html?mode=login" class="academy-action w-full justify-center">
             Войти в аккаунт
           </a>
-          <a href="auth.html?mode=register${targetRole === 'teacher' ? '&role=teacher' : ''}" class="w-full py-2 px-4 rounded-xl text-slate-400 hover:text-white font-semibold text-xs transition-colors block">
+          <a href="auth.html?mode=register${targetRole === 'teacher' ? '&role=teacher' : ''}" class="w-full py-2.5 px-4 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 font-bold text-xs transition-colors block">
             Создать аккаунт
           </a>
-          <a href="learn.html" class="academy-action">Открыть учебник без аккаунта</a>
+          <a href="learn.html" class="w-full py-2 px-4 rounded-xl text-slate-400 hover:text-white font-semibold text-xs transition-colors block">Открыть учебник без аккаунта</a>
         </div>
       </div>
     `;

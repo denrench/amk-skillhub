@@ -44,7 +44,7 @@
   <a class="academy-skip" href="#academy-main">К содержимому</a>
 
   <!-- TOP APP BAR -->
-  <header class="h-16 flex-shrink-0 bg-dark-900/90 backdrop-blur-xl border-b border-white/10 px-3 sm:px-6 flex items-center justify-between z-30">
+  <header class="lp-top-header h-16 flex-shrink-0 bg-dark-900/90 backdrop-blur-xl border-b border-white/10 px-3 sm:px-6 flex items-center justify-between z-30">
     <div class="flex items-center gap-2 sm:gap-4 min-w-0">
       <a href="tasks.html" aria-label="В кабинет к урокам" class="flex items-center gap-1 text-slate-400 hover:text-white p-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-xs font-semibold shrink-0">
         <span class="material-symbols-outlined text-[18px]">arrow_back</span>
@@ -54,15 +54,15 @@
       <div class="min-w-0">
         <div class="flex items-center gap-1.5 min-w-0">
           <span id="lp-course-badge" class="px-1.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 shrink-0">IT</span>
-          <h1 id="lp-lesson-title" class="text-xs sm:text-base font-extrabold text-white truncate max-w-[120px] sm:max-w-md">Загрузка урока...</h1>
+          <h1 id="lp-lesson-title" class="text-xs sm:text-base font-extrabold text-white truncate max-w-[140px] sm:max-w-md">Загрузка урока...</h1>
         </div>
         <p id="lp-module-title" class="text-[10px] text-slate-400 truncate hidden sm:block">Модуль 1</p>
       </div>
     </div>
 
-    <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+    <div class="lp-header-controls flex items-center gap-2 sm:gap-2.5 shrink-0">
       <!-- Real-Time AI Proctor Session Stopwatch -->
-      <div class="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono font-bold text-xs" title="Время работы над уроком учитывается при проверке ИИ">
+      <div class="lp-timer-pill items-center gap-1.5 px-2.5 py-1 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-mono font-bold text-xs" title="Время работы над уроком учитывается при проверке ИИ">
         <span class="material-symbols-outlined text-cyan-400 text-[15px]">timer</span>
         <span id="lp-timer-badge">00:00</span>
       </div>
@@ -98,7 +98,7 @@
   </header>
 
   <!-- STEPPERS STRIP (7 Steps — inline spoiler quiz removed) -->
-  <nav class="h-12 flex-shrink-0 bg-dark-950/70 border-b border-white/5 px-4 sm:px-6 overflow-x-auto no-scrollbar flex items-center gap-1 sm:gap-2 text-xs">
+  <nav class="lp-stepper-nav h-12 flex-shrink-0 bg-dark-950/70 border-b border-white/5 px-4 sm:px-6 overflow-x-auto no-scrollbar flex items-center gap-1.5 sm:gap-2 text-xs">
     <button type="button" onclick="jumpToBlock(0)" id="step-btn-0" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all bg-indigo-600 text-white shrink-0">
       <span class="material-symbols-outlined text-[16px]">lightbulb</span>
       <span>1. Вступление</span>
@@ -167,7 +167,7 @@
                 AI Тьютор AMK SkillHub
                 <span id="lp-ai-status-badge" class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-500/20 text-slate-300 border border-slate-500/30">Проверка...</span>
               </h3>
-              <p class="text-[11px] text-slate-400">Персональный контекстный 3D/LLM-наставник</p>
+              <p class="text-[11px] text-slate-400">Обученный RAG-наставник · Gemini AI</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
@@ -235,7 +235,7 @@
     </button>
 
     <div class="flex items-center gap-2">
-      <span class="text-xs text-slate-400">Шаг <span id="lp-step-num" class="text-white font-bold font-mono">1</span> из 8</span>
+      <span class="text-xs text-slate-400">Шаг <span id="lp-step-num" class="text-white font-bold font-mono">1</span> из <span id="lp-step-total" class="font-mono">7</span></span>
     </div>
 
     <button type="button" id="lp-next-btn" onclick="nextBlock()" class="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-bold text-xs shadow-glow-indigo transition-all">
@@ -662,6 +662,7 @@
                 copy.items = defaultCriteria;
               }
             } else if (copy.type === 'theory') {
+              copy.title = `Интерактивный симулятор темы: ${cleanTitle}`;
               if (!Array.isArray(copy.chunks) || !copy.chunks.length || (copy.chunks.length === 1 && catLesson && catLesson.theory && /<h[34]>/i.test(catLesson.theory))) {
                 copy.chunks = parseTheoryChunksFromHtml(catLesson && catLesson.theory, cleanTitle, toolsText);
               }
@@ -676,6 +677,7 @@
                 ];
               }
             } else if (copy.type === 'practical') {
+              copy.title = `Практическое задание: ${cleanTitle}`;
               copy.task_description = copy.task_description || copy.prompt || copy.description || defaultTaskDesc;
               copy.prompt = copy.prompt || copy.task_description;
               copy.guidelines = (Array.isArray(copy.guidelines) && copy.guidelines.length)
@@ -848,6 +850,8 @@
       document.getElementById('lp-progress-bar').style.width = `${pct}%`;
       document.getElementById('lp-progress-text').textContent = `${currentBlockIdx + 1} / ${blocks.length}`;
       document.getElementById('lp-step-num').textContent = currentBlockIdx + 1;
+      const totEl = document.getElementById('lp-step-total');
+      if (totEl) totEl.textContent = blocks.length;
 
       // Update stepper nav buttons
       for (let i = 0; i < 8; i++) {

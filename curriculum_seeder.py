@@ -290,12 +290,12 @@ def _build_8_block_lesson(item, spec, num):
         {
             "id": "b3_theory",
             "type": "theory",
-            "title": f"Интерактивный симулятор темы: {clean_title[:50]}",
+            "title": f"Интерактивный симулятор темы: {clean_title}",
             "summary": summary,
             "game": topic_game,
             "cheatsheet": [
                 f"Инструмент / стандарт: {tools or 'профильный регламент АМК'}",
-                criteria[0] if criteria else f"Контроль ключевых допусков по теме «{clean_title[:45]}»",
+                criteria[0] if criteria else f"Контроль ключевых допусков по теме «{clean_title}»",
                 first_q.get("explain", "Фиксация результата и сверка с эталонным значением")
             ],
             "chunks": chunks
@@ -314,7 +314,7 @@ def _build_8_block_lesson(item, spec, num):
         {
             "id": "b6_practice",
             "type": "practical",
-            "title": f"Практическое задание: {clean_title[:50]}",
+            "title": f"Практическое задание: {clean_title}",
             "task_description": item.get("task_prompt", summary),
             "prompt": item.get("task_prompt", summary),
             "tools": tools or "Профильный инструментарий АМК",

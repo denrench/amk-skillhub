@@ -1326,3 +1326,146 @@ body.amk-proctor-active textarea {
   -moz-user-select: text !important;
   user-select: text !important;
 }
+
+/* ==================== DESIGN POLISH & PIXEL-PERFECT ALIGNMENT ==================== */
+
+/* 1. Fix invisible dark headings on learn.html / academy pages in neon & graphite themes */
+:root[data-theme="neon"] body:not(.workshop) h1,
+:root[data-theme="neon"] body:not(.workshop) h2,
+:root[data-theme="neon"] body:not(.workshop) h3,
+:root[data-theme="graphite"] body:not(.workshop) h1,
+:root[data-theme="graphite"] body:not(.workshop) h2,
+:root[data-theme="graphite"] body:not(.workshop) h3,
+.lesson-layout .card h2,
+.lesson-layout .card h3 {
+  color: var(--ink) !important;
+}
+:root[data-theme="light"] .lesson-head h1,
+:root[data-theme="light"] .lesson-head h2,
+:root[data-theme="neon"] .lesson-head h1,
+:root[data-theme="graphite"] .lesson-head h1 {
+  color: #FFFFFF !important;
+}
+
+/* 2. Hero highlighted word spacing on index.html */
+.hero-title {
+  line-height: 1.18 !important;
+}
+.hero-title mark,
+.hero-title .hero-mark,
+.hero-title .accent-mark {
+  display: inline-block;
+  line-height: 1.08;
+  padding: 0.04em 0.24em 0.1em;
+  margin: 0.06em 0;
+  border-radius: 14px;
+  vertical-align: baseline;
+}
+
+/* 3. Sleek theme-synced scrollbars (replaces harsh white Windows bars) */
+html, body, main, aside, div, nav {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
+::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.32) !important;
+  border-radius: 999px !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent, #38bdf8) !important;
+}
+:root[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.24) !important;
+}
+.lp-stepper-nav {
+  overflow-y: hidden !important;
+  scrollbar-width: none !important;
+}
+.lp-stepper-nav::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* 4. tools.html responsive 2-column grid & top nav visibility */
+.tools-header-nav {
+  display: none;
+}
+@media (min-width: 900px) {
+  .tools-header-nav {
+    display: flex !important;
+    align-items: center;
+    gap: 4px;
+  }
+}
+.tools-main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+@media (min-width: 1024px) {
+  .tools-main-grid {
+    grid-template-columns: minmax(0, 1.65fr) minmax(320px, 1fr);
+  }
+}
+
+/* 5. Unified right-aligned header grouping (tasks.html, lesson_player.html, tools.html) */
+.top-header {
+  justify-content: flex-start !important;
+}
+.top-header .breadcrumbs {
+  margin-right: auto !important;
+}
+.top-header .header-actions {
+  margin-left: 0 !important;
+}
+.top-header > .lang-switch,
+.top-header > .theme-switch {
+  margin-left: 4px !important;
+}
+.lp-top-header {
+  justify-content: flex-start !important;
+  gap: 10px !important;
+}
+.lp-top-header .lp-header-controls {
+  margin-left: auto !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.lp-top-header > .lang-switch,
+.lp-top-header > .theme-switch {
+  margin-left: 4px !important;
+}
+.lp-timer-pill {
+  display: none;
+}
+@media (min-width: 1024px) {
+  .lp-timer-pill {
+    display: inline-flex !important;
+  }
+}
+.lp-stepper-nav button {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+@media (max-width: 640px) {
+  .lp-top-header #lp-lesson-title {
+    display: none !important;
+  }
+  .lp-top-header #lp-course-badge {
+    font-size: 10px !important;
+  }
+}

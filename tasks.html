@@ -157,7 +157,7 @@
       padding: var(--sp-2) 12px;
       z-index: 40;
       user-select: none;
-      overflow-x: visible;
+      overflow-x: hidden;
     }
 
     .sidebar-top-row {
@@ -230,7 +230,7 @@
     .sidebar-nav {
       flex: 1;
       overflow-y: auto;
-      overflow-x: visible;
+      overflow-x: hidden;
       display: flex;
       flex-direction: column;
       gap: var(--sp-2);
@@ -781,8 +781,8 @@
     .search-box {
       position: relative;
       flex: 1;
-      min-width: 240px;
-      max-width: 340px;
+      min-width: 280px;
+      max-width: 380px;
     }
     .search-input {
       width: 100%;
@@ -1552,7 +1552,12 @@
       }).replace(/\s+/g, ' ').trim();
 
       const words = shortBase.split(' ');
-      const concise = locContent.shortTitleOverride || (words.length > 7 ? words.slice(0, 7).join(' ') : shortBase);
+      let concise = locContent.shortTitleOverride || shortBase;
+      if (!locContent.shortTitleOverride && concise.length > 62) {
+        let cut = concise.slice(0, 62).replace(/\s+\S*$/, '').trim();
+        cut = cut.replace(/\s+(для|и|в|на|по|с|из|к|от|о|у|без)$/i, '').trim();
+        concise = cut + '…';
+      }
       const prefix = window.I18n.t('lesson.prefix', { num: taskNum });
       const tags = [];
       if (techMatches.length) tags.push(...techMatches);
