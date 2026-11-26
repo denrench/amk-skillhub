@@ -133,27 +133,19 @@ window.PhotorealShowcase = (function () {
     const hotspotsLayer = el('div', { class: 'pr-hotspots pr-hotspots--3d' });
 
     const label = el('div', { class: 'pr-label' });
-    const modes = el('div', { class: 'pr-modes', role: 'group', 'aria-label': 'Режим 3D-рендера' }, [
-      { id: 'scan360', text: '3D-модель 360°' },
-      { id: 'photo3d', text: 'Фотореал 3D' },
-      { id: 'clay3d', text: 'Глина 3D' },
-      { id: 'wire3d', text: 'Сетка 3D' },
-    ].map((m, i) => `<button type="button" class="pr-mode" data-pr-mode="${m.id}" aria-pressed="${i === 0}">${m.text}</button>`).join(''));
-
     const zoomBar = el('div', { class: 'pr-zoom-bar', role: 'group', 'aria-label': 'Управление 3D-камерой' }, `
       <button type="button" class="pr-zoom-btn" data-pr-zoom="out" title="Отдалить 3D-камеру" aria-label="Отдалить">−</button>
-      <button type="button" class="pr-zoom-btn pr-zoom-val" data-pr-zoom="reset" title="Сбросить 3D-ракурс">3D</button>
+      <button type="button" class="pr-zoom-btn pr-zoom-val" data-pr-zoom="reset" title="Сбросить 3D-ракурс">360°</button>
       <button type="button" class="pr-zoom-btn" data-pr-zoom="in" title="Приблизить 3D-камеру" aria-label="Приблизить">+</button>
     `);
 
     const bgSwitcher = el('div', { class: 'pr-bg-modes', role: 'group', 'aria-label': '3D-освещение сцены' },
       Object.entries(BG_PRESETS).map(([key, cfg], i) => `<button type="button" class="pr-bg-btn" data-pr-bg="${key}" aria-pressed="${i === 0}">${escapeHtml(cfg.label)}</button>`).join(''));
 
-    const hotspotCard = el('div', { class: 'pr-hotspot-card', hidden: 'true' });
-    const loader = el('div', { class: 'pr-loader', role: 'status' }, '<span class="pr-spinner"></span><span class="pr-loader-text">Построение 3D-сцены…</span>');
-    const hint = el('div', { class: 'pr-hint' }, 'Вращайте 3D-сцену мышью · Колесо — зум · Кликайте точки узлов');
+    const loader = el('div', { class: 'pr-loader', role: 'status' }, '<span class="pr-spinner"></span><span class="pr-loader-text">Загрузка 3D-модели 360°…</span>');
+    const hint = el('div', { class: 'pr-hint' }, 'Вращайте 3D-модель на 360° · Колесо — зум · Двойной клик — сброс');
 
-    stage.append(canvasHost, hotspotsLayer, label, modes, zoomBar, bgSwitcher, hotspotCard, loader, hint);
+    stage.append(canvasHost, label, zoomBar, bgSwitcher, loader, hint);
 
     const info = el('div', { class: 'pr-info' });
     container.append(tabs, stage, info);
@@ -179,22 +171,12 @@ window.PhotorealShowcase = (function () {
 
     function renderInfo(i) {
       const it = items[i];
-      const list = it.hotspots || [];
       label.innerHTML = `<b>${escapeHtml(it.course)}</b><span>${escapeHtml(it.title)}</span>`;
-      const chipsHtml = list.length ? `
-        <div class="pr-parts-block">
-          <div class="pr-parts-label">3D-разбор узлов (клик — подлёт камеры)</div>
-          <div class="pr-parts-chips">
-            ${list.map((h, idx) => `<button type="button" class="pr-part-chip" data-pr-hotspot="${idx}" aria-pressed="false"><span>${idx + 1}</span>${escapeHtml(h.short || h.title)}</button>`).join('')}
-          </div>
-        </div>
-      ` : '';
       info.innerHTML = `
         <h3 class="pr-info-title">${escapeHtml(it.title)}</h3>
         <p class="pr-info-text">${escapeHtml(it.text)}</p>
-        ${chipsHtml}
         <ul class="pr-info-facts">${(it.facts || []).map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
-        <div class="pr-info-meta">3D-движок: <a href="${safeHref(it.sourceUrl)}">${escapeHtml(it.source)}</a> · WebGL + Depth 3D + CC0</div>
+        <div class="pr-info-meta">3D-модель: <a href="${safeHref(it.sourceUrl)}">${escapeHtml(it.source)}</a> · CC0 / MIT</div>
         <a class="pr-info-cta" href="${safeHref(it.href)}">${escapeHtml(it.cta)} →</a>`;
     }
     renderInfo(0);
@@ -678,32 +660,13 @@ window.PhotorealShowcase = (function () {
     }
 
     function applyRenderMode() {
-      const isScan = state.mode === 'scan360';
-      depthRoot.visible = !isScan;
-      scanRoot.visible = isScan;
-      particles.visible = !isScan;
-      hotspotsLayer.hidden = isScan;
-
-      const entry = state.depthLoaded[state.active];
-      if (entry && !isScan) {
-        if (state.mode === 'clay3d') {
-          entry.mesh.material = clayMat;
-          entry.wireOverlay.visible = false;
-        } else if (state.mode === 'wire3d') {
-          entry.mesh.material = wireBaseMat;
-          entry.wireOverlay.visible = true;
-        } else {
-          entry.mesh.material = entry.photoMat;
-          entry.wireOverlay.visible = false;
-        }
-      }
-
+      depthRoot.visible = false;
+      scanRoot.visible = true;
+      particles.visible = false;
+      hotspotsLayer.hidden = true;
       const resetBtn = zoomBar.querySelector('[data-pr-zoom="reset"]');
-      if (resetBtn) resetBtn.textContent = isScan ? '360°' : '3D';
-      hint.textContent = isScan
-        ? 'Вращайте 3D-скан на 360° · Колесо — зум · Двойной клик — сброс'
-        : 'Вращайте 3D-сцену мышью · Колесо — зум · Кликайте точки узлов';
-
+      if (resetBtn) resetBtn.textContent = '360°';
+      hint.textContent = 'Вращайте 3D-модель на 360° · Колесо — зум · Двойной клик — сброс';
       applyLighting();
       configureControlsForMode();
     }
@@ -751,39 +714,7 @@ window.PhotorealShowcase = (function () {
       });
     }
 
-    function syncHotspotUI() {
-      const it = items[state.active] || {};
-      const list = it.hotspots || [];
-      hotspotsLayer.querySelectorAll('.pr-hotspot').forEach((btn) => {
-        const hi = Number(btn.dataset.prHotspot);
-        btn.classList.toggle('is-active', hi === state.activeHotspot);
-        btn.setAttribute('aria-pressed', String(hi === state.activeHotspot));
-      });
-      info.querySelectorAll('.pr-part-chip').forEach((chip) => {
-        const hi = Number(chip.dataset.prHotspot);
-        chip.classList.toggle('is-active', hi === state.activeHotspot);
-        chip.setAttribute('aria-pressed', String(hi === state.activeHotspot));
-      });
-
-      if (state.mode !== 'scan360' && state.activeHotspot >= 0 && list[state.activeHotspot]) {
-        const h = list[state.activeHotspot];
-        hotspotCard.innerHTML = `
-          <div class="pr-hc-head">
-            <span class="pr-hc-badge">3D-узел ${state.activeHotspot + 1} / ${list.length}${h.spec ? ' · ' + escapeHtml(h.spec) : ''}</span>
-            <button type="button" class="pr-hc-close" data-pr-hc="close" aria-label="Сбросить 3D-камеру">×</button>
-          </div>
-          <h4 class="pr-hc-title">${escapeHtml(h.title)}</h4>
-          <p class="pr-hc-desc">${escapeHtml(h.desc)}</p>
-          <div class="pr-hc-nav">
-            <button type="button" class="pr-hc-step" data-pr-hc="prev">← Пред.</button>
-            <button type="button" class="pr-hc-step pr-hc-step--next" data-pr-hc="next">След. узел →</button>
-          </div>
-        `;
-        hotspotCard.hidden = false;
-      } else {
-        hotspotCard.hidden = true;
-      }
-    }
+    function syncHotspotUI() {}
 
     function focusHotspot(idx) {
       const it = items[state.active];
@@ -882,21 +813,9 @@ window.PhotorealShowcase = (function () {
       loader.hidden = true;
     }
 
-    function setMode(nextMode) {
-      const prevMode = state.mode;
-      state.mode = nextMode;
-      modes.querySelectorAll('[data-pr-mode]').forEach((b) => {
-        b.setAttribute('aria-pressed', String(b.dataset.prMode === nextMode));
-      });
-      if (nextMode === 'scan360') {
-        state.activeHotspot = -1;
-        syncHotspotUI();
-        show(state.active);
-      } else if (prevMode === 'scan360') {
-        show(state.active);
-      } else {
-        applyRenderMode();
-      }
+    function setMode() {
+      state.mode = 'scan360';
+      applyRenderMode();
     }
 
     // ==================== RESIZE & 60 FPS RENDER LOOP ====================
@@ -991,41 +910,12 @@ window.PhotorealShowcase = (function () {
       const nextBtn = tabs.querySelector(`[data-pr-tab="${n}"]`);
       if (nextBtn) nextBtn.focus();
     });
-    modes.addEventListener('click', (e) => {
-      const b = e.target.closest('[data-pr-mode]');
-      if (b) setMode(b.dataset.prMode);
-    });
     bgSwitcher.addEventListener('click', (e) => {
       const b = e.target.closest('[data-pr-bg]');
       if (!b) return;
       state.bgPreset = b.dataset.prBg;
       bgSwitcher.querySelectorAll('[data-pr-bg]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
       applyLighting();
-    });
-    hotspotsLayer.addEventListener('click', (e) => {
-      const btn = e.target.closest('[data-pr-hotspot]');
-      if (!btn) return;
-      e.stopPropagation();
-      const idx = Number(btn.dataset.prHotspot);
-      if (idx === state.activeHotspot) resetView(false);
-      else focusHotspot(idx);
-    });
-    info.addEventListener('click', (e) => {
-      const btn = e.target.closest('.pr-part-chip[data-pr-hotspot]');
-      if (!btn) return;
-      const idx = Number(btn.dataset.prHotspot);
-      if (idx === state.activeHotspot) resetView(false);
-      else focusHotspot(idx);
-    });
-    hotspotCard.addEventListener('click', (e) => {
-      const act = e.target.closest('[data-pr-hc]');
-      if (!act) return;
-      const list = (items[state.active] && items[state.active].hotspots) || [];
-      if (!list.length) return;
-      const cmd = act.dataset.prHc;
-      if (cmd === 'close') resetView(false);
-      else if (cmd === 'next') focusHotspot((state.activeHotspot + 1) % list.length);
-      else if (cmd === 'prev') focusHotspot((state.activeHotspot - 1 + list.length) % list.length);
     });
     zoomBar.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-pr-zoom]');
