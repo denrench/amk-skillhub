@@ -592,22 +592,30 @@ window.PhotorealShowcase = (function () {
       state.scanPending[i] = (async () => {
         const it = items[i];
         const wrap = new T.Group();
-        const parts = await Promise.all((it.parts || []).map(loadPart));
-        parts.forEach((sceneObj, pi) => {
-          const p = it.parts[pi];
-          const holder = new T.Group();
-          if (p.rotation) sceneObj.rotation.set(...p.rotation);
-          holder.add(sceneObj);
-          normalizeObj(holder, p.size || 1.75);
-          if (p.offset) holder.position.add(new T.Vector3(...p.offset));
-          wrap.add(holder);
-        });
-        normalizeObj(wrap, it.scanSize || 2.15);
+        let animators = [];
+        if (it.useProStudio && window.AMKProStudios && typeof window.AMKProStudios.build === 'function') {
+          const built = window.AMKProStudios.build(T, it.sceneType);
+          wrap.add(built.group);
+          animators = built.animators || [];
+          normalizeObj(wrap, it.scanSize || 2.45);
+        } else {
+          const parts = await Promise.all((it.parts || []).map(loadPart));
+          parts.forEach((sceneObj, pi) => {
+            const p = it.parts[pi];
+            const holder = new T.Group();
+            if (p.rotation) sceneObj.rotation.set(...p.rotation);
+            holder.add(sceneObj);
+            normalizeObj(holder, p.size || 1.75);
+            if (p.offset) holder.position.add(new T.Vector3(...p.offset));
+            wrap.add(holder);
+          });
+          normalizeObj(wrap, it.scanSize || 2.15);
+        }
         const meshes = [];
         wrap.traverse((o) => {
           if (!o.isMesh) return;
           if (o.material) {
-            o.material.envMapIntensity = it.envIntensity || 1.25;
+            o.material.envMapIntensity = it.useProStudio ? 0.65 : (it.envIntensity || 1.25);
             if (o.material.aoMap && o.geometry && !o.geometry.attributes.uv2 && o.geometry.attributes.uv) {
               o.geometry.setAttribute('uv2', o.geometry.attributes.uv);
             }
@@ -615,7 +623,7 @@ window.PhotorealShowcase = (function () {
           }
           meshes.push(o);
         });
-        const entry = { object: wrap, meshes };
+        const entry = { object: wrap, meshes, animators };
         state.scanLoaded[i] = entry;
         delete state.scanPending[i];
         return entry;
@@ -790,14 +798,16 @@ window.PhotorealShowcase = (function () {
       }
     }
 
+    let activeScanAnimators = [];
     async function showScan360(i, token) {
       ensureHdriEnv();
-      loader.innerHTML = '<span class="pr-spinner"></span><span class="pr-loader-text">Загрузка 3D-скана 360°…</span>';
+      loader.innerHTML = '<span class="pr-spinner"></span><span class="pr-loader-text">Загрузка 3D-модели 360°…</span>';
       loader.hidden = false;
       const entry = await buildScanItem(i);
       if (token !== loadToken) return;
       while (scanModelHolder.children.length) scanModelHolder.remove(scanModelHolder.children[0]);
       scanModelHolder.add(entry.object);
+      activeScanAnimators = entry.animators || [];
       const box = new T.Box3().setFromObject(entry.object);
       const size = box.getSize(new T.Vector3());
       const center = box.getCenter(new T.Vector3());
@@ -892,6 +902,11 @@ window.PhotorealShowcase = (function () {
         }
       }
 
+      if (activeScanAnimators && activeScanAnimators.length) {
+        for (let a = 0; a < activeScanAnimators.length; a++) {
+          activeScanAnimators[a](sec);
+        }
+      }
       if (controls) controls.update();
       renderer.render(scene, camera);
       updateProjectedHotspots();
