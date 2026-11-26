@@ -279,7 +279,7 @@ window.PhotorealShowcase = (function () {
     const particles = new T.Points(pGeo, pMat);
     scene.add(particles);
 
-    // HDRI Environment for 360° photogrammetry & glossy reflections
+    // HDRI Environment (lazy-loaded only when user opens Скан 360° so initial page load saves 1.5 MB!)
     const pmrem = new T.PMREMGenerator(renderer);
     pmrem.compileEquirectangularShader();
     function setFallbackEnv() {
@@ -297,16 +297,22 @@ window.PhotorealShowcase = (function () {
       tex.dispose();
       state.envReady = true;
     }
-    if (T.RGBELoader) {
-      const rgbe = new T.RGBELoader();
-      if (rgbe.setDataType && T.UnsignedByteType !== undefined) rgbe.setDataType(T.UnsignedByteType);
-      rgbe.load(opts.hdri || 'assets/hdri/studio_small_09_1k.hdr', (tex) => {
-        scene.environment = pmrem.fromEquirectangular(tex).texture;
-        tex.dispose();
-        state.envReady = true;
-      }, undefined, () => setFallbackEnv());
-    } else {
+    let hdriRequested = false;
+    function ensureHdriEnv() {
+      if (hdriRequested) return;
+      hdriRequested = true;
       setFallbackEnv();
+      if (T.RGBELoader) {
+        const rgbe = new T.RGBELoader();
+        if (rgbe.setDataType && T.UnsignedByteType !== undefined) rgbe.setDataType(T.UnsignedByteType);
+        rgbe.load(opts.hdri || 'assets/hdri/studio_small_09_1k.hdr', (tex) => {
+          const envTex = pmrem.fromEquirectangular(tex).texture;
+          if (scene.environment && scene.environment.dispose) scene.environment.dispose();
+          scene.environment = envTex;
+          tex.dispose();
+          state.envReady = true;
+        }, undefined, () => {});
+      }
     }
 
     // Roots: one for the Neural Depth 3D Scene, one for the 360° Photogrammetry Scan
@@ -574,6 +580,11 @@ window.PhotorealShowcase = (function () {
 
     // ==================== 360° REAL PHOTOGRAMMETRY GLTF BUILDER ====================
     const gltfLoader = T.GLTFLoader ? new T.GLTFLoader() : null;
+    if (gltfLoader && T.DRACOLoader) {
+      const dracoLoader = new T.DRACOLoader();
+      dracoLoader.setDecoderPath('js/vendor/draco/');
+      gltfLoader.setDRACOLoader(dracoLoader);
+    }
     function loadPart(part) {
       return new Promise((resolve, reject) => {
         if (!gltfLoader) { reject(new Error('GLTFLoader missing')); return; }
@@ -849,6 +860,7 @@ window.PhotorealShowcase = (function () {
     }
 
     async function showScan360(i, token) {
+      ensureHdriEnv();
       loader.innerHTML = '<span class="pr-spinner"></span><span class="pr-loader-text">Загрузка 3D-скана 360°…</span>';
       loader.hidden = false;
       const entry = await buildScanItem(i);
