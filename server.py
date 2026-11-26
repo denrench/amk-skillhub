@@ -4638,7 +4638,7 @@ def gradebook_page():
 
 # SEC-01: Static Asset Serving Whitelist & Sensitive File Protection
 ALLOWED_STATIC_EXTENSIONS = {
-    '.html', '.css', '.js', '.svg', '.png', '.jpg', '.jpeg',
+    '.html', '.css', '.js', '.wasm', '.svg', '.png', '.jpg', '.jpeg',
     '.webp', '.mp4', '.webm', '.vtt', '.ico', '.woff', '.woff2', '.ttf',
     '.json', '.map', '.glb', '.gltf', '.bin', '.hdr'
 }

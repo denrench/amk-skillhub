@@ -134,10 +134,10 @@ window.PhotorealShowcase = (function () {
 
     const label = el('div', { class: 'pr-label' });
     const modes = el('div', { class: 'pr-modes', role: 'group', 'aria-label': 'Режим 3D-рендера' }, [
+      { id: 'scan360', text: '3D-модель 360°' },
       { id: 'photo3d', text: 'Фотореал 3D' },
       { id: 'clay3d', text: 'Глина 3D' },
       { id: 'wire3d', text: 'Сетка 3D' },
-      { id: 'scan360', text: 'Скан 360°' },
     ].map((m, i) => `<button type="button" class="pr-mode" data-pr-mode="${m.id}" aria-pressed="${i === 0}">${m.text}</button>`).join(''));
 
     const zoomBar = el('div', { class: 'pr-zoom-bar', role: 'group', 'aria-label': 'Управление 3D-камерой' }, `
@@ -160,7 +160,7 @@ window.PhotorealShowcase = (function () {
 
     const state = {
       active: 0,
-      mode: 'photo3d',
+      mode: 'scan360',
       bgPreset: 'atmosphere',
       activeHotspot: -1,
       ready: false,
