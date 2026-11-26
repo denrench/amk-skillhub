@@ -893,61 +893,70 @@ window.WorkshopModels = (() => {
           return fallbackIdx % Math.max(1, parts.length);
         };
 
-        if (T.GLTFLoader) {
+        let proTick = null;
+        const proBuilt = (window.AMKProWorkshop25 && def && def.key)
+          ? window.AMKProWorkshop25.build(T, def.key)
+          : null;
+
+        const attachLoadedScene = (modelScene) => {
+          const box = new T.Box3().setFromObject(modelScene);
+          const size = new T.Vector3();
+          box.getSize(size);
+          const maxDim = Math.max(size.x, size.y, size.z, 0.001);
+          modelScene.scale.setScalar(2.65 / maxDim);
+
+          const scaledBox = new T.Box3().setFromObject(modelScene);
+          const scaledCenter = new T.Vector3();
+          scaledBox.getCenter(scaledCenter);
+          modelScene.position.x -= scaledCenter.x;
+          modelScene.position.z -= scaledCenter.z;
+          modelScene.position.y -= scaledBox.min.y + 0.08;
+
+          gltfMeshes = [];
+          let unnamedIdx = 0;
+          modelScene.traverse((child) => {
+            if (child.isMesh) {
+              child.userData.origPos = child.position.clone();
+              const worldPos = new T.Vector3();
+              child.getWorldPosition(worldPos);
+              child.userData.explodeDir = worldPos.clone().sub(new T.Vector3(0, 0.6, 0)).normalize();
+              if (child.material) {
+                child.material = child.material.clone();
+                if (child.material.envMapIntensity !== undefined) {
+                  child.material.envMapIntensity = 1.1;
+                }
+              }
+              const matchedIdx = resolveSemanticPartIdx(child, unnamedIdx++);
+              meshToPartIdx.set(child, matchedIdx);
+              gltfMeshes.push(child);
+            }
+          });
+          fallbackGroup.visible = false;
+          gltfRoot.add(modelScene);
+          applyShaderFlags();
+          if (loadingBadge) {
+            loadingBadge.textContent = `✓ 3D PBR · ${gltfMeshes.length} дет.`;
+            loadingBadge.style.color = '#34d399';
+            loadingBadge.style.borderColor = 'rgba(52,211,153,0.45)';
+          }
+        };
+
+        if (proBuilt && proBuilt.group) {
+          proTick = proBuilt.tick || null;
+          attachLoadedScene(proBuilt.group);
+        } else if (T.GLTFLoader) {
           const loader = new T.GLTFLoader();
           loader.load(
             glbUrl,
             (gltf) => {
               const modelScene = gltf.scene || (gltf.scenes && gltf.scenes[0]);
               if (!modelScene) return;
-
-              const box = new T.Box3().setFromObject(modelScene);
-              const size = new T.Vector3();
-              box.getSize(size);
-              const maxDim = Math.max(size.x, size.y, size.z, 0.001);
-              modelScene.scale.setScalar(3.1 / maxDim);
-
-              const scaledBox = new T.Box3().setFromObject(modelScene);
-              const scaledCenter = new T.Vector3();
-              scaledBox.getCenter(scaledCenter);
-              modelScene.position.x -= scaledCenter.x;
-              modelScene.position.z -= scaledCenter.z;
-              modelScene.position.y -= scaledBox.min.y + 0.08;
-
-              gltfMeshes = [];
-              let unnamedIdx = 0;
-              modelScene.traverse((child) => {
-                if (child.isMesh) {
-                  child.userData.origPos = child.position.clone();
-                  const worldPos = new T.Vector3();
-                  child.getWorldPosition(worldPos);
-                  child.userData.explodeDir = worldPos.clone().sub(new T.Vector3(0, 0.6, 0)).normalize();
-                  if (child.material) {
-                    child.material = child.material.clone();
-                    if (child.material.envMapIntensity !== undefined) {
-                      child.material.envMapIntensity = 1.25;
-                    }
-                  }
-                  const matchedIdx = resolveSemanticPartIdx(child, unnamedIdx++);
-                  meshToPartIdx.set(child, matchedIdx);
-                  gltfMeshes.push(child);
-                }
-              });
-
+              attachLoadedScene(modelScene);
               if (gltf.animations && gltf.animations.length > 0 && T.AnimationMixer) {
                 mixer = new T.AnimationMixer(modelScene);
                 gltf.animations.forEach((clip) => {
                   try { mixer.clipAction(clip).play(); } catch {}
                 });
-              }
-
-              fallbackGroup.visible = false;
-              gltfRoot.add(modelScene);
-              applyShaderFlags();
-              if (loadingBadge) {
-                loadingBadge.textContent = `✓ GLB 3D · ${gltfMeshes.length} дет.`;
-                loadingBadge.style.color = '#34d399';
-                loadingBadge.style.borderColor = 'rgba(52,211,153,0.45)';
               }
             },
             undefined,
@@ -1097,6 +1106,9 @@ window.WorkshopModels = (() => {
           if (mixer) {
             try { mixer.update(dt); } catch {}
           }
+          if (proTick) {
+            try { proTick(t, simMultiplier); } catch {}
+          }
 
           if (gltfMeshes.length > 0) {
             gltfMeshes.forEach((m, mIdx) => {
@@ -1205,5 +1217,5 @@ window.WorkshopModels = (() => {
     return () => {};
   }
 
-  return { forLesson, forCourse, show: showDisabled, models, resolveModelKey, COURSE_MODEL_KEYS };
+  return { forLesson, forCourse, show, models, resolveModelKey, COURSE_MODEL_KEYS };
 })();
