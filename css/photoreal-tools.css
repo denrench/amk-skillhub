@@ -2414,3 +2414,147 @@ html, body, main, aside, div, nav {
     padding: 11px 13px;
   }
 }
+
+/* ==================== UNIFIED HEADER FIT & LIGHT THEME CONTRAST FIXES ==================== */
+header > .max-w-7xl {
+  max-width: 1420px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  gap: 10px !important;
+}
+header > .max-w-7xl > a:first-child {
+  flex-shrink: 0 !important;
+  min-width: max-content;
+}
+header > .max-w-7xl > a:first-child .flex-col > span:first-child {
+  white-space: nowrap !important;
+  font-size: 16px !important;
+}
+header > .max-w-7xl > a:first-child .flex-col > span:nth-child(2) {
+  white-space: nowrap !important;
+  font-size: 10.5px !important;
+}
+@media (max-width: 1500px) {
+  header > .max-w-7xl > a:first-child .flex-col > span:nth-child(2) {
+    display: none !important;
+  }
+}
+header > .max-w-7xl > nav {
+  gap: 0px !important;
+  min-width: 0;
+  flex: 1 1 auto;
+  justify-content: center;
+}
+header > .max-w-7xl > nav a {
+  padding: 6px 8px !important;
+  font-size: 12.5px !important;
+  white-space: nowrap !important;
+}
+header > .max-w-7xl > div.flex.items-center {
+  flex-shrink: 0 !important;
+  gap: 6px !important;
+}
+header > .max-w-7xl > div.flex.items-center > a {
+  white-space: nowrap !important;
+}
+
+/* Touch target minimums for switcher pills & zoom controls */
+.lang-dot,
+.theme-dot,
+.pr-zoom-btn {
+  min-height: 26px !important;
+}
+
+/* Crisp contrast for active language & theme pills across all themes */
+:root[data-theme="light"] .lang-dot[aria-pressed="true"],
+:root[data-theme="light"] .lang-dot.is-active,
+:root[data-theme="light"] .theme-dot[aria-pressed="true"] {
+  background: #2563EB !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28) !important;
+}
+:root[data-theme="light"] .lang-dot:not([aria-pressed="true"]),
+:root[data-theme="light"] .theme-dot:not([aria-pressed="true"]) {
+  color: #1E293B !important;
+}
+
+/* Hero CTA & KPI numbers contrast in Light theme */
+:root[data-theme="light"] .amk-btn-glow {
+  background: linear-gradient(135deg, #2563EB, #0891B2) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 12px 26px -10px rgba(37, 99, 235, 0.55) !important;
+}
+:root[data-theme="light"] .amk-btn-ghost {
+  color: #1E293B !important;
+  border: 1px solid rgba(37, 99, 235, 0.26) !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  border-radius: 12px;
+  padding: 10px 16px !important;
+}
+:root[data-theme="light"] .amk-kpi-tile[data-tone="cyan"] .amk-kpi-num { color: #0369A1 !important; }
+:root[data-theme="light"] .amk-kpi-tile[data-tone="violet"] .amk-kpi-num { color: #6D28D9 !important; }
+:root[data-theme="light"] .amk-kpi-tile[data-tone="emerald"] .amk-kpi-num { color: #047857 !important; }
+:root[data-theme="light"] .amk-kpi-tile[data-tone="amber"] .amk-kpi-num { color: #B45309 !important; }
+:root[data-theme="light"] .pr-tab[aria-selected="true"],
+:root[data-theme="light"] .pr-tab[aria-selected="true"] * {
+  background: linear-gradient(135deg, #2563EB 0%, #0891B2 100%) !important;
+  color: #FFFFFF !important;
+}
+:root[data-theme="light"] .pr-tab[aria-selected="true"] span {
+  background: transparent !important;
+}
+
+/* Complete Light-Theme Contrast Guard for Tailwind-based pages */
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) :is(.bg-white\/5, .bg-white\/10):not([class*="from-indigo"]):not([class*="bg-indigo-6"]):not([class*="bg-emerald-6"]) {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+  border-color: rgba(15, 23, 42, 0.14) !important;
+}
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) :is(.text-indigo-300, .text-indigo-400) {
+  color: #4338CA !important;
+}
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) :is(.text-cyan-300, .text-cyan-400, .text-sky-300) {
+  color: #0E7490 !important;
+}
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) :is(.text-emerald-300, .text-emerald-400) {
+  color: #047857 !important;
+}
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) :is(.text-purple-300, .text-purple-400, .text-violet-300) {
+  color: #6D28D9 !important;
+}
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) :is(.text-amber-300, .text-amber-400) {
+  color: #B45309 !important;
+}
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) .text-red-400 {
+  color: #DC2626 !important;
+}
+:root[data-theme="light"] body.workshop :is(a, button)[class*="from-indigo-"],
+:root[data-theme="light"] body.workshop :is(a, button)[class*="from-indigo-"] *,
+:root[data-theme="light"] body.workshop :is(a, button).bg-indigo-600,
+:root[data-theme="light"] body.workshop :is(a, button).bg-indigo-600 *,
+:root[data-theme="light"] body.workshop :is(a, button).bg-emerald-600,
+:root[data-theme="light"] body.workshop :is(a, button).bg-emerald-600 *,
+:root[data-theme="light"] body.workshop :is(a, button).bg-cyan-600,
+:root[data-theme="light"] body.workshop :is(a, button).bg-cyan-600 * {
+  color: #FFFFFF !important;
+}
+:root[data-theme="light"] body.workshop :is(.course-header-card, .tge-shell, .tge-live-pane, #lp-video-overview-mount, #lp-theory-video-mount, [class*="from-[#0e172a]"], [class*="from-[#080d1c]"]) :is(.text-indigo-300, .text-cyan-300, .text-cyan-400, .text-emerald-300, .text-emerald-400, .text-slate-300, .text-slate-400) {
+  color: #E2E8F0 !important;
+}
+:root[data-theme="light"] #lp-integrity-badge {
+  background-color: #ECFDF5 !important;
+  color: #047857 !important;
+  border-color: rgba(5, 150, 105, 0.35) !important;
+}
+:root[data-theme="light"] #lp-integrity-badge * {
+  color: #047857 !important;
+}
+:root[data-theme="light"] .theory-prose h4 { color: #0F172A !important; }
+:root[data-theme="light"] .theory-prose p,
+:root[data-theme="light"] .theory-prose ul,
+:root[data-theme="light"] .theory-prose ol { color: #334155 !important; }
+:root[data-theme="light"] .theory-prose code { background: rgba(37, 99, 235, 0.1) !important; color: #1D4ED8 !important; border-color: rgba(37, 99, 235, 0.25) !important; }
+:root[data-theme="light"] body.workshop .bg-dark-950\/95 { background-color: rgba(255, 255, 255, 0.96) !important; border-color: rgba(15, 23, 42, 0.1) !important; }
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) .bg-indigo-500\/20 { background-color: rgba(79, 70, 229, 0.12) !important; }
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) .bg-emerald-500\/20 { background-color: rgba(5, 150, 105, 0.12) !important; }
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) .bg-amber-500\/20 { background-color: rgba(217, 119, 6, 0.12) !important; }
+:root[data-theme="light"] body.workshop :is(header, nav, aside, main) .bg-cyan-500\/20 { background-color: rgba(8, 145, 178, 0.12) !important; }
