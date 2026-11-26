@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 48" width="180" height="48" fill="none">
+  <defs>
+    <linearGradient id="nyvorGrad" x1="0" y1="0" x2="180" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38BDF8"/>
+      <stop offset="50%" stop-color="#818CF8"/>
+      <stop offset="100%" stop-color="#C084FC"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="#070B14" stroke="url(#nyvorGrad)" stroke-width="2.2"/>
+  <path d="M12 34V14L23 29V14M27 14L33 34L39 14" stroke="url(#nyvorGrad)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="56" y="29" fill="#F8FAFC" font-family="Inter, system-ui, sans-serif" font-weight="900" font-size="21" letter-spacing="1.5">NyVor</text>
+  <text x="57" y="40" fill="#38BDF8" font-family="JetBrains Mono, monospace" font-weight="700" font-size="7.5" letter-spacing="2.2">CREATIVE ENGINE</text>
+</svg>

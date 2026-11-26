@@ -1228,24 +1228,35 @@
       showToast(`Цветовая схема обновлена: ${p} + ${a}`, 'info');
     }
 
+    let _multimeterStep = 0;
     function simulateMultimeterRead() {
-      const v = (12.4 + Math.random() * 0.4).toFixed(2);
-      const o = (59.8 + Math.random() * 0.8).toFixed(1);
-      const a = (0.02 + Math.random() * 0.02).toFixed(2);
+      _multimeterStep = (_multimeterStep + 1) % 3;
+      const solver = window.EduPhysics && window.EduPhysics.autoelectric ? window.EduPhysics.autoelectric.solveCircuit : null;
+      const res = solver ? solver(['bat', 'fuse', 'ecu', 'gnd'], [{ to: 'fuse', r: 0.05 }, { to: 'ecu', r: 120 }, { to: 'gnd', r: 0.02 }], 12.64, null) : null;
+      const v = res ? (res.nodeVoltages.bat - _multimeterStep * 0.02).toFixed(2) : '12.64';
+      const o = (60.0 + _multimeterStep * 0.1).toFixed(1);
+      const a = (0.02 + _multimeterStep * 0.01).toFixed(2);
       document.getElementById('meter-volt').textContent = `${v} V`;
       document.getElementById('meter-ohm').textContent = `${o} Ω`;
       document.getElementById('meter-amp').textContent = `${a} A`;
-      showToast(`Показания мультиметра обновлены: Напряжение ${v}В, Сопротивление ${o}Ом`, 'success');
+      showToast(`Показания мультиметра (Fluke True RMS): Напряжение ${v}В, Сопротивление ${o}Ом`, 'success');
     }
 
+    let _hvacStep = 0;
     function simulateHvacGauges() {
-      const low = (2.0 + Math.random() * 0.3).toFixed(1);
-      const high = (14.2 + Math.random() * 0.8).toFixed(1);
-      const sh = (6.0 + Math.random() * 0.8).toFixed(1);
+      _hvacStep = (_hvacStep + 1) % 3;
+      const lowNum = 2.1 + _hvacStep * 0.1;
+      const highNum = 14.4 + _hvacStep * 0.2;
+      const metrics = window.EduPhysics && window.EduPhysics.hvac
+        ? window.EduPhysics.hvac.cycleMetrics('R134a', lowNum, highNum, 2.0, 38.0)
+        : { superheatK: 6.5 };
+      const low = lowNum.toFixed(1);
+      const high = highNum.toFixed(1);
+      const sh = Number(metrics.superheatK || 6.5).toFixed(1);
       document.getElementById('hvac-low-p').textContent = `${low} bar`;
       document.getElementById('hvac-high-p').textContent = `${high} bar`;
-      document.getElementById('hvac-sh').textContent = `${sh} °C`;
-      showToast(`Манометрическая станция: Всасывание ${low} bar, Нагнетание ${high} bar (Перегрев: ${sh} °C)`, 'success');
+      document.getElementById('hvac-sh').textContent = `${sh} K`;
+      showToast(`Манометрическая станция: Всасывание ${low} bar, Нагнетание ${high} bar (Перегрев: ${sh} K)`, 'success');
     }
 
   

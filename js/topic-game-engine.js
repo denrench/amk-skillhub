@@ -1001,23 +1001,28 @@ window.TopicGameEngine = (function () {
       const loadSec = Math.max(0.08, (estKb / 720)).toFixed(2);
       const speedPct = Math.max(8, Math.min(100, Math.round(100 - Math.min(92, (estKb / 3500) * 100))));
       const accent = isHeavy ? '#fb7185' : '#34d399';
+      const presetTitle = fmt === 'WebP'
+        ? 'NYVOR × AMK SKILLHUB · FINTECH UI'
+        : fmt.includes('PNG')
+          ? 'NYVOR STUDIO · VECTOR BRAND KIT'
+          : 'ALMATY DIGITAL SUMMIT · POSTER';
       return `
         <div class="tge-live-pane">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <span class="tge-live-badge"><span class="tge-live-dot"></span>LIVE PREVIEW · PHOTOSHOP EXPORT</span>
+            <span class="tge-live-badge"><span class="tge-live-dot"></span>LIVE PREVIEW · NYVOR STUDIO EXPORT</span>
             <span style="font-family:monospace;font-size:11px;font-weight:800;color:${accent};">${estKb > 1000 ? (estKb / 1024).toFixed(1) + ' MB' : estKb + ' KB'}</span>
           </div>
 
           <div style="border-radius:12px;border:1px solid rgba(255,255,255,0.14);background:#090d1a;overflow:hidden;">
             <div style="padding:6px 10px;background:rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;font-family:monospace;font-size:10px;color:#94a3b8;">
-              <span>● ● ●  banner-hero.${esc(fmt.toLowerCase().replace(/[^a-z0-9]/g, ''))}</span>
-              <span style="color:#67e8f9;">${w} × ${Math.round(w / 2)} px · ${ppi} ppi</span>
+              <span>● ● ●  nyvor-artboard.${esc(fmt.toLowerCase().replace(/[^a-z0-9]/g, ''))}</span>
+              <span style="color:#67e8f9;">${w} × ${Math.round(w / 2)} px · ${ppi} ppi · sRGB</span>
             </div>
             <div class="${hasAlpha ? 'tge-checker' : ''}" style="padding:14px;display:flex;align-items:center;justify-content:center;min-height:112px;background-color:${hasAlpha ? '#0f172a' : '#ffffff'};transition:all 220ms ease;">
-              <div style="width:${scalePct}%;height:74px;border-radius:${hasAlpha ? '14px' : '4px'};background:linear-gradient(135deg,#4f46e5 0%,#06b6d4 60%,#34d399 100%);border:2px solid ${accent};display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 26px -10px ${accent};transition:all 220ms cubic-bezier(0.22,1,0.36,1);position:relative;overflow:hidden;">
-                <span style="font-weight:900;font-size:12px;letter-spacing:0.06em;">AMK HERO BANNER</span>
-                <span style="font-family:monospace;font-size:10px;opacity:0.9;">${w}px · ${esc(fmt)} · ${ppi} ppi</span>
-                ${ppi >= 300 ? '<span style="position:absolute;top:4px;right:6px;background:rgba(244,63,94,0.9);padding:1px 5px;border-radius:4px;font-size:9px;font-weight:800;">PRINT OVERLOAD</span>' : ''}
+              <div style="width:${scalePct}%;height:78px;border-radius:${hasAlpha ? '14px' : '4px'};background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 48%,#0ea5e9 100%);border:2px solid ${accent};display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 26px -10px ${accent};transition:all 220ms cubic-bezier(0.22,1,0.36,1);position:relative;overflow:hidden;">
+                <span style="font-weight:900;font-size:11.5px;letter-spacing:0.06em;">${presetTitle}</span>
+                <span style="font-family:monospace;font-size:10px;opacity:0.9;">${w}px · ${esc(fmt)} · ${ppi} ppi · 4 Layers</span>
+                ${ppi >= 300 ? '<span style="position:absolute;top:4px;right:6px;background:rgba(244,63,94,0.9);padding:1px 5px;border-radius:4px;font-size:9px;font-weight:800;">PRINT OVERLOAD</span>' : '<span style="position:absolute;bottom:3px;right:6px;font-family:monospace;font-size:8.5px;color:#38bdf8;opacity:0.85;">NV · NyVor</span>'}
               </div>
             </div>
           </div>
@@ -1025,7 +1030,7 @@ window.TopicGameEngine = (function () {
           <div style="display:flex;flex-direction:column;gap:5px;">
             <div style="display:flex;justify-content:space-between;font-size:11px;color:#cbd5e1;">
               <span>Скорость загрузки (4G/LTE): <strong style="color:${accent};font-family:monospace;">${loadSec} сек</strong></span>
-              <span>Альфа: <strong style="color:${hasAlpha ? '#34d399' : '#fbbf24'};">${hasAlpha ? 'Прозрачный' : 'Заливка'}</strong></span>
+              <span>Альфа-канал: <strong style="color:${hasAlpha ? '#34d399' : '#fbbf24'};">${hasAlpha ? 'Прозрачный (RGBA)' : 'Заливка (RGB)'}</strong></span>
             </div>
             <div style="height:7px;border-radius:999px;background:rgba(255,255,255,0.08);overflow:hidden;">
               <div style="width:${speedPct}%;height:100%;background:${accent};transition:width 240ms ease;box-shadow:0 0 12px ${accent};"></div>

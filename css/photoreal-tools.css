@@ -1329,6 +1329,133 @@ body.amk-proctor-active textarea {
 
 /* ==================== DESIGN POLISH & PIXEL-PERFECT ALIGNMENT ==================== */
 
+/* 0. Fix dark-theme auth.html form labels & inputs, learn.html progress meter box, and index.html light-theme Hero login link */
+:root[data-theme="neon"] .fields label,
+:root[data-theme="graphite"] .fields label {
+  color: var(--ink) !important;
+}
+:root[data-theme="neon"] .fields :is(input, select, textarea),
+:root[data-theme="graphite"] .fields :is(input, select, textarea) {
+  background: var(--bg-elev) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+:root[data-theme="neon"] .course-meter-box,
+:root[data-theme="graphite"] .course-meter-box {
+  background: var(--bg-elev) !important;
+  border-color: var(--line) !important;
+  color: var(--ink) !important;
+}
+:root[data-theme="neon"] .course-meter-track,
+:root[data-theme="graphite"] .course-meter-track {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+:root[data-theme="light"] .amk-btn-ghost {
+  color: #1e293b !important;
+  background: rgba(15, 23, 42, 0.05) !important;
+  border: 1px solid rgba(15, 23, 42, 0.14) !important;
+}
+:root[data-theme="light"] .amk-btn-ghost:hover {
+  color: #1d4ed8 !important;
+  background: rgba(37, 99, 235, 0.1) !important;
+  border-color: rgba(37, 99, 235, 0.3) !important;
+}
+:root[data-theme="light"] [data-amk-integrity-badge] {
+  color: #065f46 !important;
+  background: rgba(16, 185, 129, 0.16) !important;
+  border-color: rgba(5, 150, 105, 0.45) !important;
+}
+:root[data-theme="light"] button[onclick*="logoutUser"] {
+  color: #b91c1c !important;
+}
+:root[data-theme="light"] .text-red-400 {
+  color: #b91c1c !important;
+}
+.lang-dot, .theme-dot, .theme-sfx-btn, .pr-zoom-btn {
+  min-height: 26px !important;
+  min-width: 26px !important;
+}
+.amk-mobile-burger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  min-height: 28px;
+  padding: 2px 7px;
+  margin-left: 3px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-elev);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.amk-mobile-nav-sheet {
+  position: fixed;
+  top: 62px;
+  left: 10px;
+  right: 10px;
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--surface-solid, #0F172A);
+  border: 1px solid var(--line-strong, rgba(56, 189, 248, 0.45));
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.55);
+}
+.amk-mobile-nav-sheet[hidden] {
+  display: none !important;
+}
+.amk-mobile-nav-sheet a {
+  padding: 9px 12px;
+  border-radius: 10px;
+  color: var(--ink) !important;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--bg-elev);
+}
+@media (max-width: 768px) {
+  .amk-mobile-burger-btn {
+    display: inline-flex !important;
+  }
+}
+@media (min-width: 768px) {
+  .md\:flex,
+  nav.hidden.md\:flex,
+  div.hidden.md\:flex,
+  a.hidden.md\:flex,
+  span.hidden.md\:flex {
+    display: flex !important;
+  }
+  .md\:inline-flex,
+  a.hidden.md\:inline-flex,
+  button.hidden.md\:inline-flex,
+  span.hidden.md\:inline-flex {
+    display: inline-flex !important;
+  }
+  .md\:block,
+  div.hidden.md\:block {
+    display: block !important;
+  }
+  .md\:hidden {
+    display: none !important;
+  }
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+  .md\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
 /* 1. Fix invisible dark headings on learn.html / academy pages in neon & graphite themes */
 :root[data-theme="neon"] body:not(.workshop) h1,
 :root[data-theme="neon"] body:not(.workshop) h2,
@@ -1640,12 +1767,22 @@ html, body, main, aside, div, nav {
   font-weight: 700;
   font-size: 14px;
   text-decoration: none;
-  color: var(--ink-muted, #94a3b8) !important;
-  transition: color 180ms ease, background 180ms ease;
+  color: var(--muted, #94a3b8) !important;
+  transition: background 180ms ease;
 }
 .amk-btn-ghost:hover {
   color: var(--ink, #ffffff) !important;
   background: rgba(255, 255, 255, 0.06);
+}
+:root[data-theme="light"] .amk-btn-ghost {
+  color: #1e293b !important;
+  background: rgba(15, 23, 42, 0.05) !important;
+  border: 1px solid rgba(15, 23, 42, 0.14) !important;
+}
+:root[data-theme="light"] .amk-btn-ghost:hover {
+  color: #1d4ed8 !important;
+  background: rgba(37, 99, 235, 0.1) !important;
+  border-color: rgba(37, 99, 235, 0.3) !important;
 }
 
 /* Bento KPI Tiles */

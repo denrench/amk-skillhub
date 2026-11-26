@@ -16,4 +16,7 @@ database.db-journal
 .env.local
 .env.*.local
 !.env.example
+.agents/
+%SystemDrive%/
+
 

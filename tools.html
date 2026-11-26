@@ -103,8 +103,11 @@
             <div id="practicum-avg-5" class="text-3xl font-black font-mono text-emerald-400 mt-1">—</div>
           </div>
           <div class="p-4 rounded-2xl bg-dark-950/70 border border-white/10">
-            <div class="text-[11px] text-slate-400 font-semibold">GPA (4.0)</div>
-            <div id="student-tool-gpa-out" class="text-3xl font-black font-mono text-cyan-400 mt-1">—</div>
+            <div class="text-[11px] text-slate-400 font-semibold">GPA (4.0) / Цель</div>
+            <div class="flex items-baseline gap-2 mt-1">
+              <span id="student-tool-gpa-out" class="text-3xl font-black font-mono text-cyan-400">—</span>
+              <input type="number" id="student-tool-gpa-target" min="2.0" max="4.0" step="0.1" value="3.8" aria-label="Целевой GPA" class="w-16 px-2 py-0.5 rounded-lg bg-dark-850 border border-white/15 text-xs font-mono text-white"/>
+            </div>
           </div>
           <div class="p-4 rounded-2xl bg-dark-950/70 border border-white/10">
             <div class="text-[11px] text-slate-400 font-semibold">Пройдено уроков</div>
@@ -162,12 +165,12 @@
     <section class="space-y-5" aria-label="Шпаргалки и лёгкие подсказки по 5 курсам">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 class="text-xl sm:text-2xl font-extrabold text-white">Шпаргалки и лёгкие подсказки по курсам</h2>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-white">Поиск по шпаргалкам и лёгкие подсказки по курсам</h2>
           <p class="text-xs text-slate-400 mt-1">Выберите специальность — внутри короткие ориентиры и памятки, которые направляют ход мысли, не сливая готовых ответов.</p>
         </div>
         <div class="relative w-full sm:w-72">
           <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
-          <input type="search" id="student-tool-search" oninput="renderCourseCheatsheets()" placeholder="Найти подсказку..." class="w-full pl-9 pr-3 py-2 rounded-xl bg-dark-900 border border-white/15 text-xs text-white"/>
+          <input type="search" id="student-tool-search" oninput="renderCourseCheatsheets()" placeholder="Поиск по базе подсказок (HVAC, CAN)..." class="w-full pl-9 pr-3 py-2 rounded-xl bg-dark-900 border border-white/15 text-xs text-white"/>
         </div>
       </div>
 
@@ -283,7 +286,7 @@
           <div class="space-y-2">
             <div class="flex items-center justify-between gap-2">
               <span class="px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-[10px] font-bold uppercase tracking-wider">${it.tag}</span>
-              <span class="text-[10px] font-mono text-slate-400">Подсказка</span>
+              <span class="text-[10px] font-mono text-slate-400">${SPEC_TITLES[it.spec || activeCourseTab] || (it.spec || activeCourseTab)} · Подсказка</span>
             </div>
             <h3 class="text-sm font-extrabold text-white">${it.title}</h3>
             <p class="text-xs text-slate-300 leading-relaxed">${it.hint}</p>

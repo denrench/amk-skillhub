@@ -42,21 +42,30 @@
 
   <!-- Header -->
   <header class="relative z-20 border-b border-white/10 bg-dark-900/80 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white font-extrabold text-xl shadow-glow-indigo">
-          E
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <a href="index.html" class="flex items-center gap-3.5 group">
+        <div class="relative w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-glow-indigo transition-transform group-hover:scale-105">
+          <div class="w-full h-full bg-dark-900 rounded-[14px] flex items-center justify-center">
+            <img alt="AMK SkillHub × NyVor" width="24" height="24" class="h-6 w-6 object-contain" src="assets/eduspace-logo.svg"/>
+          </div>
         </div>
-        <div>
-          <span class="text-lg font-extrabold tracking-tight text-white">EDU <span class="text-indigo-400">SPACE</span></span>
+        <div class="flex flex-col">
+          <span class="text-lg font-extrabold tracking-tight text-white flex items-center gap-1.5">
+            AMK SkillHub <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">× NyVor</span>
+          </span>
           <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-400">Алматинский многопрофильный колледж</span>
         </div>
       </a>
 
-      <div class="flex items-center gap-4">
-        <a href="tasks.html" class="hidden sm:inline-flex text-xs font-bold text-slate-300 hover:text-white transition-colors">Каталог курсов</a>
-        <a href="pricing.html" class="hidden sm:inline-flex text-xs font-bold text-slate-300 hover:text-white transition-colors">Тарифы</a>
-        <a href="gradebook.html" class="hidden md:inline-flex text-xs font-bold text-slate-300 hover:text-white transition-colors">Ведомость оценок</a>
+      <nav class="hidden md:flex items-center gap-1.5 text-sm font-semibold text-slate-300">
+        <a href="index.html" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">Главная</a>
+        <a href="tasks.html" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">Каталог курсов</a>
+        <a href="features.html" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">Возможности</a>
+        <a href="about.html" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">О колледже</a>
+        <a href="pricing.html" class="px-3.5 py-2 rounded-xl hover:text-white hover:bg-white/5 transition-colors">Тарифы</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
         <a href="profile.html" class="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-xs font-bold text-white transition-colors flex items-center gap-2">
           <span class="material-symbols-outlined text-[16px] text-indigo-400">person</span>
           <span>Личный кабинет</span>
@@ -72,8 +81,8 @@
     <!-- Search / Verify Bar -->
     <div class="bg-dark-850/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 border border-white/10 shadow-xl mb-8">
       <form onsubmit="handleSearchCert(event)" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-        <div class="relative flex-1">
-          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
+        <div class="relative flex-1 flex items-center">
+          <span class="material-symbols-outlined absolute left-3.5 inset-y-0 flex items-center pointer-events-none text-slate-400 text-[20px]">search</span>
           <input type="text" id="cert-search-input" placeholder="Введите номер сертификата (например, KZ-AMK-2026-98421 или ID студента)..." class="w-full pl-11 pr-4 py-3 bg-dark-950/80 border border-white/15 rounded-xl text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-mono" />
         </div>
         <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-glow-indigo transition-all flex items-center justify-center gap-2 shrink-0">
@@ -240,11 +249,11 @@
     <footer class="relative z-10 border-t border-white/10 bg-dark-900/60 py-8 text-xs text-slate-400">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
       <div>
-        <strong class="text-white">КГКП «Алматинский многопрофильный колледж»</strong> • БИН: 990440001809 • ул. Жандосова, 63<br/>
-        Единый реестр аккредитации образовательных сертификатов ТиПО РК
+        <strong class="text-white">AMK SkillHub × NyVor</strong> • Алматинский многопрофильный колледж (ПО25-2Б)<br/>
+        Единый реестр верификации цифровых образовательных сертификатов (HMAC-SHA256)
       </div>
       <div class="text-slate-300">
-        Поддержка: <a href="https://wa.me/77079079764" class="text-emerald-400 font-bold hover:underline">+7 707 907 97 64 (WhatsApp)</a> • <a href="mailto:support@amk.kz" class="text-indigo-400 hover:underline">support@amk.kz</a>
+        Связь с автором (NyVor): <a href="https://t.me/denrench" target="_blank" rel="noopener noreferrer" class="text-cyan-400 font-bold hover:underline">Telegram @denrench</a> • <a href="https://www.instagram.com/ny.vor/" target="_blank" rel="noopener noreferrer" class="text-purple-400 hover:underline">Instagram @ny.vor</a>
       </div>
     </div>
   </footer>

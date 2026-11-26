@@ -171,7 +171,7 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="toggleLpAiKeyModal()" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-bold text-indigo-300" title="Указать API-ключ LLM для сессии">API-ключ</button>
+            <button type="button" id="lp-ai-key-trigger" onclick="toggleLpAiKeyModal()" class="hidden px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-bold text-indigo-300" title="Указать API-ключ LLM для сессии">API-ключ</button>
             <button type="button" onclick="toggleAiTutor(false)" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-colors">
               <span class="material-symbols-outlined text-[20px]">expand_less</span>
             </button>
@@ -2558,6 +2558,10 @@
         } else {
           const badge = document.getElementById('lp-ai-status-badge');
           const banner = document.getElementById('lp-ai-blocked-banner');
+          const keyTrigger = document.getElementById('lp-ai-key-trigger');
+          if (res.status === 503 && keyTrigger) {
+            keyTrigger.classList.remove('hidden');
+          }
           if (res.status === 503 && badge) {
             badge.textContent = 'BLOCKED • Нет ключа';
             badge.className = 'px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30';

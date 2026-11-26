@@ -148,7 +148,7 @@
         <section class="card"><p class="eyebrow">Программа курса</p><h2>${course[0]}</h2><p class="muted">${course[1]}</p>
         <div class="course-meter-box" id="academy-course-meter">
           <div style="flex:1 1 220px;min-width:0;">
-            <div style="display:flex;justify-content:space-between;font-size:0.86rem;font-weight:700;color:#1e293b;">
+            <div style="display:flex;justify-content:space-between;font-size:0.86rem;font-weight:700;color:var(--ink, #1e293b);">
               <span>Прогресс по направлению</span>
               <span>${doneCount} / ${list.length} (${pct}%)</span>
             </div>

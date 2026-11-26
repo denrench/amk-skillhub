@@ -1,3 +1,4 @@
+import os
 import unittest
 from unittest.mock import patch
 
@@ -15,6 +16,34 @@ def database_query(statement, parameters, *, fetch=False):
 
 
 class AccountLifecycleTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._prev_otp = os.environ.get('AUTH_REQUIRE_EMAIL_OTP')
+        cls._prev_testing = server.app.testing
+        cls._prev_db = server.DB_PATH
+        cls._prev_env_db = os.environ.get('EDUSPACE_DB_PATH')
+        os.environ['AUTH_REQUIRE_EMAIL_OTP'] = '1'
+        if not server.DB_PATH or not os.path.exists(server.DB_PATH):
+            default_db = os.path.join(server.BASE_DIR, 'database.db')
+            server.DB_PATH = default_db
+            os.environ['EDUSPACE_DB_PATH'] = default_db
+        server.app.testing = True
+        server.app.config['TESTING'] = True
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls._prev_otp is None:
+            os.environ.pop('AUTH_REQUIRE_EMAIL_OTP', None)
+        else:
+            os.environ['AUTH_REQUIRE_EMAIL_OTP'] = cls._prev_otp
+        if cls._prev_env_db is None:
+            os.environ.pop('EDUSPACE_DB_PATH', None)
+        else:
+            os.environ['EDUSPACE_DB_PATH'] = cls._prev_env_db
+        server.DB_PATH = cls._prev_db
+        server.app.testing = cls._prev_testing
+        server.app.config['TESTING'] = cls._prev_testing
+
     def test_database_file_is_not_a_public_asset(self):
         client = server.app.test_client()
         self.assertIn(client.get('/database.db').status_code, (403, 404))
@@ -33,14 +62,22 @@ class AccountLifecycleTest(unittest.TestCase):
             return True
 
         def clean():
-            if registered:
-                user_id = registered['id']
+            user_id = registered.get('id')
+            if not user_id:
+                row = database_query("SELECT id FROM users WHERE email = ?", (email,), fetch=True)
+                if row:
+                    user_id = row['id']
+            if user_id:
+                database_query("DELETE FROM xp_transactions WHERE user_id = ?", (user_id,))
+                database_query("DELETE FROM task_submissions WHERE user_id = ?", (user_id,))
                 database_query("DELETE FROM lesson_block_progress WHERE user_id = ?", (user_id,))
                 database_query("DELETE FROM notifications WHERE user_id = ?", (user_id,))
+                database_query("DELETE FROM notification_reads WHERE user_id = ?", (user_id,))
                 database_query("DELETE FROM enrollments WHERE user_id = ?", (user_id,))
                 database_query("DELETE FROM users WHERE id = ?", (user_id,))
             database_query("DELETE FROM email_verifications WHERE email = ?", (email,))
 
+        clean()
         self.addCleanup(clean)
         client = server.app.test_client()
         second = server.app.test_client()

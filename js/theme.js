@@ -180,6 +180,88 @@
     wrap.appendChild(sfxBtn);
 
     host.appendChild(wrap);
+    buildMobileNavToggle(host);
+  }
+
+  function buildMobileNavToggle(host) {
+    if (!host || document.getElementById('amk-mobile-menu-btn') || document.getElementById('mobile-nav-drawer')) return;
+    var header = document.querySelector('header, .topbar');
+    if (!header) return;
+    var nav = header.querySelector('nav');
+    if (!nav || header.classList.contains('top-header') || header.classList.contains('lp-top-header')) return;
+    var links = nav.querySelectorAll('a');
+    if (!links || links.length < 2) return;
+
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'amk-mobile-menu-btn';
+    btn.className = 'amk-mobile-burger-btn';
+    btn.setAttribute('aria-label', 'Меню навигации');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.textContent = '☰';
+
+    var sheet = document.createElement('div');
+    sheet.id = 'amk-mobile-nav-sheet';
+    sheet.className = 'amk-mobile-nav-sheet';
+    sheet.setAttribute('hidden', 'true');
+    for (var i = 0; i < links.length; i++) {
+      var a = document.createElement('a');
+      a.href = links[i].getAttribute('href') || '#';
+      a.textContent = (links[i].textContent || '').trim();
+      sheet.appendChild(a);
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = sheet.hasAttribute('hidden');
+      if (open) {
+        sheet.removeAttribute('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+        btn.textContent = '✕';
+      } else {
+        sheet.setAttribute('hidden', 'true');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.textContent = '☰';
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!sheet.hasAttribute('hidden') && !sheet.contains(e.target) && e.target !== btn) {
+        sheet.setAttribute('hidden', 'true');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.textContent = '☰';
+      }
+    });
+
+    host.appendChild(btn);
+    document.body.appendChild(sheet);
+    initSplashIntro();
+  }
+
+  function initSplashIntro() {
+    try {
+      if (window.navigator && window.navigator.webdriver) return;
+      var p = (window.location.pathname || '').toLowerCase();
+      if (p !== '/' && !p.endsWith('/index.html')) return;
+      if (sessionStorage.getItem('amk.nyvor.splash.v1')) return;
+      sessionStorage.setItem('amk.nyvor.splash.v1', '1');
+      var overlay = document.createElement('div');
+      overlay.id = 'amk-nyvor-splash';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at 50% 35%,#0f172a,#050814 75%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#f8fafc;font-family:Inter,system-ui,sans-serif;transition:opacity 320ms ease;';
+      overlay.innerHTML = '<img src="assets/nyvor-monogram.svg" alt="NyVor" width="64" height="64" style="border-radius:16px;box-shadow:0 0 32px rgba(56,189,248,0.4);"/>'
+        + '<div style="font-size:22px;font-weight:900;letter-spacing:0.06em;">AMK SkillHub <span style="color:#38bdf8;">× NyVor</span></div>'
+        + '<div style="font-size:12px;color:#94a3b8;letter-spacing:0.14em;text-transform:uppercase;">Будущее начинается с навыков · THE FUTURE BEGINS WITH SKILLS</div>'
+        + '<button type="button" id="amk-splash-skip" style="margin-top:8px;padding:6px 16px;border-radius:999px;border:1px solid rgba(56,189,248,0.4);background:rgba(15,23,42,0.8);color:#bae6fd;font-size:11px;font-weight:700;cursor:pointer;">Пропустить →</button>';
+      document.body.appendChild(overlay);
+      var closeSplash = function () {
+        if (!overlay.parentNode) return;
+        overlay.style.opacity = '0';
+        setTimeout(function () { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 320);
+      };
+      var skipBtn = document.getElementById('amk-splash-skip');
+      if (skipBtn) skipBtn.addEventListener('click', closeSplash);
+      setTimeout(closeSplash, 1750);
+    } catch (e) {}
   }
 
   // Interactive 3D Tilt & Spotlight Physics on Cards + Tactile Click Audio

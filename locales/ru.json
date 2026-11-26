@@ -100,7 +100,7 @@
     "curatorLine": "{code} · Куратор: {curator}",
     "switchCourseBtn": "Сменить курс",
     "switchCourseAria": "Сменить курс обучения",
-    "primaryCtaStart": "Начать урок {num}",
+    "primaryCtaStart": "Открыть плеер модуля №{num}",
     "primaryCtaContinue": "Продолжить обучение · Урок {num}",
     "textbookBtn": "Учебник и разобранные примеры",
     "progress": {

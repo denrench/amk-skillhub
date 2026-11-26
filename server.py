@@ -2212,8 +2212,6 @@ def deliver_auth_code(email, code, purpose):
 
 
 def auth_code_value(email, purpose, code):
-    if app.testing and not HOSTED:
-        return code
     value = f"{purpose}:{email}:{code}".encode('utf-8')
     return hmac.new(app.secret_key.encode('utf-8'), value, hashlib.sha256).hexdigest()[:20]
 

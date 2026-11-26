@@ -1332,10 +1332,9 @@
 
         <div style="display:flex;align-items:center;gap:10px;">
           <!-- Переключатель языка РУС | ҚАЗ -->
-          <div class="lang-switcher" role="group" aria-label="Выбор языка интерфейса" data-i18n-attr="aria-label:a11y.langSwitcher">
-            <button type="button" class="lang-switch-btn is-active" data-lang-switch="ru" onclick="window.I18n.setLocale('ru')" aria-pressed="true" title="Русский" lang="ru">РУС</button>
-            <span class="lang-switch-sep" aria-hidden="true">|</span>
-            <button type="button" class="lang-switch-btn" data-lang-switch="kk" onclick="window.I18n.setLocale('kk')" aria-pressed="false" title="Қазақша" lang="kk">ҚАЗ</button>
+          <div class="lang-switch" role="group" aria-label="Выбор языка интерфейса" data-i18n-attr="aria-label:a11y.langSwitcher">
+            <button type="button" class="lang-dot is-active" data-lang="ru" data-i18n-lang="ru" data-lang-switch="ru" onclick="window.I18n.setLocale('ru')" aria-pressed="true" title="Русский" lang="ru">РУС</button>
+            <button type="button" class="lang-dot" data-lang="kk" data-i18n-lang="kk" data-lang-switch="kk" onclick="window.I18n.setLocale('kk')" aria-pressed="false" title="Қазақша" lang="kk">ҚАЗ</button>
           </div>
 
           <button type="button" onclick="openAiTutorModal()" class="collapse-btn" title="AI Тьютор (Gemini)" aria-label="AI Тьютор" data-i18n-attr="title:nav.curatorChatTooltip;aria-label:nav.curatorChatTooltip">
@@ -1424,7 +1423,7 @@
             <div class="reveal reveal--up" data-reveal="up" style="--i:5;display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
               <a id="header-primary-cta" href="lesson_player.html?catalog=1&amp;specialty=it&amp;task=1" class="btn-primary-cta">
                 <span class="material-symbols-outlined" style="font-size:18px;">play_arrow</span>
-                <span id="header-primary-cta-text">Продолжить обучение · Урок 1</span>
+                <span id="header-primary-cta-text">Открыть интерактивный плеер</span>
               </a>
               <a id="header-textbook-link" href="learn.html?course=it" class="btn-secondary-outline">
                 <span class="material-symbols-outlined" style="font-size:18px;">menu_book</span>

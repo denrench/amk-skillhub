@@ -267,13 +267,22 @@ window.LessonInteractives = (() => {
       mentorBox.innerHTML = mentorCard(spec, msg, 'warn');
     }
 
-    // 1. WEB EXPORT & SVG / LIGHTHOUSE LAB
+    // 1. WEB EXPORT & SVG / LIGHTHOUSE LAB (NyVor Studio Commercial Export Pipeline)
     if (cfg.mode === 'web_export') {
       let fmt = 'png';
       let ppi = 300;
       let qual = 95;
+      let presetIdx = 0;
+      const exportPresets = [
+        { name: '01 · NyVor Cyber Identity', title: 'NYVOR × AMK SKILLHUB', sub: 'THE FUTURE BEGINS WITH SKILLS', grad: 'linear-gradient(135deg,#0f172a,#1e3a8a,#38bdf8)' },
+        { name: '02 · Kaspi Fintech Promo', title: 'KASPI RED · 0-0-12', sub: 'FINTECH UI · 72 PPI WEBP', grad: 'linear-gradient(135deg,#7f1d1d,#dc2626,#fb923c)' },
+        { name: '03 · Almaty Digital Summit', title: 'ALMATY TECH 2026', sub: 'KEYNOTE POSTER · VECTOR & RASTER', grad: 'linear-gradient(135deg,#1e1b4b,#6d28d9,#c084fc)' },
+        { name: '04 · Qazaq Gourmet Packaging', title: 'QAZAQ ROAST COFFEE', sub: 'CRAFT PACKAGING · CMYK / SRGB', grad: 'linear-gradient(135deg,#451a03,#b45309,#fbbf24)' },
+        { name: '05 · EV Telemetry HUD', title: 'EV BATTERY 800V HUD', sub: 'AUTOMOTIVE HMI DASHBOARD', grad: 'linear-gradient(135deg,#022c22,#059669,#34d399)' },
+      ];
       function update() {
         const isSvg = cfg.variant === 'svg';
+        const curPreset = exportPresets[presetIdx] || exportPresets[0];
         const kb = isSvg
           ? (fmt === 'svg' ? 2 : Math.round(qual * 1.9 + 40))
           : Math.round((ppi === 300 ? 18 : 1.8) * (fmt === 'png' ? 210 : fmt === 'jpg' ? qual * 1.4 : qual * 0.72));
@@ -286,6 +295,12 @@ window.LessonInteractives = (() => {
         ws.innerHTML = `
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;align-items:stretch;">
             <div style="display:flex;flex-direction:column;gap:14px;justify-content:center;">
+              <div>
+                <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:6px;">Макет артборда (NyVor Studio)</div>
+                <select id="lab-export-preset" style="width:100%;padding:8px 10px;border-radius:10px;background:#0f172a;border:1px solid rgba(56,189,248,0.3);color:#f8fafc;font-size:12px;font-weight:700;">
+                  ${exportPresets.map((p, idx) => `<option value="${idx}" ${idx === presetIdx ? 'selected' : ''}>${p.name}</option>`).join('')}
+                </select>
+              </div>
               <div>
                 <div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:6px;">Формат экспорта</div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -313,9 +328,9 @@ window.LessonInteractives = (() => {
                 <span style="color:${accent};font-weight:800;">${kb >= 1024 ? (kb / 1024).toFixed(1) + ' MB' : kb + ' KB'}</span>
               </div>
               <div style="border-radius:12px;padding:14px;min-height:94px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.12);background-color:${hasAlpha ? '#0f172a' : '#f8fafc'};background-image:${hasAlpha ? 'linear-gradient(45deg,rgba(148,163,184,0.2) 25%,transparent 25%),linear-gradient(-45deg,rgba(148,163,184,0.2) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,rgba(148,163,184,0.2) 75%),linear-gradient(-45deg,transparent 75%,rgba(148,163,184,0.2) 75%)' : 'none'};background-size:14px 14px;background-position:0 0,0 7px,7px -7px,-7px 0;">
-                <div style="padding:12px 18px;border-radius:${hasAlpha ? '14px' : '4px'};background:linear-gradient(135deg,#4f46e5,#06b6d4);color:#fff;font-weight:900;font-size:13px;letter-spacing:0.04em;filter:blur(${blurPx}px);transform:scale(${isSvg && fmt === 'svg' ? '1.05' : '1'});transition:all 200ms ease;box-shadow:0 10px 24px -10px ${accent};text-align:center;">
-                  ${isSvg ? (fmt === 'svg' ? '✦ VECTOR SVG 400%' : '▦ RASTER PIXELS') : 'AMK WEB BANNER'}
-                  <div style="font-family:monospace;font-size:10px;font-weight:700;opacity:0.9;margin-top:2px;">${isSvg ? fmt.toUpperCase() : `${ppi} ppi · Q${qual}% · ${hasAlpha ? 'Alpha' : 'No Alpha'}`}</div>
+                <div style="padding:12px 18px;border-radius:${hasAlpha ? '14px' : '4px'};background:${curPreset.grad};color:#fff;font-weight:900;font-size:13px;letter-spacing:0.04em;filter:blur(${blurPx}px);transform:scale(${isSvg && fmt === 'svg' ? '1.05' : '1'});transition:all 200ms ease;box-shadow:0 10px 24px -10px ${accent};text-align:center;">
+                  ${isSvg ? (fmt === 'svg' ? '✦ VECTOR SVG 400% · NYVOR' : '▦ RASTER PIXELS') : curPreset.title}
+                  <div style="font-family:monospace;font-size:10px;font-weight:700;opacity:0.9;margin-top:2px;">${isSvg ? fmt.toUpperCase() : `${curPreset.sub} · ${ppi} ppi · Q${qual}%`}</div>
                 </div>
               </div>
               <div style="display:flex;flex-direction:column;gap:5px;">
@@ -330,11 +345,12 @@ window.LessonInteractives = (() => {
             </div>
           </div>
         `;
+        ws.querySelector('#lab-export-preset')?.addEventListener('change', e => { presetIdx = Number(e.target.value) || 0; update(); });
         ws.querySelectorAll('[data-fmt]').forEach(b => b.addEventListener('click', () => { fmt = b.dataset.fmt; update(); }));
         ws.querySelectorAll('[data-ppi]').forEach(b => b.addEventListener('click', () => { ppi = Number(b.dataset.ppi); update(); }));
         ws.querySelector('#lab-qual')?.addEventListener('input', e => { qual = Number(e.target.value); update(); });
         if (ok) {
-          markSolved(isSvg ? 'Отлично! Векторный SVG весит 2 КБ и остаётся бритвенно-чётким на 4K-экранах.' : `Супер! Баннер в WebP (72 ppi) весит всего ${kb} КБ и загружается мгновенно.`, { fmt, ppi, kb });
+          markSolved(isSvg ? 'Отлично! Векторный SVG весит 2 КБ и остаётся бритвенно-чётким на 4K-экранах.' : `Супер! Макет «${curPreset.title}» в WebP (72 ppi) весит всего ${kb} КБ и загружается мгновенно.`, { fmt, ppi, kb, preset: curPreset.title });
         } else if (ppi === 300 && !isSvg) {
           warnMentor('300 ppi — это стандарт для типографии. Для сайта переключите на 72 ppi и выберите современный формат WebP.');
         }

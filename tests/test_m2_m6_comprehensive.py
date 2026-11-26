@@ -42,6 +42,8 @@ class TestM2ToM6WhiteBoxSuite(unittest.TestCase):
             cls._tmp_dir.cleanup()
         except Exception:
             pass
+        os.environ.pop("EDUSPACE_DB_PATH", None)
+        server.DB_PATH = os.path.join(server.BASE_DIR, "database.db")
 
     def _register_and_client(self, email_prefix="wb", role="student", specialty="automechanic", group="АМ-21"):
         client = server.app.test_client()

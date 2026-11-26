@@ -339,115 +339,274 @@ window.EduSimulators = (function () {
   }
 
   // =========================================================================
-  // 2. GRAPHIC & UI/UX DESIGN SIMULATOR
+  // 2. GRAPHIC & UI/UX DESIGN SIMULATOR (10 COMMERCIAL PRESETS + MULTI-LAYER CANVAS + BLOB EXPORT + NYVOR WATERMARK)
   // =========================================================================
   let canvasCtx = null;
   let canvasElements = [];
+  let activeColor = '#8b5cf6';
+  let activePresetId = 'cyber_launch';
+  let exportFormat = 'image/webp';
+  let exportQuality = 0.92;
+
+  const COMMERCIAL_DESIGN_PRESETS = {
+    cyber_launch: {
+      name: '1. Запуск IT-продукта (SaaS Hero)',
+      bg: '#0b0f1d',
+      layers: [
+        { type: 'rect', x: 28, y: 26, w: 544, h: 268, color: '#111827', label: 'Карточка фона' },
+        { type: 'circle', x: 470, y: 155, r: 85, color: '#4f46e5', label: 'Световой акцент' },
+        { type: 'rect', x: 52, y: 205, w: 150, h: 42, color: '#06b6d4', label: 'Кнопка CTA' },
+        { type: 'text', x: 52, y: 98, text: 'NYVOR CLOUD AI 3.0', color: '#ffffff', label: 'Заголовок' },
+        { type: 'text', x: 52, y: 136, text: 'Автономная 3D-аналитика и генеративный пайплайн', color: '#94a3b8', label: 'Подзаголовок' }
+      ]
+    },
+    auto_gt_poster: {
+      name: '2. Автоспорт & Тюнинг GT (Постер)',
+      bg: '#100c14',
+      layers: [
+        { type: 'rect', x: 24, y: 24, w: 552, h: 272, color: '#1c1917', label: 'Тёмный карбон' },
+        { type: 'rect', x: 24, y: 230, w: 552, h: 66, color: '#f59e0b', label: 'Спорт-полоса' },
+        { type: 'circle', x: 480, y: 120, r: 58, color: '#ef4444', label: 'Тахометр-акцент' },
+        { type: 'text', x: 48, y: 105, text: 'APEX MOTORSPORT GT', color: '#ffffff', label: 'Заголовок' },
+        { type: 'text', x: 48, y: 268, text: 'STAGE 3 TURBO • 750 HP • DYNO VERIFIED', color: '#0f172a', label: 'Спецификация' }
+      ]
+    },
+    coffee_packaging: {
+      name: '3. Крафтовая упаковка Specialty Coffee',
+      bg: '#1c1613',
+      layers: [
+        { type: 'rect', x: 140, y: 20, w: 320, h: 280, color: '#29201b', label: 'Штамп пачки' },
+        { type: 'circle', x: 300, y: 140, r: 64, color: '#d97706', label: 'Золотая печать' },
+        { type: 'text', x: 195, y: 80, text: 'ALMATY ROASTERS', color: '#fef3c7', label: 'Бренд' },
+        { type: 'text', x: 205, y: 245, text: 'ETHIOPIA YIRGACHEFFE • 250G', color: '#fde68a', label: 'Сорт и вес' }
+      ]
+    },
+    fintech_card: {
+      name: '4. Премиальная банковская карта FinTech',
+      bg: '#06111c',
+      layers: [
+        { type: 'rect', x: 95, y: 38, w: 410, h: 244, color: '#0f172a', label: 'Корпус карты' },
+        { type: 'rect', x: 130, y: 115, w: 46, h: 34, color: '#fbbf24', label: 'EMV Чип' },
+        { type: 'circle', x: 445, y: 85, r: 24, color: '#38bdf8', label: 'PayWave NFC' },
+        { type: 'text', x: 130, y: 82, text: 'QAZAQ FINTECHINFINITE', color: '#ffffff', label: 'Эмитент' },
+        { type: 'text', x: 130, y: 225, text: '4400  8901  2026  7788', color: '#7dd3fc', label: 'Номер карты' }
+      ]
+    },
+    festival_ticket: {
+      name: '5. Афиша фестиваля цифрового искусства',
+      bg: '#0c061a',
+      layers: [
+        { type: 'circle', x: 190, y: 160, r: 95, color: '#8b5cf6', label: 'Неоновая сфера A' },
+        { type: 'circle', x: 340, y: 150, r: 80, color: '#ec4899', label: 'Неоновая сфера B' },
+        { type: 'text', x: 56, y: 95, text: 'SYNTHESIS FEST ALMATY', color: '#ffffff', label: 'Событие' },
+        { type: 'text', x: 56, y: 265, text: '3D MAPPING • SOUND ART • NYVOR STAGE', color: '#67e8f9', label: 'Лайнап' }
+      ]
+    },
+    eco_hvac_passport: {
+      name: '6. Инженерный паспорт климатической системы',
+      bg: '#061417',
+      layers: [
+        { type: 'rect', x: 30, y: 28, w: 540, h: 264, color: '#0b2228', label: 'Технический лист' },
+        { type: 'rect', x: 30, y: 28, w: 12, h: 264, color: '#10b981', label: 'Маркер класса A+++' },
+        { type: 'text', x: 64, y: 86, text: 'CLIMATE PRO VRF INVERTER', color: '#ffffff', label: 'Модель' },
+        { type: 'text', x: 64, y: 145, text: 'Хладагент R32 • SEER 8.5 • Superheat 6.0 K', color: '#34d399', label: 'Телеметрия' }
+      ]
+    },
+    mobile_ui_kit: {
+      name: '7. Мобильное приложение доставки (UI Screen)',
+      bg: '#0b0e17',
+      layers: [
+        { type: 'rect', x: 190, y: 16, w: 220, h: 288, color: '#1e293b', label: 'Фрейм 375x812' },
+        { type: 'rect', x: 208, y: 46, w: 184, h: 90, color: '#4f46e5', label: 'Промо-виджет' },
+        { type: 'rect', x: 208, y: 244, w: 184, h: 40, color: '#10b981', label: 'Кнопка заказа' },
+        { type: 'text', x: 222, y: 95, text: 'ДОСТАВКА 15 МИН', color: '#ffffff', label: 'Оффер' }
+      ]
+    },
+    architecture_expo: {
+      name: '8. Швейцарская типографика Bauhaus Grid',
+      bg: '#141416',
+      layers: [
+        { type: 'rect', x: 32, y: 32, w: 170, h: 256, color: '#ef4444', label: 'Модуль 1/3' },
+        { type: 'circle', x: 420, y: 160, r: 78, color: '#f59e0b', label: 'Круг Баухаус' },
+        { type: 'text', x: 228, y: 88, text: 'SWISS GRID 1926—2026', color: '#ffffff', label: 'Заголовок' },
+        { type: 'text', x: 228, y: 256, text: 'МОДУЛЬНАЯ СЕТКА И ОПТИЧЕСКИЙ РИТМ', color: '#cbd5e1', label: 'Манифест' }
+      ]
+    },
+    esports_jersey: {
+      name: '9. Айдентика киберспортивной лиги',
+      bg: '#080711',
+      layers: [
+        { type: 'rect', x: 30, y: 30, w: 540, h: 260, color: '#131126', label: 'Арена-баннер' },
+        { type: 'circle', x: 300, y: 145, r: 72, color: '#06b6d4', label: 'Щит команды' },
+        { type: 'text', x: 165, y: 152, text: 'QAZAQ CYBER LEAGUE', color: '#ffffff', label: 'Лига' },
+        { type: 'text', x: 180, y: 262, text: 'GRAND FINALS • PRIZE POOL 50 000 000 ₸', color: '#fbbf24', label: 'Призовой фонд' }
+      ]
+    },
+    brand_book_cover: {
+      name: '10. Обложка брендбука & гайдлайна (NyVor)',
+      bg: '#070b14',
+      layers: [
+        { type: 'rect', x: 28, y: 28, w: 544, h: 264, color: '#0f172a', label: 'Лист брендбука' },
+        { type: 'circle', x: 105, y: 135, r: 44, color: '#38bdf8', label: 'Знак охранного поля' },
+        { type: 'text', x: 175, y: 125, text: 'AMK SKILLHUB × NYVOR', color: '#ffffff', label: 'Ко-брендинг' },
+        { type: 'text', x: 175, y: 165, text: 'BRAND IDENTITY & DESIGN SYSTEM 2026', color: '#818cf8', label: 'Редакция' }
+      ]
+    }
+  };
 
   function renderDesignSimulator(container) {
+    const presetOpts = Object.keys(COMMERCIAL_DESIGN_PRESETS).map(k => {
+      const p = COMMERCIAL_DESIGN_PRESETS[k];
+      return `<option value="${k}" ${k === activePresetId ? 'selected' : ''}>${p.name}</option>`;
+    }).join('');
+
     container.innerHTML = `
       <div class="space-y-4">
-        <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-white/10">
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-purple-400 text-[20px]">palette</span>
-            <span class="text-xs font-bold text-white uppercase tracking-wider">Интерактивный графический холст & Композиция</span>
+            <span class="text-xs font-bold text-white uppercase tracking-wider">Графическая лаборатория: 10 макетов, слои & экспорт Blob</span>
           </div>
-          <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30">Vector Canvas</span>
+          <div class="flex items-center gap-2">
+            <select id="design-preset-select" onchange="EduSimulators.loadDesignPreset(this.value)" class="px-3 py-1.5 rounded-xl bg-dark-900 border border-purple-500/40 text-white text-xs font-bold">
+              ${presetOpts}
+            </select>
+            <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30">NyVor Studio</span>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
           <!-- Toolbar -->
           <div class="p-4 rounded-2xl bg-dark-900 border border-white/10 space-y-3 text-xs">
-            <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Инструменты фигур</div>
+            <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Добавить слой</div>
             <div class="grid grid-cols-2 gap-2">
-              <button type="button" onclick="EduSimulators.addCanvasShape('rect')" class="p-2.5 rounded-xl bg-white/5 hover:bg-purple-600/20 border border-white/10 text-white flex items-center justify-center gap-1">
-                <span class="material-symbols-outlined text-[16px] text-purple-400">rectangle</span>Прямоугольник
+              <button type="button" onclick="EduSimulators.addCanvasShape('rect')" class="p-2 rounded-xl bg-white/5 hover:bg-purple-600/20 border border-white/10 text-white flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-[15px] text-purple-400">rectangle</span>Блок
               </button>
-              <button type="button" onclick="EduSimulators.addCanvasShape('circle')" class="p-2.5 rounded-xl bg-white/5 hover:bg-purple-600/20 border border-white/10 text-white flex items-center justify-center gap-1">
-                <span class="material-symbols-outlined text-[16px] text-cyan-400">circle</span>Круг
+              <button type="button" onclick="EduSimulators.addCanvasShape('circle')" class="p-2 rounded-xl bg-white/5 hover:bg-purple-600/20 border border-white/10 text-white flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-[15px] text-cyan-400">circle</span>Круг
               </button>
-              <button type="button" onclick="EduSimulators.addCanvasShape('text')" class="p-2.5 rounded-xl bg-white/5 hover:bg-purple-600/20 border border-white/10 text-white flex items-center justify-center gap-1">
-                <span class="material-symbols-outlined text-[16px] text-amber-400">title</span>Текст
+              <button type="button" onclick="EduSimulators.addCanvasShape('text')" class="p-2 rounded-xl bg-white/5 hover:bg-purple-600/20 border border-white/10 text-white flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-[15px] text-amber-400">title</span>Титр
               </button>
-              <button type="button" onclick="EduSimulators.clearCanvas()" class="p-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-300 flex items-center justify-center gap-1">
-                <span class="material-symbols-outlined text-[16px]">delete</span>Очистить
+              <button type="button" onclick="EduSimulators.clearCanvas()" class="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-300 flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-[15px]">delete</span>Сброс
               </button>
             </div>
 
             <!-- Color Palette -->
-            <div class="pt-2">
-              <label class="block text-[11px] font-bold text-slate-300 mb-1.5">Палитра макета</label>
+            <div class="pt-1">
+              <label class="block text-[11px] font-bold text-slate-300 mb-1.5">Акцентная палитра</label>
               <div class="flex items-center gap-2">
-                <button type="button" onclick="EduSimulators.setCanvasColor('#4f46e5')" class="w-6 h-6 rounded-full bg-indigo-600 border border-white/30"></button>
-                <button type="button" onclick="EduSimulators.setCanvasColor('#8b5cf6')" class="w-6 h-6 rounded-full bg-purple-500 border border-white/30"></button>
-                <button type="button" onclick="EduSimulators.setCanvasColor('#06b6d4')" class="w-6 h-6 rounded-full bg-cyan-500 border border-white/30"></button>
-                <button type="button" onclick="EduSimulators.setCanvasColor('#10b981')" class="w-6 h-6 rounded-full bg-emerald-500 border border-white/30"></button>
-                <button type="button" onclick="EduSimulators.setCanvasColor('#f59e0b')" class="w-6 h-6 rounded-full bg-amber-500 border border-white/30"></button>
-                <button type="button" onclick="EduSimulators.setCanvasColor('#ffffff')" class="w-6 h-6 rounded-full bg-white border border-slate-400"></button>
+                <button type="button" onclick="EduSimulators.setCanvasColor('#4f46e5')" class="w-6 h-6 rounded-full bg-indigo-600 border border-white/30" aria-label="Indigo"></button>
+                <button type="button" onclick="EduSimulators.setCanvasColor('#8b5cf6')" class="w-6 h-6 rounded-full bg-purple-500 border border-white/30" aria-label="Purple"></button>
+                <button type="button" onclick="EduSimulators.setCanvasColor('#06b6d4')" class="w-6 h-6 rounded-full bg-cyan-500 border border-white/30" aria-label="Cyan"></button>
+                <button type="button" onclick="EduSimulators.setCanvasColor('#10b981')" class="w-6 h-6 rounded-full bg-emerald-500 border border-white/30" aria-label="Emerald"></button>
+                <button type="button" onclick="EduSimulators.setCanvasColor('#f59e0b')" class="w-6 h-6 rounded-full bg-amber-500 border border-white/30" aria-label="Amber"></button>
+                <button type="button" onclick="EduSimulators.setCanvasColor('#ffffff')" class="w-6 h-6 rounded-full bg-white border border-slate-400" aria-label="White"></button>
               </div>
             </div>
 
-            <!-- WCAG Score -->
-            <div class="p-3 rounded-xl bg-dark-850 border border-white/5 space-y-1">
-              <div class="text-[10px] uppercase font-bold text-slate-400">WCAG Контрастность</div>
-              <div class="text-sm font-black text-emerald-400" id="design-wcag-val">12.5 : 1 (AAA)</div>
-              <div class="text-[10px] text-slate-400">Соответствует стандартам доступности</div>
+            <!-- Layers Inspector -->
+            <div class="space-y-1">
+              <div class="flex items-center justify-between text-[10px] uppercase font-bold text-slate-400">
+                <span>Инспектор слоёв</span>
+                <span id="design-layer-count">0</span>
+              </div>
+              <div id="design-layers-list" class="max-h-24 overflow-y-auto space-y-1 pr-1 text-[11px]"></div>
             </div>
 
-            <button type="button" onclick="EduSimulators.exportCanvasPng()" class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-[11px] shadow-sm transition-all flex items-center justify-center gap-1.5">
-              <span class="material-symbols-outlined text-[15px]">download</span>Экспорт макета (PNG)
-            </button>
+            <!-- WCAG Score -->
+            <div class="p-2.5 rounded-xl bg-dark-850 border border-white/5 space-y-0.5">
+              <div class="text-[10px] uppercase font-bold text-slate-400">WCAG 2.1 Контрастность</div>
+              <div class="text-sm font-black text-emerald-400" id="design-wcag-val">12.5 : 1 (AAA)</div>
+            </div>
+
+            <!-- Export Format & Quality -->
+            <div class="space-y-1.5 pt-1 border-t border-white/10">
+              <div class="flex items-center justify-between gap-2">
+                <select id="design-export-fmt" onchange="EduSimulators.updateExportSettings()" class="px-2 py-1 rounded-lg bg-dark-850 border border-white/15 text-[11px] text-white font-bold">
+                  <option value="image/webp">WebP</option>
+                  <option value="image/png">PNG</option>
+                  <option value="image/jpeg">JPEG</option>
+                </select>
+                <span id="design-blob-size" class="text-[11px] font-mono font-bold text-cyan-300">~18 КБ</span>
+              </div>
+              <button type="button" onclick="EduSimulators.exportCanvasPng()" class="w-full py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-[11px] shadow-sm transition-all flex items-center justify-center gap-1.5">
+                <span class="material-symbols-outlined text-[15px]">download</span>Экспорт с водяным знаком NyVor
+              </button>
+            </div>
           </div>
 
           <!-- Canvas Viewport -->
           <div class="lg:col-span-3 p-4 rounded-2xl bg-dark-950 border border-white/10 flex flex-col items-center justify-center">
             <canvas id="design-artboard" width="600" height="320" class="rounded-xl border border-white/15 bg-dark-900 shadow-2xl max-w-full cursor-crosshair"></canvas>
-            <div class="text-[10px] text-slate-500 mt-2 font-mono">Artboard 600×320px • Кликните на холст для добавления элементов</div>
+            <div class="flex flex-wrap items-center justify-between w-full text-[10px] text-slate-400 mt-2 font-mono px-1">
+              <span>Artboard 600×320px • 8px Modular Grid</span>
+              <span id="design-active-preset-label">Макет: 1. Запуск IT-продукта (SaaS Hero)</span>
+            </div>
           </div>
         </div>
       </div>
     `;
 
-    setTimeout(initCanvasArtboard, 50);
+    setTimeout(initCanvasArtboard, 40);
   }
-
-  let activeColor = '#8b5cf6';
 
   function initCanvasArtboard() {
     const canvas = document.getElementById('design-artboard');
     if (!canvas) return;
     canvasCtx = canvas.getContext('2d');
-    canvasElements = [
-      { type: 'rect', x: 40, y: 40, w: 140, h: 90, color: '#4f46e5' },
-      { type: 'circle', x: 300, y: 150, r: 60, color: '#06b6d4' },
-      { type: 'text', x: 220, y: 260, text: 'EDU SPACE UI/UX', color: '#ffffff' }
-    ];
+    loadPresetLayers(activePresetId);
+  }
+
+  function loadPresetLayers(presetId) {
+    const preset = COMMERCIAL_DESIGN_PRESETS[presetId] || COMMERCIAL_DESIGN_PRESETS.cyber_launch;
+    activePresetId = presetId in COMMERCIAL_DESIGN_PRESETS ? presetId : 'cyber_launch';
+    canvasElements = preset.layers.map(l => Object.assign({}, l));
+    const lbl = document.getElementById('design-active-preset-label');
+    if (lbl) lbl.textContent = 'Макет: ' + preset.name;
     redrawCanvas();
+  }
+
+  function renderLayersInspector() {
+    const listEl = document.getElementById('design-layers-list');
+    const cntEl = document.getElementById('design-layer-count');
+    if (cntEl) cntEl.textContent = String(canvasElements.length);
+    if (!listEl) return;
+    listEl.innerHTML = canvasElements.map((el, idx) => `
+      <div class="flex items-center justify-between px-2 py-1 rounded bg-white/5 border border-white/5">
+        <span class="truncate text-slate-200">${idx + 1}. ${el.label || el.type.toUpperCase()}</span>
+        <span class="w-3 h-3 rounded-full shrink-0 border border-white/30" style="background:${el.color || '#fff'}"></span>
+      </div>
+    `).join('');
   }
 
   function redrawCanvas() {
     if (!canvasCtx) return;
     const canvas = document.getElementById('design-artboard');
-    canvasCtx.fillStyle = '#0f1117';
+    if (!canvas) return;
+    const preset = COMMERCIAL_DESIGN_PRESETS[activePresetId] || COMMERCIAL_DESIGN_PRESETS.cyber_launch;
+    canvasCtx.fillStyle = preset.bg || '#0f1117';
     canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Subtle grid lines
-    canvasCtx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+    // 8px / 32px Modular Grid lines
+    canvasCtx.strokeStyle = 'rgba(255, 255, 255, 0.045)';
     canvasCtx.lineWidth = 1;
-    for (let x = 0; x < canvas.width; x += 30) {
+    for (let x = 0; x < canvas.width; x += 32) {
       canvasCtx.beginPath();
       canvasCtx.moveTo(x, 0);
       canvasCtx.lineTo(x, canvas.height);
       canvasCtx.stroke();
     }
-    for (let y = 0; y < canvas.height; y += 30) {
+    for (let y = 0; y < canvas.height; y += 32) {
       canvasCtx.beginPath();
       canvasCtx.moveTo(0, y);
       canvasCtx.lineTo(canvas.width, y);
       canvasCtx.stroke();
     }
 
-    // Draw elements
+    // Draw layers
     canvasElements.forEach(el => {
       canvasCtx.fillStyle = el.color;
       if (el.type === 'rect') {
@@ -457,10 +616,28 @@ window.EduSimulators = (function () {
         canvasCtx.arc(el.x, el.y, el.r, 0, Math.PI * 2);
         canvasCtx.fill();
       } else if (el.type === 'text') {
-        canvasCtx.font = 'bold 18px "Plus Jakarta Sans", sans-serif';
+        canvasCtx.font = 'bold 17px "Inter", "Plus Jakarta Sans", sans-serif';
         canvasCtx.fillText(el.text, el.x, el.y);
       }
     });
+
+    // Official NyVor × AMK SkillHub Author Watermark
+    canvasCtx.save();
+    canvasCtx.font = '700 11px "JetBrains Mono", monospace';
+    canvasCtx.fillStyle = 'rgba(255, 255, 255, 0.52)';
+    canvasCtx.textAlign = 'right';
+    canvasCtx.fillText('AMK SkillHub × NyVor', canvas.width - 14, canvas.height - 12);
+    canvasCtx.restore();
+
+    renderLayersInspector();
+    if (typeof canvas.toBlob === 'function') {
+      canvas.toBlob(blob => {
+        const sizeEl = document.getElementById('design-blob-size');
+        if (blob && sizeEl) {
+          sizeEl.textContent = (blob.size / 1024).toFixed(1) + ' КБ';
+        }
+      }, exportFormat, exportQuality);
+    }
   }
 
   // =========================================================================
@@ -846,17 +1023,29 @@ window.EduSimulators = (function () {
       }
     },
 
-    // Design Handlers (deterministic grid coordinates, zero Math.random)
+    // Design Handlers (deterministic grid coordinates, zero Math.random, 10 commercial presets, real Blob export)
+    loadDesignPreset: function (presetId) {
+      loadPresetLayers(presetId);
+    },
+
+    updateExportSettings: function () {
+      const sel = document.getElementById('design-export-fmt');
+      if (sel && sel.value) {
+        exportFormat = sel.value;
+      }
+      redrawCanvas();
+    },
+
     addCanvasShape: function (type) {
       const idx = canvasElements.length;
       const gx = 48 + (idx * 72) % 360;
       const gy = 48 + (idx * 54) % 180;
       if (type === 'rect') {
-        canvasElements.push({ type: 'rect', x: gx, y: gy, w: 100, h: 70, color: activeColor });
+        canvasElements.push({ type: 'rect', x: gx, y: gy, w: 100, h: 70, color: activeColor, label: 'Прямоугольник #' + (idx + 1) });
       } else if (type === 'circle') {
-        canvasElements.push({ type: 'circle', x: gx, y: gy, r: 40, color: activeColor });
+        canvasElements.push({ type: 'circle', x: gx, y: gy, r: 40, color: activeColor, label: 'Круг #' + (idx + 1) });
       } else if (type === 'text') {
-        canvasElements.push({ type: 'text', x: gx, y: gy, text: 'Design Component', color: activeColor });
+        canvasElements.push({ type: 'text', x: gx, y: gy, text: 'AMK × NyVor', color: activeColor, label: 'Текст #' + (idx + 1) });
       }
       redrawCanvas();
     },
@@ -865,7 +1054,8 @@ window.EduSimulators = (function () {
       activeColor = color;
       const wcagEl = document.getElementById('design-wcag-val');
       if (wcagEl && window.EduPhysics && window.EduPhysics.design) {
-        const cRes = window.EduPhysics.design.contrastRatio(color, '#0f1117');
+        const preset = COMMERCIAL_DESIGN_PRESETS[activePresetId] || COMMERCIAL_DESIGN_PRESETS.cyber_launch;
+        const cRes = window.EduPhysics.design.contrastRatio(color, preset.bg || '#0f1117');
         const grade = cRes.aaaNormal ? 'AAA' : (cRes.aaNormal ? 'AA' : (cRes.aaLarge ? 'AA Large' : 'FAIL'));
         wcagEl.textContent = `${cRes.ratio.toFixed(2)} : 1 (${grade})`;
       }
@@ -880,11 +1070,27 @@ window.EduSimulators = (function () {
     exportCanvasPng: function () {
       const canvas = document.getElementById('design-artboard');
       if (!canvas) return;
-      const dataUrl = canvas.toDataURL('image/png');
-      const a = document.createElement('a');
-      a.href = dataUrl;
-      a.download = 'eduspace-design-export.png';
-      a.click();
+      const ext = exportFormat === 'image/jpeg' ? 'jpg' : (exportFormat === 'image/webp' ? 'webp' : 'png');
+      const fileName = `amk-nyvor-${activePresetId}.${ext}`;
+      if (typeof canvas.toBlob === 'function') {
+        canvas.toBlob(blob => {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }, exportFormat, exportQuality);
+      } else {
+        const dataUrl = canvas.toDataURL(exportFormat, exportQuality);
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = fileName;
+        a.click();
+      }
     },
 
     // Autoelectric Handlers

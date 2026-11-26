@@ -80,6 +80,10 @@ def tearDownModule():
     if _TEMP_ROOT and os.path.exists(_TEMP_ROOT):
         shutil.rmtree(_TEMP_ROOT, ignore_errors=True)
     _TEMP_ROOT = None
+    os.environ.pop("EDUSPACE_DB_PATH", None)
+    os.environ.pop("UPLOAD_DIR", None)
+    import server as srv
+    srv.DB_PATH = REPO_DB_PATH
 
 
 class M1TestBase(unittest.TestCase):

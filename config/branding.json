@@ -1,0 +1,53 @@
+{
+  "platform": {
+    "name": "AMK SkillHub",
+    "cobrand": "AMK SkillHub × NyVor",
+    "version": "3.0.0",
+    "year": 2026,
+    "visual_style": "Premium Futuristic",
+    "gamification_level": "maximum_educational",
+    "tagline_ru": "Будущее начинается с навыков",
+    "tagline_en": "THE FUTURE BEGINS WITH SKILLS.",
+    "secondary_slogans": [
+      "LEARN. CREATE. MASTER.",
+      "FROM KNOWLEDGE TO MASTERY.",
+      "SKILLS BEYOND THE CLASSROOM.",
+      "BUILT FOR THE FUTURE.",
+      "Твой навык. Твоя профессия. Твоё будущее."
+    ]
+  },
+  "author": {
+    "name_ru": "Данилов Данил",
+    "name_en": "Danilov Danil",
+    "brand": "NyVor",
+    "monogram": "NV",
+    "role": "Founder & Creative Director",
+    "project_format": "Individual Project",
+    "team_size": 1,
+    "institution": "Алматинский многопрофильный колледж",
+    "group": "ПО25-2Б",
+    "city": "Алматы",
+    "country": "Казахстан",
+    "photo_used": false,
+    "bio_required": false,
+    "email_published": false
+  },
+  "contacts": {
+    "telegram_handle": "@denrench",
+    "telegram_url": "https://t.me/denrench",
+    "instagram_handle": "@ny.vor",
+    "instagram_url": "https://www.instagram.com/ny.vor/"
+  },
+  "assets": {
+    "logo_platform": "assets/eduspace-logo.svg",
+    "logo_nyvor": "assets/nyvor-logo.svg",
+    "monogram_nyvor": "assets/nyvor-monogram.svg",
+    "watermark_text": "NyVor"
+  },
+  "curriculum": {
+    "specialties_count": 5,
+    "modules_per_specialty": 20,
+    "total_lessons": 100,
+    "total_models_3d": 25
+  }
+}
