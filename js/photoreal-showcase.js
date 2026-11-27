@@ -171,13 +171,17 @@ window.PhotorealShowcase = (function () {
 
     function renderInfo(i) {
       const it = items[i];
+      const specSlug = (it.href || '').split('specialty=')[1] || 'it';
       label.innerHTML = `<b>${escapeHtml(it.course)}</b><span>${escapeHtml(it.title)}</span>`;
       info.innerHTML = `
         <h3 class="pr-info-title">${escapeHtml(it.title)}</h3>
         <p class="pr-info-text">${escapeHtml(it.text)}</p>
         <ul class="pr-info-facts">${(it.facts || []).map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
         <div class="pr-info-meta">3D-модель: <a href="${safeHref(it.sourceUrl)}">${escapeHtml(it.source)}</a> · CC0 / MIT</div>
-        <a class="pr-info-cta" href="${safeHref(it.href)}">${escapeHtml(it.cta)} →</a>`;
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <a class="pr-info-cta" style="flex:1;min-width:170px;" href="${safeHref(it.href)}">${escapeHtml(it.cta)} →</a>
+          <a class="button" style="display:inline-flex;align-items:center;justify-content:center;padding:0.75rem 1rem;border-radius:12px;" href="simulator.html?specialty=${escapeHtml(specSlug)}&task=1">3D-тренажёр</a>
+        </div>`;
     }
     renderInfo(0);
 

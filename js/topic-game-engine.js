@@ -1532,6 +1532,14 @@ window.TopicGameEngine = (function () {
       body: r.winRule || 'Отличное знание производственного стандарта.'
     };
     playTone('success');
+    if (inst.container) {
+      const hud = inst.container.querySelector('#tge-score-pill');
+      if (hud) {
+        hud.style.transform = 'scale(1.18)';
+        hud.style.boxShadow = '0 0 18px rgba(52,211,153,0.65)';
+        setTimeout(() => { hud.style.transform = ''; hud.style.boxShadow = ''; }, 550);
+      }
+    }
     inst.onStateChange({ score: inst.score, roundIdx: inst.roundIdx, completed: inst.completed });
   }
 
