@@ -772,7 +772,7 @@ window.WorkshopModels = (() => {
       let angle = 0.55;
       let pitch = 2.35;
       let radius = 4.8;
-      let autoRotate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let autoRotate = false;
 
       const selectPart = (idx) => {
         selectedIndex = idx;

@@ -161,7 +161,7 @@ window.EduSpace3D = (function () {
     let dragging = false;
     let lastX = 0;
     let lastY = 0;
-    let rotY = 0;
+    let rotY = 0.35;
     let rotX = 0.12;
     let zoom = camera.position.length() || 5.8;
 
@@ -222,9 +222,6 @@ window.EduSpace3D = (function () {
     function animate() {
       state.animId = requestAnimationFrame(animate);
       t += 0.016;
-      if (!dragging) {
-        rotY += 0.0055;
-      }
       group.rotation.y = rotY;
       group.rotation.x = rotX;
       particles.rotation.y = -t * 0.08;

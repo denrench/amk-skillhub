@@ -113,7 +113,6 @@ window.TGE3DPreview = (function () {
       }
       st.raf = requestAnimationFrame(loop);
       st.t += 0.016;
-      if (!dragging) rotY += 0.005;
       root.rotation.y = rotY;
       root.rotation.x = rotX;
       if (st.animFn) st.animFn(st.t);

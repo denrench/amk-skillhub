@@ -352,7 +352,7 @@ window.PhotorealShowcase = (function () {
         controls.maxPolarAngle = Math.PI / 2 - 0.03;
         controls.minDistance = 1.45;
         controls.maxDistance = 6.2;
-        controls.autoRotate = !reducedMotion;
+        controls.autoRotate = false;
         controls.autoRotateSpeed = 1.15;
       } else {
         // Depth 3D Relief Scene: dramatic 3D orbit (±18° yaw, ±11° pitch) with zero edge clipping
