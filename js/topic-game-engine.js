@@ -882,27 +882,10 @@ window.TopicGameEngine = (function () {
       const liveMonitor = `
         <div class="tge-live-pane">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;">
-            <span class="tge-live-badge"><span class="tge-live-dot" style="background:${statusCol};box-shadow:0 0 10px ${statusCol};"></span>ЖИВОЙ СТЕНД · ${esc(specName.toUpperCase())}</span>
-            <span style="font-family:monospace;font-size:10px;font-weight:800;color:${statusCol};">${rSt.solved ? 'ЭТАЛОН ✓' : 'АКТИВЕН'}</span>
+            <span class="tge-live-badge"><span class="tge-live-dot" style="background:${statusCol};box-shadow:0 0 10px ${statusCol};"></span>ЖИВОЙ 3D СТЕНД · ${esc(specName.toUpperCase())}</span>
+            <span style="font-family:monospace;font-size:10px;font-weight:800;color:${statusCol};">${rSt.solved ? 'ЭТАЛОН ✓' : '3D АКТИВЕН'}</span>
           </div>
-          <svg viewBox="0 0 280 132" style="width:100%;height:132px;background:#060b16;border-radius:12px;border:1px solid rgba(56,189,248,0.22);">
-            <path d="M0 33 H280 M0 66 H280 M0 99 H280 M70 0 V132 M140 0 V132 M210 0 V132" stroke="rgba(56,189,248,0.1)" stroke-width="1"/>
-            <g transform="translate(74,66)">
-              <circle r="38" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8"/>
-              <circle r="38" fill="none" stroke="${statusCol}" stroke-width="8" stroke-dasharray="${Math.round(solvedPct * 2.38)} 240" transform="rotate(-90)" style="transition:stroke-dasharray 300ms ease;"/>
-              <circle r="22" fill="none" stroke="#818cf8" stroke-width="2" stroke-dasharray="6 5" class="tge-spin"/>
-              <text y="5" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="900" font-family="monospace">${solvedPct}%</text>
-            </g>
-            <g transform="translate(132,26)">
-              <text x="0" y="10" fill="#94a3b8" font-size="9" font-family="monospace">ДИАГНОСТИКА УЗЛА</text>
-              <rect x="0" y="18" width="130" height="8" rx="4" fill="#1e293b"/>
-              <rect x="0" y="18" width="${Math.round(solvedPct * 1.3)}" height="8" rx="4" fill="${statusCol}"/>
-              <text x="0" y="44" fill="#94a3b8" font-size="9" font-family="monospace">ТОЧНОСТЬ СМЕНЫ</text>
-              <rect x="0" y="52" width="130" height="8" rx="4" fill="#1e293b"/>
-              <rect x="0" y="52" width="${Math.max(24, Math.round((inst.lives / 3) * 130))}" height="8" rx="4" fill="#34d399"/>
-              <path d="M 0 82 Q 22 66 44 82 T 88 82 T 130 82" fill="none" stroke="${statusCol}" stroke-width="2.5" class="tge-flow-line"/>
-            </g>
-          </svg>
+          <div class="tge-3d-host" style="width:100%;height:176px;border-radius:12px;background:#060b16;border:1px solid rgba(56,189,248,0.22);overflow:hidden;"></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;">
             <div style="padding:7px 9px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
               <div style="font-size:9px;color:#94a3b8;">КОМБО / ОЧКИ</div>
@@ -981,6 +964,14 @@ window.TopicGameEngine = (function () {
         ${feedbackHtml}
       </div>
     `;
+    if (window.TGE3DPreview) {
+      window.TGE3DPreview.sync(el, {
+        previewType: r.previewType,
+        spec: inst.spec,
+        vals: rSt.vals || {},
+        solved: rSt.solved,
+      });
+    }
   }
 
   // =========================================================================
@@ -1015,16 +1006,10 @@ window.TopicGameEngine = (function () {
 
           <div style="border-radius:12px;border:1px solid rgba(255,255,255,0.14);background:#090d1a;overflow:hidden;">
             <div style="padding:6px 10px;background:rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;font-family:monospace;font-size:10px;color:#94a3b8;">
-              <span>● ● ●  nyvor-artboard.${esc(fmt.toLowerCase().replace(/[^a-z0-9]/g, ''))}</span>
+              <span>● ● ●  nyvor-artboard.${esc(fmt.toLowerCase().replace(/[^a-z0-9]/g, ''))} · 3D</span>
               <span style="color:#67e8f9;">${w} × ${Math.round(w / 2)} px · ${ppi} ppi · sRGB</span>
             </div>
-            <div class="${hasAlpha ? 'tge-checker' : ''}" style="padding:14px;display:flex;align-items:center;justify-content:center;min-height:112px;background-color:${hasAlpha ? '#0f172a' : '#ffffff'};transition:all 220ms ease;">
-              <div style="width:${scalePct}%;height:78px;border-radius:${hasAlpha ? '14px' : '4px'};background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 48%,#0ea5e9 100%);border:2px solid ${accent};display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;box-shadow:0 10px 26px -10px ${accent};transition:all 220ms cubic-bezier(0.22,1,0.36,1);position:relative;overflow:hidden;">
-                <span style="font-weight:900;font-size:11.5px;letter-spacing:0.06em;">${presetTitle}</span>
-                <span style="font-family:monospace;font-size:10px;opacity:0.9;">${w}px · ${esc(fmt)} · ${ppi} ppi · 4 Layers</span>
-                ${ppi >= 300 ? '<span style="position:absolute;top:4px;right:6px;background:rgba(244,63,94,0.9);padding:1px 5px;border-radius:4px;font-size:9px;font-weight:800;">PRINT OVERLOAD</span>' : '<span style="position:absolute;bottom:3px;right:6px;font-family:monospace;font-size:8.5px;color:#38bdf8;opacity:0.85;">NV · NyVor</span>'}
-              </div>
-            </div>
+            <div class="tge-3d-host" style="width:100%;height:176px;background:#060b16;overflow:hidden;"></div>
           </div>
 
           <div style="display:flex;flex-direction:column;gap:5px;">
@@ -1054,11 +1039,7 @@ window.TopicGameEngine = (function () {
           <div style="font-family:monospace;font-size:11px;color:#67e8f9;background:rgba(0,0,0,0.45);padding:8px 10px;border-radius:8px;border:1px solid rgba(56,189,248,0.22);overflow-x:auto;">
             header { display: ${esc(disp)}; justify-content: ${esc(just)}; align-items: ${esc(align)}; gap: ${gap}px; }
           </div>
-          <div style="min-height:96px;padding:12px;border-radius:12px;background:#070c18;border:1px dashed rgba(56,189,248,0.55);display:${esc(disp)};justify-content:${esc(just)};align-items:${esc(align)};gap:${gap}px;transition:all 200ms ease;">
-            <div style="padding:8px 12px;border-radius:8px;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;font-weight:800;font-size:11px;">LOGO</div>
-            <div style="padding:8px 12px;border-radius:8px;background:#1e293b;border:1px solid rgba(255,255,255,0.15);color:#e2e8f0;font-weight:700;font-size:11px;">Курсы</div>
-            <div style="padding:8px 12px;border-radius:8px;background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-weight:700;font-size:11px;">Войти</div>
-          </div>
+          <div class="tge-3d-host" style="width:100%;height:176px;border-radius:12px;background:#060b16;border:1px solid rgba(56,189,248,0.22);overflow:hidden;"></div>
         </div>
       `;
     }
@@ -1078,18 +1059,7 @@ window.TopicGameEngine = (function () {
             <span class="tge-live-badge"><span class="tge-live-dot"></span>LIVE CIRCUIT · 12V AUTO BENCH</span>
             <span style="font-family:monospace;font-size:11px;font-weight:900;color:${wireCol};">${overheat ? '🔥 ПЕРЕГРЕВ ЖИЛЫ!' : '✓ ЦЕПЬ В НОРМЕ'}</span>
           </div>
-          <svg viewBox="0 0 320 118" style="width:100%;height:112px;background:#070c18;border-radius:12px;border:1px solid rgba(255,255,255,0.1);">
-            <rect x="14" y="34" width="54" height="48" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
-            <text x="41" y="55" text-anchor="middle" fill="#38bdf8" font-size="11" font-weight="800" font-family="monospace">12.6V</text>
-            <text x="41" y="70" text-anchor="middle" fill="#94a3b8" font-size="8" font-family="monospace">АКБ</text>
-            <path d="M 68 48 L 246 48" fill="none" stroke="${wireCol}" stroke-width="${strokeW}" stroke-linecap="round" opacity="0.35"/>
-            <path d="M 68 48 L 246 48" fill="none" stroke="${wireCol}" stroke-width="${Math.max(2, strokeW * 0.65)}" class="tge-flow-line" style="animation-duration:${flowSpeed}s;"/>
-            <path d="M 246 72 L 68 72" fill="none" stroke="#64748b" stroke-width="2.5" class="tge-flow-line" style="animation-duration:${flowSpeed}s;"/>
-            <text x="157" y="36" text-anchor="middle" fill="${wireCol}" font-size="10" font-weight="800" font-family="monospace">Жила ${sec} мм² · I = ${curr.toFixed(1)} A</text>
-            <circle cx="272" cy="60" r="24" fill="${overheat ? 'rgba(251,113,133,0.22)' : 'rgba(52,211,153,0.2)'}" stroke="${wireCol}" stroke-width="2"/>
-            <text x="272" y="57" text-anchor="middle" fill="#fff" font-size="10" font-weight="900" font-family="monospace">${power}W</text>
-            <text x="272" y="70" text-anchor="middle" fill="${wireCol}" font-size="8" font-family="monospace">-${drop.toFixed(2)}V</text>
-          </svg>
+          <div class="tge-3d-host" style="width:100%;height:176px;border-radius:12px;background:#060b16;border:1px solid rgba(56,189,248,0.22);overflow:hidden;"></div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;">
             <div style="padding:6px;border-radius:8px;background:rgba(255,255,255,0.04);"><div style="font-size:9px;color:#94a3b8;">ТОК</div><div style="font-family:monospace;font-weight:900;color:#fcd34d;font-size:13px;">${curr.toFixed(1)} A</div></div>
             <div style="padding:6px;border-radius:8px;background:rgba(255,255,255,0.04);"><div style="font-size:9px;color:#94a3b8;">ПАДЕНИЕ ΔU</div><div style="font-family:monospace;font-weight:900;color:${drop > 0.5 ? '#fb7185' : '#34d399'};font-size:13px;">${drop.toFixed(2)} V</div></div>
@@ -1192,10 +1162,10 @@ window.TopicGameEngine = (function () {
     return `
       <div class="tge-live-pane">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <span class="tge-live-badge"><span class="tge-live-dot"></span>ЖИВОЙ СТЕНД · ${esc(spec.toUpperCase())}</span>
-          <span style="font-family:monospace;font-size:10px;color:#34d399;">REAL-TIME</span>
+          <span class="tge-live-badge"><span class="tge-live-dot"></span>ЖИВОЙ 3D СТЕНД · ${esc(spec.toUpperCase())}</span>
+          <span style="font-family:monospace;font-size:10px;color:#34d399;">3D WEBGL</span>
         </div>
-        ${liveSvg}
+        <div class="tge-3d-host" style="width:100%;height:176px;border-radius:12px;background:#060b16;border:1px solid rgba(56,189,248,0.22);overflow:hidden;"></div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;">
           ${chipsHtml}
         </div>
@@ -1653,7 +1623,22 @@ window.TopicGameEngine = (function () {
       const lbl = document.getElementById(`tge-range-lbl-${ctrlId}`);
       if (lbl) lbl.textContent = val + (ctrl && ctrl.unit ? ctrl.unit : '');
       const prev = document.getElementById('tge-bench-preview');
-      if (prev) prev.innerHTML = renderBenchPreview(r, inst.roundState.vals, inst);
+      if (prev) {
+        const existingHost = prev.querySelector('.tge-3d-host');
+        prev.innerHTML = renderBenchPreview(r, inst.roundState.vals, inst);
+        const newHost = prev.querySelector('.tge-3d-host');
+        if (existingHost && newHost && existingHost.querySelector('canvas')) {
+          newHost.replaceWith(existingHost);
+        }
+        if (window.TGE3DPreview) {
+          window.TGE3DPreview.sync(prev, {
+            previewType: r.previewType,
+            spec: inst.spec,
+            vals: inst.roundState.vals,
+            solved: inst.roundState.solved,
+          });
+        }
+      }
     },
 
     checkBench: function (id) {
