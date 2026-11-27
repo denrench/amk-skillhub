@@ -52,7 +52,7 @@
   </style>
 
   <script src="js/courses-catalog.js"></script>
-  <script src="js/topic-games-60.js"></script>
+  <script src="js/data/games-loader.js"></script>
   <script src="js/topic-game-engine.js"></script>
   <script src="js/app-logistics.js"></script>
   <script src="js/interactive-simulators.js"></script>
@@ -1293,6 +1293,7 @@
     }
 
     function mountSimulatorTopicGame() {
+      if (window.AMKLoadSpecialtyGames) window.AMKLoadSpecialtyGames(activeSpecialty);
       if (!window.TopicGameEngine || !document.getElementById('sim-topic-game-mount')) return;
       const storeKey = `eduspace_sim_game_${activeSpecialty}_${activeTaskNumber}`;
       let saved = {};

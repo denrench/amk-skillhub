@@ -2395,10 +2395,28 @@
     }
   }
 
+  function ensureUnifiedFooter() {
+    if (!document.body || document.querySelector('footer')) return;
+    const f = document.createElement('footer');
+    f.className = 'amk-unified-footer';
+    f.style.cssText = 'margin-top:auto;padding:18px 20px;border-top:1px solid rgba(255,255,255,0.08);background:rgba(6,11,24,0.85);color:#94a3b8;font-size:12px;';
+    f.innerHTML = '<div style="max-width:1280px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">'
+      + '<span><strong style="color:#f8fafc;">AMK SkillHub × NyVor</strong> · Алматинский многопрофильный колледж · Данилов Данил (ПО25-2Б) · Алматы, 2026</span>'
+      + '<span style="display:flex;gap:14px;flex-wrap:wrap;">'
+      + '<a href="index.html" style="color:#cbd5e1;text-decoration:none;">Главная</a>'
+      + '<a href="tasks.html" style="color:#cbd5e1;text-decoration:none;">Практикум</a>'
+      + '<a href="simulator.html" style="color:#cbd5e1;text-decoration:none;">3D-тренажёры</a>'
+      + '<a href="gradebook.html" style="color:#cbd5e1;text-decoration:none;">Журнал</a>'
+      + '<a href="verify.html" style="color:#cbd5e1;text-decoration:none;">Сертификаты</a>'
+      + '</span></div>';
+    document.body.appendChild(f);
+  }
+
   if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initSmoothRevealEngine);
+      document.addEventListener('DOMContentLoaded', () => { initSmoothRevealEngine(); ensureUnifiedFooter(); });
     } else {
       initSmoothRevealEngine();
+      ensureUnifiedFooter();
     }
   }

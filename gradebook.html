@@ -1,18 +1,183 @@
-<!doctype html>
-<html lang="ru">
+<!DOCTYPE html>
+<html lang="ru" class="h-full scroll-smooth">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Электронная ведомость — AMK SkillHub</title>
-  <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg">
-  <meta http-equiv="refresh" content="0; url=teacher.html?tab=matrix">
-  <script>
-    window.location.replace('teacher.html?tab=matrix');
-  </script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Журнал успеваемости — AMK SkillHub</title>
+  <link rel="icon" type="image/svg+xml" href="assets/eduspace-logo.svg"/>
+  <link rel="stylesheet" href="css/tailwind.min.css"/>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/components.css"/>
+  <link rel="stylesheet" href="css/workshop.css"/>
+  <link rel="stylesheet" href="css/photoreal-tools.css"/>
+  <script src="js/courses-catalog-lite.js"></script>
+  <script src="js/app-logistics.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/i18n.js"></script>
 </head>
-<body>
-  <main style="font-family:sans-serif;padding:2rem;text-align:center;">
-    <p>Перенаправление в электронную ведомость преподавателя… <a href="teacher.html?tab=matrix">Открыть ведомость</a></p>
+<body class="workshop font-sans antialiased bg-dark-900 text-slate-100 min-h-screen flex flex-col">
+  <a class="academy-skip" href="#gradebook-main">К содержимому</a>
+
+  <header class="sticky top-0 z-40 bg-dark-900/85 backdrop-blur-xl border-b border-white/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <a href="index.html" class="flex items-center gap-3">
+        <img src="assets/eduspace-logo.svg" alt="AMK SkillHub" width="32" height="32" class="w-8 h-8"/>
+        <div>
+          <div class="font-extrabold text-white text-base leading-tight">AMK SkillHub <span class="text-xs text-cyan-400">× NyVor</span></div>
+          <div class="text-[11px] text-slate-400">Электронный журнал успеваемости</div>
+        </div>
+      </a>
+      <nav class="hidden md:flex items-center gap-4 text-sm font-semibold text-slate-300">
+        <a href="index.html" class="hover:text-white">Главная</a>
+        <a href="tasks.html" class="hover:text-white">Практикум</a>
+        <a href="simulator.html" class="hover:text-white">3D-тренажёры</a>
+        <a href="teacher.html" class="hover:text-white">Преподавателю</a>
+        <a href="profile.html" class="hover:text-white">Профиль</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <button type="button" data-lang-btn="ru" class="px-2.5 py-1 rounded-lg text-xs font-bold border border-white/15 text-slate-200">РУС</button>
+        <button type="button" data-lang-btn="kk" class="px-2.5 py-1 rounded-lg text-xs font-bold border border-white/15 text-slate-200">ҚАЗ</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="gradebook-main" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-widest text-cyan-400">AMK SkillHub · Учебная аналитика</p>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">Журнал успеваемости и оценок</h1>
+        <p class="text-sm text-slate-400 mt-1">Актуальные оценки, баллы практикума и статус проверки по специальностям колледжа.</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <input id="gb-search" type="search" placeholder="Поиск студента или темы..." aria-label="Поиск" class="px-3 py-2 rounded-xl bg-slate-900/90 border border-white/15 text-sm text-white placeholder-slate-400 min-w-[220px]"/>
+        <select id="gb-spec" aria-label="Фильтр по специальности" class="px-3 py-2 rounded-xl bg-slate-900/90 border border-white/15 text-sm text-white">
+          <option value="all">Все специальности</option>
+          <option value="it">Веб-дизайн (IT)</option>
+          <option value="graphic_design">Графический дизайн</option>
+          <option value="autoelectric">Автоэлектрика</option>
+          <option value="hvac">Холодильное (HVAC)</option>
+          <option value="automechanic">Автомеханика</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="gb-kpis">
+      <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/10"><div class="text-xs text-slate-400">Записей в журнале</div><div id="kpi-total" class="text-2xl font-extrabold text-cyan-400 mt-1">—</div></div>
+      <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/10"><div class="text-xs text-slate-400">Проверено</div><div id="kpi-graded" class="text-2xl font-extrabold text-emerald-400 mt-1">—</div></div>
+      <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/10"><div class="text-xs text-slate-400">На проверке</div><div id="kpi-pending" class="text-2xl font-extrabold text-amber-400 mt-1">—</div></div>
+      <div class="p-4 rounded-2xl bg-slate-900/80 border border-white/10"><div class="text-xs text-slate-400">Средний балл</div><div id="kpi-avg" class="text-2xl font-extrabold text-indigo-400 mt-1">—</div></div>
+    </div>
+
+    <div id="gb-notice" class="hidden p-4 rounded-2xl bg-slate-900/85 border border-cyan-500/30 text-sm text-slate-200 flex flex-wrap items-center justify-between gap-3">
+      <span id="gb-notice-text">Войдите в аккаунт студента или преподавателя, чтобы загрузить реальные оценки.</span>
+      <a href="auth.html" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs">Войти в систему →</a>
+    </div>
+
+    <div class="rounded-2xl bg-slate-900/80 border border-white/10 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-white/10 text-xs uppercase tracking-wider text-slate-400 bg-slate-950/60">
+              <th class="py-3 px-4">Студент / Группа</th>
+              <th class="py-3 px-4">Специальность</th>
+              <th class="py-3 px-4">Урок / Задание</th>
+              <th class="py-3 px-4">Статус</th>
+              <th class="py-3 px-4 text-right">Оценка / Балл</th>
+            </tr>
+          </thead>
+          <tbody id="gb-tbody" class="divide-y divide-white/5 text-slate-200">
+            <tr><td colspan="5" class="py-8 px-4 text-center text-slate-400">Загрузка данных журнала…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </main>
+
+  <script>
+    (function () {
+      const tbody = document.getElementById('gb-tbody');
+      const searchEl = document.getElementById('gb-search');
+      const specEl = document.getElementById('gb-spec');
+      const noticeEl = document.getElementById('gb-notice');
+      let rows = [];
+
+      function render() {
+        const q = (searchEl.value || '').trim().toLowerCase();
+        const sp = specEl.value;
+        const filtered = rows.filter((r) => {
+          const matchSpec = sp === 'all' || r.specialty === sp;
+          const hay = `${r.student || ''} ${r.group || ''} ${r.lesson || ''}`.toLowerCase();
+          return matchSpec && (!q || hay.includes(q));
+        });
+
+        document.getElementById('kpi-total').textContent = String(filtered.length);
+        const graded = filtered.filter((r) => r.score !== null && r.score !== undefined && r.score !== '—');
+        document.getElementById('kpi-graded').textContent = String(graded.length);
+        document.getElementById('kpi-pending').textContent = String(filtered.filter((r) => r.status === 'submitted').length);
+        const nums = graded.map((r) => Number(r.score)).filter((n) => !Number.isNaN(n));
+        document.getElementById('kpi-avg').textContent = nums.length ? (nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(1) : '—';
+
+        if (!filtered.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="py-8 px-4 text-center text-slate-400">Записи не найдены.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = filtered.slice(0, 120).map((r) => `
+          <tr class="hover:bg-white/[0.03]">
+            <td class="py-3 px-4 font-semibold">${r.student || 'Студент'} <span class="text-xs text-slate-400">${r.group || ''}</span></td>
+            <td class="py-3 px-4 text-slate-300">${r.specialty || '—'}</td>
+            <td class="py-3 px-4">${r.lesson || '—'}</td>
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-md text-xs font-bold bg-white/5 border border-white/10">${r.status || '—'}</span></td>
+            <td class="py-3 px-4 text-right font-mono font-bold text-cyan-400">${r.score ?? '—'}</td>
+          </tr>
+        `).join('');
+      }
+
+      async function boot() {
+        try {
+          const sRes = await fetch('/api/auth/session');
+          const sess = await sRes.json();
+          const user = sess && sess.user;
+          if (!user) {
+            noticeEl.classList.remove('hidden');
+            tbody.innerHTML = '<tr><td colspan="5" class="py-8 px-4 text-center text-slate-400">Необходима авторизация для просмотра оценок.</td></tr>';
+            return;
+          }
+          if (user.role === 'teacher' || user.role === 'admin') {
+            const jRes = await fetch('/api/teacher/journal');
+            const jData = await jRes.json();
+            const list = Array.isArray(jData.entries) ? jData.entries : (Array.isArray(jData) ? jData : []);
+            rows = list.map((e) => ({
+              student: e.student_name || e.full_name || 'Студент',
+              group: e.group_name || '',
+              specialty: e.specialty || e.course_slug || 'it',
+              lesson: e.lesson_title || e.task_title || `Урок #${e.task_number || e.lesson_id || 1}`,
+              status: e.status || 'graded',
+              score: e.grade ?? e.score ?? '—',
+            }));
+          } else {
+            const pRes = await fetch(`/api/user/profile/${user.id}`);
+            const pData = await pRes.json();
+            const subs = Array.isArray(pData.submissions) ? pData.submissions : [];
+            rows = subs.map((s) => ({
+              student: user.full_name || user.username,
+              group: user.group_name || '',
+              specialty: s.specialty || 'it',
+              lesson: s.lesson_title || `Задание #${s.task_number || 1}`,
+              status: s.status || 'submitted',
+              score: s.grade ?? s.score ?? '—',
+            }));
+          }
+          render();
+        } catch (err) {
+          noticeEl.classList.remove('hidden');
+          tbody.innerHTML = '<tr><td colspan="5" class="py-8 px-4 text-center text-slate-400">Сервер API недоступен (статический режим).</td></tr>';
+        }
+      }
+
+      searchEl.addEventListener('input', render);
+      specEl.addEventListener('change', render);
+      boot();
+    })();
+  </script>
 </body>
 </html>

@@ -721,10 +721,42 @@ window.WorkshopModels = (() => {
       }
 
       const T = window.THREE;
+      const getQualityMode = () => {
+        try { return localStorage.getItem('amk_3d_quality') || 'auto'; } catch { return 'auto'; }
+      };
+      const resolveDpr = (mode) => {
+        const dev = window.devicePixelRatio || 1;
+        if (mode === 'low') return 0.85;
+        if (mode === 'medium') return Math.min(dev, 1.25);
+        if (mode === 'high') return Math.min(dev, 1.75);
+        if (mode === 'ultra') return Math.min(dev, 2.25);
+        const cores = navigator.hardwareConcurrency || 4;
+        return cores <= 2 ? 1.0 : Math.min(dev, 1.75);
+      };
+      let qualityMode = getQualityMode();
       let renderer;
       try {
-        if (T) renderer = new T.WebGLRenderer({ antialias: true, alpha: true });
+        if (T) renderer = new T.WebGLRenderer({ antialias: qualityMode !== 'low', alpha: true });
       } catch {}
+      if (toolbar && !toolbar.querySelector('#wm-quality-select')) {
+        const qSel = document.createElement('select');
+        qSel.id = 'wm-quality-select';
+        qSel.setAttribute('aria-label', 'Качество 3D');
+        qSel.style.cssText = 'padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.16);background:rgba(15,23,42,0.85);color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;';
+        qSel.innerHTML = [
+          ['auto', '3D: Auto'],
+          ['low', '3D: Low'],
+          ['medium', '3D: Medium'],
+          ['high', '3D: High'],
+          ['ultra', '3D: Ultra'],
+        ].map(([v, l]) => `<option value="${v}"${v === qualityMode ? ' selected' : ''}>${l}</option>`).join('');
+        qSel.addEventListener('change', () => {
+          qualityMode = qSel.value;
+          try { localStorage.setItem('amk_3d_quality', qualityMode); } catch {}
+          if (renderer) renderer.setPixelRatio(resolveDpr(qualityMode));
+        });
+        toolbar.appendChild(qSel);
+      }
       if (!renderer) {
         status.textContent = 'WebGL недоступен. Выберите узел из списка, чтобы прочитать описание.';
       }
@@ -981,7 +1013,7 @@ window.WorkshopModels = (() => {
           const width = stage.clientWidth || 380;
           const height = stage.clientHeight || 320;
           renderer.setSize(width, height, false);
-          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+          renderer.setPixelRatio(resolveDpr(qualityMode));
           camera.aspect = width / height;
           camera.updateProjectionMatrix();
         };
